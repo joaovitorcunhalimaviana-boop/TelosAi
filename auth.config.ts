@@ -28,26 +28,14 @@ export const authConfig = {
 
       const isPublicPath = publicPaths.some((p) => path === p || path.startsWith(p));
 
+      // Permitir rotas públicas sempre
       if (isPublicPath) {
         return true;
       }
 
-      // Se não está autenticado, não autorizado
-      if (!isLoggedIn) {
-        return false;
-      }
-
-      // Verificar first login
-      if (auth.user.firstLogin && !path.startsWith("/onboarding")) {
-        return Response.redirect(new URL("/onboarding", nextUrl));
-      }
-
-      // Verificar rotas de admin
-      if (path.startsWith("/admin") && auth.user.role !== "admin") {
-        return Response.redirect(new URL("/dashboard", nextUrl));
-      }
-
-      return true;
+      // Para rotas privadas, apenas verificar se está logado
+      // Redirects de first login e admin serão tratados nas próprias páginas
+      return isLoggedIn;
     },
     async jwt({ token, user }) {
       if (user) {
