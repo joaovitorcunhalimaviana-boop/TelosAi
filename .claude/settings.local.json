@@ -31,7 +31,10 @@
       "Bash(openssl rand -base64 32)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nBuild pronto para deploy na Vercel\n\n✅ Todos os erros de build corrigidos\n✅ 49 páginas compiladas com sucesso\n✅ TypeScript sem erros\n✅ NEXTAUTH_SECRET seguro gerado\n✅ Suspense boundaries corrigidas\n✅ Client/Server components corrigidos\n✅ Database: Neon PostgreSQL conectado\n\nPronto para deploy em produção!\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx vercel --version)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
