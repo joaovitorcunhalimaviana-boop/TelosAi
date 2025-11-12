@@ -41,7 +41,8 @@
       "WebSearch",
       "WebFetch(domain:authjs.dev)",
       "Bash(vercel env add --help:*)",
-      "Bash(vercel env:*)"
+      "Bash(vercel env:*)",
+      "Bash(vercel ls:*)"
     ],
     "deny": [],
     "ask": []
