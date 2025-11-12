@@ -1,0 +1,528 @@
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+
+/**
+ * Typography Components for Telos.AI Design System
+ *
+ * Consistent, semantic typography components with proper hierarchy
+ * and accessibility built-in.
+ *
+ * @example
+ * <Heading level={1}>Page Title</Heading>
+ * <Body>This is body text with proper line height.</Body>
+ * <Caption>Last updated 2 hours ago</Caption>
+ */
+
+// ============================================================================
+// HEADING COMPONENT
+// ============================================================================
+
+const headingVariants = cva("font-semibold text-telos-blue-500", {
+  variants: {
+    level: {
+      1: "text-4xl lg:text-5xl leading-tight tracking-tight",
+      2: "text-3xl lg:text-4xl leading-tight",
+      3: "text-2xl lg:text-3xl leading-snug",
+      4: "text-xl lg:text-2xl leading-snug",
+      5: "text-lg lg:text-xl leading-normal",
+      6: "text-base lg:text-lg leading-normal",
+    },
+    weight: {
+      light: "font-light",
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+      extrabold: "font-extrabold",
+    },
+  },
+  defaultVariants: {
+    level: 1,
+    weight: "semibold",
+  },
+})
+
+interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement>,
+  VariantProps<typeof headingVariants> {
+  level?: 1 | 2 | 3 | 4 | 5 | 6
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div"
+}
+
+export function Heading({
+  level = 1,
+  as,
+  weight,
+  className,
+  children,
+  ...props
+}: HeadingProps) {
+  const Component = as || (`h${level}` as keyof React.JSX.IntrinsicElements)
+
+  return (
+    <Component
+      className={cn(headingVariants({ level, weight }), className)}
+      {...(props as any)}
+    >
+      {children}
+    </Component>
+  )
+}
+
+// ============================================================================
+// SUBHEADING COMPONENT
+// ============================================================================
+
+const subheadingVariants = cva("text-gray-600 leading-relaxed", {
+  variants: {
+    size: {
+      sm: "text-sm",
+      base: "text-base",
+      lg: "text-lg",
+    },
+  },
+  defaultVariants: {
+    size: "base",
+  },
+})
+
+interface SubheadingProps extends React.HTMLAttributes<HTMLParagraphElement>,
+  VariantProps<typeof subheadingVariants> {
+  as?: "p" | "div" | "span"
+}
+
+export function Subheading({
+  size,
+  as: Component = "p",
+  className,
+  children,
+  ...props
+}: SubheadingProps) {
+  return (
+    <Component
+      className={cn(subheadingVariants({ size }), className)}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
+}
+
+// ============================================================================
+// BODY COMPONENT
+// ============================================================================
+
+const bodyVariants = cva("text-gray-700 leading-relaxed", {
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-sm",
+      base: "text-base",
+      lg: "text-lg",
+    },
+    weight: {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+    },
+  },
+  defaultVariants: {
+    size: "base",
+    weight: "normal",
+  },
+})
+
+interface BodyProps extends React.HTMLAttributes<HTMLParagraphElement>,
+  VariantProps<typeof bodyVariants> {
+  as?: "p" | "div" | "span"
+}
+
+export function Body({
+  size,
+  weight,
+  as: Component = "p",
+  className,
+  children,
+  ...props
+}: BodyProps) {
+  return (
+    <Component
+      className={cn(bodyVariants({ size, weight }), className)}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
+}
+
+// ============================================================================
+// CAPTION COMPONENT
+// ============================================================================
+
+const captionVariants = cva("text-gray-500", {
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-sm",
+    },
+    weight: {
+      normal: "font-normal",
+      medium: "font-medium",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+    weight: "normal",
+  },
+})
+
+interface CaptionProps extends React.HTMLAttributes<HTMLSpanElement>,
+  VariantProps<typeof captionVariants> {
+  as?: "span" | "p" | "div"
+}
+
+export function Caption({
+  size,
+  weight,
+  as: Component = "span",
+  className,
+  children,
+  ...props
+}: CaptionProps) {
+  return (
+    <Component
+      className={cn(captionVariants({ size, weight }), className)}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
+}
+
+// ============================================================================
+// LABEL COMPONENT
+// ============================================================================
+
+const labelVariants = cva("font-medium text-gray-700", {
+  variants: {
+    size: {
+      sm: "text-sm",
+      base: "text-base",
+    },
+    required: {
+      true: "after:content-['*'] after:ml-1 after:text-telos-error-500",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+  },
+})
+
+interface LabelTextProps extends React.HTMLAttributes<HTMLLabelElement>,
+  VariantProps<typeof labelVariants> {
+  htmlFor?: string
+}
+
+export function LabelText({
+  size,
+  required,
+  htmlFor,
+  className,
+  children,
+  ...props
+}: LabelTextProps) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className={cn(labelVariants({ size, required }), className)}
+      {...props}
+    >
+      {children}
+    </label>
+  )
+}
+
+// ============================================================================
+// LINK COMPONENT
+// ============================================================================
+
+const linkVariants = cva(
+  "transition-colors duration-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-telos-blue-500 focus-visible:ring-offset-2 rounded-sm",
+  {
+    variants: {
+      variant: {
+        default: "text-telos-blue-500 hover:text-telos-blue-600 underline",
+        subtle: "text-gray-600 hover:text-telos-blue-500 hover:underline",
+        gold: "text-telos-gold-500 hover:text-telos-gold-600 underline",
+        destructive: "text-telos-error-500 hover:text-telos-error-600 underline",
+      },
+      size: {
+        sm: "text-sm",
+        base: "text-base",
+        lg: "text-lg",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "base",
+    },
+  }
+)
+
+interface LinkTextProps extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  VariantProps<typeof linkVariants> {
+  external?: boolean
+}
+
+export function LinkText({
+  variant,
+  size,
+  external = false,
+  className,
+  children,
+  ...props
+}: LinkTextProps) {
+  return (
+    <a
+      className={cn(linkVariants({ variant, size }), className)}
+      {...(external && {
+        target: "_blank",
+        rel: "noopener noreferrer",
+      })}
+      {...props}
+    >
+      {children}
+      {external && (
+        <svg
+          className="inline-block ml-1 h-3 w-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
+      )}
+    </a>
+  )
+}
+
+// ============================================================================
+// CODE COMPONENT
+// ============================================================================
+
+const codeVariants = cva(
+  "font-mono rounded px-1.5 py-0.5",
+  {
+    variants: {
+      variant: {
+        default: "bg-gray-100 text-gray-800 border border-gray-200",
+        primary: "bg-telos-blue-50 text-telos-blue-700 border border-telos-blue-200",
+        success: "bg-telos-success-50 text-telos-success-700 border border-telos-success-200",
+        warning: "bg-telos-warning-50 text-telos-warning-700 border border-telos-warning-200",
+        error: "bg-telos-error-50 text-telos-error-700 border border-telos-error-200",
+      },
+      size: {
+        xs: "text-xs",
+        sm: "text-sm",
+        base: "text-base",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "sm",
+    },
+  }
+)
+
+interface CodeTextProps extends React.HTMLAttributes<HTMLElement>,
+  VariantProps<typeof codeVariants> {}
+
+export function CodeText({
+  variant,
+  size,
+  className,
+  children,
+  ...props
+}: CodeTextProps) {
+  return (
+    <code
+      className={cn(codeVariants({ variant, size }), className)}
+      {...props}
+    >
+      {children}
+    </code>
+  )
+}
+
+// ============================================================================
+// BLOCKQUOTE COMPONENT
+// ============================================================================
+
+interface BlockquoteProps extends React.HTMLAttributes<HTMLQuoteElement> {
+  cite?: string
+  author?: string
+}
+
+export function Blockquote({
+  cite,
+  author,
+  className,
+  children,
+  ...props
+}: BlockquoteProps) {
+  return (
+    <blockquote
+      className={cn(
+        "border-l-4 border-telos-gold-500 pl-6 py-2 italic text-gray-700 bg-gray-50 rounded-r",
+        className
+      )}
+      cite={cite}
+      {...props}
+    >
+      {children}
+      {author && (
+        <footer className="mt-2 text-sm text-gray-600 not-italic">
+          — {author}
+        </footer>
+      )}
+    </blockquote>
+  )
+}
+
+// ============================================================================
+// LIST COMPONENT
+// ============================================================================
+
+interface ListProps extends React.HTMLAttributes<HTMLUListElement | HTMLOListElement> {
+  ordered?: boolean
+  variant?: "default" | "checkmarks" | "bullets" | "numbers"
+}
+
+export function List({
+  ordered = false,
+  variant = "default",
+  className,
+  children,
+  ...props
+}: ListProps) {
+  const Component = ordered ? "ol" : "ul"
+
+  const variantClasses = {
+    default: ordered ? "list-decimal" : "list-disc",
+    checkmarks: "",
+    bullets: "list-disc",
+    numbers: "list-decimal",
+  }
+
+  return (
+    <Component
+      className={cn(
+        "space-y-2 pl-6 text-gray-700",
+        variantClasses[variant],
+        variant === "checkmarks" && "list-none pl-0",
+        className
+      )}
+      {...props}
+    >
+      {variant === "checkmarks"
+        ? React.Children.map(children, (child) => (
+            <li className="flex items-start gap-2">
+              <svg
+                className="h-5 w-5 text-telos-success-500 mt-0.5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              {child}
+            </li>
+          ))
+        : children}
+    </Component>
+  )
+}
+
+// ============================================================================
+// TEXT VARIANTS (Utility Component)
+// ============================================================================
+
+const textVariants = cva("", {
+  variants: {
+    variant: {
+      default: "text-gray-700",
+      muted: "text-gray-500",
+      primary: "text-telos-blue-500",
+      gold: "text-telos-gold-500",
+      success: "text-telos-success-500",
+      warning: "text-telos-warning-500",
+      error: "text-telos-error-500",
+      white: "text-white",
+    },
+    size: {
+      xs: "text-xs",
+      sm: "text-sm",
+      base: "text-base",
+      lg: "text-lg",
+      xl: "text-xl",
+      "2xl": "text-2xl",
+      "3xl": "text-3xl",
+    },
+    weight: {
+      light: "font-light",
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+      extrabold: "font-extrabold",
+    },
+    align: {
+      left: "text-left",
+      center: "text-center",
+      right: "text-right",
+      justify: "text-justify",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "base",
+    weight: "normal",
+    align: "left",
+  },
+})
+
+interface TextProps extends React.HTMLAttributes<HTMLSpanElement>,
+  VariantProps<typeof textVariants> {
+  as?: "span" | "p" | "div"
+}
+
+export function Text({
+  variant,
+  size,
+  weight,
+  align,
+  as: Component = "span",
+  className,
+  children,
+  ...props
+}: TextProps) {
+  return (
+    <Component
+      className={cn(textVariants({ variant, size, weight, align }), className)}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
+}

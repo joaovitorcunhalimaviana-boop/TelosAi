@@ -1,0 +1,557 @@
+// Sistema de Acompanhamento Pós-Operatório - Dr. João Vitor Viana
+// Cirurgia Colorretal com IA (Claude) + WhatsApp
+// Banco de dados: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USUÁRIOS E AUTENTICAÇÃO (MULTI-TENANT)
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Autenticação
+  email         String  @unique
+  senha         String  // Changed from 'password' to 'senha'
+  nomeCompleto  String  // Changed from 'name' to 'nomeCompleto'
+  crm           String?
+  estado        String? // State for CRM
+  whatsapp      String?
+
+  // Perfil e Permissões
+  role String @default("medico") // admin | medico
+
+  // Plano e Configurações
+  plan                   String  @default("professional") // founding | professional
+  basePrice              Decimal @default(500) @db.Decimal(10, 2) // Changed from planPrice
+  additionalPatientPrice Decimal @default(180) @db.Decimal(10, 2)
+  isLifetimePrice        Boolean @default(false) // For founding members
+
+  // Limites de Pacientes
+  maxPatients     Int @default(3)
+  currentPatients Int @default(0)
+
+  // Integração Twilio/WhatsApp
+  twilioSubaccountSid String?
+  whatsappNumber      String?
+  whatsappConnected   Boolean @default(false)
+
+  // Marketing e Comunicação
+  aceitoTermos     Boolean @default(false)
+  aceitoNovidades  Boolean @default(false)
+
+  // Onboarding
+  firstLogin Boolean @default(true) // For onboarding redirect
+
+  // Modo de Pesquisa
+  researchMode Boolean @default(false) // Se o médico usa modo de pesquisa científica
+
+  // Relações (Multi-tenant)
+  patients            Patient[]
+  surgeries           Surgery[]
+  surgeryDetails      SurgeryDetails[]
+  followUps           FollowUp[]
+  followUpResponses   FollowUpResponse[]
+  surgeryTemplates    SurgeryTemplate[]
+  researches          Research[]
+
+  @@unique([crm, estado]) // CRM must be unique per state
+  @@index([email])
+  @@index([role])
+  @@index([plan])
+}
+
+// ============================================
+// PACIENTE E DADOS CADASTRAIS
+// ============================================
+
+model Patient {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Dados básicos
+  name        String
+  cpf         String?   @unique
+  dateOfBirth DateTime?
+  age         Int?
+  sex         String? // Masculino, Feminino, Outro
+  phone       String // WhatsApp (com DDD, ex: 5511999999999)
+  email       String?
+
+  // Status do paciente
+  isActive Boolean @default(true)
+
+  // Pesquisa Científica
+  isResearchParticipant Boolean @default(false) // Se está em um estudo
+  researchGroup         String? // A, B, C, D, etc - para ensaios clínicos randomizados
+  researchNotes         String? @db.Text // Observações sobre a pesquisa
+
+  // Relações
+  comorbidities PatientComorbidity[]
+  medications   PatientMedication[]
+  surgeries     Surgery[]
+  consentTerms  ConsentTerm[]
+  followUps     FollowUp[]
+
+  @@index([userId])
+  @@index([phone])
+  @@index([cpf])
+  @@index([isActive])
+  @@index([name]) // Para buscas rápidas por nome
+}
+
+// ============================================
+// COMORBIDADES
+// ============================================
+
+model Comorbidity {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  category  String // cardiovascular, metabolica, pulmonar, renal, hepatica, imunologica, outras
+  isActive  Boolean  @default(true) // Para soft delete
+  createdAt DateTime @default(now())
+
+  patients PatientComorbidity[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model PatientComorbidity {
+  id            String @id @default(cuid())
+  patientId     String
+  comorbidityId String
+
+  // Detalhes específicos (texto livre conforme solicitado pelo médico)
+  details  String? // Ex: "HAS controlada", "DM tipo 2", "HIV em TARV", etc
+  severity String? // Leve, Moderada, Grave (opcional)
+
+  patient     Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  comorbidity Comorbidity @relation(fields: [comorbidityId], references: [id])
+
+  @@unique([patientId, comorbidityId])
+  @@index([patientId])
+}
+
+// ============================================
+// MEDICAÇÕES
+// ============================================
+
+model Medication {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  category  String? // Analgesico, Antibiotico, Laxante, Anti-hipertensivo, etc
+  isActive  Boolean  @default(true) // Para soft delete
+  createdAt DateTime @default(now())
+
+  patients PatientMedication[]
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model PatientMedication {
+  id           String @id @default(cuid())
+  patientId    String
+  medicationId String
+
+  dose      String? // Ex: "500mg", "1 comprimido"
+  frequency String? // Ex: "8/8h", "2x/dia"
+  route     String? // VO, IV, IM, SC, Tópica
+
+  patient    Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  medication Medication @relation(fields: [medicationId], references: [id])
+
+  @@index([patientId])
+}
+
+// ============================================
+// CIRURGIA - DADOS PRINCIPAIS
+// ============================================
+
+model Surgery {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  // Tipo de cirurgia
+  type String // hemorroidectomia, fistula, fissura, pilonidal
+  date DateTime
+
+  // Hospital/Clínica
+  hospital String?
+
+  // Duração
+  durationMinutes Int?
+
+  // Status de preenchimento de dados (0-100%)
+  dataCompleteness Int @default(20) // Começa com 20% após cadastro express
+
+  // Status do acompanhamento
+  status String @default("active") // active, completed, cancelled
+
+  // Relações
+  details      SurgeryDetails?
+  preOp        PreOpPreparation?
+  anesthesia   Anesthesia?
+  postOp       PostOpPrescription?
+  followUps    FollowUp[]
+  consentTerms ConsentTerm[]
+
+  @@index([userId])
+  @@index([patientId])
+  @@index([date])
+  @@index([type])
+}
+
+// ============================================
+// DETALHES CIRÚRGICOS ESPECÍFICOS
+// ============================================
+
+model SurgeryDetails {
+  id        String  @id @default(cuid())
+  surgeryId String  @unique
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // HEMORROIDECTOMIA
+  hemorrhoidTechnique       String? // JSON array: ["Ferguson modificada por Campos", "Milligan-Morgan"]
+  hemorrhoidEnergyType      String? // bisturi_eletrico, bipolar, ligasure, ultrasonica, laser_co2, laser_diodo, radiofrequencia, bisturi_frio
+  hemorrhoidNumMamillae     Int? // Número de mamilos ressecados
+  hemorrhoidPositions       String? // Texto livre: posição dos mamilos
+  hemorrhoidType            String? // interna, externa, mista
+  hemorrhoidInternalGrade   String? // I, II, III, IV (se tipo = interna ou mista)
+  hemorrhoidExternalDetails String? // Texto livre
+
+  // FÍSTULA
+  fistulaType          String? // interesfincteriana, transesfincteriana, supraesfincteriana, extraesfincteriana, superficial
+  fistulaTechnique     String? // LIFT, fistulotomia, fistulectomia, flap, selante, plug, VAAFT, laser
+  fistulaNumTracts     Int? // Número de trajetos
+  fistulaSeton         Boolean? // Sedenho colocado?
+  fistulaSetonMaterial String?
+
+  // FISSURA
+  fissureType      String? // aguda, cronica
+  fissureLocation  String? // anterior, posterior, lateral
+  fissureTechnique String? // JSON array: técnicas aplicadas
+
+  // DOENÇA PILONIDAL
+  pilonidalTechnique String?
+
+  // DESCRIÇÃO CIRÚRGICA COMPLETA (Rich Text)
+  // Esta é a ÚNICA descrição (removida das outras seções conforme solicitado)
+  fullDescription String? @db.Text
+
+  // Intercorrências intraoperatórias
+  complications String? @db.Text
+
+  // Tempo de permanência em RPA
+  recoveryRoomMinutes Int?
+
+  // Alta no mesmo dia
+  sameDayDischarge    Boolean @default(true)
+  hospitalizationDays Int?
+
+  @@index([userId])
+}
+
+// ============================================
+// PREPARO PRÉ-OPERATÓRIO
+// ============================================
+
+model PreOpPreparation {
+  id        String  @id @default(cuid())
+  surgeryId String  @unique
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  // Toxina Botulínica
+  botoxUsed         Boolean   @default(false)
+  botoxDate         DateTime?
+  botoxDoseUnits    Int?
+  botoxLocation     String? // esfíncter interno, externo, ambos
+  botoxObservations String?   @db.Text
+
+  // Preparo intestinal
+  intestinalPrep     Boolean @default(false)
+  intestinalPrepType String?
+
+  // Outras preparações especiais
+  otherPreparations String? @db.Text
+}
+
+// ============================================
+// ANESTESIA
+// ============================================
+
+model Anesthesia {
+  id        String  @id @default(cuid())
+  surgeryId String  @unique
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  // Tipo de anestesia
+  type             String // geral_IOT, geral_mascara, raqui, peridural, local_sedacao, local, bloqueio_plexo, outra
+  anesthesiologist String?
+  observations     String? @db.Text
+
+  // Bloqueio do Nervo Pudendo
+  pudendoBlock         Boolean @default(false)
+  pudendoTechnique     String? // anatomia, ultrassom, neuroestimulacao, combinado
+  pudendoAccess        String? // transperineal, transvaginal, transglutea, outra
+  pudendoAnesthetic    String? // ropivacaina, bupivacaina, levobupivacaina, lidocaina, outra
+  pudendoConcentration String? // 0.25%, 0.5%, 0.75%, 1%, 2%
+  pudendoVolumeML      Float?
+  pudendoLaterality    String? // bilateral, unilateral_direito, unilateral_esquerdo
+  pudendoAdjuvants     String? // JSON array: epinefrina, dexametasona, clonidina
+  pudendoDetails       String? @db.Text
+}
+
+// ============================================
+// PRESCRIÇÃO PÓS-OPERATÓRIA
+// ============================================
+
+model PostOpPrescription {
+  id        String  @id @default(cuid())
+  surgeryId String  @unique
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  // Pomadas/Cremes (JSON array)
+  // Cada item: { name, frequency, durationDays }
+  // Opções: Lidocaína 5%, Nitroglicerina 0.2%, Diltiazem 2%,
+  //         Diltiazem 2% + Lidocaína 2% + Vit E 5% + Metronidazol 10% (fórmula do Dr. João)
+  ointments String? @db.Text // JSON
+
+  // Medicações sistêmicas (JSON array)
+  // Cada item: { name, dose, route, frequency, durationDays, category }
+  medications String? @db.Text // JSON
+}
+
+// ============================================
+// TERMOS DE CONSENTIMENTO
+// ============================================
+
+model ConsentTerm {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  surgeryId String?
+  surgery   Surgery? @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  // Tipo de termo
+  termType String // surgery_hemorrhoid, surgery_fistula, surgery_fissure, surgery_pilonidal, research_lgpd, whatsapp_followup
+
+  // Assinatura física (conforme solicitado pelo médico)
+  signedPhysically Boolean   @default(false)
+  signedDate       DateTime?
+
+  // PDF escaneado (opcional)
+  pdfPath String?
+
+  @@index([patientId])
+  @@index([surgeryId])
+}
+
+// ============================================
+// FOLLOW-UP (ACOMPANHAMENTO)
+// ============================================
+
+model FollowUp {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  surgeryId String
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  // Dia do follow-up (D+1, D+2, D+3, D+5, D+7, D+10, D+14)
+  dayNumber Int
+
+  // Data agendada para envio (calculada automaticamente)
+  scheduledDate DateTime
+
+  // Status
+  status String @default("pending") // pending, sent, responded, overdue, skipped
+
+  // Timestamps
+  sentAt      DateTime?
+  respondedAt DateTime?
+
+  // Respostas
+  responses FollowUpResponse[]
+
+  @@index([userId])
+  @@index([surgeryId])
+  @@index([patientId])
+  @@index([scheduledDate])
+  @@index([status])
+}
+
+// ============================================
+// RESPOSTAS DE FOLLOW-UP
+// ============================================
+
+model FollowUpResponse {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  followUpId String
+  followUp   FollowUp @relation(fields: [followUpId], references: [id], onDelete: Cascade)
+
+  // Dados do questionário (JSON)
+  // Ex: { painLevel: 7, urinaryRetention: false, bowelMovement: true, ... }
+  questionnaireData String @db.Text // JSON
+
+  // Análise da IA (Claude)
+  aiAnalysis String? @db.Text // JSON com análise completa
+  aiResponse String? @db.Text // Resposta empática enviada ao paciente
+
+  // Nível de risco detectado
+  riskLevel String @default("low") // low, medium, high, critical
+
+  // Red flags detectados (JSON array)
+  redFlags String? @db.Text // JSON: ["febre_alta", "dor_intensa", "sangramento_ativo"]
+
+  // Alertas enviados ao médico
+  doctorAlerted Boolean   @default(false)
+  alertSentAt   DateTime?
+
+  @@index([userId])
+  @@index([followUpId])
+  @@index([riskLevel])
+}
+
+// ============================================
+// TEMPLATES DE CIRURGIA
+// ============================================
+
+model SurgeryTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Template name
+  name String // "Minha hemorroidectomia padrão do Dr. João"
+
+  // Surgery type
+  surgeryType String // hemorroidectomia, fistula, fissura, pilonidal
+
+  // Template data (JSON) - includes all surgery details, anesthesia, prescription
+  templateData String @db.Text // JSON
+
+  // Default template (auto-apply to new patients)
+  isDefault Boolean @default(false)
+
+  // Active status
+  isActive Boolean @default(true)
+
+  @@index([userId])
+  @@index([surgeryType])
+  @@index([isDefault])
+  @@index([isActive])
+}
+
+// ============================================
+// PESQUISA CIENTÍFICA
+// ============================================
+
+model Research {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Informações da Pesquisa
+  title       String // "Bloqueio do Nervo Pudendo - Técnicas Analgésicas"
+  description String @db.Text // Descrição detalhada da pesquisa
+
+  // Status
+  isActive Boolean @default(true)
+  startDate DateTime @default(now())
+  endDate   DateTime?
+
+  // Tipo de cirurgia relacionada (opcional)
+  surgeryType String? // hemorroidectomia, fistula, fissura, pilonidal
+
+  // Grupos da pesquisa
+  groups ResearchGroup[]
+
+  // Estatísticas
+  totalPatients Int @default(0)
+
+  @@index([userId])
+  @@index([isActive])
+  @@index([surgeryType])
+}
+
+model ResearchGroup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Pesquisa relacionada
+  researchId String
+  research   Research @relation(fields: [researchId], references: [id], onDelete: Cascade)
+
+  // Informações do Grupo
+  groupCode   String // A, B, C, D, etc
+  groupName   String // "Grupo Controle", "Bloqueio por Anatomia", etc
+  description String @db.Text // Descrição do que esse grupo recebe/faz
+
+  // Estatísticas
+  patientCount Int @default(0)
+
+  @@unique([researchId, groupCode]) // Não pode ter dois grupos "A" na mesma pesquisa
+  @@index([researchId])
+}
+
+// ============================================
+// ÍNDICES ADICIONAIS PARA PERFORMANCE
+// ============================================
+
+// Para queries de pesquisa científica
+// @@index([Surgery.type, Surgery.date])
+// @@index([Patient.age, Patient.sex])

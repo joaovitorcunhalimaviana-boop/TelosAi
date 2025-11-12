@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Offline - Sistema Pós-Op</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f7fa;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      color: #2563eb;
+      margin-bottom: 15px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status.online {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.offline {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button.secondary:hover {
+      background: #475569;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .info-item {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 18px;
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    .log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid transparent;
+    }
+
+    .log-entry.info {
+      border-left-color: #3b82f6;
+    }
+
+    .log-entry.success {
+      border-left-color: #10b981;
+    }
+
+    .log-entry.error {
+      border-left-color: #ef4444;
+    }
+
+    .log-entry.warning {
+      border-left-color: #f59e0b;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #475569;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .patients-list {
+      margin-top: 15px;
+    }
+
+    .patient-item {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #94a3b8;
+    }
+
+    .patient-item.synced {
+      border-left-color: #10b981;
+    }
+
+    .patient-name {
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 5px;
+    }
+
+    .patient-details {
+      font-size: 13px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Teste de Funcionalidade Offline</h1>
+      <p class="subtitle">Sistema Pós-Operatório - Dr. João Vitor Viana</p>
+    </div>
+
+    <!-- Status -->
+    <div class="card">
+      <h2>Status do Sistema</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Conexão</div>
+          <div class="info-value">
+            <span id="online-status" class="status">Verificando...</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Service Worker</div>
+          <div class="info-value">
+            <span id="sw-status" class="status">Verificando...</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">IndexedDB</div>
+          <div class="info-value">
+            <span id="db-status" class="status">Verificando...</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Pacientes Pendentes</div>
+          <div class="info-value" id="pending-count">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Worker -->
+    <div class="card">
+      <h2>Service Worker</h2>
+      <button onclick="registerServiceWorker()">Registrar SW</button>
+      <button onclick="unregisterServiceWorker()" class="danger">Desregistrar SW</button>
+      <button onclick="updateServiceWorker()" class="secondary">Atualizar SW</button>
+      <div id="sw-info" style="margin-top: 15px; color: #64748b; font-size: 14px;"></div>
+    </div>
+
+    <!-- Teste Offline -->
+    <div class="card">
+      <h2>Cadastro de Paciente (Teste Offline)</h2>
+      <form id="patient-form">
+        <div class="form-group">
+          <label>Nome do Paciente</label>
+          <input type="text" id="nome" required placeholder="João da Silva">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="tel" id="telefone" required placeholder="(11) 98765-4321">
+        </div>
+        <div class="form-group">
+          <label>Cirurgia</label>
+          <input type="text" id="cirurgia" required placeholder="Rinoplastia">
+        </div>
+        <div class="form-group">
+          <label>Data da Cirurgia</label>
+          <input type="date" id="dataCirurgia" required>
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="observacoes" rows="3" placeholder="Observações adicionais..."></textarea>
+        </div>
+        <button type="submit">Salvar Paciente</button>
+      </form>
+    </div>
+
+    <!-- Pacientes Pendentes -->
+    <div class="card">
+      <h2>Pacientes Pendentes de Sincronização</h2>
+      <button onclick="loadPendingPatients()">Atualizar Lista</button>
+      <button onclick="syncPendingPatients()">Sincronizar Todos</button>
+      <button onclick="clearSyncedPatients()" class="danger">Limpar Sincronizados</button>
+      <div id="patients-list" class="patients-list"></div>
+    </div>
+
+    <!-- Cache -->
+    <div class="card">
+      <h2>Gerenciar Cache</h2>
+      <button onclick="checkCache()">Verificar Cache</button>
+      <button onclick="clearCache()" class="danger">Limpar Cache</button>
+      <div id="cache-info" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- Log -->
+    <div class="card">
+      <h2>Log de Atividades</h2>
+      <button onclick="clearLog()" class="secondary">Limpar Log</button>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <script>
+    // Logging
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    // Online/Offline status
+    function updateOnlineStatus() {
+      const status = navigator.onLine;
+      const statusEl = document.getElementById('online-status');
+      statusEl.textContent = status ? 'Online' : 'Offline';
+      statusEl.className = status ? 'status online' : 'status offline';
+      log(`Status: ${status ? 'Online' : 'Offline'}`, status ? 'success' : 'warning');
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // Service Worker
+    async function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register('/sw.js');
+          log('Service Worker registrado com sucesso!', 'success');
+          document.getElementById('sw-status').textContent = 'Ativo';
+          document.getElementById('sw-status').className = 'status success';
+          document.getElementById('sw-info').textContent = `Scope: ${registration.scope}`;
+        } catch (error) {
+          log(`Erro ao registrar SW: ${error.message}`, 'error');
+          document.getElementById('sw-status').textContent = 'Erro';
+          document.getElementById('sw-status').className = 'status error';
+        }
+      } else {
+        log('Service Worker não suportado', 'error');
+      }
+    }
+
+    async function unregisterServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.unregister();
+          log('Service Worker desregistrado', 'warning');
+          document.getElementById('sw-status').textContent = 'Inativo';
+          document.getElementById('sw-status').className = 'status offline';
+        }
+      }
+    }
+
+    async function updateServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.update();
+          log('Service Worker atualizado', 'success');
+        }
+      }
+    }
+
+    async function checkServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          document.getElementById('sw-status').textContent = 'Ativo';
+          document.getElementById('sw-status').className = 'status success';
+          document.getElementById('sw-info').textContent = `Scope: ${registration.scope}`;
+        } else {
+          document.getElementById('sw-status').textContent = 'Inativo';
+          document.getElementById('sw-status').className = 'status offline';
+        }
+      }
+    }
+
+    // IndexedDB
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('pos-op-db', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('pending-patients')) {
+            db.createObjectStore('pending-patients', { keyPath: 'id', autoIncrement: true });
+          }
+        };
+      });
+    }
+
+    async function checkIndexedDB() {
+      try {
+        const db = await openDB();
+        db.close();
+        document.getElementById('db-status').textContent = 'Disponível';
+        document.getElementById('db-status').className = 'status success';
+        log('IndexedDB disponível', 'success');
+      } catch (error) {
+        document.getElementById('db-status').textContent = 'Erro';
+        document.getElementById('db-status').className = 'status error';
+        log(`Erro no IndexedDB: ${error.message}`, 'error');
+      }
+    }
+
+    // Patient form
+    document.getElementById('patient-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const patient = {
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value,
+        cirurgia: document.getElementById('cirurgia').value,
+        dataCirurgia: document.getElementById('dataCirurgia').value,
+        observacoes: document.getElementById('observacoes').value,
+        timestamp: Date.now(),
+        synced: false,
+      };
+
+      try {
+        const db = await openDB();
+        const tx = db.transaction(['pending-patients'], 'readwrite');
+        const store = tx.objectStore('pending-patients');
+        await store.add(patient);
+        db.close();
+
+        log(`Paciente salvo offline: ${patient.nome}`, 'success');
+        document.getElementById('patient-form').reset();
+        loadPendingPatients();
+      } catch (error) {
+        log(`Erro ao salvar paciente: ${error.message}`, 'error');
+      }
+    });
+
+    // Load pending patients
+    async function loadPendingPatients() {
+      try {
+        const db = await openDB();
+        const tx = db.transaction(['pending-patients'], 'readonly');
+        const store = tx.objectStore('pending-patients');
+        const patients = await store.getAll();
+        db.close();
+
+        const listDiv = document.getElementById('patients-list');
+        document.getElementById('pending-count').textContent = patients.filter(p => !p.synced).length;
+
+        if (patients.length === 0) {
+          listDiv.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">Nenhum paciente pendente</p>';
+        } else {
+          listDiv.innerHTML = patients.map(p => `
+            <div class="patient-item ${p.synced ? 'synced' : ''}">
+              <div class="patient-name">${p.nome} ${p.synced ? '<span class="status success">Sincronizado</span>' : '<span class="status pending">Pendente</span>'}</div>
+              <div class="patient-details">
+                ${p.cirurgia} - ${new Date(p.dataCirurgia).toLocaleDateString('pt-BR')}<br>
+                Tel: ${p.telefone}
+              </div>
+            </div>
+          `).join('');
+        }
+
+        log(`${patients.length} pacientes encontrados`, 'info');
+      } catch (error) {
+        log(`Erro ao carregar pacientes: ${error.message}`, 'error');
+      }
+    }
+
+    // Sync patients (mock)
+    async function syncPendingPatients() {
+      log('Sincronizando pacientes...', 'info');
+      // In real implementation, this would call the API
+      log('Sincronização simulada - implementar com API real', 'warning');
+    }
+
+    // Clear synced patients
+    async function clearSyncedPatients() {
+      try {
+        const db = await openDB();
+        const tx = db.transaction(['pending-patients'], 'readwrite');
+        const store = tx.objectStore('pending-patients');
+        const allPatients = await store.getAll();
+
+        for (const patient of allPatients) {
+          if (patient.synced) {
+            await store.delete(patient.id);
+          }
+        }
+
+        db.close();
+        log('Pacientes sincronizados removidos', 'success');
+        loadPendingPatients();
+      } catch (error) {
+        log(`Erro ao limpar pacientes: ${error.message}`, 'error');
+      }
+    }
+
+    // Cache management
+    async function checkCache() {
+      try {
+        const cacheNames = await caches.keys();
+        const cacheInfo = document.getElementById('cache-info');
+        cacheInfo.innerHTML = `<p>Caches encontrados: ${cacheNames.length}</p>`;
+        cacheNames.forEach(name => {
+          cacheInfo.innerHTML += `<p style="color: #64748b;">- ${name}</p>`;
+        });
+        log(`${cacheNames.length} caches encontrados`, 'info');
+      } catch (error) {
+        log(`Erro ao verificar cache: ${error.message}`, 'error');
+      }
+    }
+
+    async function clearCache() {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        log('Cache limpo com sucesso', 'success');
+        document.getElementById('cache-info').innerHTML = '';
+      } catch (error) {
+        log(`Erro ao limpar cache: ${error.message}`, 'error');
+      }
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      log('=== Sistema de Teste Iniciado ===', 'info');
+      updateOnlineStatus();
+      checkServiceWorker();
+      checkIndexedDB();
+      loadPendingPatients();
+    });
+  </script>
+</body>
+</html>

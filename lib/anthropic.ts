@@ -1,0 +1,255 @@
+import Anthropic from '@anthropic-ai/sdk';
+
+// Cliente Anthropic configurado
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || '',
+});
+
+export interface PatientData {
+  name: string;
+  age?: number;
+  sex?: string;
+  comorbidities?: string[];
+  medications?: string[];
+}
+
+export interface QuestionnaireData {
+  painLevel?: number;
+  urinaryRetention?: boolean;
+  urinaryRetentionHours?: number;
+  bowelMovement?: boolean;
+  bleeding?: string; // none, light, moderate, severe
+  fever?: boolean;
+  temperature?: number;
+  discharge?: string; // none, serous, purulent, abundant
+  additionalSymptoms?: string[];
+  concerns?: string;
+}
+
+export interface AnalysisInput {
+  surgeryType: string;
+  dayNumber: number;
+  patientData: PatientData;
+  questionnaireData: QuestionnaireData;
+  detectedRedFlags: string[];
+}
+
+export interface AnalysisOutput {
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  additionalRedFlags: string[];
+  empatheticResponse: string;
+  seekCareAdvice: string | null;
+  reasoning?: string;
+}
+
+/**
+ * Analisa a resposta do paciente ao questionário de follow-up usando Claude AI
+ */
+export async function analyzeFollowUpResponse(
+  input: AnalysisInput
+): Promise<AnalysisOutput> {
+  const { surgeryType, dayNumber, patientData, questionnaireData, detectedRedFlags } = input;
+
+  // Tradução de tipos de cirurgia para português
+  const surgeryTypeTranslation: Record<string, string> = {
+    hemorroidectomia: 'Hemorroidectomia',
+    fistula: 'Fístula Anal',
+    fissura: 'Fissura Anal',
+    pilonidal: 'Cisto Pilonidal',
+  };
+
+  const surgeryTypeName = surgeryTypeTranslation[surgeryType] || surgeryType;
+
+  // Construir descrição das comorbidades
+  const comorbiditiesText = patientData.comorbidities?.length
+    ? `Comorbidades: ${patientData.comorbidities.join(', ')}`
+    : 'Sem comorbidades registradas';
+
+  const medicationsText = patientData.medications?.length
+    ? `Medicações em uso: ${patientData.medications.join(', ')}`
+    : 'Sem medicações registradas';
+
+  // Construir descrição dos dados do questionário
+  const questionnaireDescription = buildQuestionnaireDescription(questionnaireData);
+
+  // Construir prompt para Claude
+  const prompt = `Você é um assistente médico especializado em pós-operatório de cirurgia colorretal.
+
+Analise a resposta do paciente ao questionário de acompanhamento D+${dayNumber}.
+
+**Tipo de cirurgia:** ${surgeryTypeName}
+
+**Dados do paciente:**
+- Nome: ${patientData.name}
+${patientData.age ? `- Idade: ${patientData.age} anos` : ''}
+${patientData.sex ? `- Sexo: ${patientData.sex}` : ''}
+- ${comorbiditiesText}
+- ${medicationsText}
+
+**Resposta ao questionário:**
+${questionnaireDescription}
+
+**Red flags já detectados pelo sistema determinístico:**
+${detectedRedFlags.length > 0 ? detectedRedFlags.map(rf => `- ${rf}`).join('\n') : 'Nenhum red flag detectado'}
+
+**Suas tarefas:**
+1. Avalie o nível de risco geral (low, medium, high, critical) considerando:
+   - O tipo de cirurgia e o dia pós-operatório
+   - Os sintomas reportados
+   - As comorbidades do paciente
+   - Os red flags já detectados
+
+2. Identifique outros red flags não óbvios que possam ter sido perdidos pela análise determinística
+
+3. Gere uma resposta empática e acolhedora para o paciente, que:
+   - Reconheça seus sintomas
+   - Ofereça orientação apropriada
+   - Seja clara e tranquilizadora quando possível
+   - Use linguagem acessível (não use termos médicos complexos)
+   - Seja breve (máximo 3-4 parágrafos)
+
+4. Sugira quando procurar atendimento presencial, se necessário
+
+**IMPORTANTE:**
+- Seja conservador na avaliação de risco (prefira superestimar a subestimar)
+- Para sintomas graves (febre alta, dor intensa, sangramento ativo), sempre classifique como high ou critical
+- Mantenha tom empático e acolhedor na resposta
+- Não minimize sintomas preocupantes
+
+Retorne APENAS um objeto JSON válido no seguinte formato (sem markdown, sem explicações adicionais):
+{
+  "riskLevel": "low|medium|high|critical",
+  "additionalRedFlags": ["red flag 1", "red flag 2"],
+  "empatheticResponse": "texto da resposta empática",
+  "seekCareAdvice": "texto sobre quando buscar atendimento ou null",
+  "reasoning": "breve explicação do raciocínio (opcional)"
+}`;
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 2000,
+      temperature: 0.3, // Baixa temperatura para maior consistência
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    });
+
+    // Extrair resposta
+    const responseText = message.content[0].type === 'text'
+      ? message.content[0].text
+      : '';
+
+    // Parse JSON
+    const analysis: AnalysisOutput = JSON.parse(responseText);
+
+    // Validar campos obrigatórios
+    if (!analysis.riskLevel || !analysis.empatheticResponse) {
+      throw new Error('Resposta da IA incompleta');
+    }
+
+    // Validar riskLevel
+    const validRiskLevels = ['low', 'medium', 'high', 'critical'];
+    if (!validRiskLevels.includes(analysis.riskLevel)) {
+      throw new Error(`Nível de risco inválido: ${analysis.riskLevel}`);
+    }
+
+    return analysis;
+  } catch (error) {
+    console.error('Erro ao analisar resposta com Claude AI:', error);
+
+    // Fallback: retornar análise conservadora
+    return {
+      riskLevel: detectedRedFlags.length > 0 ? 'high' : 'medium',
+      additionalRedFlags: [],
+      empatheticResponse:
+        'Obrigado por responder ao questionário. Recebi suas informações e vou analisá-las com cuidado. ' +
+        'Em caso de qualquer sintoma que te preocupe, não hesite em entrar em contato.',
+      seekCareAdvice: detectedRedFlags.length > 0
+        ? 'Devido aos sintomas reportados, recomendo que você entre em contato com o consultório para avaliação.'
+        : null,
+    };
+  }
+}
+
+/**
+ * Constrói descrição legível dos dados do questionário
+ */
+function buildQuestionnaireDescription(data: QuestionnaireData): string {
+  const parts: string[] = [];
+
+  // Dor
+  if (data.painLevel !== undefined) {
+    const painIntensity =
+      data.painLevel >= 8 ? 'muito intensa' :
+      data.painLevel >= 6 ? 'intensa' :
+      data.painLevel >= 4 ? 'moderada' :
+      data.painLevel >= 2 ? 'leve' : 'mínima';
+    parts.push(`- Dor: ${data.painLevel}/10 (${painIntensity})`);
+  }
+
+  // Retenção urinária
+  if (data.urinaryRetention !== undefined) {
+    if (data.urinaryRetention) {
+      const hours = data.urinaryRetentionHours || 'não especificado';
+      parts.push(`- Retenção urinária: SIM (${hours}h)`);
+    } else {
+      parts.push('- Retenção urinária: NÃO');
+    }
+  }
+
+  // Evacuação
+  if (data.bowelMovement !== undefined) {
+    parts.push(`- Evacuação: ${data.bowelMovement ? 'SIM' : 'NÃO'}`);
+  }
+
+  // Sangramento
+  if (data.bleeding) {
+    const bleedingTranslation: Record<string, string> = {
+      none: 'nenhum',
+      light: 'leve',
+      moderate: 'moderado',
+      severe: 'intenso/ativo',
+    };
+    parts.push(`- Sangramento: ${bleedingTranslation[data.bleeding] || data.bleeding}`);
+  }
+
+  // Febre
+  if (data.fever !== undefined) {
+    if (data.fever && data.temperature) {
+      parts.push(`- Febre: SIM (${data.temperature}°C)`);
+    } else if (data.fever) {
+      parts.push('- Febre: SIM');
+    } else {
+      parts.push('- Febre: NÃO');
+    }
+  }
+
+  // Secreção
+  if (data.discharge) {
+    const dischargeTranslation: Record<string, string> = {
+      none: 'nenhuma',
+      serous: 'serosa (clara)',
+      purulent: 'purulenta',
+      abundant: 'abundante',
+    };
+    parts.push(`- Secreção: ${dischargeTranslation[data.discharge] || data.discharge}`);
+  }
+
+  // Sintomas adicionais
+  if (data.additionalSymptoms?.length) {
+    parts.push(`- Sintomas adicionais: ${data.additionalSymptoms.join(', ')}`);
+  }
+
+  // Preocupações
+  if (data.concerns) {
+    parts.push(`- Preocupações do paciente: "${data.concerns}"`);
+  }
+
+  return parts.length > 0 ? parts.join('\n') : 'Nenhum dado fornecido';
+}
+
+export { anthropic };

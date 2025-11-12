@@ -1,0 +1,300 @@
+/**
+ * Exemplo de seed para testar o Dashboard
+ *
+ * Para executar:
+ * npx ts-node prisma/seed-example.ts
+ *
+ * Ou adicionar no package.json:
+ * "prisma": {
+ *   "seed": "ts-node prisma/seed-example.ts"
+ * }
+ */
+
+import { PrismaClient } from '@prisma/client'
+import { addDays, subDays } from 'date-fns'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  console.log('Iniciando seed de dados de exemplo...')
+
+  // Limpar dados existentes (CUIDADO: Isso apaga tudo!)
+  // await prisma.followUpResponse.deleteMany()
+  // await prisma.followUp.deleteMany()
+  // await prisma.consentTerm.deleteMany()
+  // await prisma.postOpPrescription.deleteMany()
+  // await prisma.anesthesia.deleteMany()
+  // await prisma.preOpPreparation.deleteMany()
+  // await prisma.surgeryDetails.deleteMany()
+  // await prisma.surgery.deleteMany()
+  // await prisma.patientComorbidity.deleteMany()
+  // await prisma.patientMedication.deleteMany()
+  // await prisma.patient.deleteMany()
+
+  // Criar pacientes de exemplo com cirurgias
+  const today = new Date()
+
+  // Paciente 1: Hemorroidectomia hoje, dados incompletos, SEM red flags
+  const patient1 = await prisma.patient.create({
+    data: {
+      name: 'Maria da Silva',
+      phone: '11987654321',
+      cpf: '12345678901',
+      dateOfBirth: new Date('1985-05-15'),
+      age: 39,
+      sex: 'Feminino',
+      email: 'maria.silva@email.com',
+    },
+  })
+
+  const surgery1 = await prisma.surgery.create({
+    data: {
+      patientId: patient1.id,
+      type: 'hemorroidectomia',
+      date: today,
+      hospital: 'Hospital São Lucas',
+      durationMinutes: 45,
+      dataCompleteness: 30, // Dados incompletos
+      status: 'active',
+    },
+  })
+
+  // Criar follow-ups para o paciente 1
+  await prisma.followUp.create({
+    data: {
+      surgeryId: surgery1.id,
+      patientId: patient1.id,
+      dayNumber: 1,
+      scheduledDate: addDays(today, 1),
+      status: 'pending',
+    },
+  })
+
+  // Paciente 2: Fístula há 3 dias, dados bons, COM red flags
+  const patient2 = await prisma.patient.create({
+    data: {
+      name: 'João Pedro Santos',
+      phone: '11976543210',
+      cpf: '98765432109',
+      dateOfBirth: new Date('1992-08-22'),
+      age: 32,
+      sex: 'Masculino',
+      email: 'joao.santos@email.com',
+    },
+  })
+
+  const surgery2 = await prisma.surgery.create({
+    data: {
+      patientId: patient2.id,
+      type: 'fistula',
+      date: subDays(today, 3),
+      hospital: 'Clínica Proctológica',
+      durationMinutes: 60,
+      dataCompleteness: 75, // Dados razoáveis
+      status: 'active',
+    },
+  })
+
+  const followUp2 = await prisma.followUp.create({
+    data: {
+      surgeryId: surgery2.id,
+      patientId: patient2.id,
+      dayNumber: 3,
+      scheduledDate: today,
+      status: 'responded',
+      sentAt: new Date(),
+      respondedAt: new Date(),
+    },
+  })
+
+  // Criar resposta com RED FLAGS
+  await prisma.followUpResponse.create({
+    data: {
+      followUpId: followUp2.id,
+      questionnaireData: JSON.stringify({
+        painLevel: 9,
+        fever: true,
+        bleeding: true,
+      }),
+      aiAnalysis: JSON.stringify({
+        summary: 'Paciente apresenta sinais de alerta',
+        recommendations: ['Consultar médico urgentemente'],
+      }),
+      aiResponse: 'João, detectamos alguns sinais que precisam de atenção médica urgente...',
+      riskLevel: 'critical',
+      redFlags: JSON.stringify([
+        'Dor intensa (nível 9/10)',
+        'Febre alta',
+        'Sangramento ativo',
+      ]),
+      doctorAlerted: false,
+    },
+  })
+
+  // Paciente 3: Fissura há 7 dias, dados completos, sem alertas
+  const patient3 = await prisma.patient.create({
+    data: {
+      name: 'Ana Carolina Oliveira',
+      phone: '11965432109',
+      cpf: '45678912345',
+      dateOfBirth: new Date('1978-12-10'),
+      age: 46,
+      sex: 'Feminino',
+      email: 'ana.oliveira@email.com',
+    },
+  })
+
+  const surgery3 = await prisma.surgery.create({
+    data: {
+      patientId: patient3.id,
+      type: 'fissura',
+      date: subDays(today, 7),
+      hospital: 'Hospital São Lucas',
+      durationMinutes: 30,
+      dataCompleteness: 100, // Dados completos
+      status: 'active',
+    },
+  })
+
+  const followUp3 = await prisma.followUp.create({
+    data: {
+      surgeryId: surgery3.id,
+      patientId: patient3.id,
+      dayNumber: 7,
+      scheduledDate: today,
+      status: 'responded',
+      sentAt: new Date(),
+      respondedAt: new Date(),
+    },
+  })
+
+  await prisma.followUpResponse.create({
+    data: {
+      followUpId: followUp3.id,
+      questionnaireData: JSON.stringify({
+        painLevel: 2,
+        fever: false,
+        bleeding: false,
+        bowelMovement: true,
+      }),
+      aiAnalysis: JSON.stringify({
+        summary: 'Recuperação dentro do esperado',
+        recommendations: ['Continuar tratamento'],
+      }),
+      aiResponse: 'Ana, sua recuperação está indo muito bem!',
+      riskLevel: 'low',
+      redFlags: JSON.stringify([]),
+      doctorAlerted: false,
+    },
+  })
+
+  // Paciente 4: Pilonidal há 14 dias, dados parciais, alerta médio
+  const patient4 = await prisma.patient.create({
+    data: {
+      name: 'Carlos Eduardo Ferreira',
+      phone: '11954321098',
+      cpf: '78912345678',
+      dateOfBirth: new Date('1995-03-28'),
+      age: 29,
+      sex: 'Masculino',
+    },
+  })
+
+  const surgery4 = await prisma.surgery.create({
+    data: {
+      patientId: patient4.id,
+      type: 'pilonidal',
+      date: subDays(today, 14),
+      hospital: 'Clínica Proctológica',
+      durationMinutes: 50,
+      dataCompleteness: 55, // Dados parciais
+      status: 'active',
+    },
+  })
+
+  const followUp4 = await prisma.followUp.create({
+    data: {
+      surgeryId: surgery4.id,
+      patientId: patient4.id,
+      dayNumber: 14,
+      scheduledDate: today,
+      status: 'responded',
+      sentAt: new Date(),
+      respondedAt: new Date(),
+    },
+  })
+
+  await prisma.followUpResponse.create({
+    data: {
+      followUpId: followUp4.id,
+      questionnaireData: JSON.stringify({
+        painLevel: 5,
+        fever: false,
+        bleeding: false,
+        woundHealing: 'partial',
+      }),
+      aiAnalysis: JSON.stringify({
+        summary: 'Recuperação lenta',
+        recommendations: ['Monitorar cicatrização'],
+      }),
+      aiResponse: 'Carlos, vamos acompanhar sua cicatrização mais de perto.',
+      riskLevel: 'medium',
+      redFlags: JSON.stringify(['Cicatrização lenta']),
+      doctorAlerted: false,
+    },
+  })
+
+  // Paciente 5: Hemorroidectomia há 5 dias, sem resposta ainda
+  const patient5 = await prisma.patient.create({
+    data: {
+      name: 'Beatriz Almeida Costa',
+      phone: '11943210987',
+      cpf: '32165498712',
+      dateOfBirth: new Date('1988-07-19'),
+      age: 36,
+      sex: 'Feminino',
+      email: 'beatriz.costa@email.com',
+    },
+  })
+
+  const surgery5 = await prisma.surgery.create({
+    data: {
+      patientId: patient5.id,
+      type: 'hemorroidectomia',
+      date: subDays(today, 5),
+      hospital: 'Hospital São Lucas',
+      durationMinutes: 55,
+      dataCompleteness: 20, // Apenas cadastro express
+      status: 'active',
+    },
+  })
+
+  await prisma.followUp.create({
+    data: {
+      surgeryId: surgery5.id,
+      patientId: patient5.id,
+      dayNumber: 5,
+      scheduledDate: today,
+      status: 'sent',
+      sentAt: new Date(),
+    },
+  })
+
+  console.log('Seed concluído com sucesso!')
+  console.log('Foram criados 5 pacientes com diferentes cenários:')
+  console.log('1. Maria - Hemorroidectomia hoje, 30% completo, sem alertas')
+  console.log('2. João - Fístula D+3, 75% completo, ALERTA CRÍTICO')
+  console.log('3. Ana - Fissura D+7, 100% completo, sem alertas')
+  console.log('4. Carlos - Pilonidal D+14, 55% completo, alerta médio')
+  console.log('5. Beatriz - Hemorroidectomia D+5, 20% completo, aguardando resposta')
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Ícones - Sistema Pós-Op</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2563eb;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 30px;
+    }
+    .preview {
+      display: flex;
+      gap: 20px;
+      margin: 30px 0;
+      align-items: center;
+    }
+    .preview-item {
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .instructions {
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+      border-left: 4px solid #2563eb;
+    }
+    .instructions h3 {
+      margin-top: 0;
+      color: #2563eb;
+    }
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    .instructions li {
+      margin: 8px 0;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gerador de Ícones PWA</h1>
+    <p class="subtitle">Sistema Pós-Operatório - Dr. João Vitor Viana</p>
+
+    <div class="preview">
+      <div class="preview-item">
+        <canvas id="canvas192" width="192" height="192"></canvas>
+        <p>192x192</p>
+        <button onclick="downloadIcon(192)">Download 192x192</button>
+      </div>
+      <div class="preview-item">
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        <p>512x512</p>
+        <button onclick="downloadIcon(512)">Download 512x512</button>
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <button onclick="downloadAll()" style="background: #059669;">Download Todos os Ícones</button>
+    </div>
+
+    <div class="instructions">
+      <h3>Instruções:</h3>
+      <ol>
+        <li>Clique em "Download Todos os Ícones" para baixar ambos os ícones</li>
+        <li>Salve os arquivos como <code>icon-192.png</code> e <code>icon-512.png</code></li>
+        <li>Coloque os arquivos na pasta <code>public/icons/</code></li>
+        <li>Os ícones já estão otimizados para PWA e aparecem no manifesto</li>
+      </ol>
+      <p><strong>Nota:</strong> Os ícones são gerados automaticamente com o design médico (cruz + batimento cardíaco).</p>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const scale = size / 512;
+
+      ctx.clearRect(0, 0, size, size);
+
+      // Background with rounded corners
+      ctx.fillStyle = '#2563eb';
+      roundRect(ctx, 0, 0, size, size, 80 * scale);
+      ctx.fill();
+
+      // Medical Cross
+      ctx.fillStyle = 'white';
+      const center = size / 2;
+      const crossWidth = 80 * scale;
+      const crossHeight = 320 * scale;
+      const radius = 20 * scale;
+
+      // Vertical bar
+      roundRect(ctx, center - crossWidth/2, center - crossHeight/2, crossWidth, crossHeight, radius);
+      ctx.fill();
+
+      // Horizontal bar
+      roundRect(ctx, center - crossHeight/2, center - crossWidth/2, crossHeight, crossWidth, radius);
+      ctx.fill();
+
+      // Heart beat line
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 8 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = 0.6;
+
+      ctx.beginPath();
+      const beatScale = scale;
+      const beatY = center;
+      ctx.moveTo(center - 120 * beatScale, beatY - 10 * beatScale);
+      ctx.lineTo(center - 80 * beatScale, beatY - 10 * beatScale);
+      ctx.lineTo(center - 60 * beatScale, beatY + 30 * beatScale);
+      ctx.lineTo(center - 40 * beatScale, beatY - 50 * beatScale);
+      ctx.lineTo(center - 20 * beatScale, beatY + 10 * beatScale);
+      ctx.lineTo(center, beatY - 10 * beatScale);
+      ctx.lineTo(center + 40 * beatScale, beatY - 10 * beatScale);
+      ctx.lineTo(center + 60 * beatScale, beatY + 30 * beatScale);
+      ctx.lineTo(center + 80 * beatScale, beatY - 50 * beatScale);
+      ctx.lineTo(center + 100 * beatScale, beatY + 10 * beatScale);
+      ctx.lineTo(center + 120 * beatScale, beatY - 10 * beatScale);
+      ctx.stroke();
+
+      ctx.globalAlpha = 1;
+
+      // Stethoscope in corner
+      const stethoX = size - 132 * scale;
+      const stethoY = size - 132 * scale;
+      const stethoScale = 0.8 * scale;
+
+      // Stethoscope head
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(stethoX + 20 * stethoScale, stethoY + 20 * stethoScale, 18 * stethoScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(stethoX + 20 * stethoScale, stethoY + 20 * stethoScale, 12 * stethoScale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Stethoscope tube
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 6 * stethoScale;
+      ctx.beginPath();
+      ctx.moveTo(stethoX + 20 * stethoScale, stethoY + 38 * stethoScale);
+      ctx.quadraticCurveTo(
+        stethoX + 20 * stethoScale,
+        stethoY + 60 * stethoScale,
+        stethoX + 40 * stethoScale,
+        stethoY + 70 * stethoScale
+      );
+      ctx.stroke();
+
+      // Stethoscope earpiece
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(stethoX + 40 * stethoScale, stethoY + 72 * stethoScale, 8 * stethoScale, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function downloadIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      const link = document.createElement('a');
+      link.download = `icon-${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadAll() {
+      downloadIcon(192);
+      setTimeout(() => downloadIcon(512), 500);
+    }
+
+    // Draw icons on load
+    window.onload = function() {
+      drawIcon(document.getElementById('canvas192'), 192);
+      drawIcon(document.getElementById('canvas512'), 512);
+    };
+  </script>
+</body>
+</html>

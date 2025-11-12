@@ -1,26 +1,482 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+
+  /* Telos.AI Brand Colors */
+  --telos-blue-deep: #0A2647;      /* Azul profundo - cor primária */
+  --telos-blue-dark: #144272;      /* Azul escuro */
+  --telos-blue-medium: #205295;    /* Azul médio */
+  --telos-blue-light: #2C74B3;     /* Azul claro */
+  --telos-gold: #D4AF37;           /* Dourado - excelência */
+  --telos-gold-light: #E8C547;     /* Dourado claro */
+  --telos-white: #FFFFFF;          /* Branco puro */
+  --telos-gray-light: #F5F7FA;     /* Cinza claro para backgrounds */
+  --telos-gray-medium: #E2E8F0;    /* Cinza médio para bordas */
+
+  /* Theme Variables - Telos.AI Style */
+  --background: #FFFFFF;
+  --foreground: #0A2647;
+  --card: #FFFFFF;
+  --card-foreground: #0A2647;
+  --popover: #FFFFFF;
+  --popover-foreground: #0A2647;
+  --primary: #0A2647;              /* Azul profundo */
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F7FA;            /* Cinza claro */
+  --secondary-foreground: #0A2647;
+  --muted: #F5F7FA;
+  --muted-foreground: #144272;
+  --accent: #D4AF37;               /* Dourado */
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2C74B3;
+  --chart-1: #2C74B3;
+  --chart-2: #D4AF37;
+  --chart-3: #205295;
+  --chart-4: #E8C547;
+  --chart-5: #144272;
+  --sidebar: #F5F7FA;
+  --sidebar-foreground: #0A2647;
+  --sidebar-primary: #0A2647;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #D4AF37;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #2C74B3;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Telos.AI Custom Styles */
+@layer utilities {
+  .telos-gradient {
+    background: linear-gradient(135deg, #0A2647 0%, #020817 100%);
+  }
+
+  .telos-gradient-gold {
+    background: linear-gradient(135deg, #D4AF37 0%, #E8C547 100%);
+  }
+
+  .text-telos-blue {
+    color: #0A2647;
+  }
+
+  .text-telos-gold {
+    color: #D4AF37;
+  }
+
+  .bg-telos-blue {
+    background-color: #0A2647;
+  }
+
+  .bg-telos-gold {
+    background-color: #D4AF37;
+  }
+
+  .border-telos-gold {
+    border-color: #D4AF37;
+  }
+
+  /* Telos Logo Typography */
+  .telos-brand {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .telos-ai {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Telos.AI Animations */
+@layer utilities {
+  /* Fade In Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Scale Animations */
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Bounce Animation */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Pulse Animation */
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  /* Shimmer Animation */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  /* Gradient Animation */
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Float Animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* Glow Animation */
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+    }
+  }
+
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .animate-fade-in-down {
+    animation: fadeInDown 0.8s ease-out;
+  }
+
+  .animate-fade-in-left {
+    animation: fadeInLeft 0.8s ease-out;
+  }
+
+  .animate-fade-in-right {
+    animation: fadeInRight 0.8s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  /* Delay Classes */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  .animation-delay-800 {
+    animation-delay: 800ms;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  /* Gradient Background Animation */
+  .bg-gradient-animated {
+    background: linear-gradient(
+      270deg,
+      #0A2647,
+      #2C74B3,
+      #D4AF37
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Hover Lift Effect */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Hover Glow Effect */
+  .hover-glow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  }
+
+  /* Hover Scale Effect */
+  .hover-scale {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Hover Rotate Effect */
+  .hover-rotate {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-rotate:hover {
+    transform: rotate(5deg);
+  }
+
+  /* Smooth All Transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Stagger Animation (use with JavaScript or nth-child) */
+  .stagger-fade-in > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-fade-in > *:nth-child(2) { animation-delay: 100ms; }
+  .stagger-fade-in > *:nth-child(3) { animation-delay: 200ms; }
+  .stagger-fade-in > *:nth-child(4) { animation-delay: 300ms; }
+  .stagger-fade-in > *:nth-child(5) { animation-delay: 400ms; }
+  .stagger-fade-in > *:nth-child(6) { animation-delay: 500ms; }
+}
+
+/* Driver.js Tutorial System - Custom Styling */
+.driver-overlay,
+.driver-highlighted-element {
+  z-index: 999997 !important;
+}
+
+.driver-popover {
+  z-index: 999998 !important;
+  pointer-events: auto !important;
+}
+
+.driver-popover-next-btn,
+.driver-popover-prev-btn,
+.driver-popover-close-btn {
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+.driver-popover-next-btn:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+.driver-popover-prev-btn:hover {
+  opacity: 0.9 !important;
+  transition: all 0.2s ease;
+}
+
+.telos-tutorial-popover {
+  box-shadow: 0 10px 40px rgba(10, 38, 71, 0.2) !important;
 }

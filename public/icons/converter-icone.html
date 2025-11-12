@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Ícone - Telos.AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            border-color: #1e3a8a;
+            background: #f8fafc;
+        }
+
+        .upload-area.dragover {
+            border-color: #1e3a8a;
+            background: #eff6ff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-container {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            text-align: center;
+        }
+
+        .preview-item img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .preview-item span {
+            display: block;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            background: #dcfce7;
+            border: 2px solid #86efac;
+            color: #166534;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .icon-info {
+            background: #eff6ff;
+            border-left: 4px solid #1e3a8a;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .icon-info h3 {
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .icon-info ul {
+            margin-left: 20px;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Conversor de Ícone PWA</h1>
+        <p class="subtitle">Gere ícones otimizados para seu app Telos.AI</p>
+
+        <div class="icon-info">
+            <h3>📱 Para que serve?</h3>
+            <ul>
+                <li>Ícone na tela inicial do celular (como WhatsApp)</li>
+                <li>Splash screen ao abrir o app</li>
+                <li>Atalho no desktop</li>
+                <li>Lista de aplicativos</li>
+            </ul>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p style="margin-top: 16px; color: #64748b; font-weight: 600;">
+                Clique ou arraste seu ícone aqui
+            </p>
+            <p style="margin-top: 8px; color: #94a3b8; font-size: 14px;">
+                JPEG ou PNG
+            </p>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg">
+
+        <div class="preview-container" id="previewContainer">
+            <h3 style="color: #1e3a8a; margin-bottom: 16px;">Prévia dos Ícones</h3>
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <img id="preview192" alt="192x192">
+                    <span>192x192 (Android)</span>
+                </div>
+                <div class="preview-item">
+                    <img id="preview512" alt="512x512">
+                    <span>512x512 (iOS/Desktop)</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" id="downloadBtn" disabled>📥 Download Ícones (PNG)</button>
+
+        <div class="success-message" id="successMessage">
+            ✓ Ícones gerados! Salvos em: public/icons/icon-192.png e icon-512.png
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const successMessage = document.getElementById('successMessage');
+        const preview192 = document.getElementById('preview192');
+        const preview512 = document.getElementById('preview512');
+
+        let generatedIcons = {
+            icon192: null,
+            icon512: null
+        };
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                processImage(file);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                processImage(file);
+            }
+        });
+
+        function processImage(file) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Gerar ícone 192x192
+                    const canvas192 = document.createElement('canvas');
+                    canvas192.width = 192;
+                    canvas192.height = 192;
+                    const ctx192 = canvas192.getContext('2d');
+                    ctx192.drawImage(img, 0, 0, 192, 192);
+
+                    // Gerar ícone 512x512
+                    const canvas512 = document.createElement('canvas');
+                    canvas512.width = 512;
+                    canvas512.height = 512;
+                    const ctx512 = canvas512.getContext('2d');
+                    ctx512.drawImage(img, 0, 0, 512, 512);
+
+                    // Atualizar previews
+                    preview192.src = canvas192.toDataURL('image/png');
+                    preview512.src = canvas512.toDataURL('image/png');
+
+                    // Armazenar blobs
+                    canvas192.toBlob(blob => {
+                        generatedIcons.icon192 = blob;
+                    }, 'image/png');
+
+                    canvas512.toBlob(blob => {
+                        generatedIcons.icon512 = blob;
+                    }, 'image/png');
+
+                    // Mostrar preview
+                    previewContainer.style.display = 'block';
+                    downloadBtn.disabled = false;
+                    successMessage.style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            // Download icon-192.png
+            const a192 = document.createElement('a');
+            a192.href = URL.createObjectURL(generatedIcons.icon192);
+            a192.download = 'icon-192.png';
+            a192.click();
+
+            // Download icon-512.png
+            setTimeout(() => {
+                const a512 = document.createElement('a');
+                a512.href = URL.createObjectURL(generatedIcons.icon512);
+                a512.download = 'icon-512.png';
+                a512.click();
+
+                // Mostrar mensagem de sucesso
+                successMessage.style.display = 'block';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
