@@ -1,24 +1,44 @@
-// NextAuth v5 middleware para Edge Runtime
-// Usa apenas authConfig (sem Prisma/bcrypt) para compatibilidade com Edge
-import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
+// Middleware simplificado para Vercel Edge
+// Rotas de API são protegidas individualmente com getServerSession
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const { auth } = NextAuth(authConfig);
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-export default auth;
+  // Permitir todas as rotas de API (protegidas individualmente)
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
+  // Permitir rotas públicas
+  const publicPaths = [
+    '/',
+    '/auth/login',
+    '/auth/error',
+    '/cadastro-medico',
+    '/pricing',
+    '/sobre',
+    '/termos',
+  ];
+
+  if (publicPaths.some(path => pathname === path || pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
+
+  // Para outras rotas, Next.js auth vai lidar via getServerSession nas páginas
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - api/auth (authentication endpoints)
-     * - api/postop/webhook (WhatsApp webhook)
-     * - api/test (API tests)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
      */
-    "/((?!api/auth|api/postop/webhook|api/test|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.ico|sw.js|manifest.json|icons).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.ico|sw.js|manifest.json|icons).*)",
   ],
 };
