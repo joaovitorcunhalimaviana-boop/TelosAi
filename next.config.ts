@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
 
+  // External packages para evitar bundling incorreto no Edge Runtime
+  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
+
   // PWA and mobile optimizations
   async headers() {
     return [

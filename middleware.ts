@@ -1,7 +1,6 @@
-import NextAuth from "next-auth";
-import { authConfig } from "./auth.config";
-
-export default NextAuth(authConfig).auth;
+// NextAuth v5 middleware para Edge Runtime
+// Usa apenas authConfig (sem Prisma/bcrypt) para compatibilidade com Edge
+export { auth as middleware } from "@/lib/auth";
 
 export const config = {
   matcher: [
