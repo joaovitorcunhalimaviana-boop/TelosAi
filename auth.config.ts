@@ -24,6 +24,9 @@ export const authConfig = {
         "/pricing",
         "/sobre",
         "/termos",
+        "/api/postop/webhook",
+        "/api/test",
+        "/api/whatsapp/webhook",
       ];
 
       const isPublicPath = publicPaths.some((p) => path === p || path.startsWith(p));

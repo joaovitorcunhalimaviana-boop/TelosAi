@@ -42,7 +42,9 @@
       "WebFetch(domain:authjs.dev)",
       "Bash(vercel env add --help:*)",
       "Bash(vercel env:*)",
-      "Bash(vercel ls:*)"
+      "Bash(vercel ls:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(vercel logs:*)"
     ],
     "deny": [],
     "ask": []
