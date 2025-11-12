@@ -12,11 +12,13 @@ export const config = {
     /*
      * Match all request paths except:
      * - api/auth (authentication endpoints)
+     * - api/postop/webhook (WhatsApp webhook)
+     * - api/test (API tests)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
      */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.ico|sw.js|manifest.json|icons).*)",
+    "/((?!api/auth|api/postop/webhook|api/test|_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.svg|.*\\.ico|sw.js|manifest.json|icons).*)",
   ],
 };
