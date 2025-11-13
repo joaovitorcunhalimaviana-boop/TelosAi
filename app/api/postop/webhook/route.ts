@@ -3,6 +3,10 @@
  * Recebe mensagens e eventos do WhatsApp Business API
  */
 
+// Force Node.js runtime (Prisma não funciona no Edge)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { markAsRead } from '@/lib/whatsapp';
