@@ -309,7 +309,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
       `}</style>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+        <div id="dashboard-header" className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div className="flex items-center gap-3">
             <div>
               <h1 className="text-4xl font-bold mb-2" style={{ color: '#0A2647' }}>
