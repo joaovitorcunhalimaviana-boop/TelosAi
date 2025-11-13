@@ -62,19 +62,52 @@ export function SimpleTour({ onClose }: { onClose: () => void }) {
     const updatePosition = () => {
       const element = document.querySelector(step.element);
       if (element) {
-        const rect = element.getBoundingClientRect();
-        setPosition({
-          top: rect.bottom + 10,
-          left: rect.left,
-        });
-        console.log('📍 Position updated:', { top: rect.bottom + 10, left: rect.left, element: step.element });
+        // Scroll suave até o elemento
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Aguarda o scroll terminar antes de posicionar
+        setTimeout(() => {
+          const rect = element.getBoundingClientRect();
+          const popoverWidth = 450;
+          const popoverHeight = 250; // Altura estimada
+
+          let top = rect.bottom + 10;
+          let left = rect.left;
+
+          // Ajusta se a caixa sair da tela à direita
+          if (left + popoverWidth > window.innerWidth) {
+            left = window.innerWidth - popoverWidth - 20;
+          }
+
+          // Ajusta se a caixa sair da tela embaixo
+          if (top + popoverHeight > window.innerHeight) {
+            top = rect.top - popoverHeight - 10;
+          }
+
+          // Garante que não saia da tela à esquerda
+          if (left < 10) {
+            left = 10;
+          }
+
+          // Garante que não saia da tela em cima
+          if (top < 10) {
+            top = 10;
+          }
+
+          setPosition({ top, left });
+          console.log('📍 Position updated:', { top, left, element: step.element });
+        }, 300);
       } else {
         console.error('❌ Element not found:', step.element);
       }
     };
-    updatePosition();
+
+    // Delay para garantir que o elemento está renderizado
+    setTimeout(updatePosition, 100);
     window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+    };
   }, [step.element]);
 
   const handleNext = () => {
@@ -117,8 +150,9 @@ export function SimpleTour({ onClose }: { onClose: () => void }) {
           left: position.left,
           backgroundColor: 'white',
           borderRadius: '12px',
-          padding: '20px',
-          maxWidth: '400px',
+          padding: '24px',
+          width: '450px',
+          maxWidth: '90vw',
           boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
           zIndex: 999999,
           pointerEvents: 'all',
