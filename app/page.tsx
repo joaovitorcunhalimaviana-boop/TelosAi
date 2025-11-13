@@ -115,18 +115,21 @@ export default function Home() {
       {/* Why Subscribe Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
-              Por que Assinar o Telos.AI?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Invista no futuro da sua prática médica com benefícios comprovados
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
+                Por que Assinar o Telos.AI?
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Invista no futuro da sua prática médica com benefícios comprovados
+              </p>
+            </div>
+          </FadeIn>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Economize Tempo */}
-            <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift transition-smooth shadow-lg">
+            <FadeIn delay={0.2} direction="up">
+              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift transition-smooth shadow-lg">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -143,9 +146,11 @@ export default function Home() {
                 </p>
               </div>
             </div>
+            </FadeIn>
 
             {/* Economize Dinheiro */}
-            <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift transition-smooth shadow-lg">
+            <FadeIn delay={0.3} direction="up">
+              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift transition-smooth shadow-lg">
               <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold transition-colors">
                 <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -162,8 +167,10 @@ export default function Home() {
                 </p>
               </div>
             </div>
+            </FadeIn>
 
             {/* Detecção Precoce */}
+            <FadeIn delay={0.4} direction="up">
             <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift transition-smooth shadow-lg">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,8 +188,10 @@ export default function Home() {
                 </p>
               </div>
             </div>
+            </FadeIn>
           </div>
 
+          <FadeIn delay={0.5} direction="up">
           <div className="mt-12 text-center">
             <Link
               href="/pricing"
@@ -194,12 +203,14 @@ export default function Home() {
               </svg>
             </Link>
           </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* How it Works Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
+          <FadeIn delay={0.1} direction="up">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
               Como Funciona
@@ -208,6 +219,7 @@ export default function Home() {
               4 passos simples para revolucionar seu pós-operatório
             </p>
           </div>
+          </FadeIn>
 
           <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {[
@@ -345,10 +357,11 @@ export default function Home() {
                     href="/cadastro-medico?plan=professional"
                     className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-telos-gold text-white rounded-xl font-bold text-base sm:text-lg lg:text-xl hover-lift hover-glow transition-smooth shadow-2xl w-full sm:w-auto"
                   >
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span className="truncate">Ativar Modo Pesquisa Agora</span>
+                    <span className="hidden sm:inline">Ativar Modo Pesquisa Agora</span>
+                    <span className="sm:hidden">Ativar Agora</span>
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -372,7 +385,7 @@ export default function Home() {
                         <p className="text-xs sm:text-sm text-gray-600 font-semibold">Conforme LGPD</p>
                       </div>
                       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
-                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-gold mb-1 sm:mb-2">1 Clique</p>
+                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-gold mb-1 sm:mb-2">1-Click</p>
                         <p className="text-xs sm:text-sm text-gray-600 font-semibold">Exportação</p>
                       </div>
                       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
