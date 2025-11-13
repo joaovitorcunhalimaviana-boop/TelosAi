@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
 
+// Force git to detect changes - deploy with Research Mode section
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
