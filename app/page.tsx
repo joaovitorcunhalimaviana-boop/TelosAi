@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
+import { FadeIn, SlideIn } from "@/components/animations"
 
 // Deploy with complete Research Mode section - scientific research features
 export default function Home() {
@@ -14,42 +15,47 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full animate-fade-in-down">
-                  <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-telos-blue">
-                    Tecnologia + Propósito
-                  </span>
+              <FadeIn delay={0.1} direction="up">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full">
+                    <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
+                    <span className="text-sm font-medium text-telos-blue">
+                      Tecnologia + Propósito
+                    </span>
+                  </div>
+
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                    <span className="telos-brand text-telos-blue">Telos</span>
+                    <span className="telos-ai text-telos-gold">.AI</span>
+                  </h1>
+
+                  <p className="text-xl sm:text-2xl text-gray-700 font-light">
+                    A{" "}
+                    <span className="text-telos-gold font-medium">
+                      Inteligência
+                    </span>{" "}
+                    no Cuidado para o{" "}
+                    <span className="text-telos-blue font-medium">
+                      Propósito
+                    </span>{" "}
+                    da Recuperação
+                  </p>
                 </div>
+              </FadeIn>
 
-                <h1 className="text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up animation-delay-200">
-                  <span className="telos-brand text-telos-blue">Telos</span>
-                  <span className="telos-ai text-telos-gold">.AI</span>
-                </h1>
-
-                <p className="text-2xl text-gray-700 font-light animate-fade-in-up animation-delay-400">
-                  A{" "}
-                  <span className="text-telos-gold font-medium">
-                    Inteligência
-                  </span>{" "}
-                  no Cuidado para o{" "}
-                  <span className="text-telos-blue font-medium">
-                    Propósito
-                  </span>{" "}
-                  da Recuperação
+              <FadeIn delay={0.3} direction="up">
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl text-justify">
+                  Sistema de acompanhamento pós-operatório com Inteligência Artificial.
+                  Monitore seus pacientes 24/7 com análise automática de riscos e alertas em tempo real.
                 </p>
-              </div>
+              </FadeIn>
 
-              <p className="text-lg text-gray-600 leading-relaxed max-w-xl animate-fade-in-up animation-delay-600">
-                Sistema de acompanhamento pós-operatório com Inteligência Artificial.
-                Monitore seus pacientes 24/7 com análise automática de riscos e alertas em tempo real.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-800">
-                <Link
-                  href="/cadastro-medico?plan=founding"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-telos-gold text-white rounded-lg font-semibold hover-lift transition-smooth shadow-lg hover-glow"
-                >
+              <FadeIn delay={0.5} direction="up">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/cadastro-medico?plan=founding"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-telos-gold text-white rounded-lg font-semibold hover-lift transition-smooth shadow-lg hover-glow"
+                  >
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -85,12 +91,13 @@ export default function Home() {
                   </svg>
                   Começar Agora
                 </Link>
-              </div>
+                </div>
+              </FadeIn>
             </div>
 
             {/* Right Column - Visual Element */}
-            <div className="relative animate-fade-in-right animation-delay-400">
-              <div className="relative w-full h-[500px] flex items-center justify-center">
+            <SlideIn delay={0.2} direction="right">
+              <div className="relative w-full h-[400px] sm:h-[500px] flex items-center justify-center">
                 <Image
                   src="/icons/icon-512.png"
                   alt="Telos.AI - Acompanhamento Pós-Operatório"
@@ -100,7 +107,7 @@ export default function Home() {
                   priority
                 />
               </div>
-            </div>
+            </SlideIn>
           </div>
         </div>
       </section>
@@ -250,180 +257,183 @@ export default function Home() {
       </section>
 
       {/* Research Mode Section - DESTAQUE */}
-      <section className="py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-20 left-10 w-72 h-72 bg-telos-gold rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left - Content */}
-            <div className="space-y-8 text-white">
-              <div className="inline-flex items-center gap-3 px-5 py-3 bg-telos-gold/20 border-2 border-telos-gold rounded-full">
-                <div className="w-3 h-3 bg-telos-gold rounded-full animate-pulse"></div>
-                <span className="text-sm font-bold text-telos-gold uppercase tracking-wide">
-                  🔬 Exclusivo Telos.AI
-                </span>
-              </div>
-
-              <h2 className="text-5xl lg:text-6xl font-black leading-tight">
-                Modo Pesquisa
-                <br />
-                <span className="text-telos-gold">Científica</span>
-              </h2>
-
-              <p className="text-2xl font-semibold text-blue-100">
-                Transforme Seus Dados em Publicações de Impacto
-              </p>
-
-              <p className="text-lg text-blue-200 leading-relaxed text-justify">
-                O primeiro sistema de IA médica do Brasil com funcionalidade dedicada para{" "}
-                <span className="text-telos-gold font-bold">organização automática de estudos clínicos</span>.
-                Revolucione sua produção científica enquanto cuida dos seus pacientes.
-              </p>
-
-              {/* Key Features do Modo Pesquisa */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
-                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-white mb-2">Organização Automática de Grupos</h4>
-                    <p className="text-blue-200 text-justify">
-                      Crie e gerencie grupos de pesquisa automaticamente. Organize pacientes por tipo de cirurgia,
-                      protocolo experimental, ou qualquer critério científico.
-                    </p>
-                  </div>
+            <FadeIn delay={0.2} direction="left">
+              <div className="space-y-6 sm:space-y-8 text-white">
+                <div className="inline-flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-3 bg-telos-gold/20 border-2 border-telos-gold rounded-full">
+                  <div className="w-3 h-3 bg-telos-gold rounded-full animate-pulse"></div>
+                  <span className="text-xs sm:text-sm font-bold text-telos-gold uppercase tracking-wide">
+                    🔬 Exclusivo Telos.AI
+                  </span>
                 </div>
 
-                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
-                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-white mb-2">Exportação Pronta para Publicação</h4>
-                    <p className="text-blue-200 text-justify">
-                      Exporte dados anonimizados em formatos prontos para análise estatística (CSV, Excel, SPSS).
-                      Conformidade total com LGPD e ética em pesquisa.
-                    </p>
-                  </div>
-                </div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight">
+                  Modo Pesquisa
+                  <br />
+                  <span className="text-telos-gold">Científica</span>
+                </h2>
 
-                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
-                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-white mb-2">Análise Estatística Integrada</h4>
-                    <p className="text-blue-200 text-justify">
-                      Visualize tendências, compare grupos, identifique correlações. A IA sugere análises relevantes
-                      para seus dados automaticamente.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6">
-                <Link
-                  href="/cadastro-medico?plan=professional"
-                  className="group inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white rounded-xl font-bold text-xl hover-lift hover-glow transition-smooth shadow-2xl"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Ativar Modo Pesquisa Agora
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-                <p className="text-sm text-blue-200 mt-4 italic">
-                  ✨ Disponível em todos os planos Professional e Founding Member
+                <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-blue-100">
+                  Transforme Seus Dados em Publicações de Impacto
                 </p>
+
+                <p className="text-base sm:text-lg text-blue-200 leading-relaxed text-justify">
+                  O primeiro sistema de IA médica do Brasil com funcionalidade dedicada para{" "}
+                  <span className="text-telos-gold font-bold">organização automática de estudos clínicos</span>.
+                  Revolucione sua produção científica enquanto cuida dos seus pacientes.
+                </p>
+
+                {/* Key Features do Modo Pesquisa */}
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-start gap-3 sm:gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/20">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-1 sm:mb-2">Organização Automática de Grupos</h4>
+                      <p className="text-sm sm:text-base text-blue-200 text-justify">
+                        Crie e gerencie grupos de pesquisa automaticamente. Organize pacientes por tipo de cirurgia,
+                        protocolo experimental, ou qualquer critério científico.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 sm:gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/20">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-1 sm:mb-2">Exportação Pronta para Publicação</h4>
+                      <p className="text-sm sm:text-base text-blue-200 text-justify">
+                        Exporte dados anonimizados em formatos prontos para análise estatística (CSV, Excel, SPSS).
+                        Conformidade total com LGPD e ética em pesquisa.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 sm:gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/20">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-1 sm:mb-2">Análise Estatística Integrada</h4>
+                      <p className="text-sm sm:text-base text-blue-200 text-justify">
+                        Visualize tendências, compare grupos, identifique correlações. A IA sugere análises relevantes
+                        para seus dados automaticamente.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 sm:pt-6">
+                  <Link
+                    href="/cadastro-medico?plan=professional"
+                    className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-4 sm:py-5 bg-telos-gold text-white rounded-xl font-bold text-base sm:text-lg lg:text-xl hover-lift hover-glow transition-smooth shadow-2xl w-full sm:w-auto"
+                  >
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="truncate">Ativar Modo Pesquisa Agora</span>
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                  <p className="text-xs sm:text-sm text-blue-200 mt-3 sm:mt-4 italic text-center sm:text-left">
+                    ✨ Disponível em todos os planos Professional e Founding Member
+                  </p>
+                </div>
               </div>
-            </div>
+            </FadeIn>
 
             {/* Right - Visual/Stats */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border-2 border-white/20 shadow-2xl">
-                <div className="space-y-6">
-                  {/* Stat Cards */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-telos-blue mb-2">100%</p>
-                      <p className="text-sm text-gray-600 font-semibold">Conforme LGPD</p>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-telos-gold mb-2">1 Clique</p>
-                      <p className="text-sm text-gray-600 font-semibold">Exportação</p>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-telos-blue mb-2">∞</p>
-                      <p className="text-sm text-gray-600 font-semibold">Grupos</p>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-telos-gold mb-2">AI</p>
-                      <p className="text-sm text-gray-600 font-semibold">Análise Auto</p>
-                    </div>
-                  </div>
-
-                  {/* Use Case Example */}
-                  <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 border-2 border-telos-gold/30">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 bg-telos-blue rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            <FadeIn delay={0.4} direction="right">
+              <div className="relative mt-8 lg:mt-0">
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border-2 border-white/20 shadow-2xl">
+                  <div className="space-y-4 sm:space-y-6">
+                    {/* Stat Cards */}
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-blue mb-1 sm:mb-2">100%</p>
+                        <p className="text-xs sm:text-sm text-gray-600 font-semibold">Conforme LGPD</p>
                       </div>
-                      <div>
-                        <h5 className="font-bold text-telos-blue text-lg mb-1">Exemplo de Caso de Uso</h5>
-                        <p className="text-sm text-gray-700 leading-relaxed text-justify">
-                          "Organizei 150 pacientes de artroplastia de quadril em 3 grupos de pesquisa.
-                          Em 2 cliques exportei todos os dados anonimizados e publiquei meu primeiro artigo
-                          em 6 meses. O Modo Pesquisa mudou minha carreira acadêmica."
-                        </p>
-                        <p className="text-xs text-telos-gold font-semibold mt-2">
-                          - Dr. Ricardo M., Ortopedista
-                        </p>
+                      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-gold mb-1 sm:mb-2">1 Clique</p>
+                        <p className="text-xs sm:text-sm text-gray-600 font-semibold">Exportação</p>
+                      </div>
+                      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-blue mb-1 sm:mb-2">∞</p>
+                        <p className="text-xs sm:text-sm text-gray-600 font-semibold">Grupos</p>
+                      </div>
+                      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+                        <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-telos-gold mb-1 sm:mb-2">AI</p>
+                        <p className="text-xs sm:text-sm text-gray-600 font-semibold">Análise Auto</p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Features List */}
-                  <div className="space-y-3">
-                    <h5 className="text-white font-bold text-lg mb-3">Inclui também:</h5>
-                    {[
-                      "Anonimização automática (LGPD)",
-                      "Termos de consentimento digitais",
-                      "Filtros avançados por período/tipo",
-                      "Gráficos e dashboards customizados"
-                    ].map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-3 text-white">
-                        <div className="w-6 h-6 bg-telos-gold rounded-full flex items-center justify-center flex-shrink-0">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    {/* Use Case Example */}
+                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-telos-gold/30">
+                      <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-telos-blue rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium">{feature}</span>
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-bold text-telos-blue text-base sm:text-lg mb-1">Exemplo de Caso de Uso</h5>
+                          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed text-justify">
+                            "Organizei 150 pacientes de artroplastia de quadril em 3 grupos de pesquisa.
+                            Em 2 cliques exportei todos os dados anonimizados e publiquei meu primeiro artigo
+                            em 6 meses. O Modo Pesquisa mudou minha carreira acadêmica."
+                          </p>
+                          <p className="text-xs text-telos-gold font-semibold mt-2">
+                            - Dr. Ricardo M., Ortopedista
+                          </p>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Features List */}
+                    <div className="space-y-2 sm:space-y-3">
+                      <h5 className="text-white font-bold text-base sm:text-lg mb-2 sm:mb-3">Inclui também:</h5>
+                      {[
+                        "Anonimização automática (LGPD)",
+                        "Termos de consentimento digitais",
+                        "Filtros avançados por período/tipo",
+                        "Gráficos e dashboards customizados"
+                      ].map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2 sm:gap-3 text-white">
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-telos-gold rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <span className="text-xs sm:text-sm font-medium">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                {/* Floating badge */}
+                <div className="absolute -top-4 sm:-top-6 -right-4 sm:-right-6 bg-gradient-to-br from-telos-gold to-yellow-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl transform rotate-12 animate-pulse-slow">
+                  <p className="font-black text-sm sm:text-base lg:text-lg">🏆 Exclusivo!</p>
+                </div>
               </div>
-
-              {/* Floating badge */}
-              <div className="absolute -top-6 -right-6 bg-gradient-to-br from-telos-gold to-yellow-500 text-white px-6 py-3 rounded-full shadow-2xl transform rotate-12 animate-pulse-slow">
-                <p className="font-black text-lg">🏆 Exclusivo!</p>
-              </div>
-            </div>
+            </FadeIn>
           </div>
         </div>
       </section>
