@@ -521,17 +521,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           <StaggerItem>
             <ScaleOnHover>
-              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-critical-alerts" style={{ borderColor: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }}>
-                <CardHeader className="pb-3" style={{ backgroundColor: stats?.criticalAlerts > 0 ? '#FEF2F2' : '#F8F9FB' }}>
+              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-critical-alerts" style={{ borderColor: (stats?.criticalAlerts || 0) > 0 ? '#DC2626' : '#0A2647' }}>
+                <CardHeader className="pb-3" style={{ backgroundColor: (stats?.criticalAlerts || 0) > 0 ? '#FEF2F2' : '#F8F9FB' }}>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Alertas Críticos
                     </CardTitle>
-                    <AlertCircle className="h-5 w-5" style={{ color: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }} />
+                    <AlertCircle className="h-5 w-5" style={{ color: (stats?.criticalAlerts || 0) > 0 ? '#DC2626' : '#0A2647' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold" style={{ color: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }}>
+                  <div className="text-3xl font-bold" style={{ color: (stats?.criticalAlerts || 0) > 0 ? '#DC2626' : '#0A2647' }}>
                     {prefersReducedMotion ? (
                       stats?.criticalAlerts || 0
                     ) : (
