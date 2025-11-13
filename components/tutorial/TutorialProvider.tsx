@@ -224,6 +224,47 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
             options.onNextClick(element, step, opts);
           }
         },
+        onPopoverRender: (popover, options_) => {
+          // Call the default onPopoverRender first
+          if (defaultDriverConfig.onPopoverRender) {
+            defaultDriverConfig.onPopoverRender(popover, options_);
+          }
+
+          // CRITICAL FIX: Add manual click handlers to ensure buttons work
+          setTimeout(() => {
+            const nextBtn = document.querySelector('.driver-popover-next-btn') as HTMLButtonElement;
+            const prevBtn = document.querySelector('.driver-popover-prev-btn') as HTMLButtonElement;
+            const closeBtn = document.querySelector('.driver-popover-close-btn') as HTMLButtonElement;
+
+            if (nextBtn) {
+              nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                newDriver.moveNext();
+              }, { capture: true });
+            }
+
+            if (prevBtn) {
+              prevBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                newDriver.movePrevious();
+              }, { capture: true });
+            }
+
+            if (closeBtn) {
+              closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                newDriver.destroy();
+              }, { capture: true });
+            }
+          }, 100);
+
+          if (options.onPopoverRender) {
+            options.onPopoverRender(popover, options_);
+          }
+        },
       };
 
       const newDriver = driver(config);
