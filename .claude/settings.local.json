@@ -44,7 +44,18 @@
       "Bash(vercel env:*)",
       "Bash(vercel ls:*)",
       "Bash(vercel --prod:*)",
-      "Bash(vercel logs:*)"
+      "Bash(vercel logs:*)",
+      "Bash(railway login:*)",
+      "Bash(railway whoami:*)",
+      "Bash(railway link:*)",
+      "Bash(railway variables:*)",
+      "Bash(railway service:*)",
+      "Bash(railway up:*)",
+      "Bash(railway logs:*)",
+      "Bash(timeout /t 10)",
+      "Bash(railway status:*)",
+      "Bash(railway domain:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []
