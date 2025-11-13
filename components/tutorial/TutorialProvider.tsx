@@ -53,20 +53,43 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
     smoothScroll: true,
     stagePadding: 10,
     overlayColor: 'rgba(0, 0, 0, 0.5)',
+    onHighlightStarted: () => {
+      // Force overlay to not block clicks
+      const overlay = document.querySelector('.driver-overlay') as HTMLElement;
+      if (overlay) {
+        overlay.style.pointerEvents = 'none';
+      }
+    },
     onPopoverRender: (popover) => {
       // Add custom classes to popover
       const popoverElement = popover.wrapper;
       popoverElement.style.borderRadius = '12px';
       popoverElement.style.maxWidth = '420px';
-      popoverElement.style.zIndex = '999999';
+      popoverElement.style.zIndex = '2147483647'; // Maximum z-index
       popoverElement.style.pointerEvents = 'all';
 
-      // Force all interactive elements to be clickable
-      const allButtons = popoverElement.querySelectorAll('button, .driver-popover-close-btn');
-      allButtons.forEach((btn) => {
-        (btn as HTMLElement).style.pointerEvents = 'all';
-        (btn as HTMLElement).style.zIndex = '9999999';
-        (btn as HTMLElement).style.position = 'relative';
+      // CRITICAL FIX: Force overlay to NEVER block any clicks
+      const fixOverlay = () => {
+        const overlays = document.querySelectorAll('.driver-overlay, .driver-overlay-clickable');
+        overlays.forEach((overlay) => {
+          (overlay as HTMLElement).style.pointerEvents = 'none';
+          (overlay as HTMLElement).style.zIndex = '2147483646'; // Just below popover
+        });
+      };
+
+      fixOverlay();
+      // Keep fixing it in case driver.js recreates it
+      setTimeout(fixOverlay, 10);
+      setTimeout(fixOverlay, 50);
+      setTimeout(fixOverlay, 100);
+
+      // Force all buttons and interactive elements to be clickable
+      const allInteractive = popoverElement.querySelectorAll('button, .driver-popover-close-btn, .driver-popover-footer, .driver-popover-navigation-btns');
+      allInteractive.forEach((element) => {
+        (element as HTMLElement).style.pointerEvents = 'all';
+        (element as HTMLElement).style.zIndex = '2147483647';
+        (element as HTMLElement).style.position = 'relative';
+        (element as HTMLElement).style.cursor = 'pointer';
       });
 
       // Style header

@@ -447,18 +447,19 @@
 }
 
 /* Driver.js Tutorial System - Custom Styling */
-.driver-overlay {
-  z-index: 999997 !important;
-  pointer-events: auto !important;
+.driver-overlay,
+.driver-overlay-clickable {
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
 }
 
 .driver-highlighted-element {
-  z-index: 999997 !important;
+  z-index: 2147483646 !important;
   pointer-events: none !important;
 }
 
 .driver-popover {
-  z-index: 999998 !important;
+  z-index: 2147483647 !important;
   pointer-events: all !important;
 }
 
