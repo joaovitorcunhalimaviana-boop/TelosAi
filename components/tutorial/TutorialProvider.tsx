@@ -58,8 +58,16 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
       const popoverElement = popover.wrapper;
       popoverElement.style.borderRadius = '12px';
       popoverElement.style.maxWidth = '420px';
-      popoverElement.style.zIndex = '999998';
-      popoverElement.style.pointerEvents = 'auto';
+      popoverElement.style.zIndex = '999999';
+      popoverElement.style.pointerEvents = 'all';
+
+      // Force all interactive elements to be clickable
+      const allButtons = popoverElement.querySelectorAll('button, .driver-popover-close-btn');
+      allButtons.forEach((btn) => {
+        (btn as HTMLElement).style.pointerEvents = 'all';
+        (btn as HTMLElement).style.zIndex = '9999999';
+        (btn as HTMLElement).style.position = 'relative';
+      });
 
       // Style header
       const title = popoverElement.querySelector('.driver-popover-title');

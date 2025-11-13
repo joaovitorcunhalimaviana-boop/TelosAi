@@ -447,22 +447,37 @@
 }
 
 /* Driver.js Tutorial System - Custom Styling */
-.driver-overlay,
+.driver-overlay {
+  z-index: 999997 !important;
+  pointer-events: auto !important;
+}
+
 .driver-highlighted-element {
   z-index: 999997 !important;
+  pointer-events: none !important;
 }
 
 .driver-popover {
   z-index: 999998 !important;
-  pointer-events: auto !important;
+  pointer-events: all !important;
+}
+
+.driver-popover * {
+  pointer-events: all !important;
 }
 
 .driver-popover-next-btn,
 .driver-popover-prev-btn,
 .driver-popover-close-btn {
   z-index: 999999 !important;
-  pointer-events: auto !important;
+  pointer-events: all !important;
   position: relative !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.driver-popover button {
+  pointer-events: all !important;
   cursor: pointer !important;
 }
 
@@ -477,6 +492,20 @@
   transition: all 0.2s ease;
 }
 
+.driver-popover-close-btn:hover {
+  opacity: 0.7 !important;
+  transition: all 0.2s ease;
+}
+
 .telos-tutorial-popover {
   box-shadow: 0 10px 40px rgba(10, 38, 71, 0.2) !important;
+  pointer-events: all !important;
+}
+
+.driver-popover-footer {
+  pointer-events: all !important;
+}
+
+.driver-popover-navigation-btns {
+  pointer-events: all !important;
 }
