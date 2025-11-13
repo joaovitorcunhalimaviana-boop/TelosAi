@@ -50,6 +50,9 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
     popoverClass: 'telos-tutorial-popover',
     allowClose: true,
     disableActiveInteraction: false,
+    smoothScroll: true,
+    stagePadding: 10,
+    overlayColor: 'rgba(0, 0, 0, 0.5)',
     onPopoverRender: (popover) => {
       // Add custom classes to popover
       const popoverElement = popover.wrapper;
@@ -136,6 +139,20 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
       if (steps.length === 0) {
         console.warn(`No steps found for tutorial: ${tutorialId}`);
         return;
+      }
+
+      // Check if first step element exists
+      const firstStep = steps[0];
+      if (firstStep.element) {
+        const element = document.querySelector(firstStep.element as string);
+        if (!element) {
+          console.error(`Tutorial element not found: ${firstStep.element}`);
+          console.error('Available elements:', {
+            dashboardHeader: document.querySelector('#dashboard-header'),
+            body: document.body,
+          });
+          return;
+        }
       }
 
       setCurrentTutorial(tutorialId);
