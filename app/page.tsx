@@ -248,6 +248,185 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Research Mode Section - DESTAQUE */}
+      <section className="py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-telos-gold rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left - Content */}
+            <div className="space-y-8 text-white">
+              <div className="inline-flex items-center gap-3 px-5 py-3 bg-telos-gold/20 border-2 border-telos-gold rounded-full">
+                <div className="w-3 h-3 bg-telos-gold rounded-full animate-pulse"></div>
+                <span className="text-sm font-bold text-telos-gold uppercase tracking-wide">
+                  🔬 Exclusivo Telos.AI
+                </span>
+              </div>
+
+              <h2 className="text-5xl lg:text-6xl font-black leading-tight">
+                Modo Pesquisa
+                <br />
+                <span className="text-telos-gold">Científica</span>
+              </h2>
+
+              <p className="text-2xl font-semibold text-blue-100">
+                Transforme Seus Dados em Publicações de Impacto
+              </p>
+
+              <p className="text-lg text-blue-200 leading-relaxed text-justify">
+                O primeiro sistema de IA médica do Brasil com funcionalidade dedicada para{" "}
+                <span className="text-telos-gold font-bold">organização automática de estudos clínicos</span>.
+                Revolucione sua produção científica enquanto cuida dos seus pacientes.
+              </p>
+
+              {/* Key Features do Modo Pesquisa */}
+              <div className="space-y-4">
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-2">Organização Automática de Grupos</h4>
+                    <p className="text-blue-200 text-justify">
+                      Crie e gerencie grupos de pesquisa automaticamente. Organize pacientes por tipo de cirurgia,
+                      protocolo experimental, ou qualquer critério científico.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-2">Exportação Pronta para Publicação</h4>
+                    <p className="text-blue-200 text-justify">
+                      Exporte dados anonimizados em formatos prontos para análise estatística (CSV, Excel, SPSS).
+                      Conformidade total com LGPD e ética em pesquisa.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-2">Análise Estatística Integrada</h4>
+                    <p className="text-blue-200 text-justify">
+                      Visualize tendências, compare grupos, identifique correlações. A IA sugere análises relevantes
+                      para seus dados automaticamente.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                <Link
+                  href="/cadastro-medico?plan=professional"
+                  className="group inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white rounded-xl font-bold text-xl hover-lift hover-glow transition-smooth shadow-2xl"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Ativar Modo Pesquisa Agora
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+                <p className="text-sm text-blue-200 mt-4 italic">
+                  ✨ Disponível em todos os planos Professional e Founding Member
+                </p>
+              </div>
+            </div>
+
+            {/* Right - Visual/Stats */}
+            <div className="relative">
+              <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border-2 border-white/20 shadow-2xl">
+                <div className="space-y-6">
+                  {/* Stat Cards */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
+                      <p className="text-4xl font-black text-telos-blue mb-2">100%</p>
+                      <p className="text-sm text-gray-600 font-semibold">Conforme LGPD</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
+                      <p className="text-4xl font-black text-telos-gold mb-2">1 Clique</p>
+                      <p className="text-sm text-gray-600 font-semibold">Exportação</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
+                      <p className="text-4xl font-black text-telos-blue mb-2">∞</p>
+                      <p className="text-sm text-gray-600 font-semibold">Grupos</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 text-center transform hover:scale-105 transition-transform">
+                      <p className="text-4xl font-black text-telos-gold mb-2">AI</p>
+                      <p className="text-sm text-gray-600 font-semibold">Análise Auto</p>
+                    </div>
+                  </div>
+
+                  {/* Use Case Example */}
+                  <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 border-2 border-telos-gold/30">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 bg-telos-blue rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h5 className="font-bold text-telos-blue text-lg mb-1">Exemplo de Caso de Uso</h5>
+                        <p className="text-sm text-gray-700 leading-relaxed text-justify">
+                          "Organizei 150 pacientes de artroplastia de quadril em 3 grupos de pesquisa.
+                          Em 2 cliques exportei todos os dados anonimizados e publiquei meu primeiro artigo
+                          em 6 meses. O Modo Pesquisa mudou minha carreira acadêmica."
+                        </p>
+                        <p className="text-xs text-telos-gold font-semibold mt-2">
+                          - Dr. Ricardo M., Ortopedista
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features List */}
+                  <div className="space-y-3">
+                    <h5 className="text-white font-bold text-lg mb-3">Inclui também:</h5>
+                    {[
+                      "Anonimização automática (LGPD)",
+                      "Termos de consentimento digitais",
+                      "Filtros avançados por período/tipo",
+                      "Gráficos e dashboards customizados"
+                    ].map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-white">
+                        <div className="w-6 h-6 bg-telos-gold rounded-full flex items-center justify-center flex-shrink-0">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating badge */}
+              <div className="absolute -top-6 -right-6 bg-gradient-to-br from-telos-gold to-yellow-500 text-white px-6 py-3 rounded-full shadow-2xl transform rotate-12 animate-pulse-slow">
+                <p className="font-black text-lg">🏆 Exclusivo!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
