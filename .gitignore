@@ -33,11 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
+# vercel - NÃO USAR VERCEL! Deploy é no Railway
 .vercel
+vercel.json
+.vercelignore
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.vercel
