@@ -49,7 +49,7 @@ import { FadeIn, SlideIn, StaggerChildren, StaggerItem, CountUp, ScaleOnHover } 
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion"
 import { motion, AnimatePresence } from "framer-motion"
 import { OnboardingChecklist } from "@/components/tutorial/OnboardingChecklist"
-import { TutorialTrigger } from "@/components/tutorial/TutorialTrigger"
+import { SimpleTour } from "@/components/tutorial/SimpleTour"
 
 interface DashboardClientProps {
   userRole: string;
@@ -76,6 +76,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [patients, setPatients] = useState<PatientCard[]>([])
   const [loading, setLoading] = useState(true)
+  const [showTour, setShowTour] = useState(false)
 
   // Filtros
   const [filters, setFilters] = useState<DashboardFilters>({
@@ -322,11 +323,18 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 Acompanhamento Pós-Operatório - Dr. João Vitor Viana
               </p>
             </div>
-            <TutorialTrigger
-              tutorialId="dashboard-tour"
-              variant="icon"
-              label="Iniciar tour pelo dashboard"
-            />
+            <Button
+              onClick={() => {
+                console.log('🎯 Tour button clicked! Opening SimpleTour...');
+                setShowTour(true);
+              }}
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              title="Iniciar tour pelo dashboard"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Botões de Ação */}
@@ -1144,6 +1152,14 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* SimpleTour - custom tour replacing driver.js */}
+        {showTour && (
+          <SimpleTour onClose={() => {
+            console.log('🎯 SimpleTour closed!');
+            setShowTour(false);
+          }} />
+        )}
       </div>
     </div>
   )
