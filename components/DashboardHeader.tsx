@@ -10,20 +10,11 @@ export function DashboardHeader() {
   const pathname = usePathname()
   const { data: session } = useSession()
 
-  // Navegação privada - apenas após login
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/cadastro", label: "Cadastro Express" },
-    { href: "/exportar", label: "Exportar Dados" },
-    { href: "/termos", label: "Termos" },
-    { href: "/templates", label: "Templates" },
-  ]
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
-        {/* Logo */}
-        <Link href="/dashboard" className="group">
+        {/* Logo e Nome */}
+        <Link href="/dashboard" className="group flex items-center gap-3">
           <div className="relative w-14 h-14">
             <Image
               src="/icons/icon-192.png"
@@ -34,30 +25,11 @@ export function DashboardHeader() {
               priority
             />
           </div>
+          <div className="hidden sm:block">
+            <h1 className="text-xl font-bold" style={{ color: '#0A2647' }}>Telos.AI</h1>
+            <p className="text-xs text-gray-600">Inteligência no Cuidado</p>
+          </div>
         </Link>
-
-        {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                  text-sm font-medium transition-all duration-200
-                  ${
-                    isActive
-                      ? "text-telos-blue font-semibold border-b-2 border-telos-gold pb-1"
-                      : "text-gray-600 hover:text-telos-blue"
-                  }
-                `}
-              >
-                {item.label}
-              </Link>
-            )
-          })}
-        </nav>
 
         {/* User Menu */}
         <div className="flex items-center gap-4">

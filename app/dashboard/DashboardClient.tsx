@@ -39,6 +39,9 @@ import {
   MoreVertical,
   MessageCircle,
   Phone,
+  Download,
+  HelpCircle,
+  BookOpen,
 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -331,7 +334,12 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             {/* Link para Billing (médicos) */}
             {userRole === "medico" && (
               <Link href="/dashboard/billing">
-                <Button size="lg" variant="outline" className="shadow-sm gap-2 hover:bg-gray-50">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="shadow-sm gap-2 hover:opacity-80"
+                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
+                >
                   <DollarSign className="h-5 w-5" />
                   Meu Plano
                 </Button>
@@ -344,7 +352,8 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="shadow-sm gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                  className="shadow-sm gap-2 hover:opacity-80"
+                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
                 >
                   <Shield className="h-5 w-5" />
                   Admin Dashboard
@@ -357,7 +366,8 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="shadow-sm border-purple-300 text-purple-700 hover:bg-purple-50"
+                className="shadow-sm hover:opacity-80"
+                style={{ borderColor: '#0A2647', color: '#0A2647' }}
                 data-tutorial="research-btn"
               >
                 <FlaskConical className="mr-2 h-5 w-5" />
@@ -365,18 +375,40 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               </Button>
             </Link>
 
-            {/* More Options Dropdown */}
+            {/* Menu de Navegação Completo */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="lg" variant="outline" className="shadow-sm gap-2 hover:bg-gray-50">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="shadow-sm gap-2 hover:bg-gray-50"
+                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
+                >
                   <MoreVertical className="h-5 w-5" />
-                  Mais
+                  Menu
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">AÇÕES RÁPIDAS</div>
+                <DropdownMenuItem asChild>
+                  <Link href="/cadastro" className="flex items-center cursor-pointer">
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Cadastro Express
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/exportar" className="flex items-center cursor-pointer">
+                    <Download className="mr-2 h-4 w-4" />
+                    Exportar Dados
+                  </Link>
+                </DropdownMenuItem>
+
+                <div className="my-1 h-px bg-gray-200" />
+
+                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">RECURSOS</div>
                 <DropdownMenuItem asChild>
                   <Link href="/templates" className="flex items-center cursor-pointer">
-                    <FileText className="mr-2 h-4 w-4" />
+                    <BookOpen className="mr-2 h-4 w-4" />
                     Templates
                   </Link>
                 </DropdownMenuItem>
@@ -388,7 +420,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/ajuda" className="flex items-center cursor-pointer">
-                    <FileText className="mr-2 h-4 w-4" />
+                    <HelpCircle className="mr-2 h-4 w-4" />
                     Central de Ajuda
                   </Link>
                 </DropdownMenuItem>
@@ -417,17 +449,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
         >
           <StaggerItem>
             <ScaleOnHover>
-              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-today-surgeries">
-                <CardHeader className="pb-3">
+              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-today-surgeries" style={{ borderColor: '#0A2647' }}>
+                <CardHeader className="pb-3" style={{ backgroundColor: '#F8F9FB' }}>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Cirurgias Hoje
                     </CardTitle>
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5" style={{ color: '#0A2647' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-3xl font-bold" style={{ color: '#0A2647' }}>
                     {prefersReducedMotion ? (
                       stats?.todaySurgeries || 0
                     ) : (
@@ -441,17 +473,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           <StaggerItem>
             <ScaleOnHover>
-              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-active-patients">
-                <CardHeader className="pb-3">
+              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-active-patients" style={{ borderColor: '#0A2647' }}>
+                <CardHeader className="pb-3" style={{ backgroundColor: '#F8F9FB' }}>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Pacientes Ativos
                     </CardTitle>
-                    <Users className="h-5 w-5 text-green-600" />
+                    <Users className="h-5 w-5" style={{ color: '#0A2647' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-600">
+                  <div className="text-3xl font-bold" style={{ color: '#0A2647' }}>
                     {prefersReducedMotion ? (
                       stats?.activePatientsCount || 0
                     ) : (
@@ -465,17 +497,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           <StaggerItem>
             <ScaleOnHover>
-              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-followups-today">
-                <CardHeader className="pb-3">
+              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-followups-today" style={{ borderColor: '#0A2647' }}>
+                <CardHeader className="pb-3" style={{ backgroundColor: '#F8F9FB' }}>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Follow-ups Hoje
                     </CardTitle>
-                    <Clock className="h-5 w-5 text-orange-600" />
+                    <Clock className="h-5 w-5" style={{ color: '#0A2647' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-orange-600">
+                  <div className="text-3xl font-bold" style={{ color: '#0A2647' }}>
                     {prefersReducedMotion ? (
                       stats?.pendingFollowUpsToday || 0
                     ) : (
@@ -489,17 +521,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           <StaggerItem>
             <ScaleOnHover>
-              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-critical-alerts">
-                <CardHeader className="pb-3">
+              <Card className="border-2 hover:shadow-lg transition-shadow" data-tutorial="stats-critical-alerts" style={{ borderColor: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }}>
+                <CardHeader className="pb-3" style={{ backgroundColor: stats?.criticalAlerts > 0 ? '#FEF2F2' : '#F8F9FB' }}>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Alertas Críticos
                     </CardTitle>
-                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <AlertCircle className="h-5 w-5" style={{ color: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-red-600">
+                  <div className="text-3xl font-bold" style={{ color: stats?.criticalAlerts > 0 ? '#DC2626' : '#0A2647' }}>
                     {prefersReducedMotion ? (
                       stats?.criticalAlerts || 0
                     ) : (
