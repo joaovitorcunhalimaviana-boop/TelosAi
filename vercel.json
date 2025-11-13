@@ -4,5 +4,13 @@
       "path": "/api/cron/send-followups",
       "schedule": "0 10 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "app/api/**/route.ts": {
+      "runtime": "nodejs20.x"
+    },
+    "app/api/**/route.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
