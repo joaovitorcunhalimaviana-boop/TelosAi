@@ -12,17 +12,42 @@ const DASHBOARD_STEPS: TourStep[] = [
   {
     element: '#dashboard-header',
     title: '👋 Bem-vindo ao Telos.AI',
-    description: 'Este é seu painel de controle médico. Aqui você acompanha todos os seus pacientes em tempo real.',
+    description: 'Este é seu painel de controle médico inteligente. Aqui você acompanha todos os seus pacientes em tempo real com tecnologia de ponta.',
+  },
+  {
+    element: '[data-tutorial="new-patient-btn"]',
+    title: '➕ Novo Paciente',
+    description: 'Clique aqui para cadastrar um novo paciente no sistema. O cadastro é rápido e intuitivo, permitindo adicionar todas as informações necessárias.',
+  },
+  {
+    element: '[data-tutorial="research-btn"]',
+    title: '🔬 Modo Pesquisa',
+    description: 'Organize seus pacientes em grupos de pesquisa científica. Perfeito para estudos clínicos e análise de resultados em larga escala.',
   },
   {
     element: '[data-tutorial="stats-today-surgeries"]',
     title: '📅 Cirurgias Hoje',
-    description: 'Acompanhe quantos pacientes foram operados hoje.',
+    description: 'Acompanhe em tempo real quantos pacientes foram operados hoje. Este indicador ajuda a gerenciar sua agenda cirúrgica.',
   },
   {
     element: '[data-tutorial="stats-active-patients"]',
     title: '👥 Pacientes Ativos',
-    description: 'Total de pacientes em acompanhamento pós-operatório.',
+    description: 'Total de pacientes em acompanhamento pós-operatório ativo. Mantenha controle sobre todos os casos em andamento.',
+  },
+  {
+    element: '[data-tutorial="stats-followups-today"]',
+    title: '📋 Follow-ups Hoje',
+    description: 'Quantidade de acompanhamentos programados para hoje. Nunca perca um follow-up importante com lembretes automáticos.',
+  },
+  {
+    element: '[data-tutorial="stats-critical-alerts"]',
+    title: '⚠️ Alertas Críticos',
+    description: 'Pacientes que precisam de atenção urgente. O sistema detecta automaticamente situações de risco e alerta você imediatamente.',
+  },
+  {
+    element: '[data-tutorial="search-filters"]',
+    title: '🔍 Filtros e Busca',
+    description: 'Use filtros avançados para encontrar pacientes rapidamente. Filtre por tipo de cirurgia, status, período ou faça buscas por nome.',
   },
 ];
 
