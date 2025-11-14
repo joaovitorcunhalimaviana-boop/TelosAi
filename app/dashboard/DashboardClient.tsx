@@ -384,43 +384,45 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             </Link>
 
             {/* Botão de Teste - Enviar Mensagens D+1 */}
-            <button
+            <Button
               type="button"
-              className="inline-flex items-center justify-center gap-2 h-10 rounded-md px-6 text-sm font-medium transition-all border bg-white shadow-md hover:shadow-lg active:scale-95 cursor-pointer relative z-50"
-              style={{ borderColor: '#25D366', color: '#25D366', touchAction: 'manipulation' }}
-              onMouseDown={(e) => {
-                console.log('🖱️ Mouse down no botão!');
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔘 Botão clicado!');
+              size="lg"
+              variant="outline"
+              className="shadow-md hover:shadow-lg cursor-pointer relative z-50"
+              style={{ borderColor: '#25D366', color: '#25D366' }}
+              onClick={() => {
+                console.log('🔘 BOTÃO CLICADO - INICIANDO ENVIO!');
+                alert('Botão clicado! Verificar console.');
+
                 toast.loading('Enviando mensagens...', { id: 'send-followups' });
 
                 fetch('/api/test/send-followups-now', {
                   method: 'POST',
                 })
-                  .then(response => response.json())
+                  .then(response => {
+                    console.log('📡 Response recebido:', response);
+                    return response.json();
+                  })
                   .then(data => {
-                    console.log('📨 Resposta:', data);
+                    console.log('📨 Dados recebidos:', data);
                     if (data.success) {
-                      toast.success(`Enviadas ${data.results.sent} mensagens!`, { id: 'send-followups' });
+                      toast.success(`✅ Enviadas ${data.results.sent} mensagens!`, { id: 'send-followups' });
                       if (data.results.failed > 0) {
-                        toast.warning(`${data.results.failed} mensagens falharam`);
+                        toast.warning(`⚠️ ${data.results.failed} mensagens falharam`);
                       }
                     } else {
-                      toast.error(`Erro: ${data.error}`, { id: 'send-followups' });
+                      toast.error(`❌ Erro: ${data.error}`, { id: 'send-followups' });
                     }
                   })
                   .catch(error => {
-                    console.error('❌ Erro:', error);
-                    toast.error('Erro ao enviar mensagens', { id: 'send-followups' });
+                    console.error('❌ Erro na requisição:', error);
+                    toast.error('❌ Erro ao enviar mensagens', { id: 'send-followups' });
                   });
               }}
             >
-              <MessageCircle className="h-5 w-5" style={{ pointerEvents: 'none' }} />
-              <span style={{ pointerEvents: 'none' }}>Enviar D+1 Agora</span>
-            </button>
+              <MessageCircle className="mr-2 h-5 w-5" />
+              Enviar D+1 Agora
+            </Button>
 
             {/* Menu de Navegação Completo */}
             <DropdownMenu>
