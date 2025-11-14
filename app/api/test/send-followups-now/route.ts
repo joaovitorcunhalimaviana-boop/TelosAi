@@ -36,22 +36,26 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 Manual follow-up send triggered by:', user.email);
 
-    // Data de hoje no horário de Brasília (início e fim do dia)
+    // Data de hoje no horário de Brasília
     const todayBrasilia = getNowBrasilia();
     const todayStart = startOfDayBrasilia();
     const todayEnd = endOfDayBrasilia();
 
-    console.log('📅 Brasília Time:', todayBrasilia.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
-    console.log('📅 Looking for follow-ups scheduled for:', todayStart.toDateString());
+    // Também buscar de ontem (caso tenha virado o dia)
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
 
-    // Buscar follow-ups pendentes para hoje
+    console.log('📅 Brasília Time:', todayBrasilia.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+    console.log('📅 Looking for follow-ups from:', yesterdayStart.toDateString(), 'to', todayStart.toDateString());
+
+    // Buscar follow-ups pendentes para HOJE e ONTEM
     const pendingFollowUps = await prisma.followUp.findMany({
       where: {
-        userId: user.id, // Apenas do usuário logado
+        userId: user.id,
         status: 'pending',
         scheduledDate: {
-          gte: todayStart,
-          lt: todayEnd,
+          gte: yesterdayStart, // Desde ontem
+          lt: todayEnd, // Até hoje
         },
       },
       include: {
