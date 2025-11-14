@@ -383,6 +383,37 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               </Button>
             </Link>
 
+            {/* Botão de Teste - Enviar Mensagens D+1 */}
+            <Button
+              size="lg"
+              variant="outline"
+              className="shadow-sm hover:opacity-80"
+              style={{ borderColor: '#25D366', color: '#25D366' }}
+              onClick={async () => {
+                toast.loading('Enviando mensagens...', { id: 'send-followups' });
+                try {
+                  const response = await fetch('/api/test/send-followups-now', {
+                    method: 'POST',
+                  });
+                  const data = await response.json();
+
+                  if (data.success) {
+                    toast.success(`Enviadas ${data.results.sent} mensagens!`, { id: 'send-followups' });
+                    if (data.results.failed > 0) {
+                      toast.warning(`${data.results.failed} mensagens falharam`);
+                    }
+                  } else {
+                    toast.error(`Erro: ${data.error}`, { id: 'send-followups' });
+                  }
+                } catch (error) {
+                  toast.error('Erro ao enviar mensagens', { id: 'send-followups' });
+                }
+              }}
+            >
+              <MessageCircle className="mr-2 h-5 w-5" />
+              Enviar D+1 Agora
+            </Button>
+
             {/* Menu de Navegação Completo */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
