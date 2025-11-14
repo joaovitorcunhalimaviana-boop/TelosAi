@@ -16,11 +16,18 @@ export default function PricingPage() {
   const professionalPrice = calculatePrice(500, 180)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       <TelosHeader />
 
+      {/* Background Animated Blobs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-20 -left-20 w-96 h-96 bg-telos-blue/5 rounded-full blur-3xl animate-blob-move"></div>
+        <div className="absolute top-40 -right-20 w-96 h-96 bg-telos-gold/5 rounded-full blur-3xl animate-blob-move animation-delay-2000"></div>
+        <div className="absolute -bottom-20 left-1/2 w-96 h-96 bg-telos-blue/5 rounded-full blur-3xl animate-blob-move animation-delay-4000"></div>
+      </div>
+
       {/* Hero Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white relative z-10">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h1 className="text-5xl lg:text-6xl font-bold text-telos-blue animate-fade-in-down">
@@ -35,9 +42,9 @@ export default function PricingPage() {
       </section>
 
       {/* Price Calculator */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8">
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 hover-lift-strong card-shine">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-telos-blue mb-2">
                 Calculadora de Preços
@@ -74,9 +81,9 @@ export default function PricingPage() {
 
               <div className="grid md:grid-cols-2 gap-6 mt-8">
                 {/* Founding Calculation */}
-                <div className="p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold">
+                <div className="p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold hover-lift-strong card-shine animate-fade-in animation-delay-200 animate-glow-pulse-strong">
                   <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6 text-telos-gold" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-6 h-6 text-telos-gold hover-tilt animate-scale-bounce neon-gold" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
                     <h3 className="text-xl font-bold text-telos-blue">Founding Members</h3>
@@ -97,9 +104,9 @@ export default function PricingPage() {
                 </div>
 
                 {/* Professional Calculation */}
-                <div className="p-6 bg-white rounded-xl border-2 border-telos-blue">
+                <div className="p-6 bg-white rounded-xl border-2 border-telos-blue hover-lift-strong card-shine animate-fade-in animation-delay-400">
                   <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6 text-telos-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-telos-blue hover-tilt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     <h3 className="text-xl font-bold text-telos-blue">Profissional</h3>
