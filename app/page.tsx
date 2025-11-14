@@ -284,19 +284,7 @@ export default function Home() {
       </section>
 
       {/* Research Mode Section - DESTAQUE */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden animate-gradient-breathe">
-        {/* Background Pattern - Animated */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-telos-gold rounded-full blur-3xl animate-blob-move"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl animate-blob-move animation-delay-600"></div>
-        </div>
-
-        {/* Floating Particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-telos-gold rounded-full animate-float-particle"></div>
-          <div className="absolute top-3/4 right-1/4 w-3 h-3 bg-blue-400 rounded-full animate-float-particle animation-delay-800"></div>
-          <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-telos-gold rounded-full animate-float-particle animation-delay-400"></div>
-        </div>
+      <section className="py-16 sm:py-24 telos-gradient relative overflow-hidden">
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">

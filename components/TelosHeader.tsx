@@ -18,9 +18,9 @@ export function TelosHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
-      <div className="container mx-auto flex h-20 items-center justify-between px-6">
+      <div className="container mx-auto flex h-20 items-center px-6">
         {/* Logo */}
-        <Link href="/" className="group">
+        <Link href="/" className="group flex-shrink-0">
           <div className="relative w-14 h-14">
             <Image
               src="/icons/icon-192.png"
@@ -33,8 +33,8 @@ export function TelosHeader() {
           </div>
         </Link>
 
-        {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Navigation - Centralizado */}
+        <nav className="hidden md:flex items-center gap-10 flex-1 justify-center">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -42,7 +42,7 @@ export function TelosHeader() {
                 key={item.href}
                 href={item.href}
                 className={`
-                  text-sm font-medium transition-all duration-200
+                  text-base font-medium transition-all duration-200
                   ${
                     isActive
                       ? "text-telos-blue font-semibold border-b-2 border-telos-gold pb-1"
@@ -57,7 +57,7 @@ export function TelosHeader() {
         </nav>
 
         {/* CTA Buttons */}
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
           <Link
             href="/auth/login"
             className="px-4 py-2 text-telos-blue hover:text-telos-gold font-medium transition-colors"
