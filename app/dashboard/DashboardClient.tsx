@@ -1035,7 +1035,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                             variant="outline"
                             size="sm"
                             className="flex-1"
-                            onClick={() => router.push(`/paciente/${patient.id}/editar`)}
+                            onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
                           >
                             Ver Detalhes
                           </Button>
@@ -1044,7 +1044,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                               variant="default"
                               size="sm"
                               className="flex-1"
-                              onClick={() => router.push(`/paciente/${patient.id}/editar`)}
+                              onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
                             >
                               Completar Cadastro
                             </Button>

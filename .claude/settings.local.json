@@ -74,7 +74,10 @@
       "Bash(prisma/migrations/0_init/migration.sql)",
       "Bash(del prisma.config.ts 2)",
       "Bash(if exist prisma.config.ts del prisma.config.ts)",
-      "Bash(railway run:*)"
+      "Bash(railway run:*)",
+      "Bash(powershell -Command \"Start-Sleep -Seconds 20\")",
+      "Bash(tree:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

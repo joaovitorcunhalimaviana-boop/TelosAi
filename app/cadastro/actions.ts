@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { prisma } from '@/lib/prisma'
+import { fromBrasiliaTime } from '@/lib/date-utils'
 
 interface QuickPatientData {
   userId: string
@@ -30,7 +31,8 @@ export async function createQuickPatient(data: QuickPatientData) {
     })
 
     // 2. Criar a cirurgia vinculada ao paciente
-    const surgeryDate = new Date(data.surgeryDate)
+    // Converter a data do formulário (horário de Brasília) para UTC
+    const surgeryDate = fromBrasiliaTime(new Date(data.surgeryDate))
     const surgery = await prisma.surgery.create({
       data: {
         userId: data.userId,

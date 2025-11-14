@@ -6,6 +6,7 @@ import {
   isValidCuid,
   calculateCompleteness,
 } from '@/lib/api-utils';
+import { fromBrasiliaTime } from '@/lib/date-utils';
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -300,7 +301,7 @@ export async function PATCH(
         const surgeryData: any = {};
         if (validatedData.surgery.type) surgeryData.type = validatedData.surgery.type;
         if (validatedData.surgery.date)
-          surgeryData.date = new Date(validatedData.surgery.date);
+          surgeryData.date = fromBrasiliaTime(new Date(validatedData.surgery.date));
         if (validatedData.surgery.hospital !== undefined)
           surgeryData.hospital = validatedData.surgery.hospital;
         if (validatedData.surgery.durationMinutes !== undefined)
@@ -322,8 +323,8 @@ export async function PATCH(
               patientId: id,
               type: validatedData.surgery.type || 'hemorroidectomia',
               date: validatedData.surgery.date
-                ? new Date(validatedData.surgery.date)
-                : new Date(),
+                ? fromBrasiliaTime(new Date(validatedData.surgery.date))
+                : fromBrasiliaTime(new Date()),
             },
           });
           surgeryId = newSurgery.id;

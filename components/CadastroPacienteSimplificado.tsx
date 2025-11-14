@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { getNowBrasilia, startOfDayBrasilia } from "@/lib/date-utils"
 
 // Schema de validação com Zod
 const simplifiedPatientSchema = z.object({
@@ -158,12 +159,11 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
       // Validação completa
       const validatedData = simplifiedPatientSchema.parse(formData)
 
-      // Validar data da cirurgia
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
+      // Validar data da cirurgia (usar horário de Brasília)
+      const todayBrasilia = startOfDayBrasilia()
       const surgery = new Date(validatedData.surgeryDate)
 
-      if (surgery > today) {
+      if (surgery > todayBrasilia) {
         setErrors({ surgeryDate: "Data da cirurgia não pode ser futura" })
         setIsSubmitting(false)
         return

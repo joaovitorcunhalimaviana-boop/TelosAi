@@ -1,8 +1,9 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
-import { startOfDay, endOfDay, subDays } from "date-fns"
+import { subDays } from "date-fns"
 import { validateResearchFields } from "@/lib/research-field-validator"
+import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from "@/lib/date-utils"
 
 export type SurgeryType = "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
 
@@ -41,9 +42,9 @@ export interface DashboardFilters {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const today = new Date()
-  const todayStart = startOfDay(today)
-  const todayEnd = endOfDay(today)
+  const today = getNowBrasilia()
+  const todayStart = startOfDayBrasilia()
+  const todayEnd = endOfDayBrasilia()
 
   // Total de cirurgias hoje
   const todaySurgeries = await prisma.surgery.count({
@@ -99,9 +100,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 export async function getDashboardPatients(
   filters: DashboardFilters = {}
 ): Promise<PatientCard[]> {
-  const today = new Date()
-  const todayStart = startOfDay(today)
-  const todayEnd = endOfDay(today)
+  const today = getNowBrasilia()
+  const todayStart = startOfDayBrasilia()
+  const todayEnd = endOfDayBrasilia()
 
   // Construir filtros dinâmicos
   const whereClause: any = {
