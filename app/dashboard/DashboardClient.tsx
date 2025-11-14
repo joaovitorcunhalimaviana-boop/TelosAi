@@ -384,18 +384,21 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             </Link>
 
             {/* Botão de Teste - Enviar Mensagens D+1 */}
-            <Button
-              size="lg"
-              variant="outline"
-              className="shadow-sm hover:opacity-80"
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-2 h-10 rounded-md px-6 text-sm font-medium transition-all border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground hover:opacity-80 cursor-pointer"
               style={{ borderColor: '#25D366', color: '#25D366' }}
-              onClick={async () => {
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔘 Botão clicado!');
                 toast.loading('Enviando mensagens...', { id: 'send-followups' });
                 try {
                   const response = await fetch('/api/test/send-followups-now', {
                     method: 'POST',
                   });
                   const data = await response.json();
+                  console.log('📨 Resposta:', data);
 
                   if (data.success) {
                     toast.success(`Enviadas ${data.results.sent} mensagens!`, { id: 'send-followups' });
@@ -406,13 +409,14 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     toast.error(`Erro: ${data.error}`, { id: 'send-followups' });
                   }
                 } catch (error) {
+                  console.error('❌ Erro:', error);
                   toast.error('Erro ao enviar mensagens', { id: 'send-followups' });
                 }
               }}
             >
-              <MessageCircle className="mr-2 h-5 w-5" />
+              <MessageCircle className="h-5 w-5" style={{ pointerEvents: 'none' }} />
               Enviar D+1 Agora
-            </Button>
+            </button>
 
             {/* Menu de Navegação Completo */}
             <DropdownMenu>
