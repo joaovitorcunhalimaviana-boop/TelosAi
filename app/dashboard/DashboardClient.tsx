@@ -390,34 +390,51 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               variant="outline"
               className="shadow-md hover:shadow-lg cursor-pointer relative z-50"
               style={{ borderColor: '#25D366', color: '#25D366' }}
-              onClick={() => {
-                console.log('🔘 BOTÃO CLICADO - INICIANDO ENVIO!');
-                alert('Botão clicado! Verificar console.');
+              onClick={async () => {
+                try {
+                  console.log('🔘 BOTÃO CLICADO - INICIANDO ENVIO!');
+                  toast.loading('Enviando mensagens D+1...', { id: 'send-followups' });
 
-                toast.loading('Enviando mensagens...', { id: 'send-followups' });
-
-                fetch('/api/test/send-followups-now', {
-                  method: 'POST',
-                })
-                  .then(response => {
-                    console.log('📡 Response recebido:', response);
-                    return response.json();
-                  })
-                  .then(data => {
-                    console.log('📨 Dados recebidos:', data);
-                    if (data.success) {
-                      toast.success(`✅ Enviadas ${data.results.sent} mensagens!`, { id: 'send-followups' });
-                      if (data.results.failed > 0) {
-                        toast.warning(`⚠️ ${data.results.failed} mensagens falharam`);
-                      }
-                    } else {
-                      toast.error(`❌ Erro: ${data.error}`, { id: 'send-followups' });
-                    }
-                  })
-                  .catch(error => {
-                    console.error('❌ Erro na requisição:', error);
-                    toast.error('❌ Erro ao enviar mensagens', { id: 'send-followups' });
+                  console.log('📞 Chamando API: /api/test/send-followups-now');
+                  const response = await fetch('/api/test/send-followups-now', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
                   });
+
+                  console.log('📡 Response Status:', response.status, response.statusText);
+
+                  if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                  }
+
+                  const data = await response.json();
+                  console.log('📨 Dados recebidos:', data);
+
+                  if (data.success) {
+                    const msg = `✅ Enviadas ${data.results.sent} de ${data.results.total} mensagens!`;
+                    console.log(msg);
+                    toast.success(msg, { id: 'send-followups', duration: 5000 });
+
+                    if (data.results.failed > 0) {
+                      toast.warning(`⚠️ ${data.results.failed} mensagens falharam`, { duration: 5000 });
+                    }
+
+                    // Mostrar detalhes
+                    if (data.results.details) {
+                      console.table(data.results.details);
+                    }
+                  } else {
+                    const errorMsg = `❌ Erro: ${data.error || 'Erro desconhecido'}`;
+                    console.error(errorMsg);
+                    toast.error(errorMsg, { id: 'send-followups' });
+                  }
+                } catch (error) {
+                  console.error('❌ ERRO COMPLETO:', error);
+                  const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
+                  toast.error(`❌ Falha ao enviar: ${errorMsg}`, { id: 'send-followups' });
+                }
               }}
             >
               <MessageCircle className="mr-2 h-5 w-5" />
