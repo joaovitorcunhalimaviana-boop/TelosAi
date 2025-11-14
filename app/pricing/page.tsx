@@ -14,7 +14,8 @@ export default function PricingPage() {
   }
 
   const foundingPrice = calculatePrice(400, 150)
-  const professionalPrice = calculatePrice(500, 180)
+  const earlyAdopterPrice = calculatePrice(500, 180)
+  const professionalPrice = calculatePrice(950, 350)
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -83,19 +84,27 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 mt-8">
-                {/* Founding Calculation */}
+              <div className="grid md:grid-cols-3 gap-6 mt-8">
+                {/* Founding Members */}
                 <div className="p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold hover-lift-strong card-shine animate-fade-in animation-delay-200 animate-glow-pulse-strong">
-                  <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6 text-telos-gold hover-tilt animate-scale-bounce neon-gold" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
-                    <h3 className="text-xl font-bold text-telos-blue">Founding Members</h3>
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-6 h-6 text-telos-gold hover-tilt animate-scale-bounce neon-gold" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                      <h3 className="text-xl font-bold text-telos-blue">Founding Member</h3>
+                    </div>
+                    <p className="text-xs text-telos-gold font-bold mb-3">⚡ Apenas 3 vagas</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                      <div className="bg-telos-gold h-2 rounded-full" style={{ width: '33%' }}></div>
+                    </div>
+                    <p className="text-xs text-gray-600">1 de 3 vagas preenchidas</p>
                   </div>
                   <div className="space-y-2 text-sm text-gray-700 mb-4">
                     <p>Base: R$ 400 (3 pacientes)</p>
+                    <p className="font-semibold text-telos-gold">+ R$ 150/paciente adicional</p>
                     {patients > 3 && (
-                      <p>+ {patients - 3} × R$ 150 = R$ {(patients - 3) * 150}</p>
+                      <p className="text-xs">({patients - 3} × R$ 150 = R$ {(patients - 3) * 150})</p>
                     )}
                   </div>
                   <div className="text-3xl font-bold text-telos-gold">
@@ -103,50 +112,128 @@ export default function PricingPage() {
                     <span className="text-sm text-gray-600 font-normal">/mês</span>
                   </div>
                   <p className="text-xs text-telos-gold font-semibold mt-2">
-                    Preço VITALÍCIO garantido
+                    🔒 Preço VITALÍCIO garantido
                   </p>
                 </div>
 
-                {/* Professional Calculation */}
-                <div className="p-6 bg-white rounded-xl border-2 border-telos-blue hover-lift-strong card-shine animate-fade-in animation-delay-400">
-                  <div className="flex items-center gap-2 mb-4">
-                    <svg className="w-6 h-6 text-telos-blue hover-tilt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <h3 className="text-xl font-bold text-telos-blue">Profissional</h3>
+                {/* Early Adopter */}
+                <div className="p-6 bg-white rounded-xl border-2 border-telos-blue hover-lift-strong card-shine animate-fade-in animation-delay-300">
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-6 h-6 text-telos-blue hover-tilt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <h3 className="text-xl font-bold text-telos-blue">Early Adopter</h3>
+                    </div>
+                    <p className="text-xs text-telos-blue font-bold mb-3">⚡ Próximas 10 vagas</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                      <div className="bg-telos-blue h-2 rounded-full" style={{ width: '20%' }}></div>
+                    </div>
+                    <p className="text-xs text-gray-600">2 de 10 vagas preenchidas</p>
                   </div>
                   <div className="space-y-2 text-sm text-gray-700 mb-4">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-gray-400 line-through">R$ 950</span>
+                      <span className="font-bold text-red-500">→ R$ 500</span>
+                    </div>
                     <p>Base: R$ 500 (3 pacientes)</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-gray-400 line-through text-xs">R$ 350</span>
+                      <span className="font-semibold text-red-500">→ R$ 180/paciente adicional</span>
+                    </div>
                     {patients > 3 && (
-                      <p>+ {patients - 3} × R$ 180 = R$ {(patients - 3) * 180}</p>
+                      <p className="text-xs">({patients - 3} × R$ 180 = R$ {(patients - 3) * 180})</p>
                     )}
                   </div>
                   <div className="text-3xl font-bold text-telos-blue">
-                    R$ {professionalPrice.toLocaleString('pt-BR')}
+                    R$ {earlyAdopterPrice.toLocaleString('pt-BR')}
                     <span className="text-sm text-gray-600 font-normal">/mês</span>
+                  </div>
+                  <p className="text-xs text-green-600 font-semibold mt-2">
+                    💰 Economize NO MÍNIMO R$ {(professionalPrice - earlyAdopterPrice).toLocaleString('pt-BR')}/mês
+                  </p>
+                </div>
+
+                {/* Professional */}
+                <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-300 hover-lift-strong card-shine animate-fade-in animation-delay-400 opacity-80">
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <h3 className="text-xl font-bold text-gray-700">Profissional</h3>
+                    </div>
+                    <p className="text-xs text-gray-600 font-bold mb-3">Após poucas vagas</p>
+                  </div>
+                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    <p>Base: R$ 950 (3 pacientes)</p>
+                    <p className="font-semibold text-gray-700">+ R$ 350/paciente adicional</p>
+                    {patients > 3 && (
+                      <p className="text-xs">({patients - 3} × R$ 350 = R$ {(patients - 3) * 350})</p>
+                    )}
+                  </div>
+                  <div className="text-3xl font-bold text-gray-700">
+                    R$ {professionalPrice.toLocaleString('pt-BR')}
+                    <span className="text-sm text-gray-500 font-normal">/mês</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Preço regular
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 p-6 bg-gradient-to-r from-telos-gold/10 to-telos-blue/10 border-2 border-telos-gold/30 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <svg className="w-8 h-8 text-telos-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <h4 className="font-bold text-telos-blue mb-2">⚡ Poucas vagas com desconto</h4>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      Dos cirurgiões do Brasil, <span className="font-semibold text-telos-gold">poucos terão acesso ao preço promocional</span>.
+                      A partir do 14º paciente, o preço volta para o Profissional: R$ 950/mês + R$ 350/paciente adicional.
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {patients > 3 && (
-                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                      <p className="font-semibold text-green-800">
-                        Economia com Founding Members
-                      </p>
-                      <p className="text-green-700 text-sm">
-                        Você economiza R$ {(professionalPrice - foundingPrice).toLocaleString('pt-BR')}/mês
-                        ({Math.round(((professionalPrice - foundingPrice) / professionalPrice) * 100)}% de desconto)
-                        com o plano Founding!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* CTA PRINCIPAL */}
+              <div className="mt-12 text-center">
+                <Link
+                  href="/cadastro-medico?plan=founding"
+                  className="group inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white rounded-2xl font-bold text-xl hover-lift-strong hover:shadow-2xl hover:shadow-telos-gold/50 hover:bg-yellow-600 transition-all duration-500 shadow-xl"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                  Garantir Minha Vaga de Founding Member
+                  <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+                <p className="mt-4 text-sm text-gray-600">
+                  <span className="font-semibold text-telos-blue">Apenas 3 vagas disponíveis</span> • Preço vitalício garantido
+                </p>
+              </div>
+
+              {/* CTA SECUNDÁRIO */}
+              <div className="mt-6 text-center">
+                <Link
+                  href="/cadastro-medico?plan=early"
+                  className="group inline-flex items-center gap-2 px-8 py-4 bg-telos-blue text-white rounded-xl font-semibold text-lg hover-lift hover:shadow-xl hover:shadow-telos-blue/30 transition-all duration-300"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Quero ser Early Adopter
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+                <p className="mt-3 text-sm text-gray-600">
+                  Poucas vagas • Economize NO MÍNIMO R$ 450/mês
+                </p>
+              </div>
             </div>
           </div>
           </FadeIn>
@@ -184,29 +271,34 @@ export default function PricingPage() {
                     </div>
                   </th>
                   <th className="py-4 px-6 text-center text-lg font-bold text-telos-blue">
+                    Early Adopter
+                  </th>
+                  <th className="py-4 px-6 text-center text-lg font-bold text-gray-600">
                     Profissional
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { feature: "Preço mensal (3 pacientes inclusos)", founding: "R$ 400", professional: "R$ 500" },
-                  { feature: "Custo por paciente adicional", founding: "R$ 150", professional: "R$ 180" },
-                  { feature: "Acompanhamento automático 24/7", founding: true, professional: true },
-                  { feature: "Questionários via WhatsApp", founding: true, professional: true },
-                  { feature: "Análise com IA de última geração", founding: true, professional: true },
-                  { feature: "Detecção de red flags", founding: true, professional: true },
-                  { feature: "Alertas em tempo real", founding: true, professional: true },
-                  { feature: "Dashboard completo", founding: true, professional: true },
-                  { feature: "Exportação de dados (LGPD)", founding: true, professional: true },
-                  { feature: "Histórico completo de pacientes", founding: true, professional: true },
-                  { feature: "Suporte prioritário", founding: true, professional: "Via email" },
-                  { feature: "Acesso antecipado a novos recursos", founding: true, professional: false },
-                  { feature: "Preço vitalício garantido", founding: true, professional: false },
-                  { feature: "Badge exclusivo Founding Member", founding: true, professional: false },
+                  { feature: "Preço mensal (3 pacientes)", founding: "R$ 400", earlyAdopter: "R$ 500", professional: "R$ 950" },
+                  { feature: "Paciente adicional", founding: "R$ 150", earlyAdopter: "R$ 180", professional: "R$ 350" },
+                  { feature: "Vagas disponíveis", founding: "3 vagas", earlyAdopter: "10 vagas", professional: "Ilimitado" },
+                  { feature: "Acompanhamento 24/7", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "WhatsApp + IA", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Detecção de red flags", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Alertas em tempo real", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Dashboard completo", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Modo Pesquisa (LGPD)", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Histórico completo", founding: true, earlyAdopter: true, professional: true },
+                  { feature: "Suporte prioritário", founding: "WhatsApp", earlyAdopter: "Email", professional: "Email" },
+                  { feature: "Acesso antecipado", founding: true, earlyAdopter: true, professional: false },
+                  { feature: "Preço vitalício", founding: true, earlyAdopter: false, professional: false },
+                  { feature: "Badge exclusivo", founding: true, earlyAdopter: false, professional: false },
                 ].map((row, idx) => (
                   <tr key={idx} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
                     <td className="py-4 px-6 text-gray-700">{row.feature}</td>
+
+                    {/* Founding */}
                     <td className="py-4 px-6 text-center">
                       {typeof row.founding === 'boolean' ? (
                         row.founding ? (
@@ -222,9 +314,11 @@ export default function PricingPage() {
                         <span className="font-semibold text-telos-gold">{row.founding}</span>
                       )}
                     </td>
+
+                    {/* Early Adopter */}
                     <td className="py-4 px-6 text-center">
-                      {typeof row.professional === 'boolean' ? (
-                        row.professional ? (
+                      {typeof row.earlyAdopter === 'boolean' ? (
+                        row.earlyAdopter ? (
                           <svg className="w-6 h-6 text-telos-blue mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -234,7 +328,24 @@ export default function PricingPage() {
                           </svg>
                         )
                       ) : (
-                        <span className="font-semibold text-telos-blue">{row.professional}</span>
+                        <span className="font-semibold text-telos-blue">{row.earlyAdopter}</span>
+                      )}
+                    </td>
+
+                    {/* Professional */}
+                    <td className="py-4 px-6 text-center">
+                      {typeof row.professional === 'boolean' ? (
+                        row.professional ? (
+                          <svg className="w-6 h-6 text-gray-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        )
+                      ) : (
+                        <span className="font-semibold text-gray-600">{row.professional}</span>
                       )}
                     </td>
                   </tr>
@@ -261,29 +372,29 @@ export default function PricingPage() {
             <div className="max-w-3xl mx-auto space-y-6">
               {[
                 {
-                  question: "Como funciona o billing?",
-                answer: "O pagamento é mensal via cartão de crédito. Você paga o plano base + o número de pacientes adicionais ativos no mês."
-              },
-              {
-                question: "O que acontece se eu ultrapassar 3 pacientes?",
-                answer: "Não há problema! Você será cobrado automaticamente pelo valor adicional (R$ 150 ou R$ 180 por paciente extra, dependendo do plano)."
-              },
-              {
-                question: "Posso cancelar a qualquer momento?",
-                answer: "Sim! Você pode cancelar sua assinatura a qualquer momento, sem multas ou taxas de cancelamento."
-              },
-              {
-                question: "O que significa 'Preço Vitalício' para Founding Members?",
-                answer: "Como Founding Member, você garante o preço de R$ 400 base + R$ 150 adicional PARA SEMPRE, mesmo que os preços aumentem no futuro."
-              },
-              {
-                question: "Quantas vagas de Founding Members existem?",
-                answer: "Apenas 3 vagas estão disponíveis. Uma vez preenchidas, este plano especial não estará mais disponível."
-              },
-              {
-                question: "Os dados dos pacientes estão seguros?",
-                answer: "Sim! Somos 100% compatíveis com LGPD. Todos os dados são criptografados e armazenados com segurança. A exportação para pesquisa é sempre anonimizada."
-              }
+                  question: "Como funciona o Modo Pesquisa?",
+                  answer: "O Modo Pesquisa organiza automaticamente os dados dos seus pacientes em grupos, permitindo análise de complicações, comparação de tratamentos e exportação anonimizada para estudos. Totalmente conforme a LGPD."
+                },
+                {
+                  question: "Como funciona o pagamento?",
+                  answer: "O pagamento é mensal via cartão de crédito. Você paga o plano base (3 pacientes inclusos) + o valor por cada paciente adicional que estiver em acompanhamento no mês."
+                },
+                {
+                  question: "O que significa 'Preço Vitalício' para Founding Members?",
+                  answer: "Como Founding Member, você garante o preço de R$ 400 base + R$ 150/paciente adicional PARA SEMPRE, mesmo que os preços aumentem no futuro."
+                },
+                {
+                  question: "Os dados dos pacientes estão seguros?",
+                  answer: "Sim! Somos 100% compatíveis com LGPD. Todos os dados são criptografados e armazenados com segurança. A exportação é sempre anonimizada."
+                },
+                {
+                  question: "Posso cancelar a qualquer momento?",
+                  answer: "Sim! Você pode cancelar sua assinatura a qualquer momento, sem multas ou taxas de cancelamento."
+                },
+                {
+                  question: "Funciona para quais tipos de cirurgia?",
+                  answer: "Atualmente especializado em cirurgias orificiais (doença hemorroidária, fístulas, fissuras, pilonidal). Em breve expandiremos para outras especialidades cirúrgicas."
+                }
             ].map((faq, idx) => (
               <details key={idx} className="group bg-white rounded-xl border-2 border-gray-100 hover:border-telos-blue transition-colors shadow-sm">
                 <summary className="p-6 cursor-pointer flex justify-between items-center">
@@ -312,26 +423,18 @@ export default function PricingPage() {
             <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
               Escolha seu plano e transforme seu pós-operatório hoje
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/cadastro-medico?plan=founding"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white text-lg rounded-xl font-bold hover-lift hover-glow transition-smooth shadow-2xl"
+              className="inline-flex items-center gap-3 px-12 py-6 bg-telos-gold text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl hover:shadow-telos-gold/50 hover:bg-yellow-600 transition-all duration-500 shadow-xl"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
-              Garantir Vaga Founding
-            </Link>
-            <Link
-              href="/cadastro-medico?plan=professional"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-white text-telos-blue text-lg rounded-xl font-bold hover-lift transition-smooth shadow-2xl"
-            >
+              Quero Fazer Parte Agora!
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-              Começar com Profissional
             </Link>
-          </div>
           </FadeIn>
         </div>
       </section>

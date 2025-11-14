@@ -148,16 +148,19 @@ export default function SobrePage() {
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <FadeIn delay={0.2} direction="left">
-              <div className="order-2 lg:order-1 relative">
-                <div className="relative w-full h-[400px] bg-gradient-to-br from-telos-blue to-[#144272] rounded-3xl shadow-2xl flex items-center justify-center card-shine hover-lift-strong">
-                  <div className="text-center space-y-4 p-8">
-                    <div className="w-32 h-32 mx-auto bg-white rounded-full flex items-center justify-center text-6xl font-bold text-telos-blue hover-scale">
-                      JV
-                    </div>
-                    <p className="text-white text-xl font-semibold">Dr. João Vitor Viana</p>
-                    <p className="text-blue-200">Médico Coloproctologista</p>
-                    <p className="text-blue-200 text-sm">Founder & CEO</p>
-                  </div>
+              <div className="order-2 lg:order-1 relative space-y-4">
+                <div className="relative w-full h-[450px] rounded-3xl shadow-2xl overflow-hidden hover-lift-strong">
+                  <Image
+                    src="/congress photo.jpeg"
+                    alt="Dr. João Vitor Viana"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="text-telos-blue text-lg font-semibold">Dr. João Vitor Viana</p>
+                  <p className="text-gray-600 text-sm">Médico Coloproctologista</p>
+                  <p className="text-gray-500 text-xs">Founder & CEO</p>
                 </div>
               </div>
               </FadeIn>
@@ -173,7 +176,7 @@ export default function SobrePage() {
                   </p>
                   <p className="text-justify">
                     Atualmente, cursa Mestrado em Ciência Cirúrgica Interdisciplinar
-                    na <strong>Universidade Federal de São Paulo (Unifesp)</strong> — Escola Paulista de Medicina,
+                    na Universidade Federal de São Paulo (Unifesp) — Escola Paulista de Medicina,
                     e pós-graduação em Ciências Políticas e Atuação Pública na Faculdade Internacional Cidade Viva (FICV).
                     Entusiasta de tecnologias e promotor de protocolos de recuperação acelerada, fundamenta sua
                     prática na medicina baseada em evidências.

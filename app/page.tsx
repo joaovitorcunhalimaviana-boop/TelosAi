@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
-import { FadeIn, SlideIn } from "@/components/animations"
+import { FadeIn, SlideIn, FloatingParticles } from "@/components/animations"
 
 // Deploy with complete Research Mode section - scientific research features
 export default function Home() {
@@ -10,12 +10,13 @@ export default function Home() {
       <TelosHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-white py-20">
         {/* Animated Background Blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob-move"></div>
           <div className="absolute top-20 right-20 w-96 h-96 bg-telos-gold/20 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob-move animation-delay-400"></div>
           <div className="absolute -bottom-20 left-1/2 w-80 h-80 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob-move animation-delay-800"></div>
+          <FloatingParticles />
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
@@ -37,23 +38,20 @@ export default function Home() {
                   </h1>
 
                   <p className="text-xl sm:text-2xl text-gray-700 font-light">
-                    A{" "}
+                    Sistema de Acompanhamento Pós-Operatório com{" "}
                     <span className="text-telos-gold font-medium">
-                      Inteligência
-                    </span>{" "}
-                    no Cuidado para o{" "}
-                    <span className="text-telos-blue font-medium">
-                      Propósito
-                    </span>{" "}
-                    da Recuperação
+                      Inteligência Artificial
+                    </span>
                   </p>
                 </div>
               </FadeIn>
 
               <FadeIn delay={0.3} direction="up">
                 <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl text-justify">
-                  Sistema de acompanhamento pós-operatório com Inteligência Artificial.
-                  Monitore seus pacientes 24/7 com análise automática de riscos e alertas em tempo real.
+                  Monitore seus pacientes com análise automática de riscos e alertas em tempo real via WhatsApp.
+                  <span className="font-semibold text-telos-blue"> Detecção precoce de complicações.</span>{" "}
+                  <span className="font-semibold text-telos-blue">Coleta automática de dados.</span>{" "}
+                  <span className="font-semibold text-telos-blue">Mais tempo para você.</span>
                 </p>
               </FadeIn>
 
@@ -76,11 +74,11 @@ export default function Home() {
                       d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                     />
                   </svg>
-                  Quero ser Founding Member
+                  Quero ser Membro
                 </Link>
 
                 <Link
-                  href="/cadastro-medico?plan=professional"
+                  href="/pricing"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-telos-blue text-white rounded-lg font-semibold hover-lift transition-smooth shadow-lg"
                 >
                   <svg
@@ -96,7 +94,7 @@ export default function Home() {
                       d="M13 10V3L4 14h7v7l9-11h-7z"
                     />
                   </svg>
-                  Começar Agora
+                  Ver Planos
                 </Link>
                 </div>
               </FadeIn>
@@ -127,7 +125,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Subscribe Section */}
+      {/* Why Subscribe Section - 6 Real Benefits */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
@@ -136,88 +134,151 @@ export default function Home() {
                 Por que Assinar o Telos.AI?
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Invista no futuro da sua prática médica com benefícios comprovados
+                Benefícios reais para sua prática médica e produção científica
               </p>
             </div>
           </FadeIn>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Economize Tempo */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* 1. Organize Dados Automaticamente - AMARELO */}
             <FadeIn delay={0.2} direction="up">
-              <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col animate-fade-in-up">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors icon-breathe">
-                <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-telos-blue mb-3">Ganhe Tempo Valioso</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
-                Automatize o acompanhamento pós-operatório e recupere horas preciosas do seu dia.
-                O sistema trabalha 24/7 por você.
-              </p>
-              <div className="pt-4 border-t border-gray-100 mt-auto">
-                <p className="text-sm text-telos-gold font-semibold">
-                  Economize até 10 horas/semana em follow-up
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-yellow-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover:shadow-2xl hover:shadow-telos-gold/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Organize Dados Automaticamente</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  Sistema coleta e organiza tudo automaticamente. Tenha os dados pós-operatórios dos seus pacientes organizados.
+                  Analise complicações, compare tratamentos, avalie a evolução da dor. Tome decisões baseadas em dados reais.
                 </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    📊 Dados sempre organizados e acessíveis
+                  </p>
+                </div>
               </div>
-            </div>
             </FadeIn>
 
-            {/* Economize Dinheiro */}
+            {/* 2. Detecção Precoce de Complicações - AZUL */}
             <FadeIn delay={0.3} direction="up">
-              <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col animate-fade-in-up animation-delay-200">
-              <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold transition-colors icon-breathe">
-                <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-telos-blue mb-3">Economize em Custos</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
-                Reduza custos com complicações evitáveis e reinternações. Pacientes melhor monitorados
-                têm recuperação mais rápida e resultados superiores.
-              </p>
-              <div className="pt-4 border-t border-gray-100 mt-auto">
-                <p className="text-sm text-telos-gold font-semibold">
-                  ROI positivo desde o primeiro mês
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-blue-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover:shadow-2xl hover:shadow-telos-blue/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Detecte Complicações Antes</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  IA analisa respostas em tempo real e identifica red flags automaticamente.
+                  Você é alertado apenas quando há risco real, evitando emergências.
                 </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    🚨 Alertas inteligentes 24/7
+                  </p>
+                </div>
               </div>
-            </div>
             </FadeIn>
 
-            {/* Detecção Precoce */}
+            {/* 3. Paciente se Sente Cuidado - AMARELO (sem coração) */}
             <FadeIn delay={0.4} direction="up">
-            <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col animate-fade-in-up animation-delay-400">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors icon-breathe">
-                <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-telos-blue mb-3">Detecte Complicações Cedo</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
-                A IA analisa respostas em tempo real e detecta red flags automaticamente.
-                Identifique problemas antes que se tornem complicações graves.
-              </p>
-              <div className="pt-4 border-t border-gray-100 mt-auto">
-                <p className="text-sm text-telos-gold font-semibold">
-                  Alertas em tempo real para decisões rápidas
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-yellow-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover:shadow-2xl hover:shadow-telos-gold/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Paciente se Sente Cuidado</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  Mensagens personalizadas diárias mostram atenção e cuidado.
+                  Pacientes satisfeitos recomendam você para familiares e amigos.
                 </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    ⭐ Mais indicações espontâneas
+                  </p>
+                </div>
               </div>
-            </div>
+            </FadeIn>
+
+            {/* 4. Mais Indicações de Pacientes - AZUL */}
+            <FadeIn delay={0.5} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-blue-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover:shadow-2xl hover:shadow-telos-blue/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Gere Mais Indicações</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  Experiência diferenciada no pós-operatório transforma pacientes em promotores.
+                  Destaque-se dos colegas com tecnologia de ponta.
+                </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    🎯 Diferencial competitivo real
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* 5. Recupere Seu Tempo - AMARELO */}
+            <FadeIn delay={0.6} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-yellow-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover:shadow-2xl hover:shadow-telos-gold/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Recupere Seu Tempo</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  Sem ligações manuais, sem planilhas desorganizadas. Sistema trabalha 24/7.
+                  Economize até 2h/dia para focar em cirurgias, família e qualidade de vida.
+                </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    ⏰ Até 10h/semana economizadas
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* 6. Reduza Custos Operacionais - AZUL */}
+            <FadeIn delay={0.7} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-white to-blue-50/50 border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover:shadow-2xl hover:shadow-telos-blue/20 transition-all duration-500 shadow-lg card-shine flex flex-col hover:-translate-y-2 hover:scale-[1.02]">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 icon-breathe shadow-md">
+                  <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-telos-blue mb-3">Reduza Custos</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
+                  Evite complicações evitáveis e reinternações. Detecção precoce reduz custos com emergências.
+                  ROI positivo desde o primeiro mês de uso.
+                </p>
+                <div className="pt-4 border-t border-gray-100 mt-auto">
+                  <p className="text-sm text-telos-gold font-semibold">
+                    💰 Menos complicações = menos custos
+                  </p>
+                </div>
+              </div>
             </FadeIn>
           </div>
 
-          <FadeIn delay={0.5} direction="up">
-          <div className="mt-12 text-center">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 text-telos-blue hover:text-telos-gold font-semibold text-lg underline transition-colors"
-            >
-              Ver planos e começar agora
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
+          <FadeIn delay={0.7} direction="up">
+            <div className="mt-12 text-center">
+              <Link
+                href="/pricing"
+                className="group inline-flex items-center gap-2 px-8 py-4 bg-telos-blue text-white rounded-xl font-bold text-lg hover-lift-strong hover:shadow-2xl hover:shadow-telos-blue/50 hover:bg-telos-gold transition-all duration-500 shadow-xl"
+              >
+                Ver Planos e Garantir Minha Vaga
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </FadeIn>
         </div>
       </section>
@@ -463,6 +524,100 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Current Specialization Section - FOMO */}
+      <section className="py-16 bg-gradient-to-br from-blue-50 to-white">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto">
+            <FadeIn delay={0.1} direction="up">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-telos-gold/10 border-2 border-telos-gold/30 rounded-full mb-4">
+                  <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
+                  <span className="text-sm font-bold text-telos-gold uppercase tracking-wide">
+                    Especialização Atual
+                  </span>
+                </div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
+                  Foco Inicial em Cirurgias Orificiais
+                </h2>
+              </div>
+            </FadeIn>
+
+            <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-gray-100">
+              <FadeIn delay={0.2} direction="up">
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-telos-blue mb-4 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-telos-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Atualmente especializado em:
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      "Doença hemorroidária",
+                      "Fístulas anorretais",
+                      "Fissuras anais",
+                      "Doença pilonidal"
+                    ].map((surgery, idx) => (
+                      <div key={idx} className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
+                        <div className="w-2 h-2 bg-telos-blue rounded-full"></div>
+                        <span className="text-gray-700 font-medium">{surgery}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </FadeIn>
+
+              <FadeIn delay={0.3} direction="up">
+                <div className="bg-gradient-to-r from-telos-gold/10 to-telos-blue/10 rounded-xl p-6 border-2 border-telos-gold/30">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-telos-blue mb-2">
+                        🚀 Em breve: Expansão para outras cirurgias
+                      </h4>
+                      <p className="text-gray-700 leading-relaxed text-justify mb-4">
+                        Estamos expandindo o sistema para <span className="font-semibold text-telos-blue">colecistectomias,
+                        herniorrafias e outras especialidades cirúrgicas</span>. Seja um Early Adopter e
+                        influencie as próximas funcionalidades.
+                      </p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <svg className="w-5 h-5 text-telos-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="font-semibold text-telos-gold">
+                          Founding Members terão acesso prioritário a novas especialidades
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+
+              <FadeIn delay={0.4} direction="up">
+                <div className="mt-8 text-center">
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-telos-blue text-white rounded-xl font-bold text-lg hover-lift-strong transition-smooth shadow-lg"
+                  >
+                    Garantir Vaga Early Adopter Agora
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                  <p className="text-sm text-gray-600 mt-3">
+                    ⚡ Apenas 13 vagas com desconto disponíveis
+                  </p>
+                </div>
+              </FadeIn>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
@@ -546,60 +701,12 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">
-                Exportação para Pesquisa
+                Exportação de Dados
               </h3>
               <p className="text-gray-600 leading-relaxed text-justify">
-                Dados organizados e anonimizados para estudos científicos, em conformidade com LGPD
+                Dados organizados e anonimizados para sua avaliação e análise, em conformidade com LGPD
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <FadeIn delay={0.1} direction="up">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
-                Por que escolher Telos.AI?
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                A única plataforma que une tecnologia de ponta com o propósito do cuidado
-              </p>
-            </div>
-          </FadeIn>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-                title: "Economize Tempo",
-                description: "Automatize o acompanhamento e foque no que realmente importa: decisões clínicas"
-              },
-              {
-                icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-                title: "Reduza Complicações",
-                description: "Identifique problemas precocemente com análise de IA em tempo real"
-              },
-              {
-                icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                title: "Gere Insights",
-                description: "Exporte dados para pesquisa científica e aprimore sua prática"
-              }
-            ].map((benefit, idx) => (
-              <FadeIn key={idx} delay={0.2 + idx * 0.1} direction="up">
-                <div className="group h-full p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift transition-smooth shadow-lg card-shine flex flex-col">
-                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors icon-breathe">
-                  <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={benefit.icon} />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-telos-blue mb-4">{benefit.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-justify flex-grow">{benefit.description}</p>
-                </div>
-              </FadeIn>
-            ))}
           </div>
         </div>
       </section>
@@ -624,16 +731,16 @@ export default function Home() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
-                Garantir Vaga Founding
+                Garantir Minha Vaga
               </Link>
               <Link
-                href="/cadastro-medico?plan=professional"
+                href="/pricing"
                 className="inline-flex items-center gap-3 px-10 py-5 bg-white text-telos-blue text-lg rounded-xl font-bold hover-lift transition-smooth shadow-2xl"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Começar Agora
+                Ver Planos
               </Link>
             </div>
             <p className="text-sm text-telos-blue">
