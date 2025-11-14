@@ -5,7 +5,7 @@
 
 import { Patient, Surgery, FollowUp } from '@prisma/client';
 
-const WHATSAPP_API_URL = 'https://graph.facebook.com/v18.0';
+const WHATSAPP_API_URL = 'https://graph.facebook.com/v21.0';
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!;
 const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN!;
 
@@ -53,6 +53,15 @@ export async function sendMessage(
     // Formatar número de telefone (remover caracteres especiais)
     const formattedPhone = formatPhoneNumber(to);
 
+    console.log('📱 Sending WhatsApp message:', {
+      originalPhone: to,
+      formattedPhone,
+      messagePreview: message.substring(0, 100) + '...',
+      apiUrl: `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+      hasToken: !!ACCESS_TOKEN,
+      hasPhoneId: !!PHONE_NUMBER_ID,
+    });
+
     const payload: WhatsAppMessage = {
       to: formattedPhone,
       type: 'text',
@@ -78,15 +87,19 @@ export async function sendMessage(
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('WhatsApp API Error:', error);
+      console.error('❌ WhatsApp API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error,
+      });
       throw new Error(`WhatsApp API Error: ${JSON.stringify(error)}`);
     }
 
     const data = await response.json();
-    console.log('WhatsApp message sent successfully:', data);
+    console.log('✅ WhatsApp message sent successfully:', data);
     return data;
   } catch (error) {
-    console.error('Error sending WhatsApp message:', error);
+    console.error('❌ Error sending WhatsApp message:', error);
     throw error;
   }
 }
