@@ -255,7 +255,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-telos-blue mb-3">Reduza Custos</h3>
                 <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
-                  Evite complicações evitáveis e reinternações. Detecção precoce reduz custos com emergências.
+                  Evite complicações e reinternações. Detecção precoce reduz custos com emergências.
                   ROI positivo desde o primeiro mês de uso.
                 </p>
                 <div className="pt-4 border-t border-gray-100 mt-auto">
