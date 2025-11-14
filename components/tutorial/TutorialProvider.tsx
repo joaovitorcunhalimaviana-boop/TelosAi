@@ -236,29 +236,155 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
             const prevBtn = document.querySelector('.driver-popover-prev-btn') as HTMLButtonElement;
             const closeBtn = document.querySelector('.driver-popover-close-btn') as HTMLButtonElement;
 
+            console.log('🔍 DEBUG: Tentando adicionar event listeners');
+            console.log('nextBtn:', nextBtn);
+            console.log('prevBtn:', prevBtn);
+            console.log('closeBtn:', closeBtn);
+
             if (nextBtn) {
-              nextBtn.addEventListener('click', (e) => {
+              console.log('✅ SUBSTITUINDO botão PRÓXIMO por um novo');
+
+              // SOLUÇÃO RADICAL: Criar um botão completamente novo
+              const newNextBtn = document.createElement('button');
+              newNextBtn.type = 'button';
+              newNextBtn.className = 'driver-popover-next-btn-custom';
+              newNextBtn.textContent = 'Próximo →';
+              newNextBtn.style.cssText = `
+                display: block;
+                background-color: #0A2647;
+                color: white;
+                border: 2px solid #D4AF37;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                z-index: 2147483647;
+                position: relative;
+                pointer-events: all;
+              `;
+
+              // Adiciona evento de clique NO NOVO BOTÃO
+              newNextBtn.addEventListener('click', (e) => {
+                console.log('🎯 NOVO BOTÃO CLICADO!');
                 e.preventDefault();
                 e.stopPropagation();
                 newDriver.moveNext();
-              }, { capture: true });
+              });
+
+              newNextBtn.addEventListener('mouseenter', () => {
+                console.log('🖱️ Mouse no NOVO botão');
+                newNextBtn.style.opacity = '0.9';
+              });
+
+              newNextBtn.addEventListener('mouseleave', () => {
+                newNextBtn.style.opacity = '1';
+              });
+
+              // REMOVE completamente o botão antigo e adiciona o novo
+              const parent = nextBtn.parentNode;
+              if (parent) {
+                parent.removeChild(nextBtn);
+                parent.appendChild(newNextBtn);
+                console.log('✅ Botão antigo removido, novo botão inserido!');
+                console.log('🔍 Novo botão:', newNextBtn);
+                console.log('🔍 Parent:', parent);
+
+                // Verifica se o novo botão está visível
+                setTimeout(() => {
+                  const rect = newNextBtn.getBoundingClientRect();
+                  console.log('📏 Posição do novo botão:', rect);
+                  const elementAtPosition = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                  console.log('🔍 Elemento na posição do novo botão:', elementAtPosition);
+                  console.log('🔍 É o novo botão?', elementAtPosition === newNextBtn);
+
+                  // Se NÃO for o novo botão, algo está cobrindo!
+                  if (elementAtPosition !== newNextBtn) {
+                    console.error('❌ ALGO ESTÁ COBRINDO O NOVO BOTÃO!');
+                    console.error('❌ Elemento que está cobrindo:', elementAtPosition);
+
+                    // Tenta remover o que está cobrindo
+                    if (elementAtPosition && elementAtPosition !== newNextBtn) {
+                      (elementAtPosition as HTMLElement).style.pointerEvents = 'none';
+                      console.log('🔧 Desabilitei pointer-events do elemento que cobre');
+                    }
+                  }
+                }, 200);
+              } else {
+                console.error('❌ Parent não encontrado!');
+              }
+            } else {
+              console.error('❌ Botão PRÓXIMO não encontrado!');
             }
 
             if (prevBtn) {
-              prevBtn.addEventListener('click', (e) => {
+              console.log('✅ Adicionando listener no botão ANTERIOR');
+              prevBtn.style.border = '2px solid blue';
+
+              const clickHandler = (e: MouseEvent) => {
+                console.log('🎯 CLIQUE NO BOTÃO ANTERIOR DETECTADO!');
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 newDriver.movePrevious();
-              }, { capture: true });
+              };
+
+              prevBtn.addEventListener('click', clickHandler, { capture: true });
+              prevBtn.addEventListener('mousedown', clickHandler, { capture: true });
             }
 
             if (closeBtn) {
-              closeBtn.addEventListener('click', (e) => {
+              console.log('✅ SUBSTITUINDO botão FECHAR por um novo');
+
+              // SOLUÇÃO RADICAL: Criar um botão completamente novo para fechar
+              const newCloseBtn = document.createElement('button');
+              newCloseBtn.type = 'button';
+              newCloseBtn.className = 'driver-popover-close-btn-custom';
+              newCloseBtn.innerHTML = '×';
+              newCloseBtn.style.cssText = `
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: transparent;
+                border: none;
+                color: #9CA3AF;
+                font-size: 28px;
+                font-weight: 300;
+                cursor: pointer;
+                z-index: 2147483647;
+                pointer-events: all;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              `;
+
+              // Adiciona evento de clique NO NOVO BOTÃO
+              newCloseBtn.addEventListener('click', (e) => {
+                console.log('🎯 NOVO BOTÃO FECHAR CLICADO!');
                 e.preventDefault();
                 e.stopPropagation();
                 newDriver.destroy();
-              }, { capture: true });
+              });
+
+              newCloseBtn.addEventListener('mouseenter', () => {
+                console.log('🖱️ Mouse no NOVO botão fechar');
+                newCloseBtn.style.color = '#EF4444';
+              });
+
+              newCloseBtn.addEventListener('mouseleave', () => {
+                newCloseBtn.style.color = '#9CA3AF';
+              });
+
+              // SUBSTITUI o botão antigo pelo novo
+              closeBtn.parentNode?.insertBefore(newCloseBtn, closeBtn);
+              closeBtn.style.display = 'none';
+
+              console.log('✅ Novo botão fechar criado e inserido!');
             }
+
+            // Log de todos os elementos clicáveis
+            console.log('📋 Todos os botões no popover:', document.querySelectorAll('.driver-popover button'));
           }, 100);
 
           if (options.onPopoverRender) {

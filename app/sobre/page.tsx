@@ -158,7 +158,7 @@ export default function SobrePage() {
               </div>
 
               <div className="order-1 lg:order-2 space-y-6 animate-fade-in-right animation-delay-400">
-                <h2 className="text-3xl font-bold text-telos-blue animate-wave">O Fundador</h2>
+                <h2 className="text-3xl font-bold text-telos-blue">O Fundador</h2>
                 <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                   <p className="text-justify">
                     <strong className="text-telos-blue">Dr. João Vitor Viana</strong> é cirurgião coloretal
@@ -208,7 +208,7 @@ export default function SobrePage() {
         </div>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-12">
-            <h2 className="text-3xl font-bold text-gradient-animated animate-wave">Nossa Missão</h2>
+            <h2 className="text-3xl font-bold text-telos-blue">Nossa Missão</h2>
 
             <div className="grid md:grid-cols-3 gap-8">
               <div className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg animate-fade-in-up card-shine">
@@ -265,7 +265,7 @@ export default function SobrePage() {
         </div>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gradient-animated animate-wave">
+            <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue">
               Faça Parte da Revolução no Pós-Operatório
             </h2>
             <p className="text-xl text-gray-700">

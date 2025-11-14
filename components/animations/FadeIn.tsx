@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, HTMLMotionProps } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface FadeInProps extends Omit<HTMLMotionProps<"div">, "children"> {
   children: ReactNode;
@@ -17,6 +17,30 @@ export function FadeIn({
   direction = "up",
   ...props
 }: FadeInProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "50px",
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const directionOffset = {
     up: { y: 20, x: 0 },
     down: { y: -20, x: 0 },
@@ -27,18 +51,26 @@ export function FadeIn({
 
   return (
     <motion.div
+      ref={ref}
       initial={{
         opacity: 0,
         ...directionOffset[direction],
       }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        x: 0,
-      }}
+      animate={
+        isVisible
+          ? {
+              opacity: 1,
+              y: 0,
+              x: 0,
+            }
+          : {
+              opacity: 0,
+              ...directionOffset[direction],
+            }
+      }
       transition={{
         duration,
-        delay,
+        delay: isVisible ? delay : 0,
         ease: [0.25, 0.1, 0.25, 1],
       }}
       {...props}
