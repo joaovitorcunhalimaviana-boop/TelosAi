@@ -1,5 +1,8 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
+import { FadeIn } from "@/components/animations/FadeIn"
 
 export default function SobrePage() {
   return (
@@ -46,24 +49,26 @@ export default function SobrePage() {
       {/* Hero Section */}
       <section className="py-20 bg-white relative overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h1 className="text-5xl lg:text-6xl font-bold animate-fade-in-down">
-              Sobre o{" "}
-              <span className="telos-brand text-telos-blue">Telos</span>
-              <span className="telos-ai text-telos-gold">.AI</span>
-            </h1>
-            <p className="text-2xl text-gray-700 font-light animate-fade-in-up animation-delay-200">
-              A{" "}
-              <span className="text-telos-gold font-medium">
-                Inteligência
-              </span>{" "}
-              no Cuidado para o{" "}
-              <span className="text-telos-blue font-medium">
-                Propósito
-              </span>{" "}
-              da Recuperação
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="max-w-4xl mx-auto text-center space-y-6">
+              <h1 className="text-5xl lg:text-6xl font-bold">
+                Sobre o{" "}
+                <span className="telos-brand text-telos-blue">Telos</span>
+                <span className="telos-ai text-telos-gold">.AI</span>
+              </h1>
+              <p className="text-2xl text-gray-700 font-light">
+                A{" "}
+                <span className="text-telos-gold font-medium">
+                  Inteligência
+                </span>{" "}
+                no Cuidado para o{" "}
+                <span className="text-telos-blue font-medium">
+                  Propósito
+                </span>{" "}
+                da Recuperação
+              </p>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -72,7 +77,8 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6 animate-fade-in-left">
+              <FadeIn delay={0.2} direction="left">
+                <div className="space-y-6">
                 <h2 className="text-3xl font-bold text-telos-blue">O Projeto</h2>
                 <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                   <p className="text-justify">
@@ -116,8 +122,10 @@ export default function SobrePage() {
                   </Link>
                 </div>
               </div>
+              </FadeIn>
 
-              <div className="relative animate-fade-in-right animation-delay-400">
+              <FadeIn delay={0.3} direction="right">
+                <div className="relative">
                 <div className="relative w-full h-[400px] flex items-center justify-center">
                   <Image
                     src="/icons/icon-512.png"

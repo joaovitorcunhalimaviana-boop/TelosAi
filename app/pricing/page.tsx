@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
+import { FadeIn } from "@/components/animations/FadeIn"
 
 export default function PricingPage() {
   const [patients, setPatients] = useState(3)
@@ -29,22 +30,25 @@ export default function PricingPage() {
       {/* Hero Section */}
       <section className="py-20 bg-white relative z-10">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h1 className="text-5xl lg:text-6xl font-bold text-telos-blue animate-fade-in-down">
-              Planos e Preços Transparentes
-            </h1>
-            <p className="text-2xl text-gray-700 font-light animate-fade-in-up animation-delay-200">
-              Escolha o plano ideal para sua prática médica.{" "}
-              <span className="text-telos-gold font-medium">Sem taxas ocultas</span>, sem surpresas.
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="max-w-4xl mx-auto text-center space-y-6">
+              <h1 className="text-5xl lg:text-6xl font-bold text-telos-blue">
+                Planos e Preços Transparentes
+              </h1>
+              <p className="text-2xl text-gray-700 font-light">
+                Escolha o plano ideal para sua prática médica.{" "}
+                <span className="text-telos-gold font-medium">Sem taxas ocultas</span>, sem surpresas.
+              </p>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Price Calculator */}
       <section className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 hover-lift-strong card-shine">
+          <FadeIn delay={0.2} direction="up">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 hover-lift-strong card-shine">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-telos-blue mb-2">
                 Calculadora de Preços
@@ -145,23 +149,27 @@ export default function PricingPage() {
               )}
             </div>
           </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Detailed Comparison Table */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-telos-blue mb-4">
-              Comparação Detalhada
-            </h2>
-            <p className="text-gray-600">
-              Todos os recursos incluídos em ambos os planos
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-telos-blue mb-4">
+                Comparação Detalhada
+              </h2>
+              <p className="text-gray-600">
+                Todos os recursos incluídos em ambos os planos
+              </p>
+            </div>
+          </FadeIn>
 
-          <div className="max-w-5xl mx-auto overflow-x-auto">
-            <table className="w-full border-collapse">
+          <FadeIn delay={0.2} direction="up">
+            <div className="max-w-5xl mx-auto overflow-x-auto">
+              <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-200">
                   <th className="py-4 px-6 text-left text-lg font-bold text-telos-blue">
@@ -234,22 +242,26 @@ export default function PricingPage() {
               </tbody>
             </table>
           </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* FAQ Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-telos-blue mb-4">
-              Perguntas Frequentes
-            </h2>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-telos-blue mb-4">
+                Perguntas Frequentes
+              </h2>
+            </div>
+          </FadeIn>
 
-          <div className="max-w-3xl mx-auto space-y-6">
-            {[
-              {
-                question: "Como funciona o billing?",
+          <FadeIn delay={0.2} direction="up">
+            <div className="max-w-3xl mx-auto space-y-6">
+              {[
+                {
+                  question: "Como funciona o billing?",
                 answer: "O pagamento é mensal via cartão de crédito. Você paga o plano base + o número de pacientes adicionais ativos no mês."
               },
               {
@@ -286,19 +298,21 @@ export default function PricingPage() {
               </details>
             ))}
           </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
-            Pronto para começar?
-          </h2>
-          <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-            Escolha seu plano e transforme seu pós-operatório hoje
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <FadeIn delay={0.1} direction="up">
+            <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
+              Pronto para começar?
+            </h2>
+            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
+              Escolha seu plano e transforme seu pós-operatório hoje
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/cadastro-medico?plan=founding"
               className="inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white text-lg rounded-xl font-bold hover-lift hover-glow transition-smooth shadow-2xl"
@@ -318,6 +332,7 @@ export default function PricingPage() {
               Começar com Profissional
             </Link>
           </div>
+          </FadeIn>
         </div>
       </section>
 
