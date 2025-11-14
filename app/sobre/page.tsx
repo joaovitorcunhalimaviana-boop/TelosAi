@@ -136,6 +136,7 @@ export default function SobrePage() {
                   />
                 </div>
               </div>
+              </FadeIn>
             </div>
           </div>
         </div>
