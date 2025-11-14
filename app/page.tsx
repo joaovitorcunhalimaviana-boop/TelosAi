@@ -33,7 +33,7 @@ export default function Home() {
 
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                     <span className="telos-brand text-telos-blue inline-block hover-tilt">Telos</span>
-                    <span className="telos-ai text-telos-gold inline-block animate-scale-bounce neon-gold">.AI</span>
+                    <span className="telos-ai text-telos-gold inline-block">.AI</span>
                   </h1>
 
                   <p className="text-xl sm:text-2xl text-gray-700 font-light">
@@ -477,14 +477,16 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
-              Tecnologia a Serviço do Cuidado
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Um sistema completo de acompanhamento pós-operatório com inteligência artificial
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
+                Tecnologia a Serviço do Cuidado
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Um sistema completo de acompanhamento pós-operatório com inteligência artificial
+              </p>
+            </div>
+          </FadeIn>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto stagger-fade-in">
             {/* Feature 1 */}
@@ -568,14 +570,16 @@ export default function Home() {
       {/* Benefits Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
-              Por que escolher Telos.AI?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A única plataforma que une tecnologia de ponta com o propósito do cuidado
-            </p>
-          </div>
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-telos-blue mb-4">
+                Por que escolher Telos.AI?
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                A única plataforma que une tecnologia de ponta com o propósito do cuidado
+              </p>
+            </div>
+          </FadeIn>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
@@ -595,7 +599,8 @@ export default function Home() {
                 description: "Exporte dados para pesquisa científica e aprimore sua prática"
               }
             ].map((benefit, idx) => (
-              <div key={idx} className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift transition-smooth shadow-lg">
+              <FadeIn key={idx} delay={0.2 + idx * 0.1} direction="up">
+                <div className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift transition-smooth shadow-lg card-shine">
                 <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                   <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={benefit.icon} />
@@ -603,7 +608,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-telos-blue mb-3">{benefit.title}</h3>
                 <p className="text-gray-600 leading-relaxed text-justify">{benefit.description}</p>
-              </div>
+                </div>
+              </FadeIn>
             ))}
           </div>
         </div>

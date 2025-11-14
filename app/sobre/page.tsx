@@ -50,20 +50,12 @@ export default function SobrePage() {
 
       {/* Hero Section */}
       <section className="py-20 bg-white relative overflow-hidden">
-        {/* Floating Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-2 h-2 bg-telos-blue rounded-full animate-float-particle"></div>
-          <div className="absolute top-40 right-20 w-3 h-3 bg-telos-gold rounded-full animate-float-particle animation-delay-200"></div>
-          <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-telos-blue rounded-full animate-float-particle animation-delay-400"></div>
-          <div className="absolute top-60 right-1/3 w-2 h-2 bg-telos-gold rounded-full animate-float-particle animation-delay-600"></div>
-          <div className="absolute bottom-20 right-10 w-3 h-3 bg-telos-blue rounded-full animate-float-particle animation-delay-800"></div>
-        </div>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h1 className="text-5xl lg:text-6xl font-bold animate-fade-in-down">
               Sobre o{" "}
-              <span className="telos-brand text-gradient-animated">Telos</span>
-              <span className="telos-ai text-telos-gold animate-wave">.AI</span>
+              <span className="telos-brand text-telos-blue">Telos</span>
+              <span className="telos-ai text-telos-gold">.AI</span>
             </h1>
             <p className="text-2xl text-gray-700 font-light animate-fade-in-up animation-delay-200">
               A{" "}
@@ -82,17 +74,11 @@ export default function SobrePage() {
 
       {/* Sobre o Projeto */}
       <section className="py-20 bg-white relative overflow-hidden">
-        {/* Floating Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-2 h-2 bg-telos-blue rounded-full animate-float-particle"></div>
-          <div className="absolute top-1/2 right-10 w-3 h-3 bg-telos-gold rounded-full animate-float-particle animation-delay-600"></div>
-          <div className="absolute bottom-20 left-1/3 w-2 h-2 bg-telos-blue rounded-full animate-float-particle animation-delay-1000"></div>
-        </div>
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6 animate-fade-in-left">
-                <h2 className="text-3xl font-bold text-telos-blue animate-wave">O Projeto</h2>
+                <h2 className="text-3xl font-bold text-telos-blue">O Projeto</h2>
                 <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                   <p className="text-justify">
                     <span className="telos-brand font-semibold text-telos-blue">Telos</span>
@@ -138,16 +124,12 @@ export default function SobrePage() {
 
               <div className="relative animate-fade-in-right animation-delay-400">
                 <div className="relative w-full h-[400px] flex items-center justify-center">
-                  {/* Glowing Ring */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-[380px] h-[380px] rounded-full bg-gradient-to-r from-telos-blue/20 to-telos-gold/20 animate-spin-slow blur-2xl"></div>
-                  </div>
                   <Image
                     src="/icons/icon-512.png"
                     alt="Telos.AI"
                     width={350}
                     height={350}
-                    className="drop-shadow-2xl animate-float hover-scale relative z-10"
+                    className="drop-shadow-2xl hover-scale"
                   />
                 </div>
               </div>
