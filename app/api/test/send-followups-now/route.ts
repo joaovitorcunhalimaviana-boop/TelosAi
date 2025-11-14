@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { getCurrentUser } from '@/lib/session';
+import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
 
 /**
  * POST - Manually send today's follow-ups
@@ -35,13 +36,13 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 Manual follow-up send triggered by:', user.email);
 
-    // Data de hoje (início e fim do dia)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Data de hoje no horário de Brasília (início e fim do dia)
+    const todayBrasilia = getNowBrasilia();
+    const todayStart = startOfDayBrasilia();
+    const todayEnd = endOfDayBrasilia();
 
-    console.log('📅 Looking for follow-ups scheduled for:', today.toDateString());
+    console.log('📅 Brasília Time:', todayBrasilia.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+    console.log('📅 Looking for follow-ups scheduled for:', todayStart.toDateString());
 
     // Buscar follow-ups pendentes para hoje
     const pendingFollowUps = await prisma.followUp.findMany({
@@ -49,8 +50,8 @@ export async function POST(request: NextRequest) {
         userId: user.id, // Apenas do usuário logado
         status: 'pending',
         scheduledDate: {
-          gte: today,
-          lt: tomorrow,
+          gte: todayStart,
+          lt: todayEnd,
         },
       },
       include: {
