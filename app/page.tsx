@@ -144,18 +144,18 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Economize Tempo */}
             <FadeIn delay={0.2} direction="up">
-              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+              <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">Ganhe Tempo Valioso</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify">
+              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
                 Automatize o acompanhamento pós-operatório e recupere horas preciosas do seu dia.
-                O sistema trabalha 24/7 por você, enviando questionários e coletando respostas automaticamente.
+                O sistema trabalha 24/7 por você.
               </p>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 mt-auto">
                 <p className="text-sm text-telos-gold font-semibold">
                   Economize até 10 horas/semana em follow-up
                 </p>
@@ -165,18 +165,18 @@ export default function Home() {
 
             {/* Economize Dinheiro */}
             <FadeIn delay={0.3} direction="up">
-              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine">
+              <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
               <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold transition-colors">
                 <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">Economize em Custos</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify">
+              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
                 Reduza custos com complicações evitáveis e reinternações. Pacientes melhor monitorados
-                têm recuperação mais rápida e resultados superiores, reduzindo gastos hospitalares.
+                têm recuperação mais rápida e resultados superiores.
               </p>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 mt-auto">
                 <p className="text-sm text-telos-gold font-semibold">
                   ROI positivo desde o primeiro mês
                 </p>
@@ -186,18 +186,18 @@ export default function Home() {
 
             {/* Detecção Precoce */}
             <FadeIn delay={0.4} direction="up">
-            <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+            <div className="group h-full p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">Detecte Complicações Cedo</h3>
-              <p className="text-gray-600 leading-relaxed mb-4 text-justify">
+              <p className="text-gray-600 leading-relaxed mb-4 text-justify flex-grow">
                 A IA analisa respostas em tempo real e detecta red flags automaticamente.
-                Identifique problemas antes que se tornem complicações graves, salvando vidas e reputação.
+                Identifique problemas antes que se tornem complicações graves.
               </p>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 mt-auto">
                 <p className="text-sm text-telos-gold font-semibold">
                   Alertas em tempo real para decisões rápidas
                 </p>

@@ -116,7 +116,7 @@ export default function SobrePage() {
                   </Link>
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-telos-blue text-telos-blue rounded-lg font-semibold hover:bg-telos-blue hover:text-white hover-lift-strong transition-all shadow-lg"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-telos-blue text-telos-blue rounded-lg font-semibold hover:border-telos-gold hover-lift-strong transition-all shadow-lg"
                   >
                     Ver Planos
                   </Link>
@@ -144,12 +144,6 @@ export default function SobrePage() {
 
       {/* Sobre o Fundador */}
       <section className="py-20 bg-gray-50 relative overflow-hidden">
-        {/* Floating Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-20 w-2 h-2 bg-telos-gold rounded-full animate-float-particle"></div>
-          <div className="absolute top-1/3 right-10 w-3 h-3 bg-telos-blue rounded-full animate-float-particle animation-delay-400"></div>
-          <div className="absolute bottom-20 left-1/3 w-2 h-2 bg-telos-gold rounded-full animate-float-particle animation-delay-800"></div>
-        </div>
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -213,12 +207,6 @@ export default function SobrePage() {
 
       {/* Nossa Missão */}
       <section className="py-20 bg-white relative overflow-hidden">
-        {/* Floating Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-10 w-2 h-2 bg-telos-blue rounded-full animate-float-particle"></div>
-          <div className="absolute top-1/2 right-20 w-3 h-3 bg-telos-gold rounded-full animate-float-particle animation-delay-600"></div>
-          <div className="absolute bottom-1/4 left-1/4 w-2 h-2 bg-telos-blue rounded-full animate-float-particle animation-delay-1000"></div>
-        </div>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-12">
             <FadeIn delay={0.1} direction="up">
@@ -277,13 +265,6 @@ export default function SobrePage() {
 
       {/* CTA Final */}
       <section className="py-20 bg-white relative overflow-hidden">
-        {/* Floating Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-3 h-3 bg-telos-blue rounded-full animate-float-particle"></div>
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-telos-gold rounded-full animate-float-particle animation-delay-400"></div>
-          <div className="absolute bottom-10 left-10 w-2 h-2 bg-telos-blue rounded-full animate-float-particle animation-delay-800"></div>
-          <div className="absolute bottom-1/3 right-10 w-3 h-3 bg-telos-gold rounded-full animate-float-particle animation-delay-1000"></div>
-        </div>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <FadeIn delay={0.1} direction="up">
