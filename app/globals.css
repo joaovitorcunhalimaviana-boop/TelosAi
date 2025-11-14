@@ -733,6 +733,80 @@
     opacity: 1;
     left: 100%;
   }
+
+  /* ========================================
+     ANIMAÇÕES SUTIS CONTÍNUAS
+     ======================================== */
+
+  /* Respiração sutil para ícones */
+  @keyframes breathe-subtle {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+
+  .icon-breathe {
+    animation: breathe-subtle 4s ease-in-out infinite;
+  }
+
+  /* Brilho sutil pulsante */
+  @keyframes subtle-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    }
+  }
+
+  .subtle-glow-pulse {
+    animation: subtle-glow 3s ease-in-out infinite;
+  }
+
+  /* Movimento suave para badges */
+  @keyframes badge-float {
+    0%, 100% {
+      transform: translateY(0px) rotate(12deg);
+    }
+    50% {
+      transform: translateY(-5px) rotate(15deg);
+    }
+  }
+
+  .badge-float-anim {
+    animation: badge-float 4s ease-in-out infinite;
+  }
+
+  /* Rotação lenta para elementos decorativos */
+  @keyframes rotate-very-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .rotate-very-slow {
+    animation: rotate-very-slow 60s linear infinite;
+  }
+
+  /* Pulsação de border sutil */
+  @keyframes border-pulse {
+    0%, 100% {
+      border-color: rgba(212, 175, 55, 0.2);
+    }
+    50% {
+      border-color: rgba(212, 175, 55, 0.5);
+    }
+  }
+
+  .border-pulse-anim {
+    animation: border-pulse 3s ease-in-out infinite;
+  }
 }
 
 /* Driver.js Tutorial System - Custom Styling */

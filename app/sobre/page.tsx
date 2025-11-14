@@ -215,14 +215,14 @@ export default function SobrePage() {
 
             <div className="grid md:grid-cols-3 gap-8">
               <FadeIn delay={0.2} direction="up">
-              <div className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+              <div className="group h-full p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
                 <div className="w-16 h-16 mx-auto bg-telos-blue rounded-2xl flex items-center justify-center mb-6 hover-scale transition-transform">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-telos-blue mb-3">Cuidado Proativo</h3>
-                <p className="text-gray-600 text-justify">
+                <h3 className="text-xl font-bold text-telos-blue mb-4 text-center">Cuidado Proativo</h3>
+                <p className="text-gray-600 text-justify leading-relaxed flex-grow">
                   Transformar o acompanhamento pós-operatório de reativo para proativo,
                   identificando riscos antes que se tornem problemas.
                 </p>
@@ -230,14 +230,14 @@ export default function SobrePage() {
               </FadeIn>
 
               <FadeIn delay={0.3} direction="up">
-              <div className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine">
+              <div className="group h-full p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
                 <div className="w-16 h-16 mx-auto bg-telos-gold rounded-2xl flex items-center justify-center mb-6 hover-scale transition-transform">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-telos-blue mb-3">Tecnologia Acessível</h3>
-                <p className="text-gray-600 text-justify">
+                <h3 className="text-xl font-bold text-telos-blue mb-4 text-center">Tecnologia Acessível</h3>
+                <p className="text-gray-600 text-justify leading-relaxed flex-grow">
                   Democratizar o acesso à IA de ponta para médicos de todo o Brasil, com
                   preços justos e transparentes.
                 </p>
@@ -245,14 +245,14 @@ export default function SobrePage() {
               </FadeIn>
 
               <FadeIn delay={0.4} direction="up">
-              <div className="group p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+              <div className="group h-full p-8 bg-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col">
                 <div className="w-16 h-16 mx-auto bg-telos-blue rounded-2xl flex items-center justify-center mb-6 hover-scale transition-transform">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-telos-blue mb-3">Ciência e Dados</h3>
-                <p className="text-gray-600 text-justify">
+                <h3 className="text-xl font-bold text-telos-blue mb-4 text-center">Ciência e Dados</h3>
+                <p className="text-gray-600 text-justify leading-relaxed flex-grow">
                   Facilitar a produção científica através de dados organizados, anonimizados
                   e prontos para pesquisa.
                 </p>

@@ -24,8 +24,8 @@ export default function Home() {
             <div className="space-y-8">
               <FadeIn delay={0.1} direction="up">
                 <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full">
-                    <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full border-pulse-anim">
+                    <div className="w-2 h-2 bg-telos-gold rounded-full icon-breathe"></div>
                     <span className="text-sm font-medium text-telos-blue">
                       Tecnologia + Propósito
                     </span>
@@ -118,7 +118,7 @@ export default function Home() {
                   alt="Telos.AI - Acompanhamento Pós-Operatório"
                   width={400}
                   height={400}
-                  className="drop-shadow-2xl animate-float hover-scale transition-smooth relative z-10"
+                  className="drop-shadow-2xl animate-float hover-scale transition-smooth relative z-10 subtle-glow-pulse"
                   priority
                 />
               </div>
@@ -263,20 +263,22 @@ export default function Home() {
                 description: "Receba alertas e tome decisões baseadas em dados"
               }
             ].map((item, idx) => (
-              <div key={idx} className="text-center space-y-4 group animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
-                <div className="relative mx-auto w-20 h-20">
-                  <div className="absolute inset-0 bg-telos-blue rounded-2xl transform rotate-6 group-hover:rotate-12 transition-transform opacity-10"></div>
-                  <div className="relative w-full h-full bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-telos-blue transition-colors">
-                    <svg className="w-10 h-10 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                    </svg>
+              <div key={idx} className="text-center group animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                <div className="space-y-5">
+                  <div className="relative mx-auto w-20 h-20">
+                    <div className="absolute inset-0 bg-telos-blue rounded-2xl transform rotate-6 group-hover:rotate-12 transition-transform opacity-10 rotate-very-slow"></div>
+                    <div className="relative w-full h-full bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-telos-blue transition-colors icon-breathe">
+                      <svg className="w-10 h-10 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                      </svg>
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-telos-gold rounded-full flex items-center justify-center text-white font-bold shadow-lg badge-float-anim">
+                      {item.step}
+                    </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-telos-gold rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-                    {item.step}
-                  </div>
+                  <h3 className="text-xl font-bold text-telos-blue px-2">{item.title}</h3>
+                  <p className="text-gray-600 text-justify leading-relaxed px-2">{item.description}</p>
                 </div>
-                <h3 className="text-xl font-bold text-telos-blue">{item.title}</h3>
-                <p className="text-gray-600 text-justify">{item.description}</p>
               </div>
             ))}
           </div>
@@ -452,7 +454,7 @@ export default function Home() {
                   </div>
                 </div>
                 {/* Floating badge */}
-                <div className="absolute -top-4 sm:-top-6 -right-4 sm:-right-6 bg-gradient-to-br from-telos-gold to-yellow-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl transform rotate-12 animate-pulse-slow">
+                <div className="absolute -top-4 sm:-top-6 -right-4 sm:-right-6 bg-gradient-to-br from-telos-gold to-yellow-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-2xl badge-float-anim subtle-glow-pulse">
                   <p className="font-black text-sm sm:text-base lg:text-lg">🏆 Exclusivo!</p>
                 </div>
               </div>
