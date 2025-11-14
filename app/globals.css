@@ -444,6 +444,295 @@
   .stagger-fade-in > *:nth-child(4) { animation-delay: 300ms; }
   .stagger-fade-in > *:nth-child(5) { animation-delay: 400ms; }
   .stagger-fade-in > *:nth-child(6) { animation-delay: 500ms; }
+
+  /* ========================================
+     ADVANCED ANIMATIONS - Homepage Dynamic
+     ======================================== */
+
+  /* Floating Particles Background */
+  @keyframes float-particle {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 0.3;
+    }
+    25% {
+      transform: translate(20px, -30px) rotate(90deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translate(-15px, -60px) rotate(180deg);
+      opacity: 0.3;
+    }
+    75% {
+      transform: translate(30px, -40px) rotate(270deg);
+      opacity: 0.6;
+    }
+  }
+
+  /* Gradient Breathing */
+  @keyframes gradient-breathe {
+    0%, 100% {
+      background-position: 0% 50%;
+      opacity: 1;
+    }
+    50% {
+      background-position: 100% 50%;
+      opacity: 0.85;
+    }
+  }
+
+  /* Morph Shape */
+  @keyframes morph {
+    0%, 100% {
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    25% {
+      border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+    50% {
+      border-radius: 50% 30% 60% 50% / 30% 50% 50% 70%;
+    }
+    75% {
+      border-radius: 40% 70% 40% 60% / 70% 40% 60% 30%;
+    }
+  }
+
+  /* Scale Bounce */
+  @keyframes scale-bounce {
+    0%, 100% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.05);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    75% {
+      transform: scale(1.02);
+    }
+  }
+
+  /* Glow Pulse Strong */
+  @keyframes glow-pulse-strong {
+    0%, 100% {
+      box-shadow:
+        0 0 20px rgba(212, 175, 55, 0.3),
+        0 0 40px rgba(212, 175, 55, 0.2),
+        0 0 60px rgba(212, 175, 55, 0.1);
+    }
+    50% {
+      box-shadow:
+        0 0 40px rgba(212, 175, 55, 0.6),
+        0 0 80px rgba(212, 175, 55, 0.4),
+        0 0 120px rgba(212, 175, 55, 0.2);
+    }
+  }
+
+  /* Wave Motion */
+  @keyframes wave {
+    0%, 100% {
+      transform: translateY(0px) scaleY(1);
+    }
+    50% {
+      transform: translateY(-10px) scaleY(0.95);
+    }
+  }
+
+  /* Slide and Fade In Up Enhanced */
+  @keyframes slide-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(60px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Spin Slow */
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Tilt Wobble */
+  @keyframes tilt-wobble {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(2deg);
+    }
+    75% {
+      transform: rotate(-2deg);
+    }
+  }
+
+  /* Background Blob Animation */
+  @keyframes blob-move {
+    0%, 100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+  }
+
+  /* ========================================
+     UTILITY CLASSES - Dynamic Effects
+     ======================================== */
+
+  .animate-float-particle {
+    animation: float-particle 20s ease-in-out infinite;
+  }
+
+  .animate-gradient-breathe {
+    background-size: 400% 400%;
+    animation: gradient-breathe 8s ease infinite;
+  }
+
+  .animate-morph {
+    animation: morph 8s ease-in-out infinite;
+  }
+
+  .animate-scale-bounce {
+    animation: scale-bounce 2s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse-strong {
+    animation: glow-pulse-strong 3s ease-in-out infinite;
+  }
+
+  .animate-wave {
+    animation: wave 3s ease-in-out infinite;
+  }
+
+  .animate-slide-fade-up {
+    animation: slide-fade-up 1s ease-out;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-tilt-wobble {
+    animation: tilt-wobble 5s ease-in-out infinite;
+  }
+
+  .animate-blob-move {
+    animation: blob-move 10s ease-in-out infinite;
+  }
+
+  /* Hover Effects - Enhanced */
+  .hover-lift-strong {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .hover-lift-strong:hover {
+    transform: translateY(-15px) scale(1.03);
+    box-shadow:
+      0 25px 50px rgba(0, 0, 0, 0.2),
+      0 10px 30px rgba(212, 175, 55, 0.3);
+  }
+
+  .hover-glow-strong:hover {
+    box-shadow:
+      0 0 40px rgba(212, 175, 55, 0.6),
+      0 0 80px rgba(212, 175, 55, 0.3),
+      inset 0 0 20px rgba(212, 175, 55, 0.2);
+  }
+
+  .hover-tilt {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-tilt:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
+  }
+
+  /* Gradient Text Animation */
+  .text-gradient-animated {
+    background: linear-gradient(
+      90deg,
+      #0A2647,
+      #2C74B3,
+      #D4AF37,
+      #2C74B3,
+      #0A2647
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-text-flow 5s ease infinite;
+  }
+
+  @keyframes gradient-text-flow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Parallax Scroll Effect (via CSS) */
+  .parallax-slow {
+    transform: translateZ(-1px) scale(2);
+  }
+
+  /* Glass Morphism */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Neon Glow */
+  .neon-gold {
+    text-shadow:
+      0 0 10px rgba(212, 175, 55, 0.8),
+      0 0 20px rgba(212, 175, 55, 0.6),
+      0 0 30px rgba(212, 175, 55, 0.4);
+  }
+
+  /* Interactive Card Shine */
+  .card-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-shine::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+
+  .card-shine:hover::before {
+    opacity: 1;
+    left: 100%;
+  }
 }
 
 /* Driver.js Tutorial System - Custom Styling */

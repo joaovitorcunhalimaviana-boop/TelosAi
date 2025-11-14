@@ -11,7 +11,14 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-white py-20">
-        <div className="container mx-auto px-6">
+        {/* Animated Background Blobs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob-move"></div>
+          <div className="absolute top-20 right-20 w-96 h-96 bg-telos-gold/20 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob-move animation-delay-400"></div>
+          <div className="absolute -bottom-20 left-1/2 w-80 h-80 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob-move animation-delay-800"></div>
+        </div>
+
+        <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div className="space-y-8">
@@ -25,8 +32,8 @@ export default function Home() {
                   </div>
 
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                    <span className="telos-brand text-telos-blue">Telos</span>
-                    <span className="telos-ai text-telos-gold">.AI</span>
+                    <span className="telos-brand text-telos-blue inline-block hover-tilt">Telos</span>
+                    <span className="telos-ai text-telos-gold inline-block animate-scale-bounce neon-gold">.AI</span>
                   </h1>
 
                   <p className="text-xl sm:text-2xl text-gray-700 font-light">
@@ -54,7 +61,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/cadastro-medico?plan=founding"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-telos-gold text-white rounded-lg font-semibold hover-lift transition-smooth shadow-lg hover-glow"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-telos-gold text-white rounded-lg font-semibold hover-lift-strong transition-smooth shadow-lg hover-glow-strong animate-glow-pulse-strong card-shine"
                   >
                   <svg
                     className="w-5 h-5"
@@ -98,12 +105,20 @@ export default function Home() {
             {/* Right Column - Visual Element */}
             <SlideIn delay={0.2} direction="right">
               <div className="relative w-full h-[400px] sm:h-[500px] flex items-center justify-center">
+                {/* Glowing Ring Behind Logo */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[420px] h-[420px] rounded-full bg-gradient-to-r from-telos-blue/20 to-telos-gold/20 animate-spin-slow blur-2xl"></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[380px] h-[380px] rounded-full bg-telos-gold/10 animate-morph"></div>
+                </div>
+
                 <Image
                   src="/icons/icon-512.png"
                   alt="Telos.AI - Acompanhamento Pós-Operatório"
                   width={400}
                   height={400}
-                  className="drop-shadow-2xl animate-float hover-scale transition-smooth"
+                  className="drop-shadow-2xl animate-float hover-scale transition-smooth relative z-10"
                   priority
                 />
               </div>
@@ -129,7 +144,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Economize Tempo */}
             <FadeIn delay={0.2} direction="up">
-              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift transition-smooth shadow-lg">
+              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -150,7 +165,7 @@ export default function Home() {
 
             {/* Economize Dinheiro */}
             <FadeIn delay={0.3} direction="up">
-              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift transition-smooth shadow-lg">
+              <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine">
               <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-gold transition-colors">
                 <svg className="w-8 h-8 text-telos-gold group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -171,7 +186,7 @@ export default function Home() {
 
             {/* Detecção Precoce */}
             <FadeIn delay={0.4} direction="up">
-            <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift transition-smooth shadow-lg">
+            <div className="group p-8 bg-white border-2 border-gray-100 rounded-2xl hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
               <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-telos-blue transition-colors">
                 <svg className="w-8 h-8 text-telos-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -269,11 +284,19 @@ export default function Home() {
       </section>
 
       {/* Research Mode Section - DESTAQUE */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden">
-        {/* Background Pattern */}
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#0A2647] via-[#051629] to-[#020817] relative overflow-hidden animate-gradient-breathe">
+        {/* Background Pattern - Animated */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-telos-gold rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-telos-gold rounded-full blur-3xl animate-blob-move"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full blur-3xl animate-blob-move animation-delay-600"></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-telos-blue-light rounded-full blur-3xl animate-float-particle animation-delay-400"></div>
+        </div>
+
+        {/* Floating Particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-telos-gold rounded-full animate-float-particle"></div>
+          <div className="absolute top-3/4 right-1/4 w-3 h-3 bg-blue-400 rounded-full animate-float-particle animation-delay-800"></div>
+          <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-telos-gold rounded-full animate-float-particle animation-delay-400"></div>
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
