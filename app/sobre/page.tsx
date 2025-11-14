@@ -5,12 +5,7 @@ export default function SobrePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header Simples */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm relative overflow-hidden">
-        {/* Background Animated Blobs */}
-        <div className="absolute inset-0 -z-10 opacity-30">
-          <div className="absolute top-0 -left-20 w-72 h-72 bg-telos-blue rounded-full mix-blend-multiply filter blur-3xl animate-blob-move"></div>
-          <div className="absolute top-0 -right-20 w-72 h-72 bg-telos-gold rounded-full mix-blend-multiply filter blur-3xl animate-blob-move animation-delay-400"></div>
-        </div>
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto flex h-20 items-center justify-between px-6">
           <Link href="/" className="group">
             <div className="flex items-baseline gap-0.5">
