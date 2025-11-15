@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 // PUT - Atualiza protocolo
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,6 +13,8 @@ export async function PUT(
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const { id } = await params
 
     const body = await request.json()
     const {
@@ -28,7 +30,7 @@ export async function PUT(
 
     // Verifica se o protocolo pertence ao médico
     const existing = await prisma.protocol.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existing || existing.userId !== session.user.id) {
@@ -36,7 +38,7 @@ export async function PUT(
     }
 
     const protocol = await prisma.protocol.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         surgeryType,
         category,
@@ -62,7 +64,7 @@ export async function PUT(
 // DELETE - Exclui protocolo
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -71,9 +73,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Verifica se o protocolo pertence ao médico
     const existing = await prisma.protocol.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!existing || existing.userId !== session.user.id) {
@@ -81,7 +85,7 @@ export async function DELETE(
     }
 
     await prisma.protocol.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ success: true })
