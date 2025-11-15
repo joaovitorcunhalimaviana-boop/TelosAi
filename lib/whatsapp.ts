@@ -212,7 +212,7 @@ export async function sendInteractiveMessage(
 }
 
 /**
- * Envia questionário de follow-up
+ * Envia questionário de follow-up usando template aprovado
  */
 export async function sendFollowUpQuestionnaire(
   followUp: FollowUp,
@@ -220,24 +220,48 @@ export async function sendFollowUpQuestionnaire(
   surgery: Surgery
 ): Promise<WhatsAppResponse> {
   try {
-    // Importar dinamicamente para evitar circular dependency
-    const { getQuestionnaireForDay } = await import('./questionnaires');
+    // Usar template diferente para D1 vs outros dias
+    const templateName = followUp.dayNumber === 1 ? 'followup_day1' : 'followup_daily';
 
-    const questionnaire = getQuestionnaireForDay(
-      followUp.dayNumber,
-      surgery.type as 'hemorroidectomia' | 'fistula' | 'fissura' | 'pilonidal'
-    );
+    // Mapear tipo de cirurgia para texto amigável
+    const surgeryTypeMap: Record<string, string> = {
+      'hemorroidectomia': 'doença hemorroidária',
+      'fistula': 'fístula anal',
+      'fissura': 'fissura anal',
+      'pilonidal': 'cisto pilonidal'
+    };
 
-    // Construir mensagem
-    const greeting = getGreeting();
-    const message = `${greeting} ${patient.name.split(' ')[0]}!\n\n` +
-      `Este é o questionário de acompanhamento do dia ${followUp.dayNumber} após sua cirurgia.\n\n` +
-      `${questionnaire.introduction}\n\n` +
-      `Por favor, responda as seguintes perguntas:\n\n` +
-      questionnaire.questions.map((q, i) => `${i + 1}. ${q.question}`).join('\n\n') +
-      `\n\nResponda cada pergunta separadamente. Estou aqui para ajudar!`;
+    const surgeryTypeText = surgeryTypeMap[surgery.type] || surgery.type;
+    const patientFirstName = patient.name.split(' ')[0];
 
-    return await sendMessage(patient.phone, message);
+    // Componentes do template
+    const components = followUp.dayNumber === 1
+      ? [
+          {
+            type: 'body',
+            parameters: [
+              { type: 'text', text: patientFirstName },
+              { type: 'text', text: surgeryTypeText }
+            ]
+          }
+        ]
+      : [
+          {
+            type: 'body',
+            parameters: [
+              { type: 'text', text: patientFirstName }
+            ]
+          }
+        ];
+
+    console.log('📱 Sending template message:', {
+      template: templateName,
+      to: patient.phone,
+      patientName: patientFirstName,
+      surgeryType: surgeryTypeText
+    });
+
+    return await sendTemplate(patient.phone, templateName, components);
   } catch (error) {
     console.error('Error sending follow-up questionnaire:', error);
     throw error;
