@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
                   const alertMessage = formatDoctorAlert(
                     analysis,
                     patient,
-                    surgery || undefined,
-                    userMessage
+                    userMessage,
+                    surgery || undefined
                   )
 
                   try {

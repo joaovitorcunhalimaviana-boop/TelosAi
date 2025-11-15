@@ -214,8 +214,8 @@ Responda APENAS com JSON válido neste formato:
 export function formatDoctorAlert(
   analysis: MessageAnalysis,
   patient: Patient,
-  surgery?: Surgery,
-  originalMessage: string
+  originalMessage: string,
+  surgery?: Surgery
 ): string {
   const daysPostOp = surgery
     ? Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24))
