@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { sendMessage, markAsRead } from "@/lib/whatsapp"
 
 /**
  * Webhook do WhatsApp Business API
@@ -61,6 +62,31 @@ export async function POST(request: NextRequest) {
             timestamp: message.timestamp,
           })
 
+          // Marcar como lida
+          if (message.id) {
+            await markAsRead(message.id)
+          }
+
+          // Responder automaticamente para abrir a janela de 24h
+          if (message.type === 'text' && message.text?.body) {
+            const userMessage = message.text.body.toLowerCase().trim()
+
+            // Resposta de boas-vindas
+            const greeting = getGreeting()
+            const response = `${greeting}! 👋\n\n` +
+              `Obrigado por entrar em contato!\n\n` +
+              `Esta é a central de acompanhamento pós-operatório Telos.AI.\n\n` +
+              `Em breve você receberá questionários de acompanhamento após sua cirurgia.\n\n` +
+              `Se tiver alguma dúvida ou sintoma preocupante, responda aqui e nossa equipe irá analisar!`
+
+            try {
+              await sendMessage(message.from, response)
+              console.log("✅ Auto-reply sent successfully")
+            } catch (error) {
+              console.error("❌ Error sending auto-reply:", error)
+            }
+          }
+
           // TODO: Processar mensagem do paciente
           // - Identificar o paciente pelo número
           // - Salvar a resposta no banco
@@ -96,5 +122,20 @@ export async function POST(request: NextRequest) {
       { error: "Internal server error" },
       { status: 200 }
     )
+  }
+}
+
+/**
+ * Retorna saudação apropriada baseada no horário
+ */
+function getGreeting(): string {
+  const hour = new Date().getHours()
+
+  if (hour >= 5 && hour < 12) {
+    return 'Bom dia'
+  } else if (hour >= 12 && hour < 18) {
+    return 'Boa tarde'
+  } else {
+    return 'Boa noite'
   }
 }
