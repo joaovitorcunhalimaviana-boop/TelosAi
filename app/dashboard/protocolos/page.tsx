@@ -204,35 +204,43 @@ export default function ProtocolsPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Protocolos Pós-Operatórios</h1>
-          <p className="text-muted-foreground mt-2">
-            Configure as orientações que a IA usará para responder pacientes
-          </p>
-        </div>
-        <Button onClick={handleCreate} disabled={isCreating}>
-          <Plus className="w-4 h-4 mr-2" />
+    <div className="p-8 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Protocolos Pós-Operatórios
+        </h1>
+        <p className="text-lg text-muted-foreground mt-3">
+          Configure uma vez os protocolos para cada tipo de cirurgia. A IA usará automaticamente para todos os pacientes.
+        </p>
+      </div>
+
+      <div className="flex justify-end mb-6">
+        <Button onClick={handleCreate} disabled={isCreating} size="lg" className="shadow-lg">
+          <Plus className="w-5 h-5 mr-2" />
           Novo Protocolo
         </Button>
       </div>
 
       {/* Formulário de criação/edição */}
       {(isCreating || editingId) && (
-        <Card className="mb-6 border-blue-200 bg-blue-50/50">
-          <CardHeader>
-            <CardTitle>{editingId ? 'Editar Protocolo' : 'Novo Protocolo'}</CardTitle>
+        <Card className="mb-8 border-2 border-blue-300 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardHeader className="border-b border-blue-200 bg-white/50">
+            <CardTitle className="text-2xl flex items-center gap-2">
+              {editingId ? '✏️ Editar Protocolo' : '✨ Novo Protocolo'}
+            </CardTitle>
+            <CardDescription className="text-base mt-2">
+              Configure as orientações que serão usadas automaticamente pela IA para todos os pacientes deste tipo de cirurgia
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Tipo de Cirurgia</Label>
+          <CardContent className="space-y-6 pt-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">🔪 Tipo de Cirurgia</Label>
                 <Select
                   value={formData.surgeryType}
                   onValueChange={(value) => setFormData({ ...formData, surgeryType: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -243,15 +251,16 @@ export default function ProtocolsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Para qual cirurgia este protocolo se aplica</p>
               </div>
 
-              <div>
-                <Label>Categoria</Label>
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">📌 Categoria</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => setFormData({ ...formData, category: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -262,71 +271,76 @@ export default function ProtocolsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Tipo de orientação</p>
               </div>
             </div>
 
-            <div>
-              <Label>Título do Protocolo</Label>
+            <div className="space-y-2">
+              <Label className="text-base font-semibold">📝 Título do Protocolo</Label>
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Ex: Banho de assento - Primeiros 3 dias"
+                className="h-12 text-base"
               />
+              <p className="text-xs text-muted-foreground">Nome descritivo para identificar facilmente</p>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label>Dia Inicial (D+)</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  value={formData.dayRangeStart}
-                  onChange={(e) => setFormData({ ...formData, dayRangeStart: parseInt(e.target.value) })}
-                />
-              </div>
+            <div className="bg-white/80 p-4 rounded-lg border border-blue-200">
+              <Label className="text-base font-semibold mb-3 block">📅 Período Pós-Operatório</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Dia Inicial (D+)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={formData.dayRangeStart}
+                    onChange={(e) => setFormData({ ...formData, dayRangeStart: parseInt(e.target.value) })}
+                    className="h-11"
+                  />
+                  <p className="text-xs text-muted-foreground">A partir de qual dia se aplica</p>
+                </div>
 
-              <div>
-                <Label>Dia Final (D+) - opcional</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  value={formData.dayRangeEnd || ''}
-                  onChange={(e) => setFormData({ ...formData, dayRangeEnd: e.target.value ? parseInt(e.target.value) : null })}
-                  placeholder="Deixe vazio = sempre"
-                />
-              </div>
-
-              <div>
-                <Label>Prioridade</Label>
-                <Input
-                  type="number"
-                  value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                />
+                <div className="space-y-2">
+                  <Label>Dia Final (D+) <span className="text-muted-foreground">(opcional)</span></Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={formData.dayRangeEnd || ''}
+                    onChange={(e) => setFormData({ ...formData, dayRangeEnd: e.target.value ? parseInt(e.target.value) : null })}
+                    placeholder="Deixe vazio para sempre"
+                    className="h-11"
+                  />
+                  <p className="text-xs text-muted-foreground">Até qual dia (vazio = sempre após dia inicial)</p>
+                </div>
               </div>
             </div>
 
-            <div>
-              <Label>Conteúdo do Protocolo</Label>
+            <div className="space-y-2">
+              <Label className="text-base font-semibold">💬 Orientação para o Paciente</Label>
               <Textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                placeholder="Ex: Compressa gelada na região 3x ao dia por 10-15 minutos, especialmente após evacuações. Isso ajuda a reduzir o inchaço e a dor."
-                rows={4}
+                placeholder="Ex: Banho de assento com água morna 2-3x ao dia por 10-15 minutos."
+                rows={5}
+                className="text-base resize-none"
               />
-              <p className="text-sm text-muted-foreground mt-1">
-                Este texto será usado pela IA para responder o paciente. Seja claro e objetivo.
-              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
+                <p className="text-sm text-yellow-800">
+                  <strong>⚠️ Importante:</strong> Este texto será enviado EXATAMENTE como está para o paciente pela IA.
+                  Seja claro, objetivo e use apenas informações corretas baseadas no seu protocolo.
+                </p>
+              </div>
             </div>
 
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={handleCancel}>
+            <div className="flex gap-3 justify-end pt-4 border-t border-blue-200">
+              <Button variant="outline" onClick={handleCancel} size="lg" className="min-w-32">
                 <X className="w-4 h-4 mr-2" />
                 Cancelar
               </Button>
-              <Button onClick={handleSave}>
+              <Button onClick={handleSave} size="lg" className="min-w-32 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                 <Save className="w-4 h-4 mr-2" />
-                Salvar
+                Salvar Protocolo
               </Button>
             </div>
           </CardContent>
@@ -336,44 +350,68 @@ export default function ProtocolsPage() {
       {/* Lista de protocolos */}
       <div className="space-y-4">
         {protocols.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
-              Nenhum protocolo cadastrado. Clique em "Novo Protocolo" para começar.
+          <Card className="border-2 border-dashed border-gray-300">
+            <CardContent className="py-16 text-center">
+              <div className="text-6xl mb-4">📋</div>
+              <p className="text-xl text-muted-foreground font-medium">
+                Nenhum protocolo cadastrado ainda
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Clique em "Novo Protocolo" para configurar suas orientações personalizadas
+              </p>
             </CardContent>
           </Card>
         ) : (
           protocols.map(protocol => (
-            <Card key={protocol.id} className={!protocol.isActive ? 'opacity-50' : ''}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">{protocol.title}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label} •{' '}
-                      {categories.find(c => c.value === protocol.category)?.label} •{' '}
-                      {getDayRangeText(protocol.dayRangeStart, protocol.dayRangeEnd)}
-                    </CardDescription>
+            <Card
+              key={protocol.id}
+              className={`transition-all hover:shadow-lg ${!protocol.isActive ? 'opacity-50' : 'border-l-4 border-l-blue-500'}`}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl font-bold text-blue-900">
+                      {protocol.title}
+                    </CardTitle>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        🔪 {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label}
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        📌 {categories.find(c => c.value === protocol.category)?.label}
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        📅 {getDayRangeText(protocol.dayRangeStart, protocol.dayRangeEnd)}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(protocol)}
+                      className="hover:bg-blue-50 hover:border-blue-300"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-4 h-4 mr-1" />
+                      Editar
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(protocol.id)}
+                      className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Excluir
                     </Button>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{protocol.content}</p>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-2">💬 Orientação que será enviada:</p>
+                  <p className="text-base whitespace-pre-wrap text-gray-900">{protocol.content}</p>
+                </div>
               </CardContent>
             </Card>
           ))
