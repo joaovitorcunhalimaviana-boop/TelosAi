@@ -576,6 +576,11 @@ model Protocol {
   researchId String?
   research   Research? @relation(fields: [researchId], references: [id], onDelete: Cascade)
 
+  // NOVO: Protocolo específico de grupo dentro da pesquisa (null = todos os grupos)
+  // Exemplo: Grupo A usa diltiazem, Grupo B usa lidocaína
+  // Se null e researchId preenchido = protocolo para todos os grupos da pesquisa
+  researchGroupCode String? // A, B, C, D...
+
   // Tipo de cirurgia (para qual cirurgia este protocolo se aplica)
   surgeryType String // hemorroidectomia, fistula, fissura, pilonidal, geral
 

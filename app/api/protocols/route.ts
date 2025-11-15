@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
         priority: parseInt(priority) || 0,
         isActive: isActive !== false,
         researchId: researchId || null,
+        researchGroupCode: body.researchGroupCode || null,
       }
     })
 

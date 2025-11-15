@@ -50,6 +50,7 @@ export async function PUT(
         priority: parseInt(priority) || 0,
         isActive: isActive !== false,
         researchId: researchId || null,
+        researchGroupCode: body.researchGroupCode || null,
       }
     })
 

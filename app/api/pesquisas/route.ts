@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
             content: protocol.content,
             priority: protocol.priority || 0,
             isActive: true,
+            researchGroupCode: protocol.researchGroupCode || null, // null = todos os grupos
           })),
         } : undefined,
       },

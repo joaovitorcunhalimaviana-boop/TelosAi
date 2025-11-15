@@ -65,6 +65,7 @@ interface ProtocolInput {
   dayRangeEnd: number | null;
   content: string;
   priority: number;
+  researchGroupCode: string | null; // null = todos os grupos, ou código específico (A, B, C...)
 }
 
 export default function PesquisasPage() {
@@ -140,6 +141,7 @@ export default function PesquisasPage() {
       dayRangeEnd: null,
       content: '',
       priority: 0,
+      researchGroupCode: null, // Padrão: protocolo para todos os grupos
     }]);
   };
 
@@ -436,7 +438,7 @@ export default function PesquisasPage() {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3 pt-4">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
                           <div>
                             <Label className="text-xs">Tipo de Cirurgia</Label>
                             <Select
@@ -468,6 +470,28 @@ export default function PesquisasPage() {
                                 {categories.map(cat => (
                                   <SelectItem key={cat.value} value={cat.value}>
                                     {cat.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs flex items-center gap-1">
+                              Grupo Específico
+                              <span className="text-[10px] text-gray-500">(opcional)</span>
+                            </Label>
+                            <Select
+                              value={protocol.researchGroupCode || 'all'}
+                              onValueChange={(value) => handleUpdateProtocol(index, 'researchGroupCode', value === 'all' ? null : value)}
+                            >
+                              <SelectTrigger className="h-9">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">Todos os grupos</SelectItem>
+                                {groups.map(group => (
+                                  <SelectItem key={group.groupCode} value={group.groupCode}>
+                                    Grupo {group.groupCode}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

@@ -39,6 +39,7 @@ export async function analyzePatientMessage(
 
   // Buscar protocolos do médico (se userId fornecido e há cirurgia)
   // PRIORIDADE: Se paciente está em pesquisa, usar protocolos da pesquisa
+  // Se paciente está em grupo específico, usar protocolos daquele grupo
   // Caso contrário, usar protocolos normais do médico
   let relevantProtocols: any[] = [];
   if (userId && surgery && daysPostOp !== null) {
@@ -48,13 +49,22 @@ export async function analyzePatientMessage(
         where: {
           userId,
           researchId: patient.researchId, // APENAS protocolos desta pesquisa
-          isActive: true,
-          OR: [
-            { surgeryType: surgery.type },
-            { surgeryType: 'geral' }
+          // Se paciente tem grupo específico, buscar protocolos do grupo OU protocolos gerais da pesquisa
+          OR: patient.researchGroup ? [
+            { researchGroupCode: patient.researchGroup }, // Protocolo específico do grupo do paciente
+            { researchGroupCode: null } // OU protocolos para todos os grupos
+          ] : [
+            { researchGroupCode: null } // Se não tem grupo, apenas protocolos gerais
           ],
-          dayRangeStart: { lte: daysPostOp },
+          isActive: true,
           AND: [
+            {
+              OR: [
+                { surgeryType: surgery.type },
+                { surgeryType: 'geral' }
+              ]
+            },
+            { dayRangeStart: { lte: daysPostOp } },
             {
               OR: [
                 { dayRangeEnd: null },
@@ -102,7 +112,11 @@ export async function analyzePatientMessage(
   if (relevantProtocols.length > 0) {
     if (patient.researchId) {
       protocolsSection = '\n\n⚠️ PROTOCOLOS DE PESQUISA CIENTÍFICA:\n';
-      protocolsSection += '🔬 IMPORTANTE: Este paciente está em um estudo de pesquisa. Use APENAS estes protocolos específicos da pesquisa (NÃO os protocolos da prática normal):\n\n';
+      protocolsSection += '🔬 IMPORTANTE: Este paciente está em um estudo de pesquisa';
+      if (patient.researchGroup) {
+        protocolsSection += ` no GRUPO ${patient.researchGroup}`;
+      }
+      protocolsSection += '. Use APENAS estes protocolos específicos da pesquisa (NÃO os protocolos da prática normal):\n\n';
     } else {
       protocolsSection = '\n\nPROTOCOLOS DO MÉDICO:\n';
       protocolsSection += 'Use estes protocolos personalizados do médico para responder ao paciente:\n\n';
