@@ -77,7 +77,8 @@
       "Bash(railway run:*)",
       "Bash(powershell -Command \"Start-Sleep -Seconds 20\")",
       "Bash(tree:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(del:*)"
     ],
     "deny": [],
     "ask": []

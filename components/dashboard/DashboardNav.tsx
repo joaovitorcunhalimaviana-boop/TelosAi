@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DollarSign, Shield } from "lucide-react";
+import { DollarSign, Shield, FileText } from "lucide-react";
 
 interface DashboardNavProps {
   userRole: string;
@@ -9,6 +9,16 @@ interface DashboardNavProps {
 export function DashboardNav({ userRole }: DashboardNavProps) {
   return (
     <div className="flex gap-2">
+      {/* Protocolos para médicos */}
+      {userRole === "medico" && (
+        <Link href="/dashboard/protocolos">
+          <Button size="sm" variant="outline" className="gap-2">
+            <FileText className="h-4 w-4" />
+            Protocolos
+          </Button>
+        </Link>
+      )}
+
       {/* Billing link para médicos */}
       {userRole === "medico" && (
         <Link href="/dashboard/billing">
