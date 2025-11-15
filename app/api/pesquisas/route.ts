@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create research with groups
+    // Create research with groups and protocols
     const research = await prisma.research.create({
       data: {
         userId,
@@ -119,6 +119,19 @@ export async function POST(request: NextRequest) {
             description: group.description,
           })),
         },
+        protocols: body.protocols && Array.isArray(body.protocols) && body.protocols.length > 0 ? {
+          create: body.protocols.map((protocol: any) => ({
+            userId,
+            surgeryType: protocol.surgeryType,
+            category: protocol.category,
+            title: protocol.title,
+            dayRangeStart: protocol.dayRangeStart,
+            dayRangeEnd: protocol.dayRangeEnd || null,
+            content: protocol.content,
+            priority: protocol.priority || 0,
+            isActive: true,
+          })),
+        } : undefined,
       },
       include: {
         groups: {
@@ -126,6 +139,7 @@ export async function POST(request: NextRequest) {
             groupCode: 'asc',
           },
         },
+        protocols: true,
       },
     });
 

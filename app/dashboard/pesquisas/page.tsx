@@ -9,9 +9,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+
+const surgeryTypes = [
+  { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
+  { value: 'fistula', label: 'Fístula' },
+  { value: 'fissura', label: 'Fissura' },
+  { value: 'pilonidal', label: 'Doença Pilonidal' },
+  { value: 'geral', label: 'Geral (todas)' },
+];
+
+const categories = [
+  { value: 'banho', label: 'Banho / Higiene Local' },
+  { value: 'medicacao', label: 'Medicação' },
+  { value: 'alimentacao', label: 'Alimentação' },
+  { value: 'atividade_fisica', label: 'Atividade Física' },
+  { value: 'higiene', label: 'Higiene Geral' },
+  { value: 'sintomas_normais', label: 'Sintomas Normais' },
+];
 
 interface ResearchGroup {
   id: string;
@@ -39,6 +57,16 @@ interface GroupInput {
   description: string;
 }
 
+interface ProtocolInput {
+  surgeryType: string;
+  category: string;
+  title: string;
+  dayRangeStart: number;
+  dayRangeEnd: number | null;
+  content: string;
+  priority: number;
+}
+
 export default function PesquisasPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -54,6 +82,7 @@ export default function PesquisasPage() {
   const [groups, setGroups] = useState<GroupInput[]>([
     { groupCode: 'A', groupName: '', description: '' },
   ]);
+  const [protocols, setProtocols] = useState<ProtocolInput[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -102,6 +131,28 @@ export default function PesquisasPage() {
     setGroups(updated);
   };
 
+  const handleAddProtocol = () => {
+    setProtocols([...protocols, {
+      surgeryType: surgeryType || 'geral',
+      category: 'medicacao',
+      title: '',
+      dayRangeStart: 1,
+      dayRangeEnd: null,
+      content: '',
+      priority: 0,
+    }]);
+  };
+
+  const handleRemoveProtocol = (index: number) => {
+    setProtocols(protocols.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateProtocol = (index: number, field: keyof ProtocolInput, value: any) => {
+    const updated = [...protocols];
+    updated[index] = { ...updated[index], [field]: value };
+    setProtocols(updated);
+  };
+
   const handleCreateResearch = async () => {
     if (!title.trim() || !description.trim()) {
       toast.error('Título e descrição são obrigatórios');
@@ -126,6 +177,7 @@ export default function PesquisasPage() {
           description,
           surgeryType: surgeryType.trim() || null,
           groups,
+          protocols,
         }),
       });
 
@@ -177,6 +229,7 @@ export default function PesquisasPage() {
     setDescription('');
     setSurgeryType('');
     setGroups([{ groupCode: 'A', groupName: '', description: '' }]);
+    setProtocols([]);
   };
 
   if (status === 'loading' || loading) {
@@ -327,6 +380,146 @@ export default function PesquisasPage() {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+
+              {/* Protocols Section */}
+              <div className="space-y-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-lg border-2 border-amber-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-lg font-semibold flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-amber-700" />
+                      Protocolos da Pesquisa (Opcional)
+                    </Label>
+                    <p className="text-sm text-amber-800 mt-1">
+                      Configure protocolos específicos que serão usados apenas para pacientes nesta pesquisa
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddProtocol}
+                    className="bg-white hover:bg-amber-50"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Adicionar Protocolo
+                  </Button>
+                </div>
+
+                {protocols.length === 0 ? (
+                  <div className="bg-white/80 rounded-lg p-6 text-center border-2 border-dashed border-amber-300">
+                    <FileText className="h-12 w-12 mx-auto text-amber-400 mb-2" />
+                    <p className="text-sm text-gray-600">
+                      Nenhum protocolo adicionado. Clique em "Adicionar Protocolo" para criar.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Protocolos de pesquisa garantem orientações uniformes para todos os pacientes do estudo
+                    </p>
+                  </div>
+                ) : (
+                  protocols.map((protocol, index) => (
+                    <Card key={index} className="border-2 border-amber-200 bg-white">
+                      <CardHeader className="pb-3 bg-amber-50/50">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Protocolo {index + 1}
+                          </CardTitle>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveProtocol(index)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3 pt-4">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs">Tipo de Cirurgia</Label>
+                            <Select
+                              value={protocol.surgeryType}
+                              onValueChange={(value) => handleUpdateProtocol(index, 'surgeryType', value)}
+                            >
+                              <SelectTrigger className="h-9">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {surgeryTypes.map(type => (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    {type.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">Categoria</Label>
+                            <Select
+                              value={protocol.category}
+                              onValueChange={(value) => handleUpdateProtocol(index, 'category', value)}
+                            >
+                              <SelectTrigger className="h-9">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {categories.map(cat => (
+                                  <SelectItem key={cat.value} value={cat.value}>
+                                    {cat.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Título</Label>
+                          <Input
+                            value={protocol.title}
+                            onChange={(e) => handleUpdateProtocol(index, 'title', e.target.value)}
+                            placeholder="Ex: Pomada de lidocaína - pós-operatório"
+                            className="h-9"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs">Dia Inicial (D+)</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={protocol.dayRangeStart}
+                              onChange={(e) => handleUpdateProtocol(index, 'dayRangeStart', parseInt(e.target.value))}
+                              className="h-9"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Dia Final (D+) - Opcional</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={protocol.dayRangeEnd || ''}
+                              onChange={(e) => handleUpdateProtocol(index, 'dayRangeEnd', e.target.value ? parseInt(e.target.value) : null)}
+                              placeholder="Vazio = sempre"
+                              className="h-9"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Orientação para o Paciente</Label>
+                          <Textarea
+                            value={protocol.content}
+                            onChange={(e) => handleUpdateProtocol(index, 'content', e.target.value)}
+                            placeholder="Ex: Aplicar pomada de lidocaína 2% após evacuações e banhos..."
+                            rows={3}
+                            className="text-sm"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
