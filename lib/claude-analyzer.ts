@@ -5,6 +5,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
+import { prisma } from './prisma';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -27,7 +28,8 @@ export interface MessageAnalysis {
 export async function analyzePatientMessage(
   message: string,
   patient: Patient,
-  surgery?: Surgery
+  surgery?: Surgery,
+  userId?: string
 ): Promise<MessageAnalysis> {
 
   // Calcular dias pós-operatórios
@@ -35,13 +37,71 @@ export async function analyzePatientMessage(
     ? Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
+  // Buscar protocolos do médico (se userId fornecido e há cirurgia)
+  let relevantProtocols: any[] = [];
+  if (userId && surgery && daysPostOp !== null) {
+    relevantProtocols = await prisma.protocol.findMany({
+      where: {
+        userId,
+        isActive: true,
+        OR: [
+          { surgeryType: surgery.type },
+          { surgeryType: 'geral' }
+        ],
+        dayRangeStart: { lte: daysPostOp },
+        AND: [
+          {
+            OR: [
+              { dayRangeEnd: null },
+              { dayRangeEnd: { gte: daysPostOp } }
+            ]
+          }
+        ]
+      },
+      orderBy: [
+        { priority: 'desc' },
+        { category: 'asc' }
+      ]
+    });
+  }
+
+  // Formatar protocolos para o prompt
+  let protocolsSection = '';
+  if (relevantProtocols.length > 0) {
+    protocolsSection = '\n\nPROTOCOLOS DO MÉDICO:\n';
+    protocolsSection += 'Use estes protocolos personalizados do médico para responder ao paciente:\n\n';
+
+    const groupedProtocols = relevantProtocols.reduce((acc: any, p: any) => {
+      if (!acc[p.category]) acc[p.category] = [];
+      acc[p.category].push(p);
+      return acc;
+    }, {});
+
+    for (const [category, protocols] of Object.entries(groupedProtocols)) {
+      const categoryNames: any = {
+        'banho': 'BANHO/HIGIENE LOCAL',
+        'medicacao': 'MEDICAÇÃO',
+        'alimentacao': 'ALIMENTAÇÃO',
+        'atividade_fisica': 'ATIVIDADE FÍSICA',
+        'higiene': 'HIGIENE GERAL',
+        'sintomas_normais': 'SINTOMAS NORMAIS'
+      };
+
+      protocolsSection += `${categoryNames[category] || category.toUpperCase()}:\n`;
+      (protocols as any[]).forEach((p: any) => {
+        protocolsSection += `• ${p.title}: ${p.content}\n`;
+      });
+      protocolsSection += '\n';
+    }
+  }
+
   const prompt = `Você é um assistente médico especializado em cirurgia colorretal analisando mensagem de paciente pós-operatório.
 
 PACIENTE:
 - Nome: ${patient.name}
 - Cirurgia: ${surgery?.type || 'Não especificada'}
 - Dias pós-op: ${daysPostOp !== null ? `D+${daysPostOp}` : 'N/A'}
-
+${protocolsSection}
 MENSAGEM DO PACIENTE:
 "${message}"
 
@@ -60,14 +120,16 @@ ANALISE E CLASSIFIQUE:
 4. RESPOSTA SUGERIDA:
    - CRITICAL: SEMPRE orientar PRONTO-SOCORRO IMEDIATO ou SAMU 192
    - HIGH/MEDIUM: Orientação inicial + "Dr. João foi notificado e entrará em contato"
-   - LOW: Orientação baseada em protocolos padrão pós-operatórios
+   - LOW: Use os PROTOCOLOS DO MÉDICO acima (se fornecidos) para responder. Seja específico e cite o protocolo.
 
 IMPORTANTE:
+- SEMPRE use os protocolos personalizados do médico quando disponíveis
 - NUNCA prescrever medicamento novo
 - NUNCA mudar dosagem ou duração de medicamentos
 - NUNCA dar diagnóstico definitivo
 - Ser conservador: na dúvida, orientar contato com médico
 - Respostas DEVEM ser empáticas, claras e em português Brasil
+- Quando usar um protocolo, seja específico (ex: "banho de assento com água morna 2-3x ao dia")
 
 Responda APENAS com JSON válido neste formato:
 {

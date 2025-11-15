@@ -64,6 +64,7 @@ model User {
   followUpResponses   FollowUpResponse[]
   surgeryTemplates    SurgeryTemplate[]
   researches          Research[]
+  protocols           Protocol[]
 
   @@unique([crm, estado]) // CRM must be unique per state
   @@index([email])
@@ -546,6 +547,50 @@ model ResearchGroup {
 
   @@unique([researchId, groupCode]) // Não pode ter dois grupos "A" na mesma pesquisa
   @@index([researchId])
+}
+
+// ============================================
+// PROTOCOLOS PÓS-OPERATÓRIOS PERSONALIZADOS
+// ============================================
+
+model Protocol {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant - cada médico tem seus próprios protocolos
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Tipo de cirurgia (para qual cirurgia este protocolo se aplica)
+  surgeryType String // hemorroidectomia, fistula, fissura, pilonidal, geral
+
+  // Categoria do protocolo
+  category String // banho, medicacao, alimentacao, atividade_fisica, higiene, sintomas_normais
+
+  // Título do protocolo (para exibir na interface)
+  title String // Ex: "Banho de assento - Primeiros 3 dias", "Alimentação pós-hemorroidectomia"
+
+  // Período de aplicação (em dias pós-operatórios)
+  dayRangeStart Int // Dia inicial (1 = D+1)
+  dayRangeEnd   Int? // Dia final (null = aplicar para sempre após dayRangeStart)
+
+  // Conteúdo do protocolo (texto que será usado pela IA)
+  content String @db.Text
+  // Ex: "Compressa gelada na região 3x ao dia por 10-15 minutos, após evacuações"
+  // Ex: "Banho de assento com água morna 2-3x ao dia por 10-15 minutos"
+
+  // Prioridade (para ordenação)
+  priority Int @default(0) // Maior = mais importante
+
+  // Ativo/Inativo
+  isActive Boolean @default(true)
+
+  @@index([userId])
+  @@index([surgeryType])
+  @@index([category])
+  @@index([dayRangeStart])
+  @@index([isActive])
 }
 
 // ============================================

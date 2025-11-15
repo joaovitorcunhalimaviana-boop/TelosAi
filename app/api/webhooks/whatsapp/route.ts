@@ -111,7 +111,8 @@ export async function POST(request: NextRequest) {
               const analysis = await analyzePatientMessage(
                 userMessage,
                 patient,
-                surgery || undefined
+                surgery || undefined,
+                patient.userId // Passa o userId do médico para buscar protocolos
               )
 
               console.log(`📊 Analysis result:`, {
