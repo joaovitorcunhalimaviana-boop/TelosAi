@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { sendMessage, markAsRead } from "@/lib/whatsapp"
+import { sendMessage, markAsRead, sendDoctorAlert } from "@/lib/whatsapp"
+import { analyzePatientMessage, formatDoctorAlert } from "@/lib/claude-analyzer"
+import { prisma } from "@/lib/prisma"
 
 /**
  * Webhook do WhatsApp Business API
@@ -67,31 +69,97 @@ export async function POST(request: NextRequest) {
             await markAsRead(message.id)
           }
 
-          // Responder automaticamente para abrir a janela de 24h
+          // Processar mensagem de texto
           if (message.type === 'text' && message.text?.body) {
-            const userMessage = message.text.body.toLowerCase().trim()
-
-            // Resposta de boas-vindas
-            const greeting = getGreeting()
-            const response = `${greeting}! 👋\n\n` +
-              `Obrigado por entrar em contato!\n\n` +
-              `Esta é a central de acompanhamento pós-operatório Telos.AI.\n\n` +
-              `Em breve você receberá questionários de acompanhamento após sua cirurgia.\n\n` +
-              `Se tiver alguma dúvida ou sintoma preocupante, responda aqui e nossa equipe irá analisar!`
+            const userMessage = message.text.body
 
             try {
-              await sendMessage(message.from, response)
-              console.log("✅ Auto-reply sent successfully")
+              // 1. Identificar paciente pelo telefone
+              const patient = await prisma.patient.findFirst({
+                where: {
+                  phone: {
+                    contains: message.from.replace(/\D/g, '').slice(-11) // Últimos 11 dígitos
+                  }
+                }
+              })
+
+              if (!patient) {
+                // Paciente não encontrado - resposta padrão
+                const greeting = getGreeting()
+                const response = `${greeting}! 👋\n\n` +
+                  `Obrigado por entrar em contato!\n\n` +
+                  `Esta é a central de acompanhamento pós-operatório Telos.AI.\n\n` +
+                  `Não identificamos você como paciente cadastrado. ` +
+                  `Se você realizou cirurgia recentemente com Dr. João Vitor, ` +
+                  `entre em contato pelo telefone (83) 9166-4904.`
+
+                await sendMessage(message.from, response)
+                console.log("✅ Response sent to unregistered patient")
+                continue
+              }
+
+              console.log(`📋 Patient identified: ${patient.name}`)
+
+              // 2. Buscar cirurgia mais recente
+              const surgery = await prisma.surgery.findFirst({
+                where: { patientId: patient.id },
+                orderBy: { date: 'desc' }
+              })
+
+              // 3. Analisar mensagem com Claude AI
+              console.log('🤖 Analyzing message with Claude AI...')
+              const analysis = await analyzePatientMessage(
+                userMessage,
+                patient,
+                surgery || undefined
+              )
+
+              console.log(`📊 Analysis result:`, {
+                urgency: analysis.urgency,
+                category: analysis.category,
+                shouldNotifyDoctor: analysis.shouldNotifyDoctor
+              })
+
+              // 4. Enviar resposta ao paciente
+              await sendMessage(message.from, analysis.suggestedResponse)
+              console.log("✅ Intelligent response sent to patient")
+
+              // 5. Notificar médico se necessário
+              if (analysis.shouldNotifyDoctor) {
+                const doctorPhone = process.env.DOCTOR_PHONE_NUMBER
+                if (doctorPhone) {
+                  const alertMessage = formatDoctorAlert(
+                    analysis,
+                    patient,
+                    surgery || undefined,
+                    userMessage
+                  )
+
+                  try {
+                    await sendMessage(doctorPhone, alertMessage)
+                    console.log("✅ Doctor notified successfully")
+                  } catch (error) {
+                    console.error("❌ Error notifying doctor:", error)
+                  }
+                }
+              }
+
+              // 6. Salvar no banco de dados
+              // TODO: Criar tabela de conversas/mensagens para histórico
+
             } catch (error) {
-              console.error("❌ Error sending auto-reply:", error)
+              console.error("❌ Error processing message:", error)
+
+              // Fallback: resposta genérica de erro
+              const response =
+                `Recebemos sua mensagem e estamos processando.\n\n` +
+                `Se for uma emergência (sangramento volumoso, febre alta com dor, dor insuportável), ` +
+                `procure o pronto-socorro IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
+                `Dr. João Vitor foi notificado e entrará em contato.`
+
+              await sendMessage(message.from, response)
             }
           }
-
-          // TODO: Processar mensagem do paciente
-          // - Identificar o paciente pelo número
-          // - Salvar a resposta no banco
-          // - Analisar com IA se necessário
-          // - Atualizar status do follow-up
         }
       }
 
