@@ -38,38 +38,75 @@ export async function analyzePatientMessage(
     : null;
 
   // Buscar protocolos do médico (se userId fornecido e há cirurgia)
+  // PRIORIDADE: Se paciente está em pesquisa, usar protocolos da pesquisa
+  // Caso contrário, usar protocolos normais do médico
   let relevantProtocols: any[] = [];
   if (userId && surgery && daysPostOp !== null) {
-    relevantProtocols = await prisma.protocol.findMany({
-      where: {
-        userId,
-        isActive: true,
-        OR: [
-          { surgeryType: surgery.type },
-          { surgeryType: 'geral' }
-        ],
-        dayRangeStart: { lte: daysPostOp },
-        AND: [
-          {
-            OR: [
-              { dayRangeEnd: null },
-              { dayRangeEnd: { gte: daysPostOp } }
-            ]
-          }
+    // Se paciente está em pesquisa, buscar APENAS protocolos da pesquisa
+    if (patient.researchId) {
+      relevantProtocols = await prisma.protocol.findMany({
+        where: {
+          userId,
+          researchId: patient.researchId, // APENAS protocolos desta pesquisa
+          isActive: true,
+          OR: [
+            { surgeryType: surgery.type },
+            { surgeryType: 'geral' }
+          ],
+          dayRangeStart: { lte: daysPostOp },
+          AND: [
+            {
+              OR: [
+                { dayRangeEnd: null },
+                { dayRangeEnd: { gte: daysPostOp } }
+              ]
+            }
+          ]
+        },
+        orderBy: [
+          { priority: 'desc' },
+          { category: 'asc' }
         ]
-      },
-      orderBy: [
-        { priority: 'desc' },
-        { category: 'asc' }
-      ]
-    });
+      });
+    } else {
+      // Paciente NÃO está em pesquisa - usar protocolos normais do médico
+      relevantProtocols = await prisma.protocol.findMany({
+        where: {
+          userId,
+          researchId: null, // APENAS protocolos normais (não de pesquisa)
+          isActive: true,
+          OR: [
+            { surgeryType: surgery.type },
+            { surgeryType: 'geral' }
+          ],
+          dayRangeStart: { lte: daysPostOp },
+          AND: [
+            {
+              OR: [
+                { dayRangeEnd: null },
+                { dayRangeEnd: { gte: daysPostOp } }
+              ]
+            }
+          ]
+        },
+        orderBy: [
+          { priority: 'desc' },
+          { category: 'asc' }
+        ]
+      });
+    }
   }
 
   // Formatar protocolos para o prompt
   let protocolsSection = '';
   if (relevantProtocols.length > 0) {
-    protocolsSection = '\n\nPROTOCOLOS DO MÉDICO:\n';
-    protocolsSection += 'Use estes protocolos personalizados do médico para responder ao paciente:\n\n';
+    if (patient.researchId) {
+      protocolsSection = '\n\n⚠️ PROTOCOLOS DE PESQUISA CIENTÍFICA:\n';
+      protocolsSection += '🔬 IMPORTANTE: Este paciente está em um estudo de pesquisa. Use APENAS estes protocolos específicos da pesquisa (NÃO os protocolos da prática normal):\n\n';
+    } else {
+      protocolsSection = '\n\nPROTOCOLOS DO MÉDICO:\n';
+      protocolsSection += 'Use estes protocolos personalizados do médico para responder ao paciente:\n\n';
+    }
 
     const groupedProtocols = relevantProtocols.reduce((acc: any, p: any) => {
       if (!acc[p.category]) acc[p.category] = [];

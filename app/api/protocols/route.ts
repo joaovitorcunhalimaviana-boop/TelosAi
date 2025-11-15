@@ -15,6 +15,13 @@ export async function GET(request: NextRequest) {
       where: {
         userId: session.user.id
       },
+      include: {
+        research: {
+          select: {
+            title: true
+          }
+        }
+      },
       orderBy: [
         { surgeryType: 'asc' },
         { category: 'asc' },
@@ -52,6 +59,7 @@ export async function POST(request: NextRequest) {
       content,
       priority,
       isActive,
+      researchId,
     } = body
 
     // Validações
@@ -73,6 +81,7 @@ export async function POST(request: NextRequest) {
         content,
         priority: parseInt(priority) || 0,
         isActive: isActive !== false,
+        researchId: researchId || null,
       }
     })
 

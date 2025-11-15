@@ -26,6 +26,7 @@ export async function PUT(
       content,
       priority,
       isActive,
+      researchId,
     } = body
 
     // Verifica se o protocolo pertence ao médico
@@ -48,6 +49,7 @@ export async function PUT(
         content,
         priority: parseInt(priority) || 0,
         isActive: isActive !== false,
+        researchId: researchId || null,
       }
     })
 

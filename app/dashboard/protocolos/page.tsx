@@ -21,6 +21,14 @@ interface Protocol {
   content: string
   priority: number
   isActive: boolean
+  researchId: string | null
+  research?: { title: string }
+}
+
+interface Research {
+  id: string
+  title: string
+  isActive: boolean
 }
 
 const surgeryTypes = [
@@ -45,6 +53,7 @@ export default function ProtocolsPage() {
   const { toast } = useToast()
 
   const [protocols, setProtocols] = useState<Protocol[]>([])
+  const [researches, setResearches] = useState<Research[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -58,11 +67,13 @@ export default function ProtocolsPage() {
     content: '',
     priority: 0,
     isActive: true,
+    researchId: null as string | null,
   })
 
-  // Buscar protocolos
+  // Buscar protocolos e pesquisas
   useEffect(() => {
     fetchProtocols()
+    fetchResearches()
   }, [])
 
   const fetchProtocols = async () => {
@@ -84,6 +95,18 @@ export default function ProtocolsPage() {
     }
   }
 
+  const fetchResearches = async () => {
+    try {
+      const res = await fetch('/api/researches')
+      if (res.ok) {
+        const data = await res.json()
+        setResearches(data.researches || [])
+      }
+    } catch (error) {
+      console.error('Erro ao buscar pesquisas:', error)
+    }
+  }
+
   const handleCreate = () => {
     setIsCreating(true)
     setFormData({
@@ -95,6 +118,7 @@ export default function ProtocolsPage() {
       content: '',
       priority: 0,
       isActive: true,
+      researchId: null,
     })
   }
 
@@ -109,6 +133,7 @@ export default function ProtocolsPage() {
       content: protocol.content,
       priority: protocol.priority,
       isActive: protocol.isActive,
+      researchId: protocol.researchId,
     })
   }
 
@@ -124,6 +149,7 @@ export default function ProtocolsPage() {
       content: '',
       priority: 0,
       isActive: true,
+      researchId: null,
     })
   }
 
@@ -286,6 +312,35 @@ export default function ProtocolsPage() {
               <p className="text-xs text-muted-foreground">Nome descritivo para identificar facilmente</p>
             </div>
 
+            {/* Campo de Pesquisa */}
+            <div className="space-y-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border-2 border-amber-300">
+              <Label className="text-base font-semibold">🔬 Protocolo de Pesquisa (Opcional)</Label>
+              <Select
+                value={formData.researchId || 'none'}
+                onValueChange={(value) => setFormData({ ...formData, researchId: value === 'none' ? null : value })}
+              >
+                <SelectTrigger className="h-12 bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    Protocolo Normal (Prática Diária)
+                  </SelectItem>
+                  {researches.filter(r => r.isActive).map(research => (
+                    <SelectItem key={research.id} value={research.id}>
+                      🔬 Pesquisa: {research.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="bg-amber-100 border border-amber-300 rounded p-3 mt-2">
+                <p className="text-sm text-amber-900">
+                  <strong>⚠️ Importante:</strong> Protocolos de pesquisa são usados APENAS para pacientes vinculados àquela pesquisa específica.
+                  Use quando o protocolo da pesquisa diferir da sua prática normal (ex: medicação diferente para evitar fator confundidor).
+                </p>
+              </div>
+            </div>
+
             <div className="bg-white/80 p-4 rounded-lg border border-blue-200">
               <Label className="text-base font-semibold mb-3 block">📅 Período Pós-Operatório</Label>
               <div className="grid grid-cols-2 gap-4">
@@ -374,6 +429,11 @@ export default function ProtocolsPage() {
                       {protocol.title}
                     </CardTitle>
                     <div className="flex flex-wrap gap-2 mt-2">
+                      {protocol.researchId && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md">
+                          🔬 PESQUISA: {protocol.research?.title || 'Pesquisa'}
+                        </span>
+                      )}
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         🔪 {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label}
                       </span>

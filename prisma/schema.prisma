@@ -99,6 +99,8 @@ model Patient {
 
   // Pesquisa Científica
   isResearchParticipant Boolean @default(false) // Se está em um estudo
+  researchId            String? // ID da pesquisa em que está participando
+  research              Research? @relation(fields: [researchId], references: [id], onDelete: SetNull)
   researchGroup         String? // A, B, C, D, etc - para ensaios clínicos randomizados
   researchNotes         String? @db.Text // Observações sobre a pesquisa
 
@@ -521,6 +523,12 @@ model Research {
   // Grupos da pesquisa
   groups ResearchGroup[]
 
+  // NOVO: Protocolos específicos desta pesquisa
+  protocols Protocol[]
+
+  // Pacientes nesta pesquisa
+  patients Patient[]
+
   // Estatísticas
   totalPatients Int @default(0)
 
@@ -562,6 +570,12 @@ model Protocol {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // NOVO: Protocolo de pesquisa específico (null = protocolo normal do médico)
+  // Quando preenchido, este protocolo é usado APENAS para pacientes naquela pesquisa
+  // Exemplo: Pesquisa usa pomada de lidocaína, prática normal usa diltiazem
+  researchId String?
+  research   Research? @relation(fields: [researchId], references: [id], onDelete: Cascade)
+
   // Tipo de cirurgia (para qual cirurgia este protocolo se aplica)
   surgeryType String // hemorroidectomia, fistula, fissura, pilonidal, geral
 
@@ -587,6 +601,7 @@ model Protocol {
   isActive Boolean @default(true)
 
   @@index([userId])
+  @@index([researchId])
   @@index([surgeryType])
   @@index([category])
   @@index([dayRangeStart])
