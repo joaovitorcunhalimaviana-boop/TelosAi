@@ -112,11 +112,8 @@ export async function analyzePatientMessage(
   if (relevantProtocols.length > 0) {
     if (patient.researchId) {
       protocolsSection = '\n\n⚠️ PROTOCOLOS DE PESQUISA CIENTÍFICA:\n';
-      protocolsSection += '🔬 IMPORTANTE: Este paciente está em um estudo de pesquisa';
-      if (patient.researchGroup) {
-        protocolsSection += ` no GRUPO ${patient.researchGroup}`;
-      }
-      protocolsSection += '. Use APENAS estes protocolos específicos da pesquisa (NÃO os protocolos da prática normal):\n\n';
+      protocolsSection += '🔬 IMPORTANTE: Este paciente está em um estudo de pesquisa. Use APENAS estes protocolos específicos da pesquisa (NÃO os protocolos da prática normal).\n';
+      protocolsSection += '⚠️ NUNCA mencione ao paciente que ele está em um grupo específico (A, B, C, etc). Isso deve ser mantido em sigilo.\n\n';
     } else {
       protocolsSection = '\n\nPROTOCOLOS DO MÉDICO:\n';
       protocolsSection += 'Use estes protocolos personalizados do médico para responder ao paciente:\n\n';
