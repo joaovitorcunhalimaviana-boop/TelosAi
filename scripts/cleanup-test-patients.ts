@@ -8,7 +8,7 @@
  * Use com cuidado!
  */
 
-import { prisma } from '../lib/prisma'
+import { prisma } from '../lib/prisma.js'
 
 async function cleanupTestPatients() {
   console.log('🗑️  Iniciando limpeza de pacientes de teste...\n')
