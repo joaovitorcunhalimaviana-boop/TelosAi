@@ -143,15 +143,10 @@ export async function analyzePatientMessage(
     }
   }
 
-  const prompt = `Você é um assistente médico especializado em cirurgia colorretal analisando mensagem de paciente pós-operatório.
-
-PACIENTE:
-- Nome: ${patient.name}
-- Cirurgia: ${surgery?.type || 'Não especificada'}
-- Dias pós-op: ${daysPostOp !== null ? `D+${daysPostOp}` : 'N/A'}
-${protocolsSection}
-MENSAGEM DO PACIENTE:
-"${message}"
+  try {
+    // 💰 PROMPT CACHING: Reduz custo em até 90%
+    // Separa prompt em partes estáticas (cacheable) e dinâmicas
+    const systemPrompt = `Você é um assistente médico especializado em cirurgia colorretal analisando mensagem de paciente pós-operatório.
 
 ANALISE E CLASSIFIQUE:
 
@@ -189,15 +184,31 @@ Responda APENAS com JSON válido neste formato:
   "redFlags": ["flag1", "flag2"]
 }`;
 
-  try {
+    // Mensagem do usuário (parte dinâmica)
+    const userMessage = `PACIENTE:
+- Nome: ${patient.name}
+- Cirurgia: ${surgery?.type || 'Não especificada'}
+- Dias pós-op: ${daysPostOp !== null ? `D+${daysPostOp}` : 'N/A'}
+${protocolsSection}
+MENSAGEM DO PACIENTE:
+"${message}"`;
+
     const response = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
       temperature: 0.3,
+      // 🎯 SYSTEM PROMPT com cache control
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' } // Cache por 5 minutos
+        }
+      ],
       messages: [
         {
           role: 'user',
-          content: prompt,
+          content: userMessage,
         },
       ],
     });

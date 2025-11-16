@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { sendMessage, markAsRead, sendDoctorAlert } from "@/lib/whatsapp"
 import { analyzePatientMessage, formatDoctorAlert } from "@/lib/claude-analyzer"
 import { prisma } from "@/lib/prisma"
+import { validateHubChallenge } from "@/lib/security/webhook-validator"
 
 /**
  * Webhook do WhatsApp Business API
@@ -23,17 +24,16 @@ export async function GET(request: NextRequest) {
   console.log("📞 Webhook validation attempt:", {
     mode,
     token,
-    challenge,
-    expectedToken: verifyToken,
+    tokenMatch: token === verifyToken,
   })
 
-  // Valida o token
-  if (mode === "subscribe" && token === verifyToken) {
-    console.log("✅ Webhook validated successfully!")
-    return new NextResponse(challenge, { status: 200 })
+  // Valida usando função segura
+  const validatedChallenge = validateHubChallenge(mode, token, challenge, verifyToken!)
+
+  if (validatedChallenge) {
+    return new NextResponse(validatedChallenge, { status: 200 })
   }
 
-  console.log("❌ Webhook validation failed")
   return NextResponse.json(
     { error: "Forbidden" },
     { status: 403 }
@@ -180,16 +180,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Sempre retorna 200 para o Meta não retentar
+    // Retorna 200 apenas se processamento foi bem sucedido
     return NextResponse.json({ success: true }, { status: 200 })
 
   } catch (error) {
     console.error("❌ Error processing webhook:", error)
 
-    // Mesmo com erro, retorna 200 para evitar reenvios
+    // 🔧 CORREÇÃO: Retornar 500 em caso de erro real
+    // O Meta WhatsApp irá retentar automaticamente (com backoff exponencial)
+    // Isso garante que mensagens não sejam perdidas
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 200 }
+      {
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
     )
   }
 }
