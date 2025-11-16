@@ -339,6 +339,21 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           {/* Botões de Ação */}
           <div className="flex flex-wrap gap-3 items-center">
+            {/* Link para Protocolos (médicos) */}
+            {userRole === "medico" && (
+              <Link href="/dashboard/protocolos">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="shadow-sm gap-2 hover:opacity-80"
+                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
+                >
+                  <FileText className="h-5 w-5" />
+                  Protocolos
+                </Button>
+              </Link>
+            )}
+
             {/* Link para Billing (médicos) */}
             {userRole === "medico" && (
               <Link href="/dashboard/billing">
