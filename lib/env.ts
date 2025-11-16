@@ -58,7 +58,7 @@ export function validateEnv(): Env {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('❌ Environment variable validation failed:')
-      console.error(error.errors.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n'))
+      console.error(error.issues.map(e => `  - ${e.path.join('.')}: ${e.message}`).join('\n'))
       throw new Error('Invalid environment variables. Check .env file.')
     }
     throw error
