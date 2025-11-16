@@ -48,7 +48,7 @@ import { ptBR } from "date-fns/locale"
 import { FadeIn, SlideIn, StaggerChildren, StaggerItem, CountUp, ScaleOnHover } from "@/components/animations"
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion"
 import { motion, AnimatePresence } from "framer-motion"
-import { OnboardingChecklist } from "@/components/tutorial/OnboardingChecklist"
+// import { OnboardingChecklist } from "@/components/tutorial/OnboardingChecklist" // REMOVIDO: Checklist com bugs
 import { SimpleTour } from "@/components/tutorial/SimpleTour"
 
 interface DashboardClientProps {
@@ -569,10 +569,10 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
           </StaggerItem>
         </StaggerChildren>
 
-        {/* Onboarding Checklist */}
-        <FadeIn delay={0.6} className="mb-6">
+        {/* Onboarding Checklist - REMOVIDO: Estava bugado */}
+        {/* <FadeIn delay={0.6} className="mb-6">
           <OnboardingChecklist />
-        </FadeIn>
+        </FadeIn> */}
 
         {/* Filtros e Busca */}
         <SlideIn direction="down" delay={0.7}>
