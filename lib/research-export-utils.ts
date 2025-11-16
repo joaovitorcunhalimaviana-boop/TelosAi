@@ -71,11 +71,13 @@ export interface SurgeryData {
 }
 
 export interface PatientData {
-  // ❌ LGPD: Removido 'id' (UUID rastreável)
-  // ✅ LGPD: Substituído por anonymousId (ID sequencial não rastreável)
-  anonymousId: string;
+  // ✅ LGPD: ID pseudônimo determinístico (hash SHA-256)
+  // Permite re-identificação COM acesso ao banco, mas não com apenas o ID
+  // Conforme Art. 13, § 3º da LGPD (pseudonimização para pesquisa)
+  pseudonymousId: string;
   // ❌ LGPD: Removido 'name' (informação pessoal identificável)
   // ❌ LGPD: Removido 'dateOfBirth' (informação pessoal identificável)
+  // ❌ LGPD: Removido 'phone' (informação pessoal identificável)
   age?: number | null;
   sex?: string | null;
   researchGroup: string | null;
@@ -447,8 +449,8 @@ function formatIndividualData(
   data.patients.forEach(patient => {
     patient.surgeries.forEach(surgery => {
       const baseRow: any = {
-        // ✅ LGPD: ID anônimo (P001, P002, etc.) ao invés de UUID
-        ID_Anonimo: patient.anonymousId,
+        // ✅ LGPD: ID pseudônimo (hash SHA-256) - permite re-identificação
+        ID_Pseudonimo: patient.pseudonymousId,
         Grupo_Pesquisa: patient.researchGroup,
       };
 
@@ -860,8 +862,8 @@ function formatTimelineData(
   data.patients.forEach(patient => {
     patient.surgeries.forEach(surgery => {
       const baseInfo = {
-        // ✅ LGPD: ID anônimo ao invés de UUID rastreável
-        ID_Anonimo: patient.anonymousId,
+        // ✅ LGPD: ID pseudônimo (hash SHA-256) - permite re-identificação
+        ID_Pseudonimo: patient.pseudonymousId,
         Grupo: patient.researchGroup,
         Data_Cirurgia: surgery.date.toISOString().split('T')[0],
       };
@@ -940,7 +942,7 @@ function createGlossary(): any[] {
   return [
     { Campo: 'GLOSSÁRIO', Descricao: '' },
     { Campo: '', Descricao: '' },
-    { Campo: 'ID_Anonimo', Descricao: 'Identificador anônimo sequencial (P001, P002, etc.) - LGPD compliant' },
+    { Campo: 'ID_Pseudonimo', Descricao: 'Identificador pseudônimo (hash SHA-256) - permite re-identificação com acesso ao banco de dados. Conforme Art. 13, § 3º da LGPD para pesquisa científica.' },
     { Campo: 'Grupo_Pesquisa', Descricao: 'Código do grupo de pesquisa (A, B, C, etc)' },
     { Campo: 'Dor_D+N', Descricao: 'Nível de dor no dia N pós-operatório (escala 0-10)' },
     { Campo: 'NPS', Descricao: 'Net Promoter Score - satisfação do paciente (0-10)' },

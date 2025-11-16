@@ -9,6 +9,7 @@ import {
   type ResearchExportData,
   type ResearchExportOptions,
 } from '@/lib/research-export-utils';
+import { generatePseudonymousId } from '@/lib/research-pseudonymization';
 
 export async function POST(request: NextRequest) {
   try {
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         isResearchParticipant: true,
         researchGroup: {
-          in: research.groups.map(g => g.groupCode),
+          in: research.groups.map((g) => g.groupCode),
         },
       },
       include: {
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Filtrar apenas pacientes com cirurgias (após aplicar filtros de data)
-    const filteredPatients = patients.filter(p => p.surgeries.length > 0);
+    const filteredPatients = patients.filter((p) => p.surgeries.length > 0);
 
     if (filteredPatients.length === 0) {
       return NextResponse.json(
@@ -162,25 +163,27 @@ export async function POST(request: NextRequest) {
         endDate: research.endDate,
         totalPatients: research.totalPatients,
       },
-      groups: research.groups.map(g => ({
+      groups: research.groups.map((g) => ({
         id: g.id,
         groupCode: g.groupCode,
         groupName: g.groupName,
         description: g.description,
-        patientCount: filteredPatients.filter(p => p.researchGroup === g.groupCode).length,
+        patientCount: filteredPatients.filter((p) => p.researchGroup === g.groupCode).length,
       })),
-      patients: filteredPatients.map((patient, index) => ({
-        // ❌ LGPD: Removido 'id' (UUID único que pode ser rastreado)
-        // ✅ LGPD: ID anônimo sequencial por grupo
-        anonymousId: `P${String(index + 1).padStart(3, '0')}`,
+      patients: filteredPatients.map((patient) => ({
+        // ✅ LGPD: ID pseudônimo (hash SHA-256) - Art. 13, § 3º LGPD
+        // Permite re-identificação COM acesso ao banco, mas não apenas com o ID
+        // Mesmo paciente = mesmo ID em todas as exportações (determinístico)
+        pseudonymousId: generatePseudonymousId(patient.id, research.id),
         // ❌ LGPD: Removido 'name' (informação pessoal identificável)
         // ❌ LGPD: Removido 'dateOfBirth' (informação pessoal identificável)
+        // ❌ LGPD: Removido 'phone' (informação pessoal identificável)
         age: options.fields.dadosBasicos ? patient.age : undefined,
         sex: options.fields.dadosBasicos ? patient.sex : undefined,
         researchGroup: patient.researchGroup,
         researchNotes: patient.researchNotes,
         comorbidities: options.fields.comorbidades
-          ? patient.comorbidities.map(pc => ({
+          ? patient.comorbidities.map((pc) => ({
               name: pc.comorbidity.name,
               category: pc.comorbidity.category,
               details: pc.details,
@@ -188,7 +191,7 @@ export async function POST(request: NextRequest) {
             }))
           : [],
         medications: options.fields.medicacoes
-          ? patient.medications.map(pm => ({
+          ? patient.medications.map((pm) => ({
               name: pm.medication.name,
               category: pm.medication.category,
               dose: pm.dose,
@@ -196,7 +199,7 @@ export async function POST(request: NextRequest) {
               route: pm.route,
             }))
           : [],
-        surgeries: patient.surgeries.map(surgery => ({
+        surgeries: patient.surgeries.map((surgery) => ({
           id: surgery.id,
           type: surgery.type,
           date: surgery.date,
@@ -207,14 +210,14 @@ export async function POST(request: NextRequest) {
           anesthesia: options.fields.dadosCirurgicos ? surgery.anesthesia : undefined,
           postOp: options.fields.dadosCirurgicos ? surgery.postOp : undefined,
           followUps: options.fields.followUps
-            ? surgery.followUps.map(fu => ({
+            ? surgery.followUps.map((fu) => ({
                 dayNumber: fu.dayNumber,
                 scheduledDate: fu.scheduledDate,
                 status: fu.status,
                 sentAt: fu.sentAt,
                 respondedAt: fu.respondedAt,
                 responses: options.fields.respostasQuestionarios
-                  ? fu.responses.map(r => ({
+                  ? fu.responses.map((r) => ({
                       questionnaireData: r.questionnaireData,
                       aiAnalysis: options.fields.analiseIA ? r.aiAnalysis : undefined,
                       aiResponse: options.fields.analiseIA ? r.aiResponse : undefined,
