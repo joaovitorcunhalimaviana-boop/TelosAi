@@ -341,8 +341,8 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           {/* Botões de Ação */}
           <div className="flex flex-wrap gap-3 items-center">
-            {/* Link para Protocolos (médicos) */}
-            {userRole === "medico" && (
+            {/* Link para Protocolos (médicos e admins) */}
+            {(userRole === "medico" || userRole === "admin") && (
               <Link href="/dashboard/protocolos">
                 <Button
                   size="lg"
