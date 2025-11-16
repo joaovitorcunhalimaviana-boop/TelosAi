@@ -17,6 +17,7 @@ export interface DashboardStats {
 export interface PatientCard {
   id: string
   patientName: string
+  phone: string // Telefone do paciente para WhatsApp
   surgeryType: SurgeryType
   surgeryDate: Date
   daysSinceSurgery: number
@@ -271,6 +272,7 @@ export async function getDashboardPatients(
     return {
       id: surgery.id,
       patientName: surgery.patient.name,
+      phone: surgery.patient.phone, // Telefone para WhatsApp
       surgeryType: surgery.type as SurgeryType,
       surgeryDate: surgery.date,
       daysSinceSurgery,

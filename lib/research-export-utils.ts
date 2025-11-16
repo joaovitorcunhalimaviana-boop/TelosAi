@@ -71,11 +71,13 @@ export interface SurgeryData {
 }
 
 export interface PatientData {
-  id: string;
-  name?: string;
+  // ❌ LGPD: Removido 'id' (UUID rastreável)
+  // ✅ LGPD: Substituído por anonymousId (ID sequencial não rastreável)
+  anonymousId: string;
+  // ❌ LGPD: Removido 'name' (informação pessoal identificável)
+  // ❌ LGPD: Removido 'dateOfBirth' (informação pessoal identificável)
   age?: number | null;
   sex?: string | null;
-  dateOfBirth?: Date | null;
   researchGroup: string | null;
   researchNotes: string | null;
   comorbidities: ComorbidityData[];
@@ -445,13 +447,14 @@ function formatIndividualData(
   data.patients.forEach(patient => {
     patient.surgeries.forEach(surgery => {
       const baseRow: any = {
-        ID_Paciente: patient.id,
+        // ✅ LGPD: ID anônimo (P001, P002, etc.) ao invés de UUID
+        ID_Anonimo: patient.anonymousId,
         Grupo_Pesquisa: patient.researchGroup,
       };
 
       // Dados básicos
       if (options.fields.dadosBasicos) {
-        baseRow['Nome'] = patient.name;
+        // ❌ LGPD: Removido 'Nome' (PII)
         baseRow['Idade'] = patient.age;
         baseRow['Sexo'] = patient.sex;
       }
@@ -857,7 +860,8 @@ function formatTimelineData(
   data.patients.forEach(patient => {
     patient.surgeries.forEach(surgery => {
       const baseInfo = {
-        ID_Paciente: patient.id,
+        // ✅ LGPD: ID anônimo ao invés de UUID rastreável
+        ID_Anonimo: patient.anonymousId,
         Grupo: patient.researchGroup,
         Data_Cirurgia: surgery.date.toISOString().split('T')[0],
       };
@@ -936,7 +940,7 @@ function createGlossary(): any[] {
   return [
     { Campo: 'GLOSSÁRIO', Descricao: '' },
     { Campo: '', Descricao: '' },
-    { Campo: 'ID_Paciente', Descricao: 'Identificador único do paciente' },
+    { Campo: 'ID_Anonimo', Descricao: 'Identificador anônimo sequencial (P001, P002, etc.) - LGPD compliant' },
     { Campo: 'Grupo_Pesquisa', Descricao: 'Código do grupo de pesquisa (A, B, C, etc)' },
     { Campo: 'Dor_D+N', Descricao: 'Nível de dor no dia N pós-operatório (escala 0-10)' },
     { Campo: 'NPS', Descricao: 'Net Promoter Score - satisfação do paciente (0-10)' },

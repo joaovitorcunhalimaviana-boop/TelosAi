@@ -94,11 +94,7 @@ export default function PricingPage() {
                       </svg>
                       <h3 className="text-xl font-bold text-telos-blue">Founding Member</h3>
                     </div>
-                    <p className="text-xs text-telos-gold font-bold mb-3">⚡ Apenas 3 vagas</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                      <div className="bg-telos-gold h-2 rounded-full" style={{ width: '33%' }}></div>
-                    </div>
-                    <p className="text-xs text-gray-600">1 de 3 vagas preenchidas</p>
+                    <p className="text-xs text-telos-gold font-bold mb-3">⚡ Vagas limitadas</p>
                   </div>
                   <div className="space-y-2 text-sm text-gray-700 mb-4">
                     <p>Base: R$ 400 (3 pacientes)</p>
@@ -125,11 +121,7 @@ export default function PricingPage() {
                       </svg>
                       <h3 className="text-xl font-bold text-telos-blue">Early Adopter</h3>
                     </div>
-                    <p className="text-xs text-telos-blue font-bold mb-3">⚡ Próximas 10 vagas</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                      <div className="bg-telos-blue h-2 rounded-full" style={{ width: '20%' }}></div>
-                    </div>
-                    <p className="text-xs text-gray-600">2 de 10 vagas preenchidas</p>
+                    <p className="text-xs text-telos-blue font-bold mb-3">⚡ Vagas limitadas</p>
                   </div>
                   <div className="space-y-2 text-sm text-gray-700 mb-4">
                     <div className="flex items-baseline gap-2">
@@ -163,7 +155,7 @@ export default function PricingPage() {
                       </svg>
                       <h3 className="text-xl font-bold text-gray-700">Profissional</h3>
                     </div>
-                    <p className="text-xs text-gray-600 font-bold mb-3">Após poucas vagas</p>
+                    <p className="text-xs text-gray-600 font-bold mb-3">Plano regular</p>
                   </div>
                   <div className="space-y-2 text-sm text-gray-600 mb-4">
                     <p>Base: R$ 950 (3 pacientes)</p>
@@ -188,10 +180,10 @@ export default function PricingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <h4 className="font-bold text-telos-blue mb-2">⚡ Poucas vagas com desconto</h4>
+                    <h4 className="font-bold text-telos-blue mb-2">⚡ Oferta Limitada</h4>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      Dos cirurgiões do Brasil, <span className="font-semibold text-telos-gold">poucos terão acesso ao preço promocional</span>.
-                      A partir do 14º paciente, o preço volta para o Profissional: R$ 950/mês + R$ 350/paciente adicional.
+                      Os planos <span className="font-semibold text-telos-gold">Founding Member e Early Adopter têm vagas limitadas</span>.
+                      Após o preenchimento, apenas o plano Profissional estará disponível: R$ 950/mês + R$ 350/paciente adicional.
                     </p>
                   </div>
                 </div>
@@ -212,7 +204,7 @@ export default function PricingPage() {
                   </svg>
                 </Link>
                 <p className="mt-4 text-sm text-gray-600">
-                  <span className="font-semibold text-telos-blue">Apenas 3 vagas disponíveis</span> • Preço vitalício garantido
+                  <span className="font-semibold text-telos-blue">Vagas limitadas</span> • Preço vitalício garantido
                 </p>
               </div>
 
@@ -231,7 +223,7 @@ export default function PricingPage() {
                   </svg>
                 </Link>
                 <p className="mt-3 text-sm text-gray-600">
-                  Poucas vagas • Economize NO MÍNIMO R$ 450/mês
+                  Vagas limitadas • Economize NO MÍNIMO R$ 450/mês
                 </p>
               </div>
             </div>
@@ -282,7 +274,7 @@ export default function PricingPage() {
                 {[
                   { feature: "Preço mensal (3 pacientes)", founding: "R$ 400", earlyAdopter: "R$ 500", professional: "R$ 950" },
                   { feature: "Paciente adicional", founding: "R$ 150", earlyAdopter: "R$ 180", professional: "R$ 350" },
-                  { feature: "Vagas disponíveis", founding: "3 vagas", earlyAdopter: "10 vagas", professional: "Ilimitado" },
+                  { feature: "Disponibilidade", founding: "Limitada", earlyAdopter: "Limitada", professional: "Aberta" },
                   { feature: "Acompanhamento 24/7", founding: true, earlyAdopter: true, professional: true },
                   { feature: "WhatsApp + IA", founding: true, earlyAdopter: true, professional: true },
                   { feature: "Detecção de red flags", founding: true, earlyAdopter: true, professional: true },

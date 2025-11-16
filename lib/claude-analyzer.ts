@@ -6,6 +6,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
+import { z } from 'zod';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -21,6 +22,91 @@ export interface MessageAnalysis {
   shouldNotifyDoctor: boolean;
   redFlags: string[];
 }
+
+// Schema Zod para validar resposta do Claude
+const messageAnalysisSchema = z.object({
+  urgency: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
+  category: z.string(),
+  summary: z.string(),
+  suggestedResponse: z.string(),
+  shouldNotifyDoctor: z.boolean(),
+  redFlags: z.array(z.string())
+});
+
+/**
+ * Retorna expectativas específicas por tipo de cirurgia e dia pós-op
+ */
+function getSurgerySpecificContext(surgeryType: string, daysPostOp: number): string {
+  const contexts: Record<string, string> = {
+    'hemorroidectomia': `
+EXPECTATIVAS HEMORROIDECTOMIA D+${daysPostOp}:
+- Dor: Esperada 7-9/10 nos primeiros 3 dias, reduzindo para 4-6/10 em D+7
+- Sangramento: Leve ao evacuar é NORMAL até D+7. Volumoso é RED FLAG
+- Primeira evacuação: Muito dolorosa (D+1 a D+3), orientar analgesia prévia
+- Retenção urinária: Comum em D+1 (bloqueio anestésico)
+- Edema/inchaço: Normal até D+5
+`,
+    'fistula': `
+EXPECTATIVAS FÍSTULA ANAL D+${daysPostOp}:
+- Dor: Moderada 4-6/10, não deve ser insuportável
+- Secreção: Leve secreção serosa/sanguinolenta é normal
+- Sangramento: Mínimo, se moderado/volumoso é RED FLAG
+- Cicatrização: Lenta (4-6 semanas para fechar completamente)
+- Banho de assento: CRUCIAL para higiene local
+`,
+    'fissura': `
+EXPECTATIVAS FISSURA ANAL D+${daysPostOp}:
+- Dor: Intensa ao evacuar (D+1 a D+5), melhora progressiva
+- Sangramento: Leve ao papel higiênico é esperado
+- Espasmo anal: Comum, orientar relaxamento e banho de assento
+- Dieta: Rica em fibras + hidratação para fezes macias
+`,
+    'pilonidal': `
+EXPECTATIVAS DOENÇA PILONIDAL D+${daysPostOp}:
+- Dor: Moderada 5-7/10 nos primeiros dias
+- Secreção: Esperada (ferida deixada aberta para cicatrizar por segunda intenção)
+- Curativos: Diários com soro fisiológico
+- Sinais de infecção: Febre, secreção purulenta, odor fétido (RED FLAGS)
+`
+  };
+
+  return contexts[surgeryType] || `CIRURGIA: ${surgeryType} - D+${daysPostOp}`;
+}
+
+/**
+ * Few-shot examples para melhorar acurácia do Claude
+ */
+const FEW_SHOT_EXAMPLES = `
+EXEMPLOS DE CLASSIFICAÇÃO:
+
+Exemplo 1:
+Mensagem: "Tô com dor 9/10 e sangrando muito, encheu o vaso sanitário"
+Urgência: CRITICAL
+Categoria: "sangramento"
+Red Flags: ["sangramento_volumoso", "dor_intensa"]
+Resposta: "🚨 ATENÇÃO - PROCURE O PRONTO-SOCORRO IMEDIATAMENTE. Sangramento volumoso em pós-operatório é emergência. Vá agora ou ligue 192 (SAMU)."
+
+Exemplo 2:
+Mensagem: "Dor 7/10, tomei dipirona mas não aliviou. É D+2 da hemorroidectomia"
+Urgência: HIGH
+Categoria: "dor"
+Red Flags: ["dor_refrataria_analgesia"]
+Resposta: "Dor 7/10 que não melhora com dipirona em D+2 precisa avaliação. Dr. João foi notificado e entrará em contato. Se piorar, procure pronto-socorro."
+
+Exemplo 3:
+Mensagem: "Posso tomar banho hoje? É D+3"
+Urgência: LOW
+Categoria: "higiene"
+Red Flags: []
+Resposta: "Sim! Pode tomar banho normalmente. Faça também banho de assento com água morna 2-3x ao dia por 10-15 minutos após evacuações. Ajuda muito na cicatrização."
+
+Exemplo 4:
+Mensagem: "Febre 38.8°C e dor forte no local da cirurgia"
+Urgência: CRITICAL
+Categoria: "infecção"
+Red Flags: ["febre_alta", "dor_intensa", "possível_infecção"]
+Resposta: "🚨 Febre alta com dor forte pode indicar infecção. PROCURE PRONTO-SOCORRO AGORA. Dr. João foi notificado."
+`;
 
 /**
  * Analisa mensagem do paciente e retorna classificação
@@ -146,7 +232,15 @@ export async function analyzePatientMessage(
   try {
     // 💰 PROMPT CACHING: Reduz custo em até 90%
     // Separa prompt em partes estáticas (cacheable) e dinâmicas
+
+    // Adicionar contexto específico da cirurgia
+    const surgeryContext = surgery
+      ? getSurgerySpecificContext(surgery.type, daysPostOp!)
+      : '';
+
     const systemPrompt = `Você é um assistente médico especializado em cirurgia colorretal analisando mensagem de paciente pós-operatório.
+
+${surgeryContext}
 
 ANALISE E CLASSIFIQUE:
 
@@ -173,6 +267,8 @@ IMPORTANTE:
 - Ser conservador: na dúvida, orientar contato com médico
 - Respostas DEVEM ser empáticas, claras e em português Brasil
 - Quando usar um protocolo, seja específico (ex: "banho de assento com água morna 2-3x ao dia")
+
+${FEW_SHOT_EXAMPLES}
 
 Responda APENAS com JSON válido neste formato:
 {
@@ -224,7 +320,9 @@ MENSAGEM DO PACIENTE:
       throw new Error('No JSON found in Claude response');
     }
 
-    const analysis: MessageAnalysis = JSON.parse(jsonMatch[0]);
+    // Validar JSON com Zod
+    const parsedJson = JSON.parse(jsonMatch[0]);
+    const analysis = messageAnalysisSchema.parse(parsedJson);
 
     // Validações de segurança
     if (analysis.urgency === 'CRITICAL') {
@@ -251,18 +349,30 @@ MENSAGEM DO PACIENTE:
   } catch (error) {
     console.error('Error analyzing message with Claude:', error);
 
-    // Fallback seguro: tratar como alta urgência
+    // Fallback inteligente: analisar palavras-chave para urgência
+    const messageLower = message.toLowerCase();
+    const criticalKeywords = ['sangramento volumoso', 'encheu', 'febre alta', 'febre 39', 'febre 40', 'dor insuportável', 'dor 10', 'não consigo urinar', 'retenção urinária'];
+    const highKeywords = ['sangrando', 'sangue', 'febre', 'dor forte', 'dor 8', 'dor 9'];
+
+    const isCritical = criticalKeywords.some(keyword => messageLower.includes(keyword));
+    const isHigh = highKeywords.some(keyword => messageLower.includes(keyword));
+
+    const urgency: UrgencyLevel = isCritical ? 'CRITICAL' : isHigh ? 'HIGH' : 'MEDIUM';
+
+    // Fallback com melhor experiência
     return {
-      urgency: 'HIGH',
+      urgency,
       category: 'não classificado',
       summary: message.substring(0, 100),
-      suggestedResponse:
-        `Recebemos sua mensagem e Dr. João Vitor foi notificado.\n\n` +
-        `Se você está com sintomas graves (sangramento volumoso, febre alta com dor, dor insuportável), ` +
-        `procure o pronto-socorro IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
-        `Caso contrário, aguarde o retorno do Dr. João.`,
+      suggestedResponse: urgency === 'CRITICAL'
+        ? `🚨 ATENÇÃO - Sua mensagem indica sintomas graves. PROCURE O PRONTO-SOCORRO IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
+          `Dr. João Vitor foi notificado, mas não espere! Procure atendimento médico AGORA.`
+        : `Recebemos sua mensagem e Dr. João Vitor foi notificado.\n\n` +
+          `Se você está com sintomas graves (sangramento volumoso, febre alta com dor, dor insuportável), ` +
+          `procure o pronto-socorro IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
+          `Caso contrário, aguarde o retorno do Dr. João.`,
       shouldNotifyDoctor: true,
-      redFlags: [],
+      redFlags: isCritical ? ['erro_analise_claude'] : [],
     };
   }
 }

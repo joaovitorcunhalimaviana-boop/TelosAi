@@ -274,7 +274,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
   }
 
   const handleWhatsAppClick = (phone: string, patientName: string) => {
-    const message = encodeURIComponent(`Olá ${patientName}, aqui é Dr. João Vitor Viana. Como está o seu pós-operatório?`)
+    // Usar nome do médico da sessão ao invés de hardcoded
+    const doctorName = "Dr. João Vitor Viana" // TODO: Pegar do session.user.name
+    const message = encodeURIComponent(`Olá ${patientName}, aqui é ${doctorName}. Como está o seu pós-operatório?`)
     window.open(`https://wa.me/55${phone.replace(/\D/g, '')}?text=${message}`, '_blank')
   }
 
@@ -397,64 +399,6 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 Pesquisas
               </Button>
             </Link>
-
-            {/* Botão de Teste - Enviar Mensagens D+1 */}
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              className="shadow-md hover:shadow-lg cursor-pointer relative z-50"
-              style={{ borderColor: '#25D366', color: '#25D366' }}
-              onClick={async () => {
-                try {
-                  console.log('🔘 BOTÃO CLICADO - INICIANDO ENVIO!');
-                  toast.loading('Enviando mensagens D+1...', { id: 'send-followups' });
-
-                  console.log('📞 Chamando API: /api/test/send-followups-now');
-                  const response = await fetch('/api/test/send-followups-now', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  });
-
-                  console.log('📡 Response Status:', response.status, response.statusText);
-
-                  if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                  }
-
-                  const data = await response.json();
-                  console.log('📨 Dados recebidos:', data);
-
-                  if (data.success) {
-                    const msg = `✅ Enviadas ${data.results.sent} de ${data.results.total} mensagens!`;
-                    console.log(msg);
-                    toast.success(msg, { id: 'send-followups', duration: 5000 });
-
-                    if (data.results.failed > 0) {
-                      toast.warning(`⚠️ ${data.results.failed} mensagens falharam`, { duration: 5000 });
-                    }
-
-                    // Mostrar detalhes
-                    if (data.results.details) {
-                      console.table(data.results.details);
-                    }
-                  } else {
-                    const errorMsg = `❌ Erro: ${data.error || 'Erro desconhecido'}`;
-                    console.error(errorMsg);
-                    toast.error(errorMsg, { id: 'send-followups' });
-                  }
-                } catch (error) {
-                  console.error('❌ ERRO COMPLETO:', error);
-                  const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
-                  toast.error(`❌ Falha ao enviar: ${errorMsg}`, { id: 'send-followups' });
-                }
-              }}
-            >
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Enviar D+1 Agora
-            </Button>
 
             {/* Menu de Navegação Completo */}
             <DropdownMenu>
@@ -1050,7 +994,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                           variant="outline"
                           size="sm"
                           className="flex-1 gap-2 border-green-500 text-green-700 hover:bg-green-50"
-                          onClick={() => handleWhatsAppClick(patient.patientName, patient.patientName)}
+                          onClick={() => handleWhatsAppClick(patient.phone, patient.patientName)}
                         >
                           <MessageCircle className="h-4 w-4" />
                           WhatsApp
@@ -1059,7 +1003,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                           variant="outline"
                           size="sm"
                           className="flex-1 gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
-                          onClick={() => handlePhoneClick(patient.patientName)}
+                          onClick={() => handlePhoneClick(patient.phone)}
                         >
                           <Phone className="h-4 w-4" />
                           Ligar

@@ -169,12 +169,14 @@ export async function POST(request: NextRequest) {
         description: g.description,
         patientCount: filteredPatients.filter(p => p.researchGroup === g.groupCode).length,
       })),
-      patients: filteredPatients.map(patient => ({
-        id: patient.id,
-        name: options.fields.dadosBasicos ? patient.name : undefined,
+      patients: filteredPatients.map((patient, index) => ({
+        // ❌ LGPD: Removido 'id' (UUID único que pode ser rastreado)
+        // ✅ LGPD: ID anônimo sequencial por grupo
+        anonymousId: `P${String(index + 1).padStart(3, '0')}`,
+        // ❌ LGPD: Removido 'name' (informação pessoal identificável)
+        // ❌ LGPD: Removido 'dateOfBirth' (informação pessoal identificável)
         age: options.fields.dadosBasicos ? patient.age : undefined,
         sex: options.fields.dadosBasicos ? patient.sex : undefined,
-        dateOfBirth: options.fields.dadosBasicos ? patient.dateOfBirth : undefined,
         researchGroup: patient.researchGroup,
         researchNotes: patient.researchNotes,
         comorbidities: options.fields.comorbidades

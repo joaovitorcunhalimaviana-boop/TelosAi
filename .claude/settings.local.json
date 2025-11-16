@@ -78,7 +78,9 @@
       "Bash(powershell -Command \"Start-Sleep -Seconds 20\")",
       "Bash(tree:*)",
       "Bash(powershell:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(node scripts/cleanup.mjs:*)",
+      "Bash(npx kill-port:*)"
     ],
     "deny": [],
     "ask": []
