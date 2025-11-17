@@ -42,6 +42,12 @@ interface CollectiveIntelligenceStats {
     avgPainD1: number
     pudendalBlockRate: number
   }
+  painCurve: Array<{
+    day: string
+    dayNumber: number
+    avgPain: number
+    responses: number
+  }>
   surgeryDistribution: Array<{
     type: string
     count: number
@@ -276,6 +282,62 @@ export function CollectiveIntelligenceDashboard({ stats }: Props) {
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* CURVA DE DOR PÓS-OPERATÓRIA - DESTAQUE */}
+      <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-900">
+            <Activity className="h-6 w-6 text-blue-600" />
+            Curva de Dor Pós-Operatória (Machine Learning)
+          </CardTitle>
+          <CardDescription>
+            Evolução da dor média em todos os dias de acompanhamento - Dados agregados de {stats.overview.totalPatients} pacientes
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={stats.painCurve}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="day"
+                label={{ value: 'Dia Pós-Operatório', position: 'insideBottom', offset: -5 }}
+              />
+              <YAxis
+                domain={[0, 10]}
+                label={{ value: 'Dor Média (0-10)', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload[0]) {
+                    const data = payload[0].payload
+                    return (
+                      <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
+                        <p className="font-bold text-blue-900">{data.day}</p>
+                        <p className="text-sm">Dor Média: <span className="font-bold text-red-600">{data.avgPain}/10</span></p>
+                        <p className="text-xs text-gray-600">{data.responses} respostas</p>
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
+              <Legend />
+              <Bar
+                dataKey="avgPain"
+                fill="#3b82f6"
+                name="Dor Média (0-10)"
+                radius={[8, 8, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 p-4 bg-blue-100 rounded-lg">
+            <p className="text-sm text-blue-900">
+              <strong>Insight de ML:</strong> A curva de dor mostra a evolução típica do pós-operatório.
+              Picos de dor em D1-D3 são esperados. Dor persistente após D7 pode indicar complicações.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

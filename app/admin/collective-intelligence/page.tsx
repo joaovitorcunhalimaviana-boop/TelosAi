@@ -99,34 +99,48 @@ async function getCollectiveIntelligenceStats() {
   const totalWithComplications = followUpsData.filter(f => f.riskLevel === "high" || f.riskLevel === "critical").length
   const complicationRate = totalWithData > 0 ? (totalWithComplications / totalWithData) * 100 : 0
 
-  // Dor média D+1
-  // questionnaireData é JSON string, precisamos parsear
-  const painD1Responses = await prisma.followUpResponse.findMany({
-    where: {
-      userId: { in: allDoctorIds },
-      followUp: {
-        dayNumber: 1,
+  // CURVA DE DOR COMPLETA - Todos os dias de follow-up
+  const followUpDays = [1, 2, 3, 5, 7, 10, 14]
+  const painCurve = []
+
+  for (const day of followUpDays) {
+    const painResponses = await prisma.followUpResponse.findMany({
+      where: {
+        userId: { in: allDoctorIds },
+        followUp: {
+          dayNumber: day,
+        },
       },
-    },
-    select: {
-      questionnaireData: true,
-    },
-  })
-
-  const painLevels = painD1Responses
-    .map(r => {
-      try {
-        const data = JSON.parse(r.questionnaireData)
-        return data.painLevel ? parseInt(data.painLevel) : null
-      } catch {
-        return null
-      }
+      select: {
+        questionnaireData: true,
+      },
     })
-    .filter(p => p !== null) as number[]
 
-  const avgPainD1 = painLevels.length > 0
-    ? painLevels.reduce((sum, p) => sum + p, 0) / painLevels.length
-    : 0
+    const painLevels = painResponses
+      .map(r => {
+        try {
+          const data = JSON.parse(r.questionnaireData)
+          return data.painLevel ? parseInt(data.painLevel) : null
+        } catch {
+          return null
+        }
+      })
+      .filter(p => p !== null) as number[]
+
+    const avgPain = painLevels.length > 0
+      ? painLevels.reduce((sum, p) => sum + p, 0) / painLevels.length
+      : 0
+
+    painCurve.push({
+      day: `D${day}`,
+      dayNumber: day,
+      avgPain: parseFloat(avgPain.toFixed(1)),
+      responses: painLevels.length,
+    })
+  }
+
+  // Manter avgPainD1 para compatibilidade
+  const avgPainD1 = painCurve.find(p => p.dayNumber === 1)?.avgPain || 0
 
   // Técnicas mais usadas (Bloqueio do Pudendo)
   const anesthesiaData = await prisma.anesthesia.findMany({
@@ -192,6 +206,7 @@ async function getCollectiveIntelligenceStats() {
       avgPainD1: parseFloat(avgPainD1.toFixed(1)),
       pudendalBlockRate: parseFloat(pudendalBlockRate.toFixed(2)),
     },
+    painCurve, // CURVA COMPLETA DE DOR
     surgeryDistribution: surgeryDistribution.map(s => ({
       type: s.type,
       count: s._count.id,
