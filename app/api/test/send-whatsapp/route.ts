@@ -68,6 +68,11 @@ export async function GET(request: NextRequest) {
         success: false,
         error: data,
         message: 'Erro ao enviar mensagem',
+        debug: {
+          phone: pendingFollowUp.patient.phone,
+          patientName: pendingFollowUp.patient.name,
+          followUpDay: pendingFollowUp.dayNumber,
+        },
       }, { status: 500 })
     }
 
