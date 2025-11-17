@@ -9,6 +9,9 @@ import {
   buildCompletenessFilter,
   sanitizeSearchTerm,
 } from '@/lib/api-utils';
+import { AuditLogger } from '@/lib/audit/logger';
+import { getClientIP } from '@/lib/utils/ip';
+import { createNotification } from '@/lib/notifications/create-notification';
 
 // ============================================
 // GET - LIST PATIENTS WITH PAGINATION & FILTERS
@@ -219,6 +222,29 @@ export async function POST(request: NextRequest) {
         surgeries: true,
         comorbidities: true,
         medications: true,
+      },
+    });
+
+    // Audit log: paciente criado
+    await AuditLogger.patientCreated({
+      userId,
+      patientId: newPatient.id,
+      patientName: newPatient.name,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
+    });
+
+    // Criar notificação informativa
+    await createNotification({
+      userId,
+      type: 'patient_created',
+      title: 'Novo Paciente Cadastrado',
+      message: `O paciente ${newPatient.name} foi adicionado ao sistema`,
+      priority: 'low',
+      actionUrl: `/paciente/${newPatient.id}`,
+      data: {
+        patientId: newPatient.id,
+        patientName: newPatient.name,
       },
     });
 

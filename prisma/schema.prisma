@@ -50,11 +50,21 @@ model User {
   aceitoTermos     Boolean @default(false)
   aceitoNovidades  Boolean @default(false)
 
+  // Termos de Uso (OBRIGATÓRIO)
+  acceptedTermsOfService        Boolean   @default(false) // Se aceitou os Termos de Uso
+  termsOfServiceAcceptedAt      DateTime? // Data/hora de aceitação
+  termsOfServiceVersion         String?   // Versão dos termos aceita (ex: "1.0")
+  termsOfServiceAcceptedFromIP  String?   // IP de onde aceitou (auditoria)
+
   // Onboarding
   firstLogin Boolean @default(true) // For onboarding redirect
 
   // Modo de Pesquisa
   researchMode Boolean @default(false) // Se o médico usa modo de pesquisa científica
+
+  // Inteligência Coletiva (AUTOMÁTICO via Termos de Uso)
+  collectiveIntelligenceOptIn Boolean @default(false) // Opt-in para compartilhar dados anonimizados
+  collectiveIntelligenceDate  DateTime? // Data em que optou por participar
 
   // Relações (Multi-tenant)
   patients            Patient[]
@@ -65,11 +75,35 @@ model User {
   surgeryTemplates    SurgeryTemplate[]
   researches          Research[]
   protocols           Protocol[]
+  passwordResetTokens PasswordResetToken[]
+  notifications       Notification[]
+  redFlagViews        RedFlagView[]
+  auditLogs           AuditLog[]
 
   @@unique([crm, estado]) // CRM must be unique per state
   @@index([email])
   @@index([role])
   @@index([plan])
+}
+
+// ============================================
+// RECUPERAÇÃO DE SENHA
+// ============================================
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token   String   @unique
+  expires DateTime
+  used    Boolean  @default(false)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expires])
 }
 
 // ============================================
@@ -96,6 +130,12 @@ model Patient {
 
   // Status do paciente
   isActive Boolean @default(true)
+
+  // Consentimento
+  consentTermSigned   Boolean   @default(false) // Se assinou o termo de consentimento
+  consentTermDate     DateTime? // Data da assinatura
+  consentTermFileUrl  String? // URL do arquivo escaneado (opcional)
+  whatsappConsent     Boolean   @default(false) // Autorizou comunicação via WhatsApp
 
   // Pesquisa Científica
   isResearchParticipant Boolean @default(false) // Se está em um estudo
@@ -456,6 +496,9 @@ model FollowUpResponse {
   doctorAlerted Boolean   @default(false)
   alertSentAt   DateTime?
 
+  // Visualizações de red flags
+  redFlagViews RedFlagView[]
+
   @@index([userId])
   @@index([followUpId])
   @@index([riskLevel])
@@ -611,6 +654,84 @@ model Protocol {
   @@index([category])
   @@index([dayRangeStart])
   @@index([isActive])
+}
+
+// ============================================
+// NOTIFICAÇÕES EM TEMPO REAL
+// ============================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      String   // "red_flag_critical", "red_flag_high", "followup_completed", "patient_created", "followup_overdue"
+  title     String
+  message   String   @db.Text
+  priority  String   // "low", "medium", "high", "critical"
+
+  read      Boolean  @default(false)
+  readAt    DateTime?
+
+  data      Json?    // Dados adicionais (patientId, surgeryId, etc)
+  actionUrl String?  // Link para ação (ex: /paciente/[id])
+
+  @@index([userId, read, createdAt])
+  @@index([createdAt])
+  @@index([priority])
+  @@index([type])
+}
+
+// ============================================
+// RED FLAG VIEWS (Dashboard de Alertas)
+// ============================================
+
+model RedFlagView {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  followUpResponseId String
+  followUpResponse   FollowUpResponse @relation(fields: [followUpResponseId], references: [id], onDelete: Cascade)
+
+  viewedAt DateTime @default(now())
+
+  @@index([userId, viewedAt])
+  @@index([followUpResponseId])
+}
+
+// ============================================
+// AUDITORIA / LOGS (LGPD COMPLIANCE)
+// ============================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action     String  // "patient.created", "export.downloaded", etc
+  resource   String  // "Patient:abc123"
+  resourceId String? // ID do recurso
+
+  metadata Json? // Dados adicionais flexíveis
+
+  ipAddress String
+  userAgent String
+
+  // Para compliance LGPD
+  isDataAccess Boolean @default(false)
+  isSensitive  Boolean @default(false)
+
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([resourceId])
+  @@index([createdAt])
 }
 
 // ============================================

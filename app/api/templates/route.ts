@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { TemplateData } from "@/lib/template-utils"
+import { AuditLogger } from "@/lib/audit/logger"
+import { getClientIP } from "@/lib/utils/ip"
 
 // ============================================
 // GET - List all templates (filter by surgery type)
@@ -69,6 +71,16 @@ export async function POST(request: NextRequest) {
         isDefault: isDefault || false,
         userId
       }
+    })
+
+    // Audit log: template criado
+    await AuditLogger.templateCreated({
+      userId,
+      templateId: template.id,
+      templateName: template.name,
+      surgeryType: template.surgeryType,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
     })
 
     return NextResponse.json(template, { status: 201 })

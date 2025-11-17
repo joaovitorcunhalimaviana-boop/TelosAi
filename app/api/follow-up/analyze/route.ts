@@ -21,6 +21,10 @@ import {
 } from '@/lib/follow-up-analyzer';
 import { isSupportedSurgeryType, type SurgeryType } from '@/lib/surgery-templates';
 import { prisma } from '@/lib/prisma';
+import { AuditLogger } from '@/lib/audit/logger';
+import { getClientIP } from '@/lib/utils/ip';
+import { createNotification } from '@/lib/notifications/create-notification';
+import { getNotificationTypeFromRiskLevel, getPriorityFromRiskLevel } from '@/types/notifications';
 
 // ============================================
 // POST - Analisar Follow-up
@@ -101,11 +105,46 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Audit log: follow-up analisado
+    await AuditLogger.followUpAnalyzed({
+      userId: followUp.userId,
+      followUpId,
+      patientId: followUp.patient.id,
+      riskLevel: analysis.riskLevel,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
+    });
+
     // Se necessário alertar médico, enviar notificação
     if (analysis.alertarMedico) {
-      // TODO: Implementar envio de alerta ao médico via WhatsApp
-      // await sendDoctorAlert(...)
-      console.log('ALERTA MÉDICO:', {
+      // Criar notificação em tempo real
+      const notificationType = getNotificationTypeFromRiskLevel(analysis.riskLevel);
+      const priority = getPriorityFromRiskLevel(analysis.riskLevel);
+
+      const redFlagsText = analysis.redFlags && analysis.redFlags.length > 0
+        ? analysis.redFlags.join(', ')
+        : 'Alerta detectado';
+
+      await createNotification({
+        userId: followUp.userId,
+        type: notificationType,
+        title: `⚠️ ${priority === 'critical' ? 'ALERTA CRÍTICO' : 'Alerta Alto'} - ${patientName}`,
+        message: `Follow-up D+${dayNumber}: ${redFlagsText}`,
+        priority,
+        actionUrl: `/paciente/${followUp.patient.id}`,
+        data: {
+          patientId: followUp.patient.id,
+          patientName,
+          surgeryId: followUp.surgery.id,
+          followUpId,
+          followUpResponseId: followUpResponse.id,
+          dayNumber,
+          redFlags: analysis.redFlags,
+          riskLevel: analysis.riskLevel,
+        },
+      });
+
+      console.log('ALERTA MÉDICO enviado via notificação:', {
         patient: patientName,
         day: dayNumber,
         status: analysis.status,

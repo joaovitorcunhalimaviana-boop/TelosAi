@@ -50,6 +50,8 @@ import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion"
 import { motion, AnimatePresence } from "framer-motion"
 // import { OnboardingChecklist } from "@/components/tutorial/OnboardingChecklist" // REMOVIDO: Checklist com bugs
 import { SimpleTour } from "@/components/tutorial/SimpleTour"
+import { useRedFlags } from "@/hooks/useRedFlags"
+import { RedFlagsCard } from "@/components/dashboard/RedFlagsCard"
 
 interface DashboardClientProps {
   userRole: string;
@@ -77,6 +79,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
   const [patients, setPatients] = useState<PatientCard[]>([])
   const [loading, setLoading] = useState(true)
   const [showTour, setShowTour] = useState(false)
+
+  // Red Flags Hook
+  const { redFlags, count: redFlagsCount, markAsViewed } = useRedFlags()
 
   // Filtros
   const [filters, setFilters] = useState<DashboardFilters>({
@@ -573,6 +578,13 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
         {/* <FadeIn delay={0.6} className="mb-6">
           <OnboardingChecklist />
         </FadeIn> */}
+
+        {/* Red Flags Card - ALERTAS URGENTES */}
+        <RedFlagsCard
+          redFlags={redFlags}
+          count={redFlagsCount}
+          onView={markAsViewed}
+        />
 
         {/* Filtros e Busca */}
         <SlideIn direction="down" delay={0.7}>

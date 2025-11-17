@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { AuditLogger } from '@/lib/audit/logger'
+import { getClientIP } from '@/lib/utils/ip'
 
 // GET - Lista todos os protocolos do médico
 export async function GET(request: NextRequest) {
@@ -84,6 +86,17 @@ export async function POST(request: NextRequest) {
         researchId: researchId || null,
         researchGroupCode: body.researchGroupCode || null,
       }
+    })
+
+    // Audit log: protocolo criado
+    await AuditLogger.protocolCreated({
+      userId: session.user.id,
+      protocolId: protocol.id,
+      title: protocol.title,
+      surgeryType: protocol.surgeryType,
+      category: protocol.category,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
     })
 
     return NextResponse.json({ protocol }, { status: 201 })

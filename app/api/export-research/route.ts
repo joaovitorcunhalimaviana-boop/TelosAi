@@ -10,6 +10,8 @@ import {
   type ResearchExportOptions,
 } from '@/lib/research-export-utils';
 import { generatePseudonymousId } from '@/lib/research-pseudonymization';
+import { AuditLogger } from '@/lib/audit/logger';
+import { getClientIP } from '@/lib/utils/ip';
 
 export async function POST(request: NextRequest) {
   try {
@@ -269,6 +271,17 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     }
+
+    // Audit log: exportação de pesquisa (SENSÍVEL)
+    await AuditLogger.exportResearch({
+      userId: user.id,
+      researchId: research.id,
+      researchTitle: research.title,
+      exportFormat: options.format,
+      recordCount: filteredPatients.length,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
+    });
 
     // Retornar arquivo para download
     return new NextResponse(fileBuffer as unknown as BodyInit, {

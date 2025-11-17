@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
+import { AuditLogger } from '@/lib/audit/logger';
+import { getClientIP } from '@/lib/utils/ip';
 
 // ============================================
 // GET - LIST ALL RESEARCH STUDIES
@@ -142,6 +144,16 @@ export async function POST(request: NextRequest) {
         },
         protocols: true,
       },
+    });
+
+    // Audit log: pesquisa criada
+    await AuditLogger.researchCreated({
+      userId,
+      researchId: research.id,
+      title: research.title,
+      surgeryType: research.surgeryType || undefined,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
     });
 
     return NextResponse.json(

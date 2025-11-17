@@ -7,6 +7,8 @@ import {
   calculateCompleteness,
 } from '@/lib/api-utils';
 import { fromBrasiliaTime } from '@/lib/date-utils';
+import { AuditLogger } from '@/lib/audit/logger';
+import { getClientIP } from '@/lib/utils/ip';
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -211,6 +213,15 @@ export async function GET(
         surgery: latestSurgery,
       });
     }
+
+    // Audit log: visualização de dados do paciente
+    await AuditLogger.patientViewed({
+      userId: patient.userId,
+      patientId: patient.id,
+      patientName: patient.name,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
+    });
 
     return NextResponse.json({
       success: true,
@@ -487,6 +498,17 @@ export async function PATCH(
           },
         },
       },
+    });
+
+    // Audit log: paciente atualizado
+    const fieldsUpdated = Object.keys(validatedData);
+    await AuditLogger.patientUpdated({
+      userId: existingPatient.userId,
+      patientId: id,
+      patientName: updatedPatient?.name || existingPatient.name,
+      fieldsUpdated,
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
     });
 
     return NextResponse.json({

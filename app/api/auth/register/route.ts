@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { hashPassword } from "@/lib/auth"
 import { prisma } from '@/lib/prisma'
+import { AuditLogger } from "@/lib/audit/logger"
+import { getClientIP } from "@/lib/utils/ip"
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +17,7 @@ export async function POST(request: NextRequest) {
       senha,
       plan,
       aceitoTermos,
+      acceptedTermsOfService,
       aceitoNovidades,
     } = body
 
@@ -29,6 +32,14 @@ export async function POST(request: NextRequest) {
     if (!aceitoTermos) {
       return NextResponse.json(
         { error: "Você deve aceitar os termos de uso" },
+        { status: 400 }
+      )
+    }
+
+    // Validação OBRIGATÓRIA dos Termos de Uso completos
+    if (!acceptedTermsOfService) {
+      return NextResponse.json(
+        { error: "Você deve aceitar os Termos de Uso e Política de Privacidade para usar a plataforma" },
         { status: 400 }
       )
     }
@@ -130,6 +141,9 @@ export async function POST(request: NextRequest) {
 
     const planPricing = pricing[selectedPlan as keyof typeof pricing]
 
+    // Pega IP do request para auditoria
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
+
     // Create user in database
     const user = await prisma.user.create({
       data: {
@@ -146,12 +160,32 @@ export async function POST(request: NextRequest) {
         aceitoTermos,
         aceitoNovidades: aceitoNovidades || false,
         firstLogin: true,
+
+        // NOVO: Termos de Uso completos (OBRIGATÓRIO)
+        acceptedTermsOfService: true,
+        termsOfServiceAcceptedAt: new Date(),
+        termsOfServiceVersion: "1.0",
+        termsOfServiceAcceptedFromIP: ip,
+
+        // NOVO: Automaticamente ativa Inteligência Coletiva (via Termos)
+        collectiveIntelligenceOptIn: true,
+        collectiveIntelligenceDate: new Date(),
+
         createdAt: new Date(),
       },
     })
 
     // Remove password from response
     const { senha: _, ...userWithoutPassword } = user
+
+    // Audit log: novo usuário registrado
+    await AuditLogger.userRegistered({
+      userId: user.id,
+      email: user.email,
+      role: "medico",
+      ipAddress: getClientIP(request),
+      userAgent: request.headers.get('user-agent') || 'unknown',
+    })
 
     // In production, you would:
     // 1. Send welcome email

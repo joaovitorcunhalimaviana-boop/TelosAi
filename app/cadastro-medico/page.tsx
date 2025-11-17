@@ -30,6 +30,7 @@ const registrationSchema = z.object({
     .regex(/[0-9]/, "Senha deve conter pelo menos um número"),
   confirmarSenha: z.string(),
   aceitoTermos: z.boolean().refine(val => val === true, "Você deve aceitar os termos"),
+  acceptedTermsOfService: z.boolean().refine(val => val === true, "Você deve aceitar os Termos de Uso e Política de Privacidade"),
   aceitoNovidades: z.boolean().optional(),
 }).refine((data) => data.senha === data.confirmarSenha, {
   message: "As senhas não coincidem",
@@ -56,12 +57,14 @@ function CadastroMedicoPage() {
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       aceitoTermos: false,
+      acceptedTermsOfService: false,
       aceitoNovidades: false,
     }
   })
 
   const watchEstado = watch("estado")
   const watchAceitoTermos = watch("aceitoTermos")
+  const watchAcceptedTermsOfService = watch("acceptedTermsOfService")
   const watchAceitoNovidades = watch("aceitoNovidades")
   const senha = watch("senha")
 
@@ -343,6 +346,36 @@ function CadastroMedicoPage() {
                 {errors.aceitoTermos && (
                   <p className="text-red-500 text-sm">{errors.aceitoTermos.message}</p>
                 )}
+
+                {/* NOVO: Termos de Uso e Compartilhamento de Dados */}
+                <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="acceptedTermsOfService"
+                      checked={watchAcceptedTermsOfService}
+                      onCheckedChange={(checked) => setValue("acceptedTermsOfService", checked as boolean)}
+                    />
+                    <Label htmlFor="acceptedTermsOfService" className="text-sm cursor-pointer leading-relaxed">
+                      <strong className="text-red-600">OBRIGATÓRIO:</strong> Li e aceito os{" "}
+                      <Link href="/terms-of-service" className="text-telos-blue font-bold underline" target="_blank">
+                        Termos de Uso e Política de Privacidade
+                      </Link>{" "}
+                      incluindo a <strong>autorização irrevogável</strong> para uso de <strong>dados totalmente anonimizados</strong> dos meus pacientes para:
+                      <ul className="list-disc ml-5 mt-2 space-y-1 text-xs">
+                        <li>Treinamento de modelos de Inteligência Artificial</li>
+                        <li>Pesquisas científicas em cirurgia colorretal</li>
+                        <li>Melhoria contínua dos algoritmos da plataforma</li>
+                        <li>Publicações científicas com dados agregados</li>
+                      </ul>
+                      <p className="mt-2 text-xs text-gray-700">
+                        <strong>Garantia:</strong> Os dados são irreversivelmente anonimizados (SHA-256) e não permitem identificação dos pacientes. Conforme LGPD Art. 12, dados anonimizados não são considerados dados pessoais. *
+                      </p>
+                    </Label>
+                  </div>
+                  {errors.acceptedTermsOfService && (
+                    <p className="text-red-500 text-sm mt-2">{errors.acceptedTermsOfService.message}</p>
+                  )}
+                </div>
 
                 <div className="flex items-start gap-3">
                   <Checkbox

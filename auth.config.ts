@@ -20,6 +20,8 @@ export const authConfig = {
         "/",
         "/auth/login",
         "/auth/error",
+        "/auth/forgot-password",
+        "/auth/reset-password",
         "/cadastro-medico",
         "/pricing",
         "/sobre",
@@ -27,6 +29,9 @@ export const authConfig = {
         "/api/postop/webhook",
         "/api/test",
         "/api/whatsapp/webhook",
+        "/api/auth/forgot-password",
+        "/api/auth/reset-password",
+        "/api/auth/validate-reset-token",
       ];
 
       const isPublicPath = publicPaths.some((p) => path === p || path.startsWith(p));

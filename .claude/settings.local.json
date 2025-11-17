@@ -80,7 +80,11 @@
       "Bash(powershell:*)",
       "Bash(del:*)",
       "Bash(node scripts/cleanup.mjs:*)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(openssl rand:*)",
+      "Bash(.env)",
+      "Bash(if exist node_modules.prismaclient rmdir /s /q node_modules.prismaclient)",
+      "Bash(npx next build)"
     ],
     "deny": [],
     "ask": []
