@@ -110,10 +110,14 @@ export async function sendMessage(
 export async function sendTemplate(
   to: string,
   templateName: string,
-  components?: any[]
+  components?: any[],
+  languageCode?: string
 ): Promise<WhatsAppResponse> {
   try {
     const formattedPhone = formatPhoneNumber(to);
+
+    // Template "day1" usa idioma "en" (erro na criação), outros usam "pt_BR"
+    const language = languageCode || (templateName === 'day1' ? 'en' : 'pt_BR');
 
     const payload: WhatsAppMessage = {
       to: formattedPhone,
@@ -121,7 +125,7 @@ export async function sendTemplate(
       template: {
         name: templateName,
         language: {
-          code: 'pt_BR',
+          code: language,
         },
         components,
       },
@@ -234,25 +238,18 @@ export async function sendFollowUpQuestionnaire(
     const surgeryTypeText = surgeryTypeMap[surgery.type] || surgery.type;
     const patientFirstName = patient.name.split(' ')[0];
 
-    // Componentes do template
-    const components = followUp.dayNumber === 1
-      ? [
+    // Componentes do template (usando formato NAMED conforme templates aprovados)
+    const components = [
+      {
+        type: 'body',
+        parameters: [
           {
-            type: 'body',
-            parameters: [
-              { type: 'text', text: patientFirstName },
-              { type: 'text', text: surgeryTypeText }
-            ]
+            type: 'text',
+            text: patientFirstName
           }
         ]
-      : [
-          {
-            type: 'body',
-            parameters: [
-              { type: 'text', text: patientFirstName }
-            ]
-          }
-        ];
+      }
+    ];
 
     console.log('📱 Sending template message:', {
       template: templateName,
