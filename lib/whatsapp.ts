@@ -221,7 +221,7 @@ export async function sendFollowUpQuestionnaire(
 ): Promise<WhatsAppResponse> {
   try {
     // Usar template diferente para D1 vs outros dias
-    const templateName = followUp.dayNumber === 1 ? 'followup_day1' : 'followup_daily';
+    const templateName = followUp.dayNumber === 1 ? 'day1' : 'otherdays';
 
     // Mapear tipo de cirurgia para texto amigável
     const surgeryTypeMap: Record<string, string> = {
