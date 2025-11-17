@@ -2,7 +2,7 @@ import { requireAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { MetricCard } from "@/components/admin/MetricCard";
 import { QuickLink } from "@/components/admin/QuickLink";
-import { Users, Heart, DollarSign, Star, UserCheck, Wifi } from "lucide-react";
+import { Users, Heart, DollarSign, Star, UserCheck, Wifi, Brain, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -152,7 +152,7 @@ export default async function AdminDashboard() {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Ações Rápidas</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <QuickLink
             href="/admin/medicos"
             title="Gerenciar Médicos"
@@ -164,6 +164,18 @@ export default async function AdminDashboard() {
             title="Gerenciar Pacientes"
             description="Ver e exportar pacientes de todos os médicos"
             icon={<Heart className="h-6 w-6" />}
+          />
+          <QuickLink
+            href="/admin/collective-intelligence"
+            title="Inteligência Coletiva"
+            description="Insights de Machine Learning baseados em dados agregados de todos os médicos"
+            icon={<Brain className="h-6 w-6 text-purple-600" />}
+          />
+          <QuickLink
+            href="/admin/audit-logs"
+            title="Auditoria do Sistema"
+            description="Histórico completo de ações e eventos do sistema"
+            icon={<FileText className="h-6 w-6 text-blue-600" />}
           />
         </div>
       </div>
