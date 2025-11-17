@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { LogOut, User } from "lucide-react"
+import { NotificationBell } from "@/components/notifications/NotificationBell"
 
 export function DashboardHeader() {
   const pathname = usePathname()
@@ -33,6 +34,9 @@ export function DashboardHeader() {
 
         {/* User Menu */}
         <div className="flex items-center gap-4">
+          {/* Notificações */}
+          <NotificationBell />
+
           {session?.user && (
             <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-lg">
               <User className="w-5 h-5 text-telos-blue" />
