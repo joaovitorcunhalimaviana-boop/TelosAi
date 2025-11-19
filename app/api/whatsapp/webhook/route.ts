@@ -136,12 +136,61 @@ async function processTextMessage(message: any, contacts: any[]) {
       return;
     }
 
-    // Processar resposta ao questionário
+    // Verificar se é início do questionário (resposta "sim" ao template)
+    const textLower = text.toLowerCase().trim();
+    if ((textLower === 'sim' || textLower === 's') && pendingFollowUp.status === 'sent') {
+      // Enviar perguntas do questionário
+      await sendQuestionnaireQuestions(phone, patient, pendingFollowUp);
+
+      // Atualizar status para "aguardando resposta"
+      await prisma.followUp.update({
+        where: { id: pendingFollowUp.id },
+        data: { status: 'sent' } // Manter como 'sent' até receber resposta completa
+      });
+
+      return;
+    }
+
+    // Processar resposta completa ao questionário
     await processFollowUpResponse(pendingFollowUp, patient, text);
 
   } catch (error) {
     console.error('Error processing text message:', error);
   }
+}
+
+/**
+ * Envia perguntas do questionário
+ */
+async function sendQuestionnaireQuestions(
+  phone: string,
+  patient: any,
+  followUp: any
+) {
+  const firstName = patient.name.split(' ')[0];
+
+  const questions = `Olá ${firstName}! Vou fazer algumas perguntas sobre sua recuperação:
+
+1️⃣ Como está sua DOR hoje? (0 a 10, onde 0 = sem dor e 10 = dor insuportável)
+
+2️⃣ Você está com FEBRE? (Sim/Não)
+
+3️⃣ Teve SANGRAMENTO? (Nenhum / Leve / Moderado / Intenso)
+
+4️⃣ Conseguiu URINAR normalmente? (Sim/Não)
+
+5️⃣ Conseguiu EVACUAR? (Sim/Não)
+
+6️⃣ Está com NÁUSEAS ou VÔMITOS? (Sim/Não)
+
+7️⃣ Observou SECREÇÃO na ferida? (Nenhuma / Clara / Purulenta)
+
+8️⃣ Alguma PREOCUPAÇÃO adicional?
+
+Por favor, responda TODAS as perguntas em uma única mensagem. Exemplo:
+"Dor 3, sem febre, sangramento leve, urinou sim, evacuou não, sem náuseas, sem secreção, sem preocupações"`;
+
+  await sendEmpatheticResponse(phone, questions);
 }
 
 /**
