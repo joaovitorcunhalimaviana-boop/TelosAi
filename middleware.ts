@@ -2,7 +2,9 @@ import NextAuth from "next-auth";
 import { authConfig } from "@/auth.config";
 
 // Usa auth.config.ts que é compatível com Edge Runtime (sem Prisma)
-export const { auth: middleware } = NextAuth(authConfig);
+const { auth } = NextAuth(authConfig);
+
+export default auth;
 
 export const config = {
   matcher: [
