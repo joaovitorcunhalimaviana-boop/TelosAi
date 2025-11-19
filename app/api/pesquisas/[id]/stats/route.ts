@@ -8,6 +8,7 @@ import {
   calculateFisherExact,
   interpretCramerV,
 } from '@/lib/research-export-utils';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // GET - RESEARCH STATISTICS AND ANALYTICS
@@ -25,8 +26,14 @@ export async function GET(
     const resolvedParams = await params;
     const researchId = resolvedParams.id;
 
-    // TODO: Pegar userId da session
-    const userId = 'temp-user-id'; // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
     // Get research with all related data
     const research = await prisma.research.findFirst({

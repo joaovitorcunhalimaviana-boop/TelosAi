@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // POST - ASSIGN PATIENT TO RESEARCH GROUP
@@ -11,16 +12,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // TODO: Pegar userId da session
-    // const session = await getServerSession(authOptions)
-    // if (!session?.user?.id) {
-    //   return NextResponse.json(
-    //     buildErrorResponse('Unauthorized', 'You must be logged in'),
-    //     { status: 401 }
-    //   )
-    // }
-    // const userId = session.user.id
-    const userId = 'temp-user-id'; // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
     const { id: patientId } = await params;
     const body = await request.json();
 
@@ -146,16 +145,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // TODO: Pegar userId da session
-    // const session = await getServerSession(authOptions)
-    // if (!session?.user?.id) {
-    //   return NextResponse.json(
-    //     buildErrorResponse('Unauthorized', 'You must be logged in'),
-    //     { status: 401 }
-    //   )
-    // }
-    // const userId = session.user.id
-    const userId = 'temp-user-id'; // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
     const { id: patientId } = await params;
 
     // Verify patient belongs to user

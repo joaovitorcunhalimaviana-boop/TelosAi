@@ -9,6 +9,7 @@ import { markAsRead } from '@/lib/whatsapp';
 import { analyzeFollowUpResponse } from '@/lib/anthropic';
 import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
 import { sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
+import { sendPushNotification } from '@/app/api/notifications/send/route';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -248,6 +249,16 @@ async function processFollowUpResponse(
 
     await sendEmpatheticResponse(patient.phone, responseMessage);
 
+    // Enviar notificação push informando que paciente respondeu
+    await sendPushNotification(patient.userId, {
+      title: 'Paciente Respondeu',
+      body: `${patient.name} respondeu ao questionário D+${followUp.dayNumber}`,
+      url: `/paciente/${patient.id}`,
+      tag: `patient-response-${followUpResponse.id}`,
+      requireInteraction: false,
+    }).catch(err => console.error('Error sending response push notification:', err));
+
+
     // Alertar médico se risco alto ou crítico
     if (finalRiskLevel === 'high' || finalRiskLevel === 'critical') {
       await sendDoctorAlert(
@@ -264,6 +275,15 @@ async function processFollowUpResponse(
           alertSentAt: new Date(),
         },
       });
+
+      // Enviar notificação push para o médico
+      await sendPushNotification(patient.userId, {
+        title: `Red Flag: ${patient.name}`,
+        body: `Nível de risco ${finalRiskLevel} detectado em D+${followUp.dayNumber}. ${allRedFlags.length} alerta(s).`,
+        url: `/paciente/${patient.id}`,
+        tag: `red-flag-${followUpResponse.id}`,
+        requireInteraction: true,
+      }).catch(err => console.error('Error sending push notification:', err));
     }
 
     console.log(`Follow-up response processed successfully for patient ${patient.id}`);
@@ -284,17 +304,39 @@ async function processFollowUpResponse(
  * Encontra paciente pelo telefone
  */
 async function findPatientByPhone(phone: string): Promise<any | null> {
-  // Normalizar número de telefone
+  // Normalizar número de telefone (remover tudo exceto dígitos)
   const normalizedPhone = phone.replace(/\D/g, '');
 
-  // Tentar encontrar por match exato
+  // WhatsApp envia formato: 5583998663089 (país + DDD + número)
+  // Banco pode ter: (83) 99866-3089, 83998663089, 5583998663089, etc
+  // Estratégia: buscar pelos últimos 8 dígitos (mais confiável)
+  const last8 = normalizedPhone.slice(-8); // Últimos 8 dígitos do número
+
   let patient = await prisma.patient.findFirst({
     where: {
       phone: {
-        contains: normalizedPhone.slice(-9), // Últimos 9 dígitos
+        contains: last8,
       },
     },
   });
+
+  // Se não encontrou, tentar com últimos 9 (inclui primeiro dígito do celular)
+  if (!patient) {
+    const last9 = normalizedPhone.slice(-9);
+    patient = await prisma.patient.findFirst({
+      where: {
+        phone: {
+          contains: last9,
+        },
+      },
+    });
+  }
+
+  // Log para debug
+  console.log(`🔍 Buscando telefone: ${phone}`);
+  console.log(`   Normalizado: ${normalizedPhone}`);
+  console.log(`   Últimos 8: ${last8}`);
+  console.log(`   Paciente ${patient ? 'ENCONTRADO ✅' : 'NÃO encontrado ❌'}`);
 
   return patient;
 }

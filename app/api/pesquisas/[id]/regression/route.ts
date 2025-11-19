@@ -9,6 +9,7 @@ import {
   type SimpleRegressionResult,
   type MultipleRegressionResult,
 } from '@/lib/linear-regression';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // POST - CALCULATE LINEAR REGRESSION
@@ -36,8 +37,14 @@ export async function POST(
 
     const { modelType, outcome, predictors, groupCodes } = body;
 
-    // TODO: Get userId from session
-    const userId = 'temp-user-id';
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
     // Validate research
     const research = await prisma.research.findFirst({
@@ -365,8 +372,14 @@ export async function GET(
     const resolvedParams = await params;
     const researchId = resolvedParams.id;
 
-    // TODO: Get userId from session
-    const userId = 'temp-user-id';
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
     // Validate research
     const research = await prisma.research.findFirst({

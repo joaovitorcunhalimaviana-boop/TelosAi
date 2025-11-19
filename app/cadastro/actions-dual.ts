@@ -3,6 +3,7 @@
 import { createFollowUpSchedule } from "@/lib/follow-up-scheduler"
 import { prisma } from '@/lib/prisma'
 import { fromBrasiliaTime } from '@/lib/date-utils'
+import { auth } from '@/lib/auth'
 
 // Tipos para os dados dos pacientes
 interface SimplifiedPatientData {
@@ -28,10 +29,14 @@ interface CompletePatientData extends SimplifiedPatientData {
  */
 export async function createSimplifiedPatient(data: SimplifiedPatientData) {
   try {
-    // TODO: Pegar userId da session
-    // const session = await getServerSession()
-    // const userId = session.user.id
-    const userId = "temp-user-id" // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Você precisa estar autenticado para cadastrar pacientes.",
+      };
+    }
+    const userId = session.user.id;
 
     // 1. Criar o paciente
     const patient = await prisma.patient.create({
@@ -107,13 +112,14 @@ export async function createSimplifiedPatient(data: SimplifiedPatientData) {
  */
 export async function createCompletePatient(data: CompletePatientData) {
   try {
-    // TODO: Pegar userId da session e verificar se é admin
-    // const session = await getServerSession()
-    // const userId = session.user.id
-    // if (session.user.role !== 'admin') {
-    //   return { success: false, error: 'Acesso negado' }
-    // }
-    const userId = "temp-user-id" // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Você precisa estar autenticado para cadastrar pacientes.",
+      };
+    }
+    const userId = session.user.id;
 
     // 1. Criar o paciente com TODOS os dados
     const patient = await prisma.patient.create({

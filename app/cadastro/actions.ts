@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation"
 import { prisma } from '@/lib/prisma'
 import { fromBrasiliaTime } from '@/lib/date-utils'
+import { predictComplicationRisk } from '@/lib/ml-prediction'
 
 interface QuickPatientData {
   userId: string
@@ -65,6 +66,35 @@ export async function createQuickPatient(data: QuickPatientData) {
     await prisma.followUp.createMany({
       data: followUpsData,
     })
+
+    // 4. INTEGRAÇÃO ML: Predizer risco de complicações (não-bloqueante)
+    // Esta chamada é assíncrona e não afeta o sucesso do cadastro
+    predictComplicationRisk(surgery, patient)
+      .then(async (prediction) => {
+        if (prediction) {
+          // Salvar predição no banco de dados
+          await prisma.surgery.update({
+            where: { id: surgery.id },
+            data: {
+              predictedRisk: prediction.risk,
+              predictedRiskLevel: prediction.level,
+              mlModelVersion: prediction.modelVersion,
+              mlPredictedAt: prediction.timestamp,
+              mlFeatures: JSON.stringify(prediction.features),
+            },
+          })
+
+          console.log('[ML] Predição salva com sucesso:', {
+            surgeryId: surgery.id,
+            risk: prediction.risk,
+            level: prediction.level,
+          })
+        }
+      })
+      .catch((error) => {
+        // Log de erro mas NÃO falha o cadastro
+        console.error('[ML] Erro ao salvar predição (não-crítico):', error)
+      })
 
     return {
       success: true,

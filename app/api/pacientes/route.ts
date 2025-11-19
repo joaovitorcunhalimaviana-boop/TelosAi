@@ -12,6 +12,7 @@ import {
 import { AuditLogger } from '@/lib/audit/logger';
 import { getClientIP } from '@/lib/utils/ip';
 import { createNotification } from '@/lib/notifications/create-notification';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // GET - LIST PATIENTS WITH PAGINATION & FILTERS
@@ -19,16 +20,14 @@ import { createNotification } from '@/lib/notifications/create-notification';
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Pegar userId da session
-    // const session = await getServerSession()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json(
-    //     buildErrorResponse('Unauthorized', 'You must be logged in'),
-    //     { status: 401 }
-    //   )
-    // }
-    // const userId = session.user.id
-    const userId = 'temp-user-id'; // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
     const { searchParams } = new URL(request.url);
 
@@ -182,16 +181,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Pegar userId da session
-    // const session = await getServerSession()
-    // if (!session?.user?.id) {
-    //   return NextResponse.json(
-    //     buildErrorResponse('Unauthorized', 'You must be logged in'),
-    //     { status: 401 }
-    //   )
-    // }
-    // const userId = session.user.id
-    const userId = 'temp-user-id'; // Temporário
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+    const userId = session.user.id;
 
     const body = await request.json();
 

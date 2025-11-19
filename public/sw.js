@@ -308,4 +308,140 @@ self.addEventListener('periodicsync', (event) => {
   }
 });
 
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+/**
+ * Recebe notificação push do servidor
+ */
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received:', event);
+
+  // Dados padrão caso o push venha vazio
+  let notificationData = {
+    title: 'Sistema Pós-Operatório',
+    body: 'Você tem uma nova notificação',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: {
+      url: '/dashboard',
+    },
+  };
+
+  // Tentar extrair dados do push
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      notificationData = {
+        ...notificationData,
+        ...payload,
+      };
+    } catch (error) {
+      console.error('[SW] Error parsing push data:', error);
+      notificationData.body = event.data.text() || notificationData.body;
+    }
+  }
+
+  // Configurações da notificação
+  const notificationOptions = {
+    body: notificationData.body,
+    icon: notificationData.icon || '/icons/icon-192.png',
+    badge: notificationData.badge || '/icons/icon-192.png',
+    tag: notificationData.tag || 'default-notification',
+    data: notificationData.data || { url: '/dashboard' },
+    vibrate: notificationData.vibrate || [200, 100, 200], // Padrão de vibração
+    requireInteraction: notificationData.requireInteraction || false,
+    actions: notificationData.actions || [],
+    // Configurações adicionais
+    silent: notificationData.silent || false,
+    renotify: notificationData.renotify || false,
+    timestamp: notificationData.timestamp || Date.now(),
+  };
+
+  // Exibir notificação
+  event.waitUntil(
+    self.registration.showNotification(
+      notificationData.title,
+      notificationOptions
+    )
+  );
+});
+
+/**
+ * Quando o usuário clica na notificação
+ */
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked:', event.notification);
+
+  const notification = event.notification;
+  const data = notification.data || {};
+  const action = event.action;
+
+  notification.close();
+
+  // URL para abrir (padrão: dashboard)
+  let urlToOpen = data.url || '/dashboard';
+
+  // Se clicar em uma ação específica
+  if (action && data.actions) {
+    const actionData = data.actions.find(a => a.action === action);
+    if (actionData && actionData.url) {
+      urlToOpen = actionData.url;
+    }
+  }
+
+  // Abrir ou focar na janela do app
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Tentar encontrar uma janela já aberta no domínio
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          const clientUrl = new URL(client.url);
+          const targetUrl = new URL(urlToOpen, self.location.origin);
+
+          // Se já existe uma janela aberta, focar nela e navegar
+          if (clientUrl.origin === targetUrl.origin && 'focus' in client) {
+            return client.focus().then(() => {
+              if ('navigate' in client) {
+                return client.navigate(targetUrl.href);
+              }
+            });
+          }
+        }
+
+        // Se não houver janela aberta, abrir uma nova
+        if (clients.openWindow) {
+          const fullUrl = new URL(urlToOpen, self.location.origin).href;
+          return clients.openWindow(fullUrl);
+        }
+      })
+  );
+});
+
+/**
+ * Quando o usuário fecha a notificação sem clicar
+ */
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification closed:', event.notification);
+
+  // Opcional: registrar analytics ou métricas
+  const data = event.notification.data;
+  if (data && data.trackClose) {
+    event.waitUntil(
+      fetch('/api/notifications/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'close',
+          notificationId: data.id,
+          timestamp: Date.now(),
+        }),
+      }).catch(err => console.error('[SW] Error tracking notification close:', err))
+    );
+  }
+});
+
 console.log('[SW] Service Worker loaded');

@@ -13,6 +13,7 @@ import { ApplyTemplateDialog } from "@/components/ApplyTemplateDialog"
 import { SaveAsTemplateDialog } from "@/components/SaveAsTemplateDialog"
 import { ResearchCompletionProgress } from "@/components/ResearchCompletionProgress"
 import { validateResearchFields, type ValidationResult } from "@/lib/research-field-validator"
+import { SurgeryRiskDisplay, SurgeryRiskNotAvailable } from "@/components/ml/surgery-risk-display"
 
 // Section components
 import { DadosBasicosSection } from "@/components/edit/DadosBasicosSection"
@@ -42,6 +43,12 @@ interface PatientData {
     hospital?: string
     durationMinutes?: number
     dataCompleteness: number
+    // ML Prediction fields
+    predictedRisk?: number
+    predictedRiskLevel?: 'low' | 'medium' | 'high'
+    mlModelVersion?: string
+    mlPredictedAt?: Date
+    mlFeatures?: string
   }
 }
 
@@ -296,6 +303,24 @@ export default function EditPatientPage() {
               }
             }}
           />
+        )}
+
+        {/* ML Risk Prediction */}
+        {patient?.surgery?.predictedRisk !== null &&
+         patient?.surgery?.predictedRisk !== undefined &&
+         patient?.surgery?.predictedRiskLevel ? (
+          <SurgeryRiskDisplay
+            risk={patient.surgery.predictedRisk}
+            level={patient.surgery.predictedRiskLevel}
+            features={patient.surgery.mlFeatures}
+            modelVersion={patient.surgery.mlModelVersion}
+            predictedAt={patient.surgery.mlPredictedAt}
+            showDetails={true}
+            showFactors={true}
+            className="mb-6"
+          />
+        ) : (
+          <SurgeryRiskNotAvailable className="mb-6" />
         )}
 
         {/* Main Form */}

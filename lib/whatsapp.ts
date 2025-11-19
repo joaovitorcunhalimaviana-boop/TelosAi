@@ -224,8 +224,9 @@ export async function sendFollowUpQuestionnaire(
   surgery: Surgery
 ): Promise<WhatsAppResponse> {
   try {
-    // Usar template diferente para D1 vs outros dias
-    const templateName = followUp.dayNumber === 1 ? 'day1' : 'otherdays';
+    // Usar templates com parâmetros posicionais ({{1}}) que funcionam corretamente
+    // Template "pos_op_dia1" para D+1, "acompanhamento_medico" para outros dias
+    const templateName = followUp.dayNumber === 1 ? 'pos_op_dia1' : 'acompanhamento_medico';
 
     // Mapear tipo de cirurgia para texto amigável
     const surgeryTypeMap: Record<string, string> = {
@@ -236,10 +237,11 @@ export async function sendFollowUpQuestionnaire(
     };
 
     const surgeryTypeText = surgeryTypeMap[surgery.type] || surgery.type;
-    const patientFirstName = patient.name.split(' ')[0];
+    const patientFirstName = patient.name.split(' ')[0] || 'Paciente';
 
-    // Componentes do template (usando formato NAMED conforme templates aprovados)
-    const components = [
+    // Template "pos_op_dia1" usa parâmetro {{1}} (posicional)
+    // Template "acompanhamento_medico" não tem parâmetros
+    const components = followUp.dayNumber === 1 ? [
       {
         type: 'body',
         parameters: [
@@ -249,7 +251,7 @@ export async function sendFollowUpQuestionnaire(
           }
         ]
       }
-    ];
+    ] : undefined; // Sem componentes para "acompanhamento_medico"
 
     console.log('📱 Sending template message:', {
       template: templateName,

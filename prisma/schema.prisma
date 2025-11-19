@@ -79,6 +79,7 @@ model User {
   notifications       Notification[]
   redFlagViews        RedFlagView[]
   auditLogs           AuditLog[]
+  pushSubscriptions   PushSubscription[]
 
   @@unique([crm, estado]) // CRM must be unique per state
   @@index([email])
@@ -105,6 +106,33 @@ model PasswordResetToken {
   @@index([userId])
   @@index([expires])
 }
+
+// ============================================
+// PUSH NOTIFICATIONS (PWA)
+// ============================================
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Push subscription endpoint e keys (Web Push API)
+  endpoint String @db.Text // URL do serviço de push
+  p256dh   String @db.Text // Chave pública para encriptação (base64)
+  auth     String @db.Text // Chave de autenticação (base64)
+
+  // Metadados
+  userAgent String? @db.Text // Browser/dispositivo
+  isActive  Boolean @default(true) // Para desativar subscriptions antigas
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@index([isActive])
+}
+
 
 // ============================================
 // PACIENTE E DADOS CADASTRAIS
@@ -255,6 +283,13 @@ model Surgery {
   // Status do acompanhamento
   status String @default("active") // active, completed, cancelled
 
+  // Machine Learning - Predição de Risco
+  predictedRisk      Float?    // 0.0 a 1.0 (probabilidade de complicação)
+  predictedRiskLevel String?   // low, medium, high
+  mlModelVersion     String?   // versão do modelo usado
+  mlPredictedAt      DateTime? // quando foi calculado
+  mlFeatures         String?   @db.Text // JSON com features usadas na predição
+
   // Relações
   details      SurgeryDetails?
   preOp        PreOpPreparation?
@@ -267,6 +302,7 @@ model Surgery {
   @@index([patientId])
   @@index([date])
   @@index([type])
+  @@index([predictedRiskLevel])
 }
 
 // ============================================
