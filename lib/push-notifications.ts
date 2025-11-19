@@ -211,7 +211,6 @@ export async function sendTestNotification(): Promise<void> {
     body: 'As notificações estão funcionando! Você receberá alertas importantes sobre seus pacientes.',
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
-    vibrate: [200, 100, 200],
     tag: 'test-notification',
     data: {
       url: '/dashboard',
