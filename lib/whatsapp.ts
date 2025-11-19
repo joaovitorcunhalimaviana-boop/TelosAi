@@ -248,7 +248,8 @@ export async function sendFollowUpQuestionnaire(
         parameters: [
           {
             type: 'text',
-            text: patientFirstName
+            text: patientFirstName,
+            name: 'custumer_name' // NAMED parameter (note o typo no template da Meta)
           }
         ]
       }
