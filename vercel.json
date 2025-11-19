@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/send-followups",
       "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/renew-whatsapp-token",
-      "schedule": "0 0 */30 * *"
     }
   ]
 }
