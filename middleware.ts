@@ -1,11 +1,8 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 
-// Middleware ultra-leve (sem Prisma) para Edge Runtime
-export function middleware(request: NextRequest) {
-  // Para rotas públicas (API, auth, etc), apenas permite
-  return NextResponse.next();
-}
+// Usa auth.config.ts que é compatível com Edge Runtime (sem Prisma)
+export const { auth: middleware } = NextAuth(authConfig);
 
 export const config = {
   matcher: [
