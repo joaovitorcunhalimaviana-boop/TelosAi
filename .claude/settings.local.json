@@ -84,7 +84,8 @@
       "Bash(openssl rand:*)",
       "Bash(.env)",
       "Bash(if exist node_modules.prismaclient rmdir /s /q node_modules.prismaclient)",
-      "Bash(npx next build)"
+      "Bash(npx next build)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
