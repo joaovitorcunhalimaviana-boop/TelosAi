@@ -240,7 +240,7 @@ export async function sendFollowUpQuestionnaire(
     const surgeryTypeText = surgeryTypeMap[surgery.type] || surgery.type;
     const patientFirstName = patient.name.split(' ')[0] || 'Paciente';
 
-    // Template "dia_1" usa parâmetro {{custumer_name}} (note o typo, mas é o nome do parâmetro)
+    // Template "dia_1" usa parâmetro posicional {{1}} (não NAMED)
     // Template "acompanhamento_medico" não tem parâmetros
     const components = followUp.dayNumber === 1 ? [
       {
@@ -248,8 +248,7 @@ export async function sendFollowUpQuestionnaire(
         parameters: [
           {
             type: 'text',
-            text: patientFirstName,
-            name: 'custumer_name' // NAMED parameter (note o typo no template da Meta)
+            text: patientFirstName
           }
         ]
       }
