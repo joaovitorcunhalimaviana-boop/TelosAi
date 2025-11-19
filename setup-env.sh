@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Script para configurar variáveis de ambiente no Vercel
+# Todas as variáveis serão adicionadas ao ambiente de produção
+
+PROJECT_NAME="sistema-pos-operatorio"
+
+echo "🚀 Configurando variáveis de ambiente no Vercel..."
+
+# Array com todas as variáveis
+declare -a VARS=(
+  "ANTHROPIC_API_KEY=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"
+  "AUTH_SECRET=7lBvFRYgEcVpCiELM1zcfh1JmZG4/WhbLRfgAlSmznM="
+  "AUTH_URL=https://sistema-pos-operatorio-kjiivyow4-joao-vitor-vianas-projects.vercel.app"
+  "CRON_SECRET=eUNh2cF7Ul5grcGvXwz4T1hHg+jUiB/ilG8wY3Am/VA="
+  "DATABASE_URL=postgresql://neondb_owner:npg_F9Kb4mPoVtcB@ep-royal-voice-ae6ov58i-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require"
+  "DOCTOR_PHONE_NUMBER=5583991664904"
+  "NEXTAUTH_SECRET=7lBvFRYgEcVpCiELM1zcfh1JmZG4/WhbLRfgAlSmznM="
+  "NEXTAUTH_URL=https://sistema-pos-operatorio-kjiivyow4-joao-vitor-vianas-projects.vercel.app"
+  "WHATSAPP_ACCESS_TOKEN=EAATN9ORQfVcBPxMLivSMuo5mZBR2H3g1MKNNQ3lAOK6fvNYZBaGB1oZAXfzvn37JICEcl16tRFggRsIP9tMXMZBZBt4GOu5wntLz1YhOB2LPF0w6ZBxjDViGXmLv2WFlTZANpDMwmglh0LYnflzVr3Tkd0FtLfCFhKmYCAo7nu5MivEXLTj7ZBkVpYrgIqwZB"
+  "WHATSAPP_APP_ID=1352351593037143"
+  "WHATSAPP_APP_SECRET=f8788e99231afa0bbb84685c4bea4924"
+  "WHATSAPP_BUSINESS_ACCOUNT_ID=4331043357171950"
+  "WHATSAPP_PHONE_NUMBER_ID=866244236573219"
+  "WHATSAPP_VERIFY_TOKEN=meu-token-super-secreto-2024"
+  "WHATSAPP_WEBHOOK_VERIFY_TOKEN=meu-token-super-secreto-2024"
+  "RESEARCH_PSEUDONYM_SALT=f1668d9cfdf515ffb56fc3fde839244123b64ca042a58f8bef8a332d1cc208ef"
+  "RESEND_API_KEY=re_placeholder_key"
+)
+
+# Contador
+TOTAL=${#VARS[@]}
+COUNT=0
+
+# Loop para adicionar cada variável
+for VAR in "${VARS[@]}"; do
+  COUNT=$((COUNT + 1))
+  VAR_NAME="${VAR%%=*}"
+  VAR_VALUE="${VAR#*=}"
+
+  echo "[$COUNT/$TOTAL] Adicionando $VAR_NAME..."
+
+  # Adiciona a variável no ambiente de produção
+  vercel env add "$VAR_NAME" production <<EOF
+$VAR_VALUE
+EOF
+
+  if [ $? -eq 0 ]; then
+    echo "✅ $VAR_NAME adicionada com sucesso!"
+  else
+    echo "⚠️  Erro ao adicionar $VAR_NAME (pode já existir)"
+  fi
+
+  echo ""
+done
+
+echo ""
+echo "✅ Configuração concluída!"
+echo ""
+echo "📋 Próximos passos:"
+echo "1. Verificar variáveis: vercel env ls"
+echo "2. Fazer redeploy: vercel --prod"
