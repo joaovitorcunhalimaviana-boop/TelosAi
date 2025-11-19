@@ -160,7 +160,7 @@ async function processTextMessage(message: any, contacts: any[]) {
 }
 
 /**
- * Envia perguntas do questionário
+ * Envia perguntas do questionário (SIMPLIFICADO - todas de uma vez mas numeradas)
  */
 async function sendQuestionnaireQuestions(
   phone: string,
@@ -169,26 +169,12 @@ async function sendQuestionnaireQuestions(
 ) {
   const firstName = patient.name.split(' ')[0];
 
-  const questions = `Olá ${firstName}! Vou fazer algumas perguntas sobre sua recuperação:
+  const questions = `Olá ${firstName}! 👋
 
-1️⃣ Como está sua DOR hoje? (0 a 10, onde 0 = sem dor e 10 = dor insuportável)
+Vou fazer algumas perguntas sobre sua recuperação. Responda cada uma por vez:
 
-2️⃣ Você está com FEBRE? (Sim/Não)
-
-3️⃣ Teve SANGRAMENTO? (Nenhum / Leve / Moderado / Intenso)
-
-4️⃣ Conseguiu URINAR normalmente? (Sim/Não)
-
-5️⃣ Conseguiu EVACUAR? (Sim/Não)
-
-6️⃣ Está com NÁUSEAS ou VÔMITOS? (Sim/Não)
-
-7️⃣ Observou SECREÇÃO na ferida? (Nenhuma / Clara / Purulenta)
-
-8️⃣ Alguma PREOCUPAÇÃO adicional?
-
-Por favor, responda TODAS as perguntas em uma única mensagem. Exemplo:
-"Dor 3, sem febre, sangramento leve, urinou sim, evacuou não, sem náuseas, sem secreção, sem preocupações"`;
+📊 *Pergunta 1 de 8*
+Como está sua DOR hoje? (número de 0 a 10)`;
 
   await sendEmpatheticResponse(phone, questions);
 }
