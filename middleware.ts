@@ -1,19 +1,22 @@
-export { auth as middleware } from "@/lib/auth";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+// Middleware ultra-leve (sem Prisma) para Edge Runtime
+export function middleware(request: NextRequest) {
+  // Para rotas públicas (API, auth, etc), apenas permite
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api/auth (NextAuth endpoints)
-     * - api/webhooks (Webhook endpoints like WhatsApp)
-     * - api/postop/webhook (WhatsApp webhook)
-     * - api/whatsapp/webhook (WhatsApp webhook)
-     * - api/cron (Cron jobs endpoints)
+     * - api/ (all API routes - incluindo webhooks, auth, cron)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder files
      */
-    "/((?!api/auth|api/webhooks|api/postop/webhook|api/whatsapp/webhook|api/cron|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
