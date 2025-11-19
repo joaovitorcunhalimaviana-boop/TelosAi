@@ -95,7 +95,7 @@ export async function subscribeToPush(): Promise<PushSubscription> {
 
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true, // Sempre mostrar notificação ao usuário
-      applicationServerKey: convertedVapidKey,
+      applicationServerKey: convertedVapidKey as BufferSource,
     });
   }
 
