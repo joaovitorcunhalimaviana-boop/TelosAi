@@ -18,13 +18,38 @@ export interface ConversationMessage {
 }
 
 export interface QuestionnaireData {
-  pain?: number | string;
-  bowelMovement?: boolean | string;
-  bleeding?: string;
-  urination?: boolean | string;
-  fever?: boolean | string | number;
-  medications?: boolean | string;
+  // Dor
+  pain?: number; // 0-10 na escala visual analógica
+
+  // Evacuação
+  bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
+  lastBowelMovement?: string; // Quando foi a última evacuação
+  painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
+
+  // Sangramento
+  bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
+  bleedingDetails?: string;
+
+  // Urina
+  urination?: boolean; // Consegue urinar normalmente
+  urinationIssues?: string;
+
+  // Febre
+  fever?: boolean;
+  feverTemperature?: number; // Temperatura em °C
+
+  // Secreção (D5+)
+  discharge?: boolean; // Tem secreção?
+  dischargeType?: 'clear' | 'yellowish' | 'purulent' | 'bloody'; // Tipo de secreção
+  dischargeAmount?: 'minimal' | 'moderate' | 'abundant';
+
+  // Medicações
+  medications?: boolean; // Está tomando conforme prescrito
+  medicationIssues?: string;
+
+  // Preocupações gerais
   concerns?: string;
+
   [key: string]: any;
 }
 
@@ -48,7 +73,7 @@ export async function conductConversation(
   const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
   // Definir o que ainda precisa ser coletado
-  const missingInfo = getMissingInformation(currentData);
+  const missingInfo = getMissingInformation(currentData, daysPostOp);
 
   // Construir prompt para Claude
   const systemPrompt = `Você é uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
@@ -93,11 +118,37 @@ CONTEXTO DO PACIENTE:
       Você: "Sim, percebo que está bem forte. Me ajuda com um número de 0 a 10? Isso é importante para o Dr. João acompanhar sua recuperação."
 
    d) OUTRAS INFORMAÇÕES:
-      - Evacuação: sim ou não (+ detalhes se necessário)
-      - Sangramento: nenhum, leve, moderado ou intenso
-      - Urina: sim ou não
-      - Febre: sim (com temperatura) ou não
-      - Medicações: está tomando ou não
+
+      EVACUAÇÃO (MUITO IMPORTANTE):
+      - Pergunte: "Você evacuou desde a última vez que conversamos?"
+      - Se SIM: pergunte "Qual foi a dor durante a evacuação? De 0 a 10, sendo 0 sem dor e 10 a pior dor que já sentiu"
+      - Se NÃO: pergunte "Quando foi a última vez que você evacuou?"
+      - ⚠️ NÃO pergunte "evacuou hoje" pois a mensagem pode chegar 10h e paciente evacuar às 19h
+
+      SANGRAMENTO:
+      - Nenhum
+      - Leve (apenas no papel higiênico)
+      - Moderado (mancha a roupa íntima)
+      - Intenso (encheu o vaso sanitário)
+
+      URINA:
+      - Consegue urinar normalmente? Sim/Não
+      - Se não: quais dificuldades?
+
+      FEBRE:
+      - Teve febre? Sim/Não
+      - Se sim: qual temperatura mediu? (em °C)
+
+      SECREÇÃO (APENAS D5+):
+      ${daysPostOp >= 5 ? `
+      - Tem saída de secreção pela ferida? Sim/Não
+      - Se sim:
+        * Cor/aspecto: clara, amarelada, purulenta (pus), sanguinolenta
+        * Quantidade: pouca, moderada, muita
+      ` : '(Não perguntar - paciente está em D+' + daysPostOp + ')'}
+
+      MEDICAÇÕES:
+      - Está tomando as medicações conforme prescrito? Sim/Não
 
    e) FLUXO DA CONVERSA:
       - Faça UMA pergunta por vez
@@ -204,34 +255,66 @@ RESPONDA APENAS COM JSON:
 /**
  * Determina quais informações ainda faltam coletar
  */
-function getMissingInformation(data: QuestionnaireData): string[] {
+function getMissingInformation(data: QuestionnaireData, daysPostOp: number): string[] {
   const missing: string[] = [];
 
-  if (!data.pain && data.pain !== 0) {
-    missing.push('Nível de dor (0-10)');
+  // 1. DOR (sempre obrigatório)
+  if (data.pain === undefined || data.pain === null) {
+    missing.push('Nível de dor ATUAL (0-10 na escala visual analógica)');
   }
 
-  if (data.bowelMovement === undefined) {
-    missing.push('Se conseguiu evacuar');
+  // 2. EVACUAÇÃO
+  if (data.bowelMovementSinceLastContact === undefined) {
+    missing.push('Se evacuou desde o último contato');
+  } else if (data.bowelMovementSinceLastContact === false) {
+    // Se não evacuou, perguntar quando foi a última vez
+    if (!data.lastBowelMovement) {
+      missing.push('Quando foi a última evacuação');
+    }
+  } else if (data.bowelMovementSinceLastContact === true) {
+    // Se evacuou, perguntar a dor durante a evacuação
+    if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
+      missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
+    }
   }
 
+  // 3. SANGRAMENTO
   if (!data.bleeding) {
-    missing.push('Informações sobre sangramento');
+    missing.push('Informações sobre sangramento (nenhum, leve, moderado, intenso)');
   }
 
+  // 4. URINA
   if (data.urination === undefined) {
-    missing.push('Se conseguiu urinar normalmente');
+    missing.push('Se está conseguindo urinar normalmente');
   }
 
+  // 5. FEBRE
   if (data.fever === undefined) {
     missing.push('Se teve febre');
+  } else if (data.fever === true && !data.feverTemperature) {
+    missing.push('Qual foi a temperatura da febre (em °C)');
   }
 
+  // 6. SECREÇÃO PURULENTA (apenas D5+)
+  if (daysPostOp >= 5) {
+    if (data.discharge === undefined) {
+      missing.push('Se tem saída de secreção pela ferida');
+    } else if (data.discharge === true) {
+      if (!data.dischargeType) {
+        missing.push('Aspecto/cor da secreção (clara, amarelada, purulenta, sanguinolenta)');
+      }
+      if (!data.dischargeAmount) {
+        missing.push('Quantidade de secreção (pouca, moderada, muita)');
+      }
+    }
+  }
+
+  // 7. MEDICAÇÕES
   if (data.medications === undefined) {
-    missing.push('Se está tomando as medicações');
+    missing.push('Se está tomando as medicações conforme prescrito');
   }
 
-  // Concerns é opcional, não adiciona como "missing"
+  // Concerns é sempre opcional
 
   return missing;
 }
