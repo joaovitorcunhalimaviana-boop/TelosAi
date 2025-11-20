@@ -43,6 +43,60 @@ export interface WhatsAppResponse {
 }
 
 /**
+ * Envia imagem via WhatsApp
+ */
+export async function sendImage(
+  to: string,
+  imageUrl: string,
+  caption?: string
+): Promise<WhatsAppResponse> {
+  try {
+    const formattedPhone = formatPhoneNumber(to);
+
+    console.log('📸 Sending WhatsApp image:', {
+      to: formattedPhone,
+      imageUrl,
+      hasCaption: !!caption,
+    });
+
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: formattedPhone,
+      type: 'image',
+      image: {
+        link: imageUrl,
+        ...(caption && { caption })
+      }
+    };
+
+    const response = await fetch(
+      `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('❌ WhatsApp Image API Error:', error);
+      throw new Error(`WhatsApp Image API Error: ${JSON.stringify(error)}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ WhatsApp image sent successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error sending WhatsApp image:', error);
+    throw error;
+  }
+}
+
+/**
  * Envia mensagem de texto simples
  */
 export async function sendMessage(

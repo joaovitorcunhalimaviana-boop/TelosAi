@@ -291,6 +291,11 @@ model Surgery {
   mlPredictedAt      DateTime? // quando foi calculado
   mlFeatures         String?   @db.Text // JSON com features usadas na predição
 
+  // Rastreamento de Primeira Evacuação
+  hadFirstBowelMovement  Boolean   @default(false)
+  firstBowelMovementDate DateTime? // Data/hora exata da primeira evacuação
+  firstBowelMovementDay  Int?      // D+X quando evacuou pela primeira vez
+
   // Relações
   details      SurgeryDetails?
   preOp        PreOpPreparation?

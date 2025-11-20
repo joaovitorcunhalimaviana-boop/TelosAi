@@ -234,7 +234,7 @@ export async function startQuestionnaireCollection(
 
   // Enviar saudação inicial usando IA conversacional
   const { getInitialGreeting } = await import('./conversational-ai');
-  const greeting = getInitialGreeting(patient, surgery, daysPostOp + 1);
+  const greeting = await getInitialGreeting(patient, surgery, daysPostOp + 1, phoneNumber);
 
   await sendMessage(phoneNumber, greeting);
   await recordSystemMessage(conversation.id, greeting);
@@ -395,6 +395,16 @@ async function saveQuestionnaireResponse(
   userId: string,
   urgencyLevel: string = 'low'
 ) {
+  // Buscar follow-up para obter surgeryId e dayNumber
+  const followUp = await prisma.followUp.findUnique({
+    where: { id: followUpId },
+    include: { surgery: true }
+  });
+
+  if (!followUp) {
+    throw new Error('FollowUp not found');
+  }
+
   // Atualizar status do follow-up
   await prisma.followUp.update({
     where: { id: followUpId },
@@ -403,6 +413,25 @@ async function saveQuestionnaireResponse(
       respondedAt: new Date()
     }
   });
+
+  // Se evacuou e ainda não havia registrado primeira evacuação, registrar
+  if (
+    answers.bowelMovementSinceLastContact === true &&
+    !followUp.surgery.hadFirstBowelMovement
+  ) {
+    const { recordFirstBowelMovement } = await import('./bowel-movement-tracker');
+    await recordFirstBowelMovement(
+      followUp.surgeryId,
+      followUp.dayNumber,
+      answers.painDuringBowelMovement || 0,
+      answers.stoolConsistency || 4
+    );
+    console.log('✅ First bowel movement recorded:', {
+      dayNumber: followUp.dayNumber,
+      painDuringBM: answers.painDuringBowelMovement,
+      stoolConsistency: answers.stoolConsistency
+    });
+  }
 
   // Mapear níveis de urgência
   const riskLevelMap: Record<string, string> = {

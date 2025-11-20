@@ -20,11 +20,13 @@ export interface ConversationMessage {
 export interface QuestionnaireData {
   // Dor
   pain?: number; // 0-10 na escala visual analógica
+  painComparison?: 'better' | 'same' | 'worse'; // Comparação com dia anterior
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
   lastBowelMovement?: string; // Quando foi a última evacuação
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
+  stoolConsistency?: number; // Bristol Scale 1-7
 
   // Sangramento
   bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
@@ -38,14 +40,19 @@ export interface QuestionnaireData {
   fever?: boolean;
   feverTemperature?: number; // Temperatura em °C
 
-  // Secreção (D5+)
+  // Secreção (D3+)
   discharge?: boolean; // Tem secreção?
   dischargeType?: 'clear' | 'yellowish' | 'purulent' | 'bloody'; // Tipo de secreção
   dischargeAmount?: 'minimal' | 'moderate' | 'abundant';
 
-  // Medicações
+  // Medicações / Analgesia
   medications?: boolean; // Está tomando conforme prescrito
   medicationIssues?: string;
+  painControlledWithMeds?: boolean;
+  medicationSideEffects?: string;
+
+  // Atividade (D7+)
+  activityLevel?: string;
 
   // Preocupações gerais
   concerns?: string;
@@ -72,11 +79,17 @@ export async function conductConversation(
   // Calcular dias pós-operatórios
   const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
+  // Obter contexto do questionário diário
+  const { getDailyQuestions } = await import('./daily-questionnaire-flow');
+  const dailyQuestions = await getDailyQuestions(surgery.id, daysPostOp + 1);
+
   // Definir o que ainda precisa ser coletado
   const missingInfo = getMissingInformation(currentData, daysPostOp);
 
   // Construir prompt para Claude
   const systemPrompt = `Você é uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
+
+${dailyQuestions.contextForAI}
 
 CONTEXTO DO PACIENTE:
 - Nome: ${patient.name}
@@ -121,9 +134,19 @@ CONTEXTO DO PACIENTE:
 
       EVACUAÇÃO (MUITO IMPORTANTE):
       - Pergunte: "Você evacuou desde a última vez que conversamos?"
-      - Se SIM: pergunte "Qual foi a dor durante a evacuação? De 0 a 10, sendo 0 sem dor e 10 a pior dor que já sentiu"
+      - Se SIM:
+        * Pergunte dor durante evacuação: "Qual foi a dor durante a evacuação? De 0 a 10"
+        * Pergunte consistência usando ESCALA DE BRISTOL COMPLETA (7 opções):
+          1 - Pedaços duros separados, como nozes (muito constipado)
+          2 - Em forma de salsicha, mas com pedaços
+          3 - Salsicha com rachaduras na superfície
+          4 - Salsicha lisa e macia (IDEAL)
+          5 - Pedaços macios com bordas definidas
+          6 - Pedaços fofos com bordas irregulares
+          7 - Aquosa, sem pedaços sólidos (diarreia)
       - Se NÃO: pergunte "Quando foi a última vez que você evacuou?"
-      - ⚠️ NÃO pergunte "evacuou hoje" pois a mensagem pode chegar 10h e paciente evacuar às 19h
+      - ⚠️ SEMPRE pergunte "evacuou desde a última vez que conversamos?"
+      - ⚠️ NUNCA pergunte "evacuou hoje" ou "evacuou desde ontem"
 
       SANGRAMENTO:
       - Nenhum
@@ -139,16 +162,31 @@ CONTEXTO DO PACIENTE:
       - Teve febre? Sim/Não
       - Se sim: qual temperatura mediu? (em °C)
 
-      SECREÇÃO (APENAS D5+):
-      ${daysPostOp >= 5 ? `
+      SECREÇÃO (APENAS D+3 OU SUPERIOR):
+      ${daysPostOp >= 3 ? `
       - Tem saída de secreção pela ferida? Sim/Não
       - Se sim:
         * Cor/aspecto: clara, amarelada, purulenta (pus), sanguinolenta
         * Quantidade: pouca, moderada, muita
       ` : '(Não perguntar - paciente está em D+' + daysPostOp + ')'}
 
-      MEDICAÇÕES:
+      MEDICAÇÕES E ANALGESIA:
       - Está tomando as medicações conforme prescrito? Sim/Não
+      - Sua dor está controlada com as medicações? Sim/Não
+      - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
+
+      COMPARAÇÃO DE DOR (D+2 EM DIANTE):
+      ${daysPostOp >= 2 ? `
+      - Pergunte: "Comparando com ontem, sua dor hoje está melhor, igual ou pior?"
+      ${daysPostOp === 2 ? `
+      ⚠️ IMPORTANTE D+2: Se paciente disser que dor PIOROU em relação a D+1:
+      - Isso é NORMAL e ESPERADO (bloqueio pudendo terminando após ~48h)
+      - TRANQUILIZAR o paciente
+      - Explicar que deve melhorar nos próximos dias
+      ` : `
+      ⚠️ Espera-se melhora progressiva após D+3. Se piorar: investigar e alertar médico.
+      `}
+      ` : '(Não aplicável em D+1)'}
 
    e) FLUXO DA CONVERSA:
       - Faça UMA pergunta por vez
@@ -178,12 +216,22 @@ RESPONDA APENAS COM JSON:
 {
   "response": "sua resposta natural para o paciente",
   "extractedInfo": {
-    "pain": 7  // APENAS se paciente deu número específico
+    "pain": 7,  // APENAS se paciente deu número específico
+    "painDuringBowelMovement": 5,  // Se evacuou e respondeu
+    "stoolConsistency": 4,  // Bristol Scale 1-7, se evacuou
+    "bowelMovementSinceLastContact": true,  // true/false
+    "painComparison": "worse",  // "better"|"same"|"worse" (D+2+)
+    "medications": true,
+    "painControlledWithMeds": false,
+    // ... outros campos conforme coletados
   },
   "isComplete": false,
   "urgency": "low|medium|high|critical",
   "needsDoctorAlert": false
-}`;
+}
+
+⚠️ IMPORTANTE: Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
+             Não invente ou assuma valores. Se paciente não respondeu algo, não incluir no JSON.`;
 
   try {
     // Construir mensagens para Claude
@@ -276,6 +324,10 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
       missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
     }
+    // E a consistência das fezes (Bristol Scale)
+    if (data.stoolConsistency === undefined || data.stoolConsistency === null) {
+      missing.push('Consistência das fezes (Escala de Bristol 1-7)');
+    }
   }
 
   // 3. SANGRAMENTO
@@ -295,8 +347,8 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     missing.push('Qual foi a temperatura da febre (em °C)');
   }
 
-  // 6. SECREÇÃO PURULENTA (apenas D5+)
-  if (daysPostOp >= 5) {
+  // 6. SECREÇÃO PURULENTA (apenas D+3 ou superior)
+  if (daysPostOp >= 3) {
     if (data.discharge === undefined) {
       missing.push('Se tem saída de secreção pela ferida');
     } else if (data.discharge === true) {
@@ -322,17 +374,45 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
 /**
  * Inicia conversa com saudação personalizada
  */
-export function getInitialGreeting(patient: Patient, surgery: Surgery, dayNumber: number): string {
+export async function getInitialGreeting(
+  patient: Patient,
+  surgery: Surgery,
+  dayNumber: number,
+  phoneNumber: string
+): Promise<string> {
   const greeting = getGreeting();
   const firstName = patient.name.split(' ')[0];
+
+  // Obter mensagem de introdução do dia
+  const { getIntroductionMessage } = await import('./daily-questionnaire-flow');
+  const introMessage = getIntroductionMessage(dayNumber);
+
+  // Enviar imagem da escala de dor ANTES da saudação
+  const { sendImage } = await import('./whatsapp');
+  try {
+    // URL pública da imagem da escala de dor
+    // Nota: O arquivo escala-dor.png deve estar em public/
+    const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://proactive-rejoicing-production.up.railway.app'}/escala-dor.png`;
+
+    await sendImage(
+      phoneNumber,
+      imageUrl,
+      'Escala Visual Analógica de Dor (0-10)'
+    );
+
+    console.log('✅ Pain scale image sent before initial greeting');
+  } catch (error) {
+    console.error('❌ Error sending pain scale image:', error);
+    // Continuar mesmo se falhar o envio da imagem
+  }
 
   return `${greeting}, ${firstName}! 👋
 
 Aqui é a assistente de acompanhamento pós-operatório do Dr. João Vitor.
 
-Vi que você está no ${dayNumber}º dia após sua cirurgia de ${surgery.type}. Como você está se sentindo hoje?
+${introMessage}
 
-Pode me contar livremente como está sua recuperação, e vou fazer algumas perguntas para entender melhor como você está. 😊`;
+Vou te fazer algumas perguntas sobre como você está. Pode responder livremente que eu vou anotando tudo certinho. 😊`;
 }
 
 /**
