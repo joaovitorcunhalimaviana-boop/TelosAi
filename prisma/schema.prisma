@@ -178,6 +178,7 @@ model Patient {
   surgeries     Surgery[]
   consentTerms  ConsentTerm[]
   followUps     FollowUp[]
+  conversations Conversation[]
 
   @@index([userId])
   @@index([phone])
@@ -768,6 +769,50 @@ model AuditLog {
   @@index([action])
   @@index([resourceId])
   @@index([createdAt])
+}
+
+// ============================================
+// CONVERSAS WHATSAPP (Gestão de Estado)
+// ============================================
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identificação do paciente
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  // Número de telefone (para identificar antes de associar ao paciente)
+  phoneNumber String @unique
+
+  // Estado atual da conversa
+  state String @default("idle") // idle, awaiting_consent, collecting_answers, completed
+
+  // Follow-up relacionado (se estiver respondendo um questionário)
+  followUpId String?
+
+  // Contexto da conversa (JSON)
+  // Armazena respostas parciais, perguntas já feitas, etc
+  context Json?
+
+  // Última mensagem enviada pelo sistema
+  lastSystemMessage String? @db.Text
+  lastSystemMessageAt DateTime?
+
+  // Última mensagem do paciente
+  lastUserMessage String? @db.Text
+  lastUserMessageAt DateTime?
+
+  // Histórico de mensagens (JSON array)
+  messageHistory Json?
+
+  @@index([phoneNumber])
+  @@index([patientId])
+  @@index([state])
+  @@index([followUpId])
+  @@index([updatedAt])
 }
 
 // ============================================

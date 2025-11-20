@@ -224,32 +224,45 @@ export async function sendFollowUpQuestionnaire(
   surgery: Surgery
 ): Promise<WhatsAppResponse> {
   try {
-    // TEMPORÁRIO: Usar "acompanhamento_medico" para TODOS os dias (sem parâmetros)
-    // até descobrirmos o formato correto do template "dia_1"
-    const templateName = 'acompanhamento_medico';
-
-    // Mapear tipo de cirurgia para texto amigável
-    const surgeryTypeMap: Record<string, string> = {
-      'hemorroidectomia': 'doença hemorroidária',
-      'fistula': 'fístula anal',
-      'fissura': 'fissura anal',
-      'pilonidal': 'cisto pilonidal'
-    };
-
-    const surgeryTypeText = surgeryTypeMap[surgery.type] || surgery.type;
+    // Usar template baseado no dia
+    // D1: usar 'day1' (mais completo e empático)
+    // D2+: usar 'otherdays' (continuação)
+    const templateName = followUp.dayNumber === 1 ? 'day1' : 'otherdays';
     const patientFirstName = patient.name.split(' ')[0] || 'Paciente';
 
-    // Template "acompanhamento_medico" não tem parâmetros
-    const components = undefined;
+    // Componentes usando formato NAMED
+    const components = [
+      {
+        type: 'body',
+        parameters: [
+          {
+            type: 'text',
+            text: patientFirstName
+          }
+        ]
+      }
+    ];
+
+    // day1 usa 'en' (erro no template), otherdays usa 'pt_BR'
+    const language = templateName === 'day1' ? 'en' : 'pt_BR';
 
     console.log('📱 Sending template message:', {
       template: templateName,
+      language,
       to: patient.phone,
       patientName: patientFirstName,
-      surgeryType: surgeryTypeText
+      dayNumber: followUp.dayNumber
     });
 
-    return await sendTemplate(patient.phone, templateName, components);
+    const response = await sendTemplate(patient.phone, templateName, components, language);
+
+    // Marcar que o template foi enviado (para gestão de conversa)
+    const { markTemplateSent } = await import('./conversation-manager');
+    await markTemplateSent(patient.phone, followUp.id);
+
+    console.log('✅ Template marked as sent in conversation manager');
+
+    return response;
   } catch (error) {
     console.error('Error sending follow-up questionnaire:', error);
     throw error;

@@ -3,6 +3,14 @@ import { sendMessage, markAsRead, sendDoctorAlert } from "@/lib/whatsapp"
 import { analyzePatientMessage, formatDoctorAlert } from "@/lib/claude-analyzer"
 import { prisma } from "@/lib/prisma"
 import { validateHubChallenge } from "@/lib/security/webhook-validator"
+import {
+  getOrCreateConversation,
+  recordUserMessage,
+  isAwaitingQuestionnaire,
+  startQuestionnaireCollection,
+  processQuestionnaireAnswer,
+  updateConversationState
+} from "@/lib/conversation-manager"
 
 /**
  * Webhook do WhatsApp Business API
@@ -71,7 +79,7 @@ export async function POST(request: NextRequest) {
 
           // Processar mensagem de texto
           if (message.type === 'text' && message.text?.body) {
-            const userMessage = message.text.body
+            const userMessage = message.text.body.trim()
 
             try {
               // 1. Identificar paciente pelo telefone
@@ -100,13 +108,58 @@ export async function POST(request: NextRequest) {
 
               console.log(`📋 Patient identified: ${patient.name}`)
 
-              // 2. Buscar cirurgia mais recente
+              // 2. Verificar se está aguardando para responder questionário
+              const awaitingQuestionnaire = await isAwaitingQuestionnaire(message.from)
+
+              if (awaitingQuestionnaire && userMessage.toLowerCase() === 'sim') {
+                console.log('✅ Patient confirmed - starting questionnaire')
+
+                // Buscar cirurgia mais recente
+                const surgery = await prisma.surgery.findFirst({
+                  where: { patientId: patient.id },
+                  orderBy: { date: 'desc' }
+                })
+
+                if (surgery) {
+                  // Iniciar coleta de respostas
+                  await startQuestionnaireCollection(message.from, patient, surgery)
+                  console.log('📝 Questionnaire started')
+                  continue
+                }
+              }
+
+              // 3. Verificar se está respondendo questionário
+              const conversation = await getOrCreateConversation(message.from, patient.id)
+
+              if (conversation.state === 'collecting_answers') {
+                console.log('📝 Processing questionnaire answer')
+
+                try {
+                  const result = await processQuestionnaireAnswer(message.from, userMessage)
+
+                  if (result.completed) {
+                    console.log('✅ Questionnaire completed')
+                  } else {
+                    console.log('➡️ Next question sent')
+                  }
+
+                  continue
+                } catch (error) {
+                  console.error('❌ Error processing questionnaire answer:', error)
+                  // Continua para análise com IA como fallback
+                }
+              }
+
+              // 4. Registrar mensagem do usuário
+              await recordUserMessage(conversation.id, userMessage)
+
+              // 5. Buscar cirurgia mais recente
               const surgery = await prisma.surgery.findFirst({
                 where: { patientId: patient.id },
                 orderBy: { date: 'desc' }
               })
 
-              // 3. Analisar mensagem com Claude AI
+              // 6. Analisar mensagem com Claude AI
               console.log('🤖 Analyzing message with Claude AI...')
               const analysis = await analyzePatientMessage(
                 userMessage,
@@ -121,11 +174,11 @@ export async function POST(request: NextRequest) {
                 shouldNotifyDoctor: analysis.shouldNotifyDoctor
               })
 
-              // 4. Enviar resposta ao paciente
+              // 7. Enviar resposta ao paciente
               await sendMessage(message.from, analysis.suggestedResponse)
               console.log("✅ Intelligent response sent to patient")
 
-              // 5. Notificar médico se necessário
+              // 8. Notificar médico se necessário
               if (analysis.shouldNotifyDoctor) {
                 const doctorPhone = process.env.DOCTOR_PHONE_NUMBER
                 if (doctorPhone) {
@@ -144,9 +197,6 @@ export async function POST(request: NextRequest) {
                   }
                 }
               }
-
-              // 6. Salvar no banco de dados
-              // TODO: Criar tabela de conversas/mensagens para histórico
 
             } catch (error) {
               console.error("❌ Error processing message:", error)
