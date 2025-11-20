@@ -1,0 +1,31 @@
+# Ignora arquivos que não precisam ser enviados ao Sentry
+
+# Dependencies
+node_modules/
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+coverage/
+
+# Development
+.env*
+.git/
+.next/
+.vercel/
+
+# Build outputs
+out/
+dist/
+build/
+
+# Scripts e ferramentas
+scripts/
+prisma/migrations/
+
+# Documentação
+*.md
+docs/

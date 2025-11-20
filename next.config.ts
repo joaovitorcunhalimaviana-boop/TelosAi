@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -63,4 +64,22 @@ const nextConfig: NextConfig = {
   }),
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Sentry Webpack Plugin options
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Silencia warnings de source maps em desenvolvimento
+  silent: !process.env.CI,
+
+  // Upload de source maps apenas em produção
+  widenClientFileUpload: true,
+
+  // Desabilita telemetria do Sentry
+  telemetry: false,
+
+  // Oculta source maps em produção
+  sourcemaps: {
+    disable: false,
+  },
+});
