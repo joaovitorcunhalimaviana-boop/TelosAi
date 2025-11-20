@@ -483,7 +483,7 @@ model FollowUp {
   scheduledDate DateTime
 
   // Status
-  status String @default("pending") // pending, sent, responded, overdue, skipped
+  status String @default("pending") // pending, sent, in_progress, responded, overdue, skipped
 
   // Timestamps
   sentAt      DateTime?

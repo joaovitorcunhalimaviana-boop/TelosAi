@@ -138,21 +138,47 @@ async function processTextMessage(message: any, contacts: any[]) {
 
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
-    if ((textLower === 'sim' || textLower === 's') && pendingFollowUp.status === 'sent') {
-      // Enviar perguntas do questionário
-      await sendQuestionnaireQuestions(phone, patient, pendingFollowUp);
 
-      // Atualizar status para "aguardando resposta"
+    // Estado 1: Resposta "sim" ao template inicial
+    if ((textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent') {
+      console.log('📋 Iniciando questionário interativo...');
+
+      // Criar uma resposta vazia para tracking
+      const response = await prisma.followUpResponse.create({
+        data: {
+          followUpId: pendingFollowUp.id,
+          userId: patient.userId,
+          questionnaireData: JSON.stringify({ answers: [], currentQuestion: 1 }),
+          riskLevel: 'low',
+        },
+      });
+
+      // Enviar primeira pergunta
+      await sendQuestionByNumber(phone, patient, 1);
+
+      // Atualizar follow-up para status "in_progress"
       await prisma.followUp.update({
         where: { id: pendingFollowUp.id },
-        data: { status: 'sent' } // Manter como 'sent' até receber resposta completa
+        data: {
+          status: 'in_progress', // NOVO STATUS
+        },
       });
 
       return;
     }
 
-    // Processar resposta completa ao questionário
-    await processFollowUpResponse(pendingFollowUp, patient, text);
+    // Estado 2: Respondendo questionário interativo
+    if (pendingFollowUp.status === 'in_progress') {
+      await processQuestionnaireAnswer(pendingFollowUp, patient, phone, text);
+      return;
+    }
+
+    // Estado 3: Mensagem fora de contexto
+    await sendEmpatheticResponse(
+      phone,
+      `Olá ${patient.name.split(' ')[0]}! Não entendi sua mensagem. ` +
+      'Se você deseja iniciar o questionário, responda "sim".'
+    );
 
   } catch (error) {
     console.error('Error processing text message:', error);
@@ -160,23 +186,306 @@ async function processTextMessage(message: any, contacts: any[]) {
 }
 
 /**
- * Envia perguntas do questionário (SIMPLIFICADO - todas de uma vez mas numeradas)
+ * Lista de perguntas do questionário
  */
-async function sendQuestionnaireQuestions(
-  phone: string,
-  patient: any,
-  followUp: any
-) {
+const QUESTIONNAIRE_QUESTIONS = [
+  {
+    number: 1,
+    question: 'Como está sua DOR hoje? (número de 0 a 10, onde 0 = sem dor e 10 = pior dor imaginável)',
+    field: 'painLevel',
+    type: 'number',
+  },
+  {
+    number: 2,
+    question: 'Você está com FEBRE? (responda sim ou não)',
+    field: 'fever',
+    type: 'boolean',
+  },
+  {
+    number: 3,
+    question: 'Está conseguindo URINAR normalmente? (responda sim ou não)',
+    field: 'urination',
+    type: 'boolean',
+  },
+  {
+    number: 4,
+    question: 'Já conseguiu EVACUAR (fazer cocô)? (responda sim ou não)',
+    field: 'bowelMovement',
+    type: 'boolean',
+  },
+  {
+    number: 5,
+    question: 'Tem algum SANGRAMENTO? (responda: nenhum, leve, moderado ou intenso)',
+    field: 'bleeding',
+    type: 'text',
+  },
+  {
+    number: 6,
+    question: 'Está conseguindo se ALIMENTAR bem? (responda sim ou não)',
+    field: 'eating',
+    type: 'boolean',
+  },
+  {
+    number: 7,
+    question: 'Tem alguma NÁUSEA ou VÔMITO? (responda sim ou não)',
+    field: 'nausea',
+    type: 'boolean',
+  },
+  {
+    number: 8,
+    question: 'Há algo mais que você gostaria de me contar sobre sua recuperação? (responda livremente ou "não")',
+    field: 'concerns',
+    type: 'text',
+  },
+];
+
+/**
+ * Envia pergunta específica por número
+ */
+async function sendQuestionByNumber(phone: string, patient: any, questionNumber: number) {
   const firstName = patient.name.split(' ')[0];
+  const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === questionNumber);
 
-  const questions = `Olá ${firstName}! 👋
+  if (!question) {
+    console.error(`Pergunta ${questionNumber} não encontrada`);
+    return;
+  }
 
-Vou fazer algumas perguntas sobre sua recuperação. Responda cada uma por vez:
+  const message = `📋 *Pergunta ${question.number} de ${QUESTIONNAIRE_QUESTIONS.length}*\n\n${question.question}`;
 
-📊 *Pergunta 1 de 8*
-Como está sua DOR hoje? (número de 0 a 10)`;
+  await sendEmpatheticResponse(phone, message);
+  console.log(`✅ Pergunta ${questionNumber} enviada para ${firstName}`);
+}
 
-  await sendEmpatheticResponse(phone, questions);
+/**
+ * Processa resposta do questionário interativo
+ */
+async function processQuestionnaireAnswer(
+  followUp: any,
+  patient: any,
+  phone: string,
+  answer: string
+) {
+  try {
+    // Buscar a resposta em andamento
+    const existingResponse = await prisma.followUpResponse.findFirst({
+      where: {
+        followUpId: followUp.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (!existingResponse) {
+      console.error('Resposta não encontrada');
+      return;
+    }
+
+    // Parse dos dados atuais
+    const data = JSON.parse(existingResponse.questionnaireData);
+    const currentQuestion = data.currentQuestion || 1;
+
+    // Validar e salvar resposta
+    const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === currentQuestion);
+    if (!question) {
+      console.error(`Pergunta ${currentQuestion} não encontrada`);
+      return;
+    }
+
+    // Adicionar resposta
+    data.answers.push({
+      question: question.number,
+      field: question.field,
+      answer: answer,
+    });
+
+    console.log(`✅ Resposta ${currentQuestion} salva: ${answer}`);
+
+    // Verificar se é a última pergunta
+    if (currentQuestion >= QUESTIONNAIRE_QUESTIONS.length) {
+      console.log('📊 Questionário completo! Finalizando...');
+      await finalizeQuestionnaire(followUp, patient, phone, data.answers, existingResponse.id);
+      return;
+    }
+
+    // Incrementar pergunta e salvar
+    data.currentQuestion = currentQuestion + 1;
+
+    await prisma.followUpResponse.update({
+      where: { id: existingResponse.id },
+      data: {
+        questionnaireData: JSON.stringify(data),
+      },
+    });
+
+    // Enviar próxima pergunta
+    await sendQuestionByNumber(phone, patient, data.currentQuestion);
+
+  } catch (error) {
+    console.error('Error processing questionnaire answer:', error);
+    await sendEmpatheticResponse(
+      phone,
+      'Desculpe, houve um erro ao processar sua resposta. Por favor, tente novamente.'
+    );
+  }
+}
+
+/**
+ * Finaliza o questionário e processa todas as respostas
+ */
+async function finalizeQuestionnaire(
+  followUp: any,
+  patient: any,
+  phone: string,
+  answers: any[],
+  responseId: string
+) {
+  try {
+    console.log('🔄 Finalizando questionário e analisando respostas...');
+
+    // Converter respostas em formato estruturado
+    const questionnaireData = convertAnswersToStructuredData(answers);
+
+    // Detectar red flags deterministicamente
+    const redFlags = detectRedFlags({
+      surgeryType: followUp.surgery.type,
+      dayNumber: followUp.dayNumber,
+      ...questionnaireData,
+    });
+
+    const detectedRedFlagMessages = redFlags.map(rf => rf.message);
+    const deterministicRiskLevel = getRiskLevel(redFlags);
+
+    // Analisar com Claude AI
+    const aiAnalysis = await analyzeFollowUpResponse({
+      surgeryType: followUp.surgery.type,
+      dayNumber: followUp.dayNumber,
+      patientData: {
+        name: patient.name,
+        age: patient.age,
+        sex: patient.sex,
+        comorbidities: [],
+        medications: [],
+      },
+      questionnaireData,
+      detectedRedFlags: detectedRedFlagMessages,
+    });
+
+    // Combinar red flags
+    const allRedFlags = [
+      ...detectedRedFlagMessages,
+      ...aiAnalysis.additionalRedFlags,
+    ];
+
+    // Determinar nível de risco final
+    const riskLevels = ['low', 'medium', 'high', 'critical'];
+    const finalRiskLevel = riskLevels.indexOf(aiAnalysis.riskLevel) > riskLevels.indexOf(deterministicRiskLevel)
+      ? aiAnalysis.riskLevel
+      : deterministicRiskLevel;
+
+    // Atualizar resposta no banco
+    await prisma.followUpResponse.update({
+      where: { id: responseId },
+      data: {
+        questionnaireData: JSON.stringify(questionnaireData),
+        aiAnalysis: JSON.stringify(aiAnalysis),
+        aiResponse: aiAnalysis.empatheticResponse,
+        riskLevel: finalRiskLevel,
+        redFlags: JSON.stringify(allRedFlags),
+      },
+    });
+
+    // Atualizar status do follow-up
+    await prisma.followUp.update({
+      where: { id: followUp.id },
+      data: {
+        status: 'responded',
+        respondedAt: new Date(),
+      },
+    });
+
+    // Enviar resposta empática ao paciente
+    let responseMessage = `✅ *Questionário concluído!*\n\n${aiAnalysis.empatheticResponse}`;
+    if (aiAnalysis.seekCareAdvice) {
+      responseMessage += `\n\n⚠️ ${aiAnalysis.seekCareAdvice}`;
+    }
+
+    await sendEmpatheticResponse(phone, responseMessage);
+
+    // Enviar notificação push
+    await sendPushNotification(patient.userId, {
+      title: 'Paciente Respondeu',
+      body: `${patient.name} respondeu ao questionário D+${followUp.dayNumber}`,
+      url: `/paciente/${patient.id}`,
+      tag: `patient-response-${responseId}`,
+      requireInteraction: false,
+    }).catch(err => console.error('Error sending response push notification:', err));
+
+    // Alertar médico se risco alto ou crítico
+    if (finalRiskLevel === 'high' || finalRiskLevel === 'critical') {
+      await sendDoctorAlert(
+        patient.name,
+        followUp.dayNumber,
+        finalRiskLevel,
+        allRedFlags
+      );
+
+      await prisma.followUpResponse.update({
+        where: { id: responseId },
+        data: {
+          doctorAlerted: true,
+          alertSentAt: new Date(),
+        },
+      });
+
+      await sendPushNotification(patient.userId, {
+        title: `Red Flag: ${patient.name}`,
+        body: `Nível de risco ${finalRiskLevel} detectado em D+${followUp.dayNumber}. ${allRedFlags.length} alerta(s).`,
+        url: `/paciente/${patient.id}`,
+        tag: `red-flag-${responseId}`,
+        requireInteraction: true,
+      }).catch(err => console.error('Error sending push notification:', err));
+    }
+
+    console.log(`✅ Questionário finalizado com sucesso para ${patient.name}`);
+
+  } catch (error) {
+    console.error('Error finalizing questionnaire:', error);
+    await sendEmpatheticResponse(
+      phone,
+      'Obrigado por responder! Recebi suas informações e vou analisá-las com cuidado. ' +
+      'Em caso de qualquer sintoma que te preocupe, não hesite em entrar em contato.'
+    );
+  }
+}
+
+/**
+ * Converte array de respostas em dados estruturados
+ */
+function convertAnswersToStructuredData(answers: any[]): any {
+  const data: any = {};
+
+  for (const ans of answers) {
+    const question = QUESTIONNAIRE_QUESTIONS.find(q => q.field === ans.field);
+    if (!question) continue;
+
+    const answerLower = ans.answer.toLowerCase().trim();
+
+    // Converter baseado no tipo
+    if (question.type === 'number') {
+      const num = parseInt(ans.answer);
+      if (!isNaN(num)) {
+        data[ans.field] = num;
+      }
+    } else if (question.type === 'boolean') {
+      data[ans.field] = answerLower.includes('sim') || answerLower === 's' || answerLower === 'yes';
+    } else {
+      data[ans.field] = ans.answer;
+    }
+  }
+
+  return data;
 }
 
 /**
@@ -205,135 +514,7 @@ async function processInteractiveMessage(message: any, contacts: any[]) {
   }
 }
 
-/**
- * Processa resposta ao questionário de follow-up
- */
-async function processFollowUpResponse(
-  followUp: any,
-  patient: any,
-  responseText: string
-) {
-  try {
-    // Parse da resposta (simplificado - em produção usar NLP)
-    const questionnaireData = parseResponseText(responseText);
-
-    // Detectar red flags deterministicamente
-    const redFlags = detectRedFlags({
-      surgeryType: followUp.surgery.type,
-      dayNumber: followUp.dayNumber,
-      ...questionnaireData,
-    });
-
-    const detectedRedFlagMessages = redFlags.map(rf => rf.message);
-    const deterministicRiskLevel = getRiskLevel(redFlags);
-
-    // Analisar com Claude AI
-    const aiAnalysis = await analyzeFollowUpResponse({
-      surgeryType: followUp.surgery.type,
-      dayNumber: followUp.dayNumber,
-      patientData: {
-        name: patient.name,
-        age: patient.age,
-        sex: patient.sex,
-        comorbidities: [], // TODO: buscar do banco
-        medications: [], // TODO: buscar do banco
-      },
-      questionnaireData,
-      detectedRedFlags: detectedRedFlagMessages,
-    });
-
-    // Combinar red flags
-    const allRedFlags = [
-      ...detectedRedFlagMessages,
-      ...aiAnalysis.additionalRedFlags,
-    ];
-
-    // Determinar nível de risco final (o maior entre determinístico e IA)
-    const riskLevels = ['low', 'medium', 'high', 'critical'];
-    const finalRiskLevel = riskLevels.indexOf(aiAnalysis.riskLevel) > riskLevels.indexOf(deterministicRiskLevel)
-      ? aiAnalysis.riskLevel
-      : deterministicRiskLevel;
-
-    // Salvar resposta no banco
-    const followUpResponse = await prisma.followUpResponse.create({
-      data: {
-        followUpId: followUp.id,
-        userId: patient.userId,
-        questionnaireData: JSON.stringify(questionnaireData),
-        aiAnalysis: JSON.stringify(aiAnalysis),
-        aiResponse: aiAnalysis.empatheticResponse,
-        riskLevel: finalRiskLevel,
-        redFlags: JSON.stringify(allRedFlags),
-      },
-    });
-
-    // Atualizar status do follow-up
-    await prisma.followUp.update({
-      where: { id: followUp.id },
-      data: {
-        status: 'responded',
-        respondedAt: new Date(),
-      },
-    });
-
-    // Enviar resposta empática ao paciente
-    let responseMessage = aiAnalysis.empatheticResponse;
-    if (aiAnalysis.seekCareAdvice) {
-      responseMessage += `\n\n${aiAnalysis.seekCareAdvice}`;
-    }
-
-    await sendEmpatheticResponse(patient.phone, responseMessage);
-
-    // Enviar notificação push informando que paciente respondeu
-    await sendPushNotification(patient.userId, {
-      title: 'Paciente Respondeu',
-      body: `${patient.name} respondeu ao questionário D+${followUp.dayNumber}`,
-      url: `/paciente/${patient.id}`,
-      tag: `patient-response-${followUpResponse.id}`,
-      requireInteraction: false,
-    }).catch(err => console.error('Error sending response push notification:', err));
-
-
-    // Alertar médico se risco alto ou crítico
-    if (finalRiskLevel === 'high' || finalRiskLevel === 'critical') {
-      await sendDoctorAlert(
-        patient.name,
-        followUp.dayNumber,
-        finalRiskLevel,
-        allRedFlags
-      );
-
-      await prisma.followUpResponse.update({
-        where: { id: followUpResponse.id },
-        data: {
-          doctorAlerted: true,
-          alertSentAt: new Date(),
-        },
-      });
-
-      // Enviar notificação push para o médico
-      await sendPushNotification(patient.userId, {
-        title: `Red Flag: ${patient.name}`,
-        body: `Nível de risco ${finalRiskLevel} detectado em D+${followUp.dayNumber}. ${allRedFlags.length} alerta(s).`,
-        url: `/paciente/${patient.id}`,
-        tag: `red-flag-${followUpResponse.id}`,
-        requireInteraction: true,
-      }).catch(err => console.error('Error sending push notification:', err));
-    }
-
-    console.log(`Follow-up response processed successfully for patient ${patient.id}`);
-
-  } catch (error) {
-    console.error('Error processing follow-up response:', error);
-
-    // Enviar mensagem de erro ao paciente
-    await sendEmpatheticResponse(
-      patient.phone,
-      'Desculpe, houve um erro ao processar sua resposta. ' +
-      'Por favor, tente novamente ou entre em contato com o consultório.'
-    ).catch(err => console.error('Error sending error message:', err));
-  }
-}
+// Função processFollowUpResponse removida - agora usamos fluxo interativo (processQuestionnaireAnswer + finalizeQuestionnaire)
 
 /**
  * Encontra paciente pelo telefone

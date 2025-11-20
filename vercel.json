@@ -3,6 +3,18 @@
     {
       "path": "/api/cron/send-followups",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/check-overdue-followups",
+      "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/renew-whatsapp-token",
+      "schedule": "0 0 1 * *"
+    },
+    {
+      "path": "/api/cron/check-token",
+      "schedule": "0 0 * * 0"
     }
   ]
 }
