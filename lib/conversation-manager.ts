@@ -217,23 +217,27 @@ export async function startQuestionnaireCollection(
   surgery: Surgery
 ) {
   const conversation = await getOrCreateConversation(phoneNumber, patient.id);
+  const context = conversation.context as ConversationContext;
+
+  // Calcular dias pós-operatórios
+  const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
   // Atualizar estado para coleta de respostas
   await updateConversationState(
     conversation.id,
     'collecting_answers',
     {
-      currentQuestion: 1,
+      followUpId: context.followUpId,
       answers: {}
     }
   );
 
-  // Enviar primeira pergunta
-  const questions = getQuestions(surgery.type);
-  const firstQuestion = questions[0];
+  // Enviar saudação inicial usando IA conversacional
+  const { getInitialGreeting } = await import('./conversational-ai');
+  const greeting = getInitialGreeting(patient, surgery, daysPostOp + 1);
 
-  await sendMessage(phoneNumber, firstQuestion.text);
-  await recordSystemMessage(conversation.id, firstQuestion.text);
+  await sendMessage(phoneNumber, greeting);
+  await recordSystemMessage(conversation.id, greeting);
 }
 
 /**
@@ -275,18 +279,14 @@ function getQuestions(surgeryType: string) {
 }
 
 /**
- * Processa resposta do paciente durante questionário
+ * Processa resposta do paciente durante questionário usando IA conversacional
  */
 export async function processQuestionnaireAnswer(
   phoneNumber: string,
   answer: string
-): Promise<{ completed: boolean; nextQuestion?: string }> {
+): Promise<{ completed: boolean; nextQuestion?: string; needsDoctorAlert?: boolean }> {
   const conversation = await getOrCreateConversation(phoneNumber);
   const context = conversation.context as ConversationContext;
-
-  if (!context.currentQuestion || !context.answers) {
-    throw new Error('Questionário não iniciado');
-  }
 
   // Registrar resposta
   await recordUserMessage(conversation.id, answer);
@@ -307,61 +307,59 @@ export async function processQuestionnaireAnswer(
   }
 
   const surgery = patient.surgeries[0];
-  const questions = getQuestions(surgery.type);
-  const currentQuestionIndex = context.currentQuestion - 1;
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentData = context.answers || {};
 
-  // Salvar resposta
-  const updatedAnswers = {
-    ...context.answers,
-    [currentQuestion.id]: answer
-  };
+  // Obter histórico de conversação
+  const messageHistory = (conversation.messageHistory as any[]) || [];
+  const conversationMessages = messageHistory
+    .slice(-10) // Últimas 10 mensagens para contexto
+    .map(msg => ({
+      role: msg.role === 'system' ? 'assistant' : msg.role,
+      content: msg.content,
+      timestamp: msg.timestamp
+    }));
 
-  // Verificar se há mais perguntas
-  const nextQuestionIndex = context.currentQuestion;
-  const hasMoreQuestions = nextQuestionIndex < questions.length;
+  // Usar IA conversacional para processar resposta
+  const { conductConversation } = await import('./conversational-ai');
+  const result = await conductConversation(
+    answer,
+    patient,
+    surgery,
+    conversationMessages,
+    currentData
+  );
 
-  if (hasMoreQuestions) {
-    // Próxima pergunta
-    const nextQuestion = questions[nextQuestionIndex];
+  // Atualizar dados coletados
+  await updateConversationState(
+    conversation.id,
+    result.isComplete ? 'completed' : 'collecting_answers',
+    {
+      followUpId: context.followUpId,
+      answers: result.updatedData
+    }
+  );
 
-    await updateConversationState(
-      conversation.id,
-      'collecting_answers',
-      {
-        currentQuestion: nextQuestionIndex + 1,
-        answers: updatedAnswers
-      }
-    );
+  // Enviar resposta da IA
+  await sendMessage(phoneNumber, result.aiResponse);
+  await recordSystemMessage(conversation.id, result.aiResponse);
 
-    await sendMessage(phoneNumber, nextQuestion.text);
-    await recordSystemMessage(conversation.id, nextQuestion.text);
-
-    return {
-      completed: false,
-      nextQuestion: nextQuestion.text
-    };
-  } else {
-    // Questionário completo
-    await updateConversationState(
-      conversation.id,
-      'completed',
-      {
-        answers: updatedAnswers
-      }
-    );
-
+  if (result.isComplete) {
     // Salvar respostas no FollowUp
     if (context.followUpId) {
-      await saveQuestionnaireResponse(context.followUpId, updatedAnswers, patient.userId);
+      await saveQuestionnaireResponse(
+        context.followUpId,
+        result.updatedData,
+        patient.userId,
+        result.urgencyLevel
+      );
     }
 
     // Enviar mensagem de agradecimento
     const thankYouMessage =
-      '✅ Obrigado por responder ao questionário!\n\n' +
-      'Recebi suas informações e vou analisá-las com cuidado.\n\n' +
-      'Em caso de qualquer sintoma que te preocupe, não hesite em entrar em contato.\n\n' +
-      '⚕️ Dr. João Vitor';
+      '✅ Perfeito! Muito obrigada por compartilhar essas informações comigo.\n\n' +
+      'Vou passar tudo para o Dr. João Vitor. Ele vai analisar com atenção e, se necessário, entrará em contato com você.\n\n' +
+      'Lembre-se: se sentir qualquer sintoma que te preocupe, pode me mandar mensagem a qualquer momento. Estou aqui para ajudar! 😊\n\n' +
+      'Boa recuperação! 💙';
 
     await sendMessage(phoneNumber, thankYouMessage);
     await recordSystemMessage(conversation.id, thankYouMessage);
@@ -370,16 +368,22 @@ export async function processQuestionnaireAnswer(
     setTimeout(async () => {
       await updateConversationState(conversation.id, 'idle', {
         followUpId: undefined,
-        currentQuestion: undefined,
         answers: undefined,
         templateSent: false
       });
     }, 60000);
 
     return {
-      completed: true
+      completed: true,
+      needsDoctorAlert: result.needsDoctorAlert
     };
   }
+
+  return {
+    completed: false,
+    nextQuestion: result.aiResponse,
+    needsDoctorAlert: result.needsDoctorAlert
+  };
 }
 
 /**
@@ -388,7 +392,8 @@ export async function processQuestionnaireAnswer(
 async function saveQuestionnaireResponse(
   followUpId: string,
   answers: Record<string, any>,
-  userId: string
+  userId: string,
+  urgencyLevel: string = 'low'
 ) {
   // Atualizar status do follow-up
   await prisma.followUp.update({
@@ -399,13 +404,23 @@ async function saveQuestionnaireResponse(
     }
   });
 
+  // Mapear níveis de urgência
+  const riskLevelMap: Record<string, string> = {
+    'low': 'low',
+    'medium': 'medium',
+    'high': 'high',
+    'critical': 'critical'
+  };
+
+  const riskLevel = riskLevelMap[urgencyLevel] || 'low';
+
   // Criar resposta de follow-up
   await prisma.followUpResponse.create({
     data: {
       userId,
       followUpId,
       questionnaireData: JSON.stringify(answers),
-      riskLevel: 'low' // Será analisado pela IA depois
+      riskLevel
     }
   });
 
