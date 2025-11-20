@@ -75,6 +75,10 @@ export async function conductConversation(
   isComplete: boolean;
   needsDoctorAlert: boolean;
   urgencyLevel: string;
+  sendImages?: {
+    painScale?: boolean;
+    bristolScale?: boolean;
+  };
 }> {
   // Calcular dias pós-operatórios
   const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
@@ -135,18 +139,14 @@ CONTEXTO DO PACIENTE:
       EVACUAÇÃO (MUITO IMPORTANTE):
       - Pergunte: "Você evacuou desde a última vez que conversamos?"
       - Se SIM:
+        * Primeiro: ENVIAR IMAGEM da escala visual analógica de dor
         * Pergunte dor durante evacuação: "Qual foi a dor durante a evacuação? De 0 a 10"
-        * Pergunte consistência usando ESCALA DE BRISTOL COMPLETA (7 opções):
-          1 - Pedaços duros separados, como nozes (muito constipado)
-          2 - Em forma de salsicha, mas com pedaços
-          3 - Salsicha com rachaduras na superfície
-          4 - Salsicha lisa e macia (IDEAL)
-          5 - Pedaços macios com bordas definidas
-          6 - Pedaços fofos com bordas irregulares
-          7 - Aquosa, sem pedaços sólidos (diarreia)
+        * Depois: ENVIAR IMAGEM da Escala de Bristol
+        * Pergunte consistência: "Olhando a imagem que acabei de enviar, qual número de 1 a 7 mais se parece com suas fezes?"
       - Se NÃO: pergunte "Quando foi a última vez que você evacuou?"
       - ⚠️ SEMPRE pergunte "evacuou desde a última vez que conversamos?"
       - ⚠️ NUNCA pergunte "evacuou hoje" ou "evacuou desde ontem"
+      - ⚠️ NUNCA descreva a escala com texto, SEMPRE enviar a IMAGEM
 
       SANGRAMENTO:
       - Nenhum
@@ -225,13 +225,20 @@ RESPONDA APENAS COM JSON:
     "painControlledWithMeds": false,
     // ... outros campos conforme coletados
   },
+  "sendImages": {
+    "painScale": false,  // true se precisa enviar escala de dor
+    "bristolScale": false  // true se precisa enviar escala de Bristol
+  },
   "isComplete": false,
   "urgency": "low|medium|high|critical",
   "needsDoctorAlert": false
 }
 
-⚠️ IMPORTANTE: Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
-             Não invente ou assuma valores. Se paciente não respondeu algo, não incluir no JSON.`;
+⚠️ IMPORTANTE:
+- Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
+- Não invente ou assuma valores. Se paciente não respondeu algo, não incluir no JSON.
+- Use sendImages.painScale: true ANTES de perguntar sobre dor (em repouso ou durante evacuação)
+- Use sendImages.bristolScale: true ANTES de perguntar sobre consistência das fezes`;
 
   try {
     // Construir mensagens para Claude
@@ -283,7 +290,8 @@ RESPONDA APENAS COM JSON:
       updatedData,
       isComplete: result.isComplete || false,
       needsDoctorAlert: result.needsDoctorAlert || false,
-      urgencyLevel: result.urgency || 'low'
+      urgencyLevel: result.urgency || 'low',
+      sendImages: result.sendImages
     };
 
   } catch (error) {

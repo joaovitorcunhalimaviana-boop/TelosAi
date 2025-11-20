@@ -329,6 +329,35 @@ export async function processQuestionnaireAnswer(
     currentData
   );
 
+  // Enviar imagens se a IA solicitou
+  if (result.sendImages) {
+    const { sendImage } = await import('./whatsapp');
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://proactive-rejoicing-production.up.railway.app';
+
+    try {
+      if (result.sendImages.painScale) {
+        await sendImage(
+          phoneNumber,
+          `${baseUrl}/escala-dor.png`,
+          'Escala Visual Analógica de Dor (0-10)'
+        );
+        console.log('✅ Pain scale image sent');
+      }
+
+      if (result.sendImages.bristolScale) {
+        await sendImage(
+          phoneNumber,
+          `${baseUrl}/escala-bristol.png`,
+          'Escala de Bristol - Tipos de Fezes (1-7)'
+        );
+        console.log('✅ Bristol scale image sent');
+      }
+    } catch (error) {
+      console.error('❌ Error sending images:', error);
+      // Continuar mesmo se falhar
+    }
+  }
+
   // Atualizar dados coletados
   await updateConversationState(
     conversation.id,
