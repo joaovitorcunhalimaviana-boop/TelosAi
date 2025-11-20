@@ -32,6 +32,9 @@ export interface PatientCard {
   researchGroup: string | null // Research group name
   researchDataComplete: boolean // Research fields validation
   researchMissingFieldsCount: number // Number of missing required fields
+  latestResponse?: {
+    riskLevel: "low" | "medium" | "high" | "critical"
+  } | null
 }
 
 export interface DashboardFilters {
@@ -287,6 +290,9 @@ export async function getDashboardPatients(
       researchGroup: surgery.patient.researchGroup,
       researchDataComplete,
       researchMissingFieldsCount,
+      latestResponse: latestResponse ? {
+        riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical"
+      } : null,
     }
   })
 

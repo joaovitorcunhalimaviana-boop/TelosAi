@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { sendMessage, markAsRead, sendDoctorAlert } from "@/lib/whatsapp"
 import { analyzePatientMessage, formatDoctorAlert } from "@/lib/claude-analyzer"
 import { prisma } from "@/lib/prisma"
-import { validateHubChallenge } from "@/lib/security/webhook-validator"
+import { validateHubChallenge, validateWhatsAppSignature } from "@/lib/security/webhook-validator"
 import {
   getOrCreateConversation,
   recordUserMessage,
@@ -51,7 +51,24 @@ export async function GET(request: NextRequest) {
 // POST - Recebe mensagens
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    // 1. VALIDAÇÃO DE SEGURANÇA: Verificar signature do webhook
+    const signature = request.headers.get('x-hub-signature-256')
+    const appSecret = process.env.WHATSAPP_APP_SECRET
+
+    // Pegar o body RAW para validação de signature
+    const rawBody = await request.text()
+
+    // Validar signature (protege contra requisições falsas)
+    if (appSecret && !validateWhatsAppSignature(signature, rawBody, appSecret)) {
+      console.error('❌ Invalid webhook signature - rejecting request')
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 403 }
+      )
+    }
+
+    // Parsear o body JSON após validação
+    const body = JSON.parse(rawBody)
 
     console.log("📩 Webhook received:", JSON.stringify(body, null, 2))
 

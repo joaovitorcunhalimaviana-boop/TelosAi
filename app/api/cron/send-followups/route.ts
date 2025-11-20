@@ -1,11 +1,12 @@
 /**
  * Vercel Cron Job - Send Follow-ups
- * Runs daily at 10:00 AM to send scheduled follow-up questionnaires
+ * Runs daily at 10:00 AM BRT (Brasília Time) to send scheduled follow-up questionnaires
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
 
 const CRON_SECRET = process.env.CRON_SECRET!;
 
@@ -38,9 +39,12 @@ export async function GET(request: NextRequest) {
 
     console.log('Starting follow-up cron job...');
 
-    // Data de hoje (início e fim do dia)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Data de hoje no horário de Brasília (início e fim do dia)
+    const nowInBrazil = toBrasiliaTime(new Date());
+    nowInBrazil.setHours(0, 0, 0, 0);
+
+    // Converter para UTC para comparar com o banco
+    const today = fromBrasiliaTime(nowInBrazil);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -252,15 +256,16 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Calculates next run time (informational)
+ * Returns the next scheduled time in BRT (Brasília Time)
  */
 function getNextRunInfo(): string {
-  const now = new Date();
-  const next = new Date();
-  next.setHours(10, 0, 0, 0);
+  const nowInBrazil = toBrasiliaTime(new Date());
+  const nextInBrazil = new Date(nowInBrazil);
+  nextInBrazil.setHours(10, 0, 0, 0);
 
-  if (now.getHours() >= 10) {
-    next.setDate(next.getDate() + 1);
+  if (nowInBrazil.getHours() >= 10) {
+    nextInBrazil.setDate(nextInBrazil.getDate() + 1);
   }
 
-  return next.toISOString();
+  return fromBrasiliaTime(nextInBrazil).toISOString();
 }

@@ -5,8 +5,10 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { toBrasiliaTime, fromBrasiliaTime, BRASILIA_TZ } from '@/lib/date-utils';
 
 const FOLLOW_UP_DAYS = [1, 2, 3, 5, 7, 10, 14];
+const SEND_HOUR = 10; // 10:00 BRT (horário de Brasília)
 
 interface CreateFollowUpScheduleParams {
   patientId: string;
@@ -26,15 +28,23 @@ export async function createFollowUpSchedule({
 }: CreateFollowUpScheduleParams) {
   try {
     const followUpsData = FOLLOW_UP_DAYS.map((dayNumber) => {
+      // Adiciona o número de dias à data da cirurgia
       const scheduledDate = new Date(surgeryDate);
       scheduledDate.setDate(scheduledDate.getDate() + dayNumber);
+
+      // Converter para timezone do Brasil
+      const zonedDate = toBrasiliaTime(scheduledDate);
+      zonedDate.setHours(SEND_HOUR, 0, 0, 0);
+
+      // Converter de volta para UTC para salvar no banco
+      const utcDate = fromBrasiliaTime(zonedDate);
 
       return {
         surgeryId,
         patientId,
         userId,
         dayNumber,
-        scheduledDate,
+        scheduledDate: utcDate,
         status: 'pending',
       };
     });
@@ -74,8 +84,12 @@ export async function getPendingFollowUps(patientId: string) {
  * Obtém os follow-ups que devem ser enviados hoje
  */
 export async function getTodayFollowUps(userId: string) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Obter data atual no timezone do Brasil
+  const nowInBrazil = toBrasiliaTime(new Date());
+  nowInBrazil.setHours(0, 0, 0, 0);
+
+  // Converter para UTC para comparar com o banco
+  const today = fromBrasiliaTime(nowInBrazil);
 
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);

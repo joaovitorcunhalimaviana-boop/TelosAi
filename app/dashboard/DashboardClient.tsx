@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -288,6 +289,12 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
   const handlePhoneClick = (phone: string) => {
     window.open(`tel:${phone.replace(/\D/g, '')}`, '_self')
   }
+
+  // Filter critical patients for alert
+  const criticalPatients = patients.filter(p =>
+    p.latestResponse?.riskLevel === 'critical' ||
+    p.latestResponse?.riskLevel === 'high'
+  )
 
   if (loading) {
     return (
@@ -794,6 +801,17 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
         {/* Seção de Pacientes em Acompanhamento */}
         <FadeIn delay={0.9}>
+          {/* Critical Patients Alert */}
+          {criticalPatients.length > 0 && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>⚠️ {criticalPatients.length} PACIENTES CRÍTICOS</AlertTitle>
+              <AlertDescription>
+                Requerem atenção médica imediata
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex items-center gap-2 mb-4">
             <UserCheck className="h-6 w-6 text-blue-600" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -834,6 +852,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               <AnimatePresence mode="popLayout">
               {patients.map((patient, index) => {
                 const riskLevel = getPatientRiskLevel(patient)
+                const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
                 return (
                 <StaggerItem key={patient.id}>
                   <motion.div
@@ -845,7 +864,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                   >
                     <ScaleOnHover scale={1.02}>
                       <Card
-                        className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative`}
+                        className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative ${
+                          isCritical ? 'bg-red-50 border-l-4 border-l-red-600' : ''
+                        }`}
                       >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-3">
