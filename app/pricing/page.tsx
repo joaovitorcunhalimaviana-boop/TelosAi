@@ -45,6 +45,78 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Why Invest Section */}
+      <section className="py-16 bg-white relative z-10">
+        <div className="container mx-auto px-6">
+          <FadeIn delay={0.15} direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-telos-blue mb-4">
+                Por que Investir no Telos.AI?
+              </h2>
+              <p className="text-xl text-gray-600">
+                O investimento se paga sozinho. Veja como:
+              </p>
+            </div>
+          </FadeIn>
+
+          <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+            <FadeIn delay={0.2} direction="up">
+              <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border-2 border-gray-200 hover-lift-strong card-shine flex flex-col">
+                <div className="w-16 h-16 bg-telos-blue/10 rounded-2xl flex items-center justify-center mb-6">
+                  <span className="text-4xl">💰</span>
+                </div>
+                <h3 className="text-2xl font-bold text-telos-blue mb-4">
+                  Evite Custos
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-4 flex-grow">
+                  Uma complicação com reinternação <span className="font-bold text-telos-blue">custa caro</span>
+                  ao sistema de saúde e ao seu paciente.
+                </p>
+                <p className="text-lg font-semibold text-telos-blue">
+                  Evitar apenas 1 complicação por ano já paga o sistema completo.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={0.25} direction="up">
+              <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border-2 border-gray-200 hover-lift-strong card-shine flex flex-col">
+                <div className="w-16 h-16 bg-telos-blue/10 rounded-2xl flex items-center justify-center mb-6">
+                  <span className="text-4xl">⏰</span>
+                </div>
+                <h3 className="text-2xl font-bold text-telos-blue mb-4">
+                  Economize Tempo
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-4 flex-grow">
+                  Economize <span className="font-bold text-telos-blue">10+ horas por semana</span> em
+                  ligações manuais, planilhas e anotações.
+                </p>
+                <p className="text-lg font-semibold text-telos-blue">
+                  Mais tempo para cirurgias, família e qualidade de vida.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={0.3} direction="up">
+              <div className="h-full bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border-2 border-telos-gold hover-lift-strong card-shine flex flex-col">
+                <div className="w-16 h-16 bg-telos-gold/20 rounded-2xl flex items-center justify-center mb-6">
+                  <span className="text-4xl">🚀</span>
+                </div>
+                <h3 className="text-2xl font-bold text-telos-blue mb-4">
+                  Diferencial Competitivo
+                </h3>
+                <p className="text-gray-700 leading-relaxed mb-4 flex-grow">
+                  Seja o cirurgião que usa <span className="font-bold text-telos-gold">Inteligência Artificial</span> no
+                  acompanhamento.
+                </p>
+                <p className="text-lg font-semibold text-telos-gold">
+                  Pacientes escolhem inovação, tecnologia e cuidado proativo.
+                </p>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
       {/* Price Calculator */}
       <section className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-6">
@@ -86,7 +158,12 @@ export default function PricingPage() {
 
               <div className="grid md:grid-cols-3 gap-6 mt-8">
                 {/* Founding Members */}
-                <div className="p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold hover-lift-strong card-shine animate-fade-in animation-delay-200 animate-glow-pulse-strong">
+                <div className="relative p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold hover-lift-strong card-shine animate-fade-in animation-delay-200 animate-glow-pulse-strong">
+                  {/* Badge PREÇO VITALÍCIO */}
+                  <div className="absolute -top-3 -right-3 bg-telos-gold text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg transform rotate-12 animate-pulse">
+                    🔒 PREÇO VITALÍCIO
+                  </div>
+
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <svg className="w-6 h-6 text-telos-gold hover-tilt animate-scale-bounce neon-gold" fill="currentColor" viewBox="0 0 20 20">
@@ -107,9 +184,16 @@ export default function PricingPage() {
                     R$ {foundingPrice.toLocaleString('pt-BR')}
                     <span className="text-sm text-gray-600 font-normal">/mês</span>
                   </div>
-                  <p className="text-xs text-telos-gold font-semibold mt-2">
-                    🔒 Preço VITALÍCIO garantido
-                  </p>
+
+                  {/* Destaque de Economia */}
+                  <div className="mt-4 p-3 bg-green-50 border-2 border-green-300 rounded-lg">
+                    <p className="text-sm font-bold text-green-700 text-center">
+                      💰 Economize R$ {(professionalPrice - foundingPrice).toLocaleString('pt-BR')}/mês
+                    </p>
+                    <p className="text-xs text-green-600 text-center mt-1">
+                      PARA SEMPRE
+                    </p>
+                  </div>
                 </div>
 
                 {/* Early Adopter */}
@@ -228,6 +312,141 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Investment Comparison Section */}
+      <section className="py-16 bg-gradient-to-br from-telos-blue/5 to-telos-gold/5 relative z-10">
+        <div className="container mx-auto px-6">
+          <FadeIn delay={0.1} direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-telos-blue mb-4">
+                Comparativo de Investimento
+              </h2>
+              <p className="text-xl text-gray-600">
+                Veja como o Telos.AI se paga sozinho
+              </p>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.2} direction="up">
+            <div className="max-w-5xl mx-auto overflow-x-auto">
+              <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-100 overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-telos-blue to-telos-blue/90">
+                    <tr>
+                      <th className="py-5 px-6 text-left text-lg font-bold text-white">
+                        Item
+                      </th>
+                      <th className="py-5 px-6 text-center text-lg font-bold text-telos-gold">
+                        Founding Member
+                      </th>
+                      <th className="py-5 px-6 text-center text-lg font-bold text-white">
+                        Early Adopter
+                      </th>
+                      <th className="py-5 px-6 text-center text-lg font-bold text-white/80">
+                        Profissional
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
+                      <td className="py-5 px-6 font-semibold text-telos-blue">
+                        Custo mensal (3 pacientes)
+                      </td>
+                      <td className="py-5 px-6 text-center">
+                        <span className="text-2xl font-bold text-telos-gold">R$ 400</span>
+                      </td>
+                      <td className="py-5 px-6 text-center">
+                        <span className="text-2xl font-bold text-telos-blue">R$ 500</span>
+                      </td>
+                      <td className="py-5 px-6 text-center">
+                        <span className="text-2xl font-bold text-gray-600">R$ 950</span>
+                      </td>
+                    </tr>
+
+                    <tr className="border-b border-gray-100 bg-red-50/30">
+                      <td className="py-5 px-6 font-semibold text-red-700">
+                        Custo de 1 complicação evitada
+                      </td>
+                      <td colSpan={3} className="py-5 px-6 text-center">
+                        <span className="text-3xl font-bold text-red-600">Alto custo</span>
+                        <p className="text-sm text-gray-600 mt-1">(reinternação + reoperação)</p>
+                      </td>
+                    </tr>
+
+                    <tr className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
+                      <td className="py-5 px-6 font-semibold text-telos-blue">
+                        Horas economizadas/semana
+                      </td>
+                      <td colSpan={3} className="py-5 px-6 text-center">
+                        <span className="text-2xl font-bold text-blue-600">~10 horas</span>
+                        <p className="text-sm text-gray-600 mt-1">em ligações e acompanhamento manual</p>
+                      </td>
+                    </tr>
+
+                    <tr className="border-b border-gray-100 bg-green-50/30">
+                      <td className="py-5 px-6 font-semibold text-green-700">
+                        Valor do tempo economizado
+                      </td>
+                      <td colSpan={3} className="py-5 px-6 text-center">
+                        <span className="text-3xl font-bold text-green-600">R$ 8.000/mês</span>
+                        <p className="text-sm text-gray-600 mt-1">(10h/semana × R$ 200/h × 4 semanas)</p>
+                      </td>
+                    </tr>
+
+                    <tr className="bg-gradient-to-r from-telos-gold/10 to-yellow-50">
+                      <td className="py-6 px-6 font-bold text-telos-blue text-lg">
+                        ROI (Retorno sobre Investimento)
+                      </td>
+                      <td className="py-6 px-6 text-center">
+                        <div className="inline-block bg-telos-gold text-white px-6 py-3 rounded-xl">
+                          <span className="text-2xl font-bold">+1.900%</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                      </td>
+                      <td className="py-6 px-6 text-center">
+                        <div className="inline-block bg-telos-blue text-white px-6 py-3 rounded-xl">
+                          <span className="text-2xl font-bold">+1.500%</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                      </td>
+                      <td className="py-6 px-6 text-center">
+                        <div className="inline-block bg-gray-600 text-white px-6 py-3 rounded-xl">
+                          <span className="text-2xl font-bold">+740%</span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Conclusão */}
+              <div className="mt-8 p-8 bg-white rounded-2xl border-2 border-telos-gold shadow-xl">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-telos-gold/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-8 h-8 text-telos-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-bold text-telos-blue mb-3">
+                      Conclusão: O Investimento se Paga Sozinho
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed mb-3">
+                      Evitando apenas <span className="font-bold text-red-600">1 complicação por ano</span>, você já recupera
+                      completamente o investimento anual no Telos.AI. Uma complicação custa muito caro ao sistema e ao paciente.
+                    </p>
+                    <p className="text-gray-700 leading-relaxed">
+                      Além disso, as <span className="font-bold text-blue-600">10 horas/semana economizadas</span> permitem realizar
+                      mais cirurgias, aumentar sua receita ou simplesmente ter mais qualidade de vida.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </FadeIn>
         </div>
       </section>

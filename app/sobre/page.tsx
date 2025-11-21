@@ -2,49 +2,13 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { TelosHeader } from "@/components/TelosHeader"
 import { FadeIn } from "@/components/animations/FadeIn"
 
 export default function SobrePage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Simples */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
-        <div className="container mx-auto flex h-20 items-center justify-between px-6">
-          <Link href="/" className="group">
-            <div className="flex items-baseline gap-0.5">
-              <span className="telos-brand text-2xl text-telos-blue group-hover:text-telos-gold transition-colors">Telos</span>
-              <span className="telos-ai text-2xl text-telos-gold">.AI</span>
-            </div>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-sm font-medium text-gray-600 hover:text-telos-blue transition-colors">
-              Início
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-telos-blue transition-colors">
-              Preços
-            </Link>
-            <Link href="/sobre" className="text-sm font-medium text-telos-blue font-semibold border-b-2 border-telos-gold pb-1">
-              Sobre
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 text-telos-blue hover:text-telos-gold font-medium transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/cadastro-medico?plan=professional"
-              className="hidden sm:flex items-center gap-2 px-6 py-3 bg-telos-blue text-white rounded-lg font-medium hover:bg-opacity-90 transition-all shadow-md"
-            >
-              Começar Agora
-            </Link>
-          </div>
-        </div>
-      </header>
+      <TelosHeader />
 
       {/* Hero Section */}
       <section className="py-20 bg-white relative overflow-hidden">
@@ -182,10 +146,10 @@ export default function SobrePage() {
                     prática na medicina baseada em evidências.
                   </p>
                   <p className="text-justify">
-                    Após anos acompanhando pacientes e identificando desafios no follow-up
-                    tradicional, decidiu unir sua experiência clínica, formação científica e visão
-                    de inovação para criar uma solução que pudesse beneficiar médicos e pacientes
-                    em todo o Brasil, democratizando o acesso à tecnologia de ponta no cuidado pós-operatório.
+                    Frustrado com a dificuldade de acompanhar dezenas de pacientes pós-operatórios simultaneamente
+                    de forma personalizada e eficiente, decidiu unir sua experiência clínica, formação científica
+                    e visão de inovação para criar uma solução que pudesse beneficiar médicos e pacientes em todo
+                    o Brasil, democratizando o acesso à tecnologia de ponta no cuidado pós-operatório.
                   </p>
                 </div>
 
@@ -259,6 +223,143 @@ export default function SobrePage() {
                   Facilitar a produção científica através de dados organizados, anonimizados
                   e prontos para pesquisa.
                 </p>
+              </div>
+              </FadeIn>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visão de Futuro */}
+      <section className="py-20 bg-gray-50 relative overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto space-y-12">
+            <FadeIn delay={0.1} direction="up">
+            <h2 className="text-3xl font-bold text-telos-blue text-center">Visão de Futuro</h2>
+            </FadeIn>
+
+            <FadeIn delay={0.2} direction="up">
+            <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
+              <p className="text-justify">
+                <strong className="text-telos-blue">O futuro da medicina é colaborativo e orientado por dados.</strong> Acreditamos
+                que a Inteligência Artificial não substitui o médico, mas amplifica sua capacidade de análise,
+                predição e tomada de decisão. No pós-operatório, onde cada hora conta, essa transformação
+                digital pode significar a diferença entre detectar uma complicação a tempo ou enfrentar
+                uma emergência evitável.
+              </p>
+
+              <p className="text-justify">
+                Machine Learning e IA estão revolucionando o acompanhamento pós-operatório ao identificar
+                padrões invisíveis ao olho humano. Nosso sistema analisa milhares de respostas de pacientes,
+                aprende com cada caso e aprimora continuamente sua capacidade de alertar médicos sobre
+                sinais precoces de complicações.
+              </p>
+
+              <p className="text-justify">
+                Mais do que isso, estamos construindo uma <strong className="text-telos-gold">inteligência coletiva</strong>: cada médico
+                que usa Telos.AI contribui para um sistema que aprende com a experiência de centenas
+                de profissionais. Isso significa que decisões clínicas se tornam mais precisas, guidelines
+                se adaptam à realidade brasileira, e o conhecimento médico se multiplica exponencialmente.
+              </p>
+
+              <p className="text-justify">
+                Tudo isso fundamentado nos pilares da <strong className="text-telos-blue">ética e da LGPD</strong>. Seus dados e os
+                de seus pacientes são criptografados com SHA-256, anonimizados para pesquisa científica,
+                e jamais compartilhados sem consentimento explícito. A tecnologia deve servir à medicina,
+                não o contrário — e isso começa com transparência, segurança e respeito à privacidade.
+              </p>
+            </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* Por que Telos.AI é Diferente */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto space-y-12">
+            <FadeIn delay={0.1} direction="up">
+            <h2 className="text-3xl font-bold text-telos-blue text-center">Por que Telos.AI é Diferente</h2>
+            </FadeIn>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <FadeIn delay={0.2} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-telos-blue rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-telos-blue">Machine Learning Preditivo</h3>
+                    <p className="text-gray-700 leading-relaxed text-justify">
+                      Não apenas coletamos dados — <strong>prevemos complicações</strong>. Nosso sistema
+                      de IA analisa respostas em tempo real e identifica padrões de risco antes
+                      que sintomas graves apareçam. É medicina preventiva de verdade.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              </FadeIn>
+
+              <FadeIn delay={0.3} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-gray-100 hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-telos-blue">Inteligência Coletiva</h3>
+                    <p className="text-gray-700 leading-relaxed text-justify">
+                      Cada médico que usa Telos.AI contribui para um sistema que <strong>aprende
+                      com múltiplos profissionais</strong>. Sua experiência clínica ajuda a melhorar
+                      os alertas para toda a comunidade médica. Juntos, somos mais fortes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              </FadeIn>
+
+              <FadeIn delay={0.4} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-gray-100 hover:border-telos-blue hover-lift-strong transition-smooth shadow-lg card-shine">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-telos-blue rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-telos-blue">IA Conversacional Real</h3>
+                    <p className="text-gray-700 leading-relaxed text-justify">
+                      Powered by <strong>Claude Sonnet 4.5</strong>, a IA mais avançada da Anthropic.
+                      Conversas naturais com pacientes, compreensão de contexto médico, e análise
+                      de sintomas que vai muito além de chatbots simples. É inteligência de verdade.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              </FadeIn>
+
+              <FadeIn delay={0.5} direction="up">
+              <div className="group h-full p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-gray-100 hover:border-telos-gold hover-lift-strong transition-smooth shadow-lg card-shine">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-telos-gold rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-telos-blue">LGPD-Compliant desde o Dia 1</h3>
+                    <p className="text-gray-700 leading-relaxed text-justify">
+                      Criptografia <strong>SHA-256</strong> de ponta a ponta, anonimização automática
+                      para pesquisas, consentimento explícito em cada etapa. Segurança e privacidade
+                      não são recursos opcionais — são fundamentos do nosso sistema.
+                    </p>
+                  </div>
+                </div>
               </div>
               </FadeIn>
             </div>

@@ -48,10 +48,10 @@ export default function Home() {
 
               <FadeIn delay={0.3} direction="up">
                 <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl text-justify">
-                  Monitore seus pacientes com análise automática de riscos e alertas em tempo real via WhatsApp.
-                  <span className="font-semibold text-telos-blue"> Detecção precoce de complicações.</span>{" "}
-                  <span className="font-semibold text-telos-blue">Coleta automática de dados.</span>{" "}
-                  <span className="font-semibold text-telos-blue">Mais tempo para você.</span>
+                  Monitore seus pacientes através de <span className="font-semibold text-telos-blue">inteligência artificial conversacional via WhatsApp</span>,
+                  enquanto nosso <span className="font-semibold text-telos-gold">sistema de Machine Learning analisa mais de 15 variáveis clínicas para prever complicações</span>.
+                  Com <span className="font-semibold text-telos-blue">inteligência coletiva LGPD-compliant</span>, o sistema aprende continuamente
+                  e entrega alertas em tempo real, economizando seu tempo e oferecendo um diferencial competitivo real.
                 </p>
               </FadeIn>
 
@@ -676,10 +676,10 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">
-                Análise com IA
+                Machine Learning Preditivo
               </h3>
               <p className="text-gray-600 leading-relaxed text-justify">
-                Inteligência Artificial analisa respostas e detecta red flags automaticamente, alertando o médico
+                Modelo de ML analisa 15+ variáveis clínicas e prevê risco de complicações. IA detecta red flags automaticamente, alertando você em tempo real
               </p>
             </div>
 
@@ -701,10 +701,10 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-telos-blue mb-3">
-                Exportação de Dados
+                Inteligência Coletiva
               </h3>
               <p className="text-gray-600 leading-relaxed text-justify">
-                Dados organizados e anonimizados para sua avaliação e análise, em conformidade com LGPD
+                Sistema aprende com dados pseudonimizados de múltiplos cirurgiões. LGPD-compliant com SHA-256. Exportação científica em 1 clique
               </p>
             </div>
           </div>
