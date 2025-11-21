@@ -343,8 +343,8 @@ function getGreeting(): string {
 }
 
 /**
- * Encontra paciente pelo telefone usando múltiplas estratégias
- * CORRIGIDO: contains não funciona com telefone formatado, então busca todos e filtra manualmente
+ * Encontra paciente pelo telefone usando SQL raw para normalizar e buscar
+ * SOLUÇÃO DEFINITIVA: Usa REGEXP_REPLACE do PostgreSQL para normalizar telefone na query
  */
 async function findPatientByPhone(phone: string): Promise<any | null> {
   // Normalizar número de telefone (remover tudo exceto dígitos)
@@ -369,81 +369,73 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
     last8
   })
 
-  // SOLUÇÃO: Buscar todos os pacientes ativos e filtrar manualmente
-  // (contains não funciona com telefone formatado como "(83) 99866-3089")
-  const allPatients = await prisma.patient.findMany({
-    where: {
-      isActive: true
-    },
-    select: {
-      id: true,
-      name: true,
-      phone: true,
-      userId: true
-    }
-  })
+  try {
+    // SOLUÇÃO: Usar raw SQL para normalizar telefone no banco e comparar
+    // REGEXP_REPLACE remove todos os caracteres não-numéricos
+    const result = await prisma.$queryRaw`
+      SELECT id, name, phone, "userId"
+      FROM "Patient"
+      WHERE "isActive" = true
+      AND (
+        REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last11}%`}
+        OR REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last9}%`}
+        OR REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last8}%`}
+      )
+      LIMIT 1
+    ` as any[];
 
-  logger.debug(`📋 Buscando entre ${allPatients.length} pacientes ativos`)
-
-  // Tentar encontrar com cada estratégia
-  for (const patient of allPatients) {
-    const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
-
-    // Estratégia 1: Match pelos últimos 11 dígitos
-    if (patientPhoneNormalized.includes(last11)) {
-      logger.debug('✅ Paciente encontrado (últimos 11 dígitos)', {
+    if (result && result.length > 0) {
+      const patient = result[0];
+      logger.debug('✅ Paciente encontrado via SQL', {
         patientId: patient.id,
         patientName: patient.name,
         patientPhone: patient.phone,
-        patientPhoneNormalized,
-        searchTerm: last11
+        userId: patient.userId
       })
       return patient
     }
 
-    // Estratégia 2: Match pelos últimos 9 dígitos
-    if (patientPhoneNormalized.includes(last9)) {
-      logger.debug('✅ Paciente encontrado (últimos 9 dígitos)', {
-        patientId: patient.id,
-        patientName: patient.name,
-        patientPhone: patient.phone,
-        patientPhoneNormalized,
-        searchTerm: last9
-      })
-      return patient
+    // Log detalhado de falha
+    logger.error('❌ Paciente NÃO encontrado após todas as estratégias', {
+      phoneOriginal: phone,
+      phoneNormalized: normalizedPhone,
+      last11,
+      last9,
+      last8
+    })
+
+    // Buscar amostra para debug
+    const allPatients = await prisma.$queryRaw`
+      SELECT id, name, phone, REGEXP_REPLACE(phone, '[^0-9]', '', 'g') as phone_normalized
+      FROM "Patient"
+      WHERE "isActive" = true
+      LIMIT 5
+    ` as any[];
+
+    logger.debug('📋 Amostra de telefones no banco:', allPatients)
+
+    return null
+
+  } catch (error) {
+    logger.error('❌ Erro na busca SQL:', error)
+
+    // Fallback: buscar todos e filtrar manualmente
+    logger.debug('🔄 Tentando fallback com busca manual...')
+    const allPatients = await prisma.patient.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, phone: true, userId: true }
+    })
+
+    for (const patient of allPatients) {
+      const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
+      if (patientPhoneNormalized.includes(last11) ||
+          patientPhoneNormalized.includes(last9) ||
+          patientPhoneNormalized.includes(last8)) {
+        logger.debug('✅ Paciente encontrado via fallback')
+        return patient
+      }
     }
 
-    // Estratégia 3: Match pelos últimos 8 dígitos
-    if (patientPhoneNormalized.includes(last8)) {
-      logger.debug('✅ Paciente encontrado (últimos 8 dígitos)', {
-        patientId: patient.id,
-        patientName: patient.name,
-        patientPhone: patient.phone,
-        patientPhoneNormalized,
-        searchTerm: last8
-      })
-      return patient
-    }
+    return null
   }
-
-  // Log detalhado de falha
-  logger.error('❌ Paciente NÃO encontrado após todas as estratégias', {
-    phoneOriginal: phone,
-    phoneNormalized: normalizedPhone,
-    last11,
-    last9,
-    last8,
-    totalPatientsChecked: allPatients.length
-  })
-
-  // Mostrar amostra para debug
-  logger.debug('📋 Amostra de telefones no banco:',
-    allPatients.slice(0, 5).map(p => ({
-      name: p.name,
-      phoneOriginal: p.phone,
-      phoneNormalized: p.phone.replace(/\D/g, '')
-    }))
-  )
-
-  return null
 }
