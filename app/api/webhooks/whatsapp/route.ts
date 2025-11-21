@@ -344,7 +344,7 @@ function getGreeting(): string {
 
 /**
  * Encontra paciente pelo telefone usando múltiplas estratégias
- * Tenta várias formas de match para maximizar chances de encontrar
+ * CORRIGIDO: contains não funciona com telefone formatado, então busca todos e filtra manualmente
  */
 async function findPatientByPhone(phone: string): Promise<any | null> {
   // Normalizar número de telefone (remover tudo exceto dígitos)
@@ -359,83 +359,71 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
   // WhatsApp envia formato: 5583998663089 (país + DDD + número)
   // Banco pode ter: (83) 99866-3089, 83998663089, 5583998663089, etc
 
-  // Estratégia 1: Buscar pelos últimos 11 dígitos (DDD + número completo)
-  const last11 = normalizedPhone.slice(-11)
-  let patient = await prisma.patient.findFirst({
-    where: {
-      phone: {
-        contains: last11,
-      },
-    },
+  const last11 = normalizedPhone.slice(-11) // 83998663089
+  const last9 = normalizedPhone.slice(-9)   // 998663089
+  const last8 = normalizedPhone.slice(-8)   // 98663089
+
+  logger.debug('🔍 Termos de busca', {
+    last11,
+    last9,
+    last8
   })
 
-  if (patient) {
-    logger.debug('✅ Paciente encontrado (últimos 11 dígitos)', {
-      patientId: patient.id,
-      patientName: patient.name,
-      patientPhone: patient.phone,
-      searchTerm: last11
-    })
-    return patient
-  }
-
-  // Estratégia 2: Buscar pelos últimos 9 dígitos (número sem DDD)
-  const last9 = normalizedPhone.slice(-9)
-  patient = await prisma.patient.findFirst({
+  // SOLUÇÃO: Buscar todos os pacientes ativos e filtrar manualmente
+  // (contains não funciona com telefone formatado como "(83) 99866-3089")
+  const allPatients = await prisma.patient.findMany({
     where: {
-      phone: {
-        contains: last9,
-      },
+      isActive: true
     },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      userId: true
+    }
   })
 
-  if (patient) {
-    logger.debug('✅ Paciente encontrado (últimos 9 dígitos)', {
-      patientId: patient.id,
-      patientName: patient.name,
-      patientPhone: patient.phone,
-      searchTerm: last9
-    })
-    return patient
-  }
+  logger.debug(`📋 Buscando entre ${allPatients.length} pacientes ativos`)
 
-  // Estratégia 3: Buscar pelos últimos 8 dígitos (mais específico)
-  const last8 = normalizedPhone.slice(-8)
-  patient = await prisma.patient.findFirst({
-    where: {
-      phone: {
-        contains: last8,
-      },
-    },
-  })
+  // Tentar encontrar com cada estratégia
+  for (const patient of allPatients) {
+    const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
 
-  if (patient) {
-    logger.debug('✅ Paciente encontrado (últimos 8 dígitos)', {
-      patientId: patient.id,
-      patientName: patient.name,
-      patientPhone: patient.phone,
-      searchTerm: last8
-    })
-    return patient
-  }
+    // Estratégia 1: Match pelos últimos 11 dígitos
+    if (patientPhoneNormalized.includes(last11)) {
+      logger.debug('✅ Paciente encontrado (últimos 11 dígitos)', {
+        patientId: patient.id,
+        patientName: patient.name,
+        patientPhone: patient.phone,
+        patientPhoneNormalized,
+        searchTerm: last11
+      })
+      return patient
+    }
 
-  // Estratégia 4: Buscar pelo número completo normalizado
-  patient = await prisma.patient.findFirst({
-    where: {
-      phone: {
-        contains: normalizedPhone,
-      },
-    },
-  })
+    // Estratégia 2: Match pelos últimos 9 dígitos
+    if (patientPhoneNormalized.includes(last9)) {
+      logger.debug('✅ Paciente encontrado (últimos 9 dígitos)', {
+        patientId: patient.id,
+        patientName: patient.name,
+        patientPhone: patient.phone,
+        patientPhoneNormalized,
+        searchTerm: last9
+      })
+      return patient
+    }
 
-  if (patient) {
-    logger.debug('✅ Paciente encontrado (número completo)', {
-      patientId: patient.id,
-      patientName: patient.name,
-      patientPhone: patient.phone,
-      searchTerm: normalizedPhone
-    })
-    return patient
+    // Estratégia 3: Match pelos últimos 8 dígitos
+    if (patientPhoneNormalized.includes(last8)) {
+      logger.debug('✅ Paciente encontrado (últimos 8 dígitos)', {
+        patientId: patient.id,
+        patientName: patient.name,
+        patientPhone: patient.phone,
+        patientPhoneNormalized,
+        searchTerm: last8
+      })
+      return patient
+    }
   }
 
   // Log detalhado de falha
@@ -444,17 +432,18 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
     phoneNormalized: normalizedPhone,
     last11,
     last9,
-    last8
+    last8,
+    totalPatientsChecked: allPatients.length
   })
 
-  // Buscar TODOS os pacientes para debug (somente em desenvolvimento)
-  if (process.env.NODE_ENV !== 'production') {
-    const allPatients = await prisma.patient.findMany({
-      select: { id: true, name: true, phone: true },
-      take: 10
-    })
-    logger.debug('📋 Amostra de pacientes no banco (primeiros 10):', allPatients)
-  }
+  // Mostrar amostra para debug
+  logger.debug('📋 Amostra de telefones no banco:',
+    allPatients.slice(0, 5).map(p => ({
+      name: p.name,
+      phoneOriginal: p.phone,
+      phoneNormalized: p.phone.replace(/\D/g, '')
+    }))
+  )
 
   return null
 }
