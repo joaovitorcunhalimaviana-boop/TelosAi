@@ -135,14 +135,8 @@ export async function POST(request: NextRequest) {
             const userMessage = message.text.body.trim()
 
             try {
-              // 1. Identificar paciente pelo telefone
-              const patient = await prisma.patient.findFirst({
-                where: {
-                  phone: {
-                    contains: message.from.replace(/\D/g, '').slice(-11) // Últimos 11 dígitos
-                  }
-                }
-              })
+              // 1. Identificar paciente pelo telefone usando múltiplas estratégias
+              const patient = await findPatientByPhone(message.from)
 
               if (!patient) {
                 // Paciente não encontrado - resposta padrão
@@ -155,17 +149,31 @@ export async function POST(request: NextRequest) {
                   `entre em contato pelo telefone (83) 9166-4904.`
 
                 await sendMessage(message.from, response)
-                logger.debug("Response sent to unregistered patient")
+                logger.debug("Response sent to unregistered patient", {
+                  phone: message.from,
+                  phoneNormalized: message.from.replace(/\D/g, '')
+                })
                 continue
               }
 
-              logger.debug("Patient identified", { patientName: patient.name })
+              logger.debug("✅ Patient identified", {
+                patientId: patient.id,
+                patientName: patient.name,
+                patientPhone: patient.phone,
+                userId: patient.userId
+              })
 
               // 2. Verificar se está aguardando para responder questionário
               const awaitingQuestionnaire = await isAwaitingQuestionnaire(message.from)
 
+              logger.debug('📋 Checking questionnaire status', {
+                awaitingQuestionnaire,
+                userMessage: userMessage.toLowerCase(),
+                isSimResponse: userMessage.toLowerCase() === 'sim'
+              })
+
               if (awaitingQuestionnaire && userMessage.toLowerCase() === 'sim') {
-                logger.debug('Patient confirmed - starting questionnaire')
+                logger.debug('✅ Patient confirmed with "sim" - starting questionnaire')
 
                 // Buscar cirurgia mais recente
                 const surgery = await prisma.surgery.findFirst({
@@ -174,9 +182,26 @@ export async function POST(request: NextRequest) {
                 })
 
                 if (surgery) {
+                  logger.debug('✅ Surgery found for patient', {
+                    surgeryId: surgery.id,
+                    surgeryType: surgery.type,
+                    surgeryDate: surgery.date
+                  })
+
                   // Iniciar coleta de respostas
                   await startQuestionnaireCollection(message.from, patient, surgery)
-                  logger.debug('Questionnaire started')
+                  logger.debug('✅ Questionnaire collection started successfully')
+                  continue
+                } else {
+                  logger.error('❌ No surgery found for patient', {
+                    patientId: patient.id,
+                    patientName: patient.name
+                  })
+
+                  await sendMessage(
+                    message.from,
+                    'Desculpe, não encontrei uma cirurgia registrada para você. Por favor, entre em contato com o consultório.'
+                  )
                   continue
                 }
               }
@@ -315,4 +340,121 @@ function getGreeting(): string {
   } else {
     return 'Boa noite'
   }
+}
+
+/**
+ * Encontra paciente pelo telefone usando múltiplas estratégias
+ * Tenta várias formas de match para maximizar chances de encontrar
+ */
+async function findPatientByPhone(phone: string): Promise<any | null> {
+  // Normalizar número de telefone (remover tudo exceto dígitos)
+  const normalizedPhone = phone.replace(/\D/g, '')
+
+  logger.debug('🔍 Buscando paciente', {
+    phoneOriginal: phone,
+    phoneNormalized: normalizedPhone,
+    length: normalizedPhone.length
+  })
+
+  // WhatsApp envia formato: 5583998663089 (país + DDD + número)
+  // Banco pode ter: (83) 99866-3089, 83998663089, 5583998663089, etc
+
+  // Estratégia 1: Buscar pelos últimos 11 dígitos (DDD + número completo)
+  const last11 = normalizedPhone.slice(-11)
+  let patient = await prisma.patient.findFirst({
+    where: {
+      phone: {
+        contains: last11,
+      },
+    },
+  })
+
+  if (patient) {
+    logger.debug('✅ Paciente encontrado (últimos 11 dígitos)', {
+      patientId: patient.id,
+      patientName: patient.name,
+      patientPhone: patient.phone,
+      searchTerm: last11
+    })
+    return patient
+  }
+
+  // Estratégia 2: Buscar pelos últimos 9 dígitos (número sem DDD)
+  const last9 = normalizedPhone.slice(-9)
+  patient = await prisma.patient.findFirst({
+    where: {
+      phone: {
+        contains: last9,
+      },
+    },
+  })
+
+  if (patient) {
+    logger.debug('✅ Paciente encontrado (últimos 9 dígitos)', {
+      patientId: patient.id,
+      patientName: patient.name,
+      patientPhone: patient.phone,
+      searchTerm: last9
+    })
+    return patient
+  }
+
+  // Estratégia 3: Buscar pelos últimos 8 dígitos (mais específico)
+  const last8 = normalizedPhone.slice(-8)
+  patient = await prisma.patient.findFirst({
+    where: {
+      phone: {
+        contains: last8,
+      },
+    },
+  })
+
+  if (patient) {
+    logger.debug('✅ Paciente encontrado (últimos 8 dígitos)', {
+      patientId: patient.id,
+      patientName: patient.name,
+      patientPhone: patient.phone,
+      searchTerm: last8
+    })
+    return patient
+  }
+
+  // Estratégia 4: Buscar pelo número completo normalizado
+  patient = await prisma.patient.findFirst({
+    where: {
+      phone: {
+        contains: normalizedPhone,
+      },
+    },
+  })
+
+  if (patient) {
+    logger.debug('✅ Paciente encontrado (número completo)', {
+      patientId: patient.id,
+      patientName: patient.name,
+      patientPhone: patient.phone,
+      searchTerm: normalizedPhone
+    })
+    return patient
+  }
+
+  // Log detalhado de falha
+  logger.error('❌ Paciente NÃO encontrado após todas as estratégias', {
+    phoneOriginal: phone,
+    phoneNormalized: normalizedPhone,
+    last11,
+    last9,
+    last8
+  })
+
+  // Buscar TODOS os pacientes para debug (somente em desenvolvimento)
+  if (process.env.NODE_ENV !== 'production') {
+    const allPatients = await prisma.patient.findMany({
+      select: { id: true, name: true, phone: true },
+      take: 10
+    })
+    logger.debug('📋 Amostra de pacientes no banco (primeiros 10):', allPatients)
+  }
+
+  return null
 }

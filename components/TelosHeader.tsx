@@ -12,6 +12,7 @@ export function TelosHeader() {
   // Navegação pública - apenas páginas sem necessidade de login
   const navItems = [
     { href: "/", label: "Início" },
+    { href: "/como-funciona", label: "Como Funciona" },
     { href: "/pricing", label: "Preços" },
     { href: "/sobre", label: "Sobre" },
   ]
