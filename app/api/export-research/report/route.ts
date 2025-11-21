@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Generate PDF document
-      const pdfGenerator = new ResearchPDFGenerator({
+      const pdfGenerator = await ResearchPDFGenerator.create({
         title: config.anonymize ? 'Research Study' : research.title,
         subtitle: research.description || undefined,
         author: config.anonymize ? 'Anonymous' : session.user.name || 'Researcher',
@@ -304,7 +304,7 @@ export async function POST(request: NextRequest) {
           config.language === 'pt' ? 'Características Demográficas' : 'Demographics',
           1
         );
-        pdfGenerator.addTable({
+        await pdfGenerator.addTable({
           title:
             config.language === 'pt'
               ? 'Características Basais por Grupo de Estudo'

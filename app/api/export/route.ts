@@ -199,11 +199,11 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date().toISOString().split('T')[0];
 
     if (filters.format === 'xlsx') {
-      fileBuffer = generateExcelFile(exportData, filters);
+      fileBuffer = await generateExcelFile(exportData, filters);
       fileName = `exportacao_dados_${filters.anonymize ? 'anonimizado_' : ''}${timestamp}.xlsx`;
       mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     } else {
-      const csvContent = generateCSVFile(exportData, filters);
+      const csvContent = await generateCSVFile(exportData, filters);
       fileBuffer = Buffer.from(csvContent, 'utf-8');
       fileName = `exportacao_dados_${filters.anonymize ? 'anonimizado_' : ''}${timestamp}.csv`;
       mimeType = 'text/csv';

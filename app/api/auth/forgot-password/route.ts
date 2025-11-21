@@ -2,11 +2,29 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import crypto from "crypto"
 import { Resend } from "resend"
+import { rateLimit, getClientIP } from "@/lib/rate-limit"
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 req/hora por IP (prevenir abuso de reset de senha)
+    const ip = getClientIP(request);
+    const rateLimitResult = await rateLimit(ip, 3, 3600); // 3 requisições por 3600 segundos (1 hora)
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas de recuperação de senha. Tente novamente mais tarde.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+          }
+        }
+      );
+    }
+
     const { email } = await request.json()
 
     if (!email) {

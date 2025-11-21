@@ -3,9 +3,27 @@ import { hashPassword } from "@/lib/auth"
 import { prisma } from '@/lib/prisma'
 import { AuditLogger } from "@/lib/audit/logger"
 import { getClientIP } from "@/lib/utils/ip"
+import { rateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 req/hora por IP (prevenir spam de registros)
+    const ip = getClientIP(request);
+    const rateLimitResult = await rateLimit(ip, 5, 3600); // 5 requisições por 3600 segundos (1 hora)
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas de registro. Tente novamente mais tarde.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+          }
+        }
+      );
+    }
+
     const body = await request.json()
 
     const {
@@ -141,9 +159,6 @@ export async function POST(request: NextRequest) {
 
     const planPricing = pricing[selectedPlan as keyof typeof pricing]
 
-    // Pega IP do request para auditoria
-    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
-
     // Create user in database
     const user = await prisma.user.create({
       data: {
@@ -183,7 +198,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       email: user.email,
       role: "medico",
-      ipAddress: getClientIP(request),
+      ipAddress: ip,
       userAgent: request.headers.get('user-agent') || 'unknown',
     })
 

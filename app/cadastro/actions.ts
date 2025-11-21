@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { prisma } from '@/lib/prisma'
 import { fromBrasiliaTime } from '@/lib/date-utils'
 import { predictComplicationRisk } from '@/lib/ml-prediction'
+import { invalidateAllDashboardData } from '@/lib/cache-helpers'
 
 interface QuickPatientData {
   userId: string
@@ -95,6 +96,9 @@ export async function createQuickPatient(data: QuickPatientData) {
         // Log de erro mas NÃO falha o cadastro
         console.error('[ML] Erro ao salvar predição (não-crítico):', error)
       })
+
+    // Invalidate dashboard cache (novo paciente e cirurgia)
+    invalidateAllDashboardData()
 
     return {
       success: true,

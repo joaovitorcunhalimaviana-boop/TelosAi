@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Cria gerador de PDF
-    const generator = new ResearchPDFGenerator({
+    const generator = await ResearchPDFGenerator.create({
       title: research.title,
       subtitle: research.description.substring(0, 200),
       author: session.user.name || "Telos.AI User",
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         group.description,
       ])
 
-      generator.addTable({
+      await generator.addTable({
         title: "Distribuição de Pacientes por Grupo",
         headers: ["Código", "Nome do Grupo", "N° Pacientes", "Descrição"],
         rows: groupData,
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       ]
     })
 
-    generator.addTable({
+    await generator.addTable({
       title: "Amostra de Dados Pseudonimizados (primeiros 50 pacientes)",
       headers: ["ID Pseudônimo", "Grupo", "Idade", "Sexo", "Cirurgia", "Dor D+1"],
       rows: pseudonymizedData,

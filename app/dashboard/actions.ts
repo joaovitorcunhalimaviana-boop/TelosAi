@@ -1,5 +1,6 @@
 "use server"
 
+import { unstable_cache } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { subDays } from "date-fns"
 import { validateResearchFields } from "@/lib/research-field-validator"
@@ -45,73 +46,94 @@ export interface DashboardFilters {
   researchFilter?: "all" | "non-participants" | string // "all" | "non-participants" | researchId
 }
 
-export async function getDashboardStats(): Promise<DashboardStats> {
-  const today = getNowBrasilia()
-  const todayStart = startOfDayBrasilia()
-  const todayEnd = endOfDayBrasilia()
+// Cached version of getDashboardStats
+const getCachedDashboardStatsInternal = unstable_cache(
+  async () => {
+    const startTime = Date.now()
+    const today = getNowBrasilia()
+    const todayStart = startOfDayBrasilia()
+    const todayEnd = endOfDayBrasilia()
 
-  // Total de cirurgias hoje
-  const todaySurgeries = await prisma.surgery.count({
-    where: {
-      date: {
-        gte: todayStart,
-        lte: todayEnd,
+    // Total de cirurgias hoje
+    const todaySurgeries = await prisma.surgery.count({
+      where: {
+        date: {
+          gte: todayStart,
+          lte: todayEnd,
+        },
       },
-    },
-  })
+    })
 
-  // Pacientes em acompanhamento ativo
-  const activePatientsCount = await prisma.surgery.count({
-    where: {
-      status: "active",
-    },
-  })
+    // Pacientes em acompanhamento ativo
+    const activePatientsCount = await prisma.surgery.count({
+      where: {
+        status: "active",
+      },
+    })
 
-  // Follow-ups pendentes para hoje
-  const pendingFollowUpsToday = await prisma.followUp.count({
-    where: {
-      scheduledDate: {
-        gte: todayStart,
-        lte: todayEnd,
+    // Follow-ups pendentes para hoje
+    const pendingFollowUpsToday = await prisma.followUp.count({
+      where: {
+        scheduledDate: {
+          gte: todayStart,
+          lte: todayEnd,
+        },
+        status: {
+          in: ["pending", "sent"],
+        },
       },
-      status: {
-        in: ["pending", "sent"],
-      },
-    },
-  })
+    })
 
-  // Alertas críticos (red flags)
-  const criticalAlerts = await prisma.followUpResponse.count({
-    where: {
-      riskLevel: {
-        in: ["high", "critical"],
+    // Alertas críticos (red flags)
+    const criticalAlerts = await prisma.followUpResponse.count({
+      where: {
+        riskLevel: {
+          in: ["high", "critical"],
+        },
+        doctorAlerted: false,
+        createdAt: {
+          gte: subDays(today, 7), // Últimos 7 dias
+        },
       },
-      doctorAlerted: false,
-      createdAt: {
-        gte: subDays(today, 7), // Últimos 7 dias
-      },
-    },
-  })
+    })
 
-  return {
-    todaySurgeries,
-    activePatientsCount,
-    pendingFollowUpsToday,
-    criticalAlerts,
+    const duration = Date.now() - startTime
+    console.log(`[CACHE] Dashboard stats action computed in ${duration}ms`)
+
+    return {
+      todaySurgeries,
+      activePatientsCount,
+      pendingFollowUpsToday,
+      criticalAlerts,
+    }
+  },
+  ['dashboard-stats-action'],
+  {
+    revalidate: 300, // 5 minutes
+    tags: ['dashboard', 'dashboard-stats'],
   }
+)
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const startTime = Date.now()
+  const stats = await getCachedDashboardStatsInternal()
+  const duration = Date.now() - startTime
+  console.log(`[CACHE] Dashboard stats action served in ${duration}ms`)
+  return stats
 }
 
-export async function getDashboardPatients(
-  filters: DashboardFilters = {}
-): Promise<PatientCard[]> {
-  const today = getNowBrasilia()
-  const todayStart = startOfDayBrasilia()
-  const todayEnd = endOfDayBrasilia()
+// Cached version of getDashboardPatients with filter-based cache key
+const getCachedDashboardPatientsInternal = unstable_cache(
+  async (filters: DashboardFilters) => {
+    const startTime = Date.now()
+    const today = getNowBrasilia()
+    const todayStart = startOfDayBrasilia()
+    const todayEnd = endOfDayBrasilia()
 
-  // Construir filtros dinâmicos
-  const whereClause: any = {
-    status: "active",
-  }
+    // Construir filtros dinâmicos
+    const whereClause: any = {
+      status: "active",
+    }
 
   // Filtro por tipo de cirurgia
   if (filters.surgeryType && filters.surgeryType !== "all") {
@@ -296,14 +318,26 @@ export async function getDashboardPatients(
     }
   })
 
-  // Filter research-incomplete post-query
-  if (filters.dataStatus === "research-incomplete") {
-    return patientCards.filter(card =>
-      card.isResearchParticipant && !card.researchDataComplete
-    )
-  }
+    // Filter research-incomplete post-query
+    if (filters.dataStatus === "research-incomplete") {
+      const filtered = patientCards.filter(card =>
+        card.isResearchParticipant && !card.researchDataComplete
+      )
+      const duration = Date.now() - startTime
+      console.log(`[CACHE] Dashboard patients computed in ${duration}ms (${filtered.length} results)`)
+      return filtered
+    }
 
-  return patientCards
+    const duration = Date.now() - startTime
+    console.log(`[CACHE] Dashboard patients computed in ${duration}ms (${patientCards.length} results)`)
+    return patientCards
+  }
+)
+
+export async function getDashboardPatients(
+  filters: DashboardFilters = {}
+): Promise<PatientCard[]> {
+  return getCachedDashboardPatientsInternal(filters)
 }
 
 export async function getPatientSummary(surgeryId: string) {
@@ -398,51 +432,52 @@ export async function getResearchStats(userId?: string): Promise<{
     },
   })
 
-  // For each research, count patients in each group
-  const researchStats: ResearchStats[] = await Promise.all(
-    researches.map(async (research) => {
-      const groupCodes = research.groups.map(g => g.groupCode)
+  // Get all patients grouped by research group in a single query to avoid N+1
+  const patientsByGroup = await prisma.patient.groupBy({
+    by: ['researchGroup'],
+    where: {
+      isActive: true,
+      isResearchParticipant: true,
+      ...(userId && { userId }),
+    },
+    _count: {
+      id: true,
+    },
+  })
 
-      // Count total patients in this research
-      const researchPatientCount = await prisma.patient.count({
-        where: {
-          isActive: true,
-          isResearchParticipant: true,
-          researchGroup: {
-            in: groupCodes,
-          },
-          ...(userId && { userId }),
-        },
-      })
+  // Create a map for O(1) lookup
+  const groupCountMap = new Map<string, number>()
+  patientsByGroup.forEach((group) => {
+    if (group.researchGroup) {
+      groupCountMap.set(group.researchGroup, group._count.id)
+    }
+  })
 
-      // Count patients in each group
-      const groupStats = await Promise.all(
-        research.groups.map(async (group) => {
-          const count = await prisma.patient.count({
-            where: {
-              isActive: true,
-              isResearchParticipant: true,
-              researchGroup: group.groupCode,
-              ...(userId && { userId }),
-            },
-          })
+  // Build research stats using the precomputed counts (no more N+1 queries)
+  const researchStats: ResearchStats[] = researches.map((research) => {
+    const groupCodes = research.groups.map(g => g.groupCode)
 
-          return {
-            groupCode: group.groupCode,
-            groupName: group.groupName,
-            patientCount: count,
-          }
-        })
-      )
+    // Calculate total patients in this research by summing group counts
+    const researchPatientCount = groupCodes.reduce((total, code) => {
+      return total + (groupCountMap.get(code) || 0)
+    }, 0)
 
+    // Build group stats using the map
+    const groupStats = research.groups.map((group) => {
       return {
-        researchId: research.id,
-        researchTitle: research.title,
-        patientCount: researchPatientCount,
-        groups: groupStats,
+        groupCode: group.groupCode,
+        groupName: group.groupName,
+        patientCount: groupCountMap.get(group.groupCode) || 0,
       }
     })
-  )
+
+    return {
+      researchId: research.id,
+      researchTitle: research.title,
+      patientCount: researchPatientCount,
+      groups: groupStats,
+    }
+  })
 
   return {
     totalPatients,

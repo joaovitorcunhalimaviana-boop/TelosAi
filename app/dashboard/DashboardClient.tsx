@@ -271,10 +271,10 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
   const getRiskBorderClass = (riskLevel: 'low' | 'medium' | 'high' | 'critical') => {
     const borders = {
-      low: 'border-green-300 hover:border-green-400',
-      medium: 'border-yellow-400 hover:border-yellow-500',
-      high: 'border-orange-400 hover:border-orange-500',
-      critical: 'border-red-500 hover:border-red-600 bg-red-50/50 dark:bg-red-950/20',
+      low: 'border-green-600 hover:border-green-700',
+      medium: 'border-yellow-500 hover:border-yellow-600',
+      high: 'border-orange-500 hover:border-orange-600',
+      critical: 'border-red-600 hover:border-red-700 bg-red-50/50 dark:bg-red-950/20',
     }
     return borders[riskLevel]
   }
@@ -299,9 +299,10 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="text-center" role="status" aria-live="polite" aria-busy="true">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4" aria-hidden="true"></div>
           <p className="text-muted-foreground">Carregando dashboard...</p>
+          <span className="sr-only">Carregando dados do dashboard, por favor aguarde...</span>
         </div>
       </div>
     )
@@ -345,9 +346,10 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               variant="outline"
               size="icon"
               className="rounded-full"
-              title="Iniciar tour pelo dashboard"
+              aria-label="Iniciar tour guiado pelo dashboard"
+              aria-expanded={showTour}
             >
-              <HelpCircle className="h-5 w-5" />
+              <HelpCircle className="h-5 w-5" aria-hidden="true" />
             </Button>
           </div>
 
@@ -492,7 +494,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Cirurgias Hoje
                     </CardTitle>
-                    <Calendar className="h-5 w-5" style={{ color: '#0A2647' }} />
+                    <Calendar className="h-5 w-5" style={{ color: '#0A2647' }} aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -516,7 +518,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Pacientes Ativos
                     </CardTitle>
-                    <Users className="h-5 w-5" style={{ color: '#0A2647' }} />
+                    <Users className="h-5 w-5" style={{ color: '#0A2647' }} aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -540,7 +542,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Follow-ups Hoje
                     </CardTitle>
-                    <Clock className="h-5 w-5" style={{ color: '#0A2647' }} />
+                    <Clock className="h-5 w-5" style={{ color: '#0A2647' }} aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -564,7 +566,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       Alertas Críticos
                     </CardTitle>
-                    <AlertCircle className="h-5 w-5" style={{ color: (stats?.criticalAlerts || 0) > 0 ? '#DC2626' : '#0A2647' }} />
+                    <AlertCircle className="h-5 w-5" style={{ color: (stats?.criticalAlerts || 0) > 0 ? '#DC2626' : '#0A2647' }} aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -599,7 +601,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             <CardHeader style={{ backgroundColor: '#F5F7FA' }}>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2" style={{ color: '#0A2647' }}>
-                  <Search className="h-5 w-5" />
+                  <Search className="h-5 w-5" aria-hidden="true" />
                   Buscar e Filtrar Pacientes
                 </CardTitle>
                 <Badge variant="secondary" className="text-base px-3 py-1">
@@ -611,19 +613,20 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             <div className="space-y-4">
               {/* Busca Principal */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
                 <Input
                   placeholder="Buscar por nome ou telefone do paciente..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10 h-12 text-base border-2 focus:border-blue-400"
+                  aria-label="Buscar pacientes por nome ou telefone"
                 />
               </div>
 
               {/* Filtros em Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                  <label htmlFor="surgery-type-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
                     Tipo de Cirurgia
                   </label>
                   <Select
@@ -632,7 +635,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                       handleFilterChange("surgeryType", value as any)
                     }
                   >
-                    <SelectTrigger className="w-full h-10 border-2">
+                    <SelectTrigger id="surgery-type-filter" className="w-full h-10 border-2" aria-label="Filtrar por tipo de cirurgia">
                       <SelectValue placeholder="Todos os tipos" />
                     </SelectTrigger>
                     <SelectContent>
@@ -646,14 +649,14 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                  <label htmlFor="data-status-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
                     Status do Cadastro
                   </label>
                   <Select
                     value={filters.dataStatus || "all"}
                     onValueChange={(value) => handleFilterChange("dataStatus", value)}
                   >
-                    <SelectTrigger className="w-full h-10 border-2">
+                    <SelectTrigger id="data-status-filter" className="w-full h-10 border-2" aria-label="Filtrar por status do cadastro">
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
@@ -666,14 +669,14 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                  <label htmlFor="period-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
                     Período
                   </label>
                   <Select
                     value={filters.period || "all"}
                     onValueChange={(value) => handleFilterChange("period", value)}
                   >
-                    <SelectTrigger className="w-full h-10 border-2">
+                    <SelectTrigger id="period-filter" className="w-full h-10 border-2" aria-label="Filtrar por período">
                       <SelectValue placeholder="Todos os períodos" />
                     </SelectTrigger>
                     <SelectContent>
@@ -686,15 +689,15 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: '#7C3AED' }}>
-                    <FlaskConical className="h-4 w-4" />
+                  <label htmlFor="research-filter" className="text-sm font-semibold flex items-center gap-1.5" style={{ color: '#7C3AED' }}>
+                    <FlaskConical className="h-4 w-4" aria-hidden="true" />
                     Pesquisas
                   </label>
                   <Select
                     value={filters.researchFilter || "all"}
                     onValueChange={(value) => handleFilterChange("researchFilter", value)}
                   >
-                    <SelectTrigger className="w-full h-10 border-2 border-purple-300 focus:border-purple-500">
+                    <SelectTrigger id="research-filter" className="w-full h-10 border-2 border-purple-300 focus:border-purple-500" aria-label="Filtrar por pesquisa">
                       <SelectValue placeholder="Todas as pesquisas" />
                     </SelectTrigger>
                     <SelectContent>
@@ -803,8 +806,8 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
         <FadeIn delay={0.9}>
           {/* Critical Patients Alert */}
           {criticalPatients.length > 0 && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="h-4 w-4" />
+            <Alert variant="destructive" className="mb-6" role="alert" aria-live="assertive">
+              <AlertCircle className="h-4 w-4" aria-hidden="true" />
               <AlertTitle>⚠️ {criticalPatients.length} PACIENTES CRÍTICOS</AlertTitle>
               <AlertDescription>
                 Requerem atenção médica imediata
@@ -813,7 +816,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
           )}
 
           <div className="flex items-center gap-2 mb-4">
-            <UserCheck className="h-6 w-6 text-blue-600" />
+            <UserCheck className="h-6 w-6 text-blue-600" aria-hidden="true" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Pacientes em Acompanhamento
             </h2>
@@ -867,6 +870,8 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                         className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative ${
                           isCritical ? 'bg-red-50 border-l-4 border-l-red-600' : ''
                         }`}
+                        role="article"
+                        aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
                       >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-3">
@@ -931,9 +936,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                   <CardContent>
                     {/* Research Data Warning */}
                     {patient.isResearchParticipant && !patient.researchDataComplete && (
-                      <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-4">
+                      <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-4" role="status" aria-live="polite">
                         <div className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                           <div className="flex-1">
                             <p className="font-semibold text-red-900 text-sm mb-1">
                               Dados de Pesquisa Incompletos
@@ -951,7 +956,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                     <div className="space-y-3">
                       {/* Data da cirurgia */}
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
+                        <Calendar className="h-4 w-4" aria-hidden="true" />
                         <span>
                           {format(new Date(patient.surgeryDate), "dd 'de' MMMM 'de' yyyy", {
                             locale: ptBR,
@@ -999,9 +1004,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
                       {/* Red flags */}
                       {patient.hasRedFlags && (
-                        <div className="bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-800 rounded-lg p-3">
+                        <div className="bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-800 rounded-lg p-3" role="alert">
                           <div className="flex items-start gap-2">
-                            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                             <div>
                               <p className="font-semibold text-red-900 dark:text-red-100 text-sm mb-1">
                                 ALERTA
@@ -1028,8 +1033,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                           size="sm"
                           className="flex-1 gap-2 border-green-500 text-green-700 hover:bg-green-50"
                           onClick={() => handleWhatsAppClick(patient.phone, patient.patientName)}
+                          aria-label={`Enviar mensagem no WhatsApp para ${patient.patientName}`}
                         >
-                          <MessageCircle className="h-4 w-4" />
+                          <MessageCircle className="h-4 w-4" aria-hidden="true" />
                           WhatsApp
                         </Button>
                         <Button
@@ -1037,8 +1043,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                           size="sm"
                           className="flex-1 gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
                           onClick={() => handlePhoneClick(patient.phone)}
+                          aria-label={`Ligar para ${patient.patientName}`}
                         >
-                          <Phone className="h-4 w-4" />
+                          <Phone className="h-4 w-4" aria-hidden="true" />
                           Ligar
                         </Button>
                       </div>
@@ -1051,6 +1058,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                             size="sm"
                             className="flex-1"
                             onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
+                            aria-label={`Ver detalhes de ${patient.patientName}`}
                           >
                             Ver Detalhes
                           </Button>
@@ -1060,6 +1068,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                               size="sm"
                               className="flex-1"
                               onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
+                              aria-label={`Completar cadastro de ${patient.patientName}`}
                             >
                               Completar Cadastro
                             </Button>
@@ -1071,8 +1080,9 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                             size="sm"
                             className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
                             onClick={() => handleOpenResearchModal(patient.id)}
+                            aria-label={`Adicionar ${patient.patientName} à pesquisa`}
                           >
-                            <FlaskConical className="mr-2 h-4 w-4" />
+                            <FlaskConical className="mr-2 h-4 w-4" aria-hidden="true" />
                             Adicionar à Pesquisa
                           </Button>
                         )}
@@ -1091,10 +1101,10 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
         {/* Research Assignment Modal */}
         <Dialog open={isResearchModalOpen} onOpenChange={setIsResearchModalOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl" aria-labelledby="research-dialog-title" aria-describedby="research-dialog-description">
             <DialogHeader>
-              <DialogTitle>Adicionar Paciente à Pesquisa</DialogTitle>
-              <DialogDescription>
+              <DialogTitle id="research-dialog-title">Adicionar Paciente à Pesquisa</DialogTitle>
+              <DialogDescription id="research-dialog-description">
                 Selecione a pesquisa e o grupo para incluir este paciente
               </DialogDescription>
             </DialogHeader>

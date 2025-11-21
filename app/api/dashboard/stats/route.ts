@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
 
 // ============================================
-// GET - DASHBOARD STATISTICS
+// CACHED DASHBOARD STATS FUNCTION
 // ============================================
 
-export async function GET(request: NextRequest) {
-  try {
+const getCachedDashboardStats = unstable_cache(
+  async () => {
+    const startTime = Date.now();
+
     // Get today's date at midnight
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -224,8 +227,11 @@ export async function GET(request: NextRequest) {
       {} as Record<string, number>
     );
 
-    // Build response
-    return NextResponse.json({
+    const duration = Date.now() - startTime;
+    console.log(`[CACHE] Dashboard stats computed in ${duration}ms`);
+
+    // Build response data
+    return {
       success: true,
       data: {
         summary: {
@@ -289,7 +295,28 @@ export async function GET(request: NextRequest) {
           },
         })),
       },
-    });
+    };
+  },
+  ['dashboard-stats'], // Cache key
+  {
+    revalidate: 300, // 5 minutes
+    tags: ['dashboard', 'dashboard-stats'], // Tags for manual invalidation
+  }
+);
+
+// ============================================
+// GET - DASHBOARD STATISTICS
+// ============================================
+
+export async function GET(request: NextRequest) {
+  try {
+    const startTime = Date.now();
+    const stats = await getCachedDashboardStats();
+    const duration = Date.now() - startTime;
+
+    console.log(`[CACHE] Dashboard stats request served in ${duration}ms`);
+
+    return NextResponse.json(stats);
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     return NextResponse.json(

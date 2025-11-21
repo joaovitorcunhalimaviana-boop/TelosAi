@@ -1,7 +1,6 @@
 // PDF Export System with Professional Layout
-import { jsPDF } from 'jspdf';
-import autoTable, { RowInput } from 'jspdf-autotable';
-import html2canvas from 'html2canvas';
+// jsPDF, autoTable and html2canvas are dynamically imported to reduce bundle size
+import type { RowInput } from 'jspdf-autotable';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -54,7 +53,7 @@ export interface PDFStatisticalSummary {
 // ============================================
 
 export class ResearchPDFGenerator {
-  private doc: jsPDF;
+  private doc: any; // jsPDF instance (loaded dynamically)
   private currentPage: number = 1;
   private pageWidth: number;
   private pageHeight: number;
@@ -68,13 +67,9 @@ export class ResearchPDFGenerator {
   private figureNumber: number = 1;
   private tableNumber: number = 1;
 
-  constructor(options: PDFReportOptions) {
+  private constructor(doc: any, options: PDFReportOptions) {
     this.options = options;
-    this.doc = new jsPDF({
-      orientation: options.orientation || 'portrait',
-      unit: 'mm',
-      format: 'a4',
-    });
+    this.doc = doc;
 
     this.pageWidth = this.doc.internal.pageSize.getWidth();
     this.pageHeight = this.doc.internal.pageSize.getHeight();
@@ -82,6 +77,21 @@ export class ResearchPDFGenerator {
 
     // Set default font
     this.doc.setFont('helvetica', 'normal');
+  }
+
+  /**
+   * Factory method to create ResearchPDFGenerator with dynamic imports
+   */
+  static async create(options: PDFReportOptions): Promise<ResearchPDFGenerator> {
+    const { jsPDF } = await import('jspdf');
+
+    const doc = new jsPDF({
+      orientation: options.orientation || 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    return new ResearchPDFGenerator(doc, options);
   }
 
   /**
@@ -249,7 +259,10 @@ export class ResearchPDFGenerator {
   /**
    * Add APA-style table
    */
-  addTable(data: PDFTableData): void {
+  async addTable(data: PDFTableData): Promise<void> {
+    // Dynamic import of autoTable
+    const autoTable = (await import('jspdf-autotable')).default;
+
     if (data.title) {
       this.doc.setFontSize(11);
       this.doc.setFont('helvetica', 'italic');
@@ -405,6 +418,9 @@ export class ResearchPDFGenerator {
    * Capture HTML element as image and add to PDF
    */
   async addChartFromElement(elementId: string, caption?: string): Promise<void> {
+    // Dynamic import of html2canvas
+    const html2canvas = (await import('html2canvas')).default;
+
     const element = document.getElementById(elementId);
     if (!element) {
       console.error(`Element with id "${elementId}" not found`);
@@ -537,6 +553,9 @@ export async function captureChartAsImage(
   elementId: string,
   options: { scale?: number; backgroundColor?: string } = {}
 ): Promise<string> {
+  // Dynamic import of html2canvas
+  const html2canvas = (await import('html2canvas')).default;
+
   const { scale = 3, backgroundColor = '#ffffff' } = options;
 
   const element = document.getElementById(elementId);
@@ -561,7 +580,7 @@ export async function quickExportPDF(
   filename: string,
   title: string
 ): Promise<void> {
-  const generator = new ResearchPDFGenerator({
+  const generator = await ResearchPDFGenerator.create({
     title,
     author: 'Telos.AI User',
     date: new Date(),

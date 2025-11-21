@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from "@/lib/logger";
 
 /**
  * Cron job unificado para tarefas diárias
@@ -17,14 +18,14 @@ export async function GET(request: NextRequest) {
     const cronSecret = process.env.CRON_SECRET;
 
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      console.error('❌ Unauthorized cron request');
+      logger.error('❌ Unauthorized cron request');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    console.log('🕐 Iniciando tarefas diárias...');
+    logger.debug('🕐 Iniciando tarefas diárias...');
 
     const results = {
       timestamp: new Date().toISOString(),
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     // ============================================
     // TAREFA 1: BACKUP DO BANCO DE DADOS
     // ============================================
-    console.log('\n💾 TAREFA 1/2: Backup do banco de dados');
+    logger.info('Backup do banco de dados');
 
     try {
       const neonApiKey = process.env.NEON_API_KEY;
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       const branchName = `backup-${timestamp}`;
 
-      console.log(`📸 Criando branch de backup: ${branchName}`);
+      logger.debug(`📸 Criando branch de backup: ${branchName}`);
 
       const createBranchResponse = await fetch(
         `https://console.neon.tech/api/v2/projects/${neonProjectId}/branches`,
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
 
         // Se branch já existe, não é erro crítico
         if (createBranchResponse.status === 409) {
-          console.log('⚠️ Branch já existe - backup já foi feito hoje');
+          logger.info('backup já foi feito hoje');
           results.tasks.push({
             name: 'Database Backup',
             status: 'success',
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
         }
       } else {
         const branchData = await createBranchResponse.json();
-        console.log('✅ Branch de backup criada:', branchData.branch?.id);
+        logger.info('backup criada:', branchData.branch?.id);
 
         results.tasks.push({
           name: 'Database Backup',
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
         });
 
         // Limpeza de branches antigos (7 dias)
-        console.log('🧹 Limpando backups antigos...');
+        logger.info('backups antigos...');
 
         const listBranchesResponse = await fetch(
           `https://console.neon.tech/api/v2/projects/${neonProjectId}/branches`,
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
             return branchDate < sevenDaysAgo;
           });
 
-          console.log(`📊 Backups: ${backupBranches.length}, deletar: ${branchesToDelete.length}`);
+          logger.debug(`📊 Backups: ${backupBranches.length}, deletar: ${branchesToDelete.length}`);
 
           for (const branch of branchesToDelete) {
             try {
@@ -134,15 +135,15 @@ export async function GET(request: NextRequest) {
                   },
                 }
               );
-              console.log(`✅ Deletado: ${branch.name}`);
+              logger.debug(`✅ Deletado: ${branch.name}`);
             } catch (error) {
-              console.error(`⚠️ Erro ao deletar ${branch.name}:`, error);
+              logger.error(`⚠️ Erro ao deletar ${branch.name}:`, error);
             }
           }
         }
       }
     } catch (error) {
-      console.error('❌ Erro no backup:', error);
+      logger.error('❌ Erro no backup:', error);
       results.tasks.push({
         name: 'Database Backup',
         status: 'error',
@@ -153,7 +154,7 @@ export async function GET(request: NextRequest) {
     // ============================================
     // TAREFA 2: ENVIO DE FOLLOW-UPS
     // ============================================
-    console.log('\n📨 TAREFA 2/2: Envio de follow-ups agendados');
+    logger.debug('\n📨 TAREFA 2/2: Envio de follow-ups agendados');
 
     try {
       // Chamar o endpoint de envio de follow-ups
@@ -169,7 +170,7 @@ export async function GET(request: NextRequest) {
       const followupData = await followupResponse.json();
 
       if (followupResponse.ok) {
-        console.log('✅ Follow-ups enviados com sucesso');
+        logger.debug('✅ Follow-ups enviados com sucesso');
         results.tasks.push({
           name: 'Send Follow-ups',
           status: 'success',
@@ -180,7 +181,7 @@ export async function GET(request: NextRequest) {
         throw new Error(followupData.error || 'Failed to send follow-ups');
       }
     } catch (error) {
-      console.error('❌ Erro no envio de follow-ups:', error);
+      logger.error('❌ Erro no envio de follow-ups:', error);
       results.tasks.push({
         name: 'Send Follow-ups',
         status: 'error',
@@ -191,8 +192,8 @@ export async function GET(request: NextRequest) {
     // ============================================
     // RESULTADO FINAL
     // ============================================
-    console.log('\n✅ Tarefas diárias concluídas!');
-    console.log(`📊 Sucesso: ${results.tasks.filter(t => t.status === 'success').length}/${results.tasks.length}`);
+    logger.debug('\n✅ Tarefas diárias concluídas!');
+    logger.debug(`📊 Sucesso: ${results.tasks.filter(t => t.status === 'success').length}/${results.tasks.length}`);
 
     const hasErrors = results.tasks.some(t => t.status === 'error');
 
@@ -206,7 +207,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('❌ Erro crítico nas tarefas diárias:', error);
+    logger.error('❌ Erro crítico nas tarefas diárias:', error);
 
     return NextResponse.json(
       {

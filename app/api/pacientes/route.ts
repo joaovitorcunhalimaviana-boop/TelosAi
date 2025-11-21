@@ -13,6 +13,7 @@ import { AuditLogger } from '@/lib/audit/logger';
 import { getClientIP } from '@/lib/utils/ip';
 import { createNotification } from '@/lib/notifications/create-notification';
 import { auth } from '@/lib/auth';
+import { invalidateAllDashboardData } from '@/lib/cache-helpers';
 
 // ============================================
 // GET - LIST PATIENTS WITH PAGINATION & FILTERS
@@ -244,6 +245,9 @@ export async function POST(request: NextRequest) {
         patientName: newPatient.name,
       },
     });
+
+    // Invalidate dashboard cache (novo paciente)
+    invalidateAllDashboardData();
 
     return NextResponse.json(
       {

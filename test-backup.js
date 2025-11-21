@@ -4,13 +4,13 @@
  * Execute: node test-backup.js
  */
 
-const PRODUCTION_URL = 'https://proactive-rejoicing-production.up.railway.app';
+const PRODUCTION_URL = 'https://sistema-pos-operatorio-6hlfqc2a1-joao-vitor-vianas-projects.vercel.app';
 
 async function testBackup() {
   console.log('\n🧪 TESTANDO BACKUP DO BANCO DE DADOS\n');
   console.log('═══════════════════════════════════════════════════════════\n');
 
-  const endpoint = `${PRODUCTION_URL}/api/cron/backup-database`;
+  const endpoint = `${PRODUCTION_URL}/api/cron/daily-tasks`;
 
   console.log(`📡 Endpoint: ${endpoint}\n`);
   console.log('⏳ Executando backup...\n');

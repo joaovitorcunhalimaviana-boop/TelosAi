@@ -2,7 +2,6 @@ import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { PrivateLayout } from "@/components/PrivateLayout";
 import DashboardClient from "./DashboardClient";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -13,9 +12,7 @@ export default async function DashboardPage() {
 
   return (
     <PrivateLayout>
-      <ErrorBoundary>
-        <DashboardClient userRole={user.role} />
-      </ErrorBoundary>
+      <DashboardClient userRole={user.role} />
     </PrivateLayout>
   );
 }

@@ -1,5 +1,5 @@
 // Utilitários para exportação de dados científicos
-import * as XLSX from 'xlsx';
+// XLSX is dynamically imported in functions to reduce bundle size
 
 // Tipos de dados do paciente e cirurgia
 export interface PatientExportData {
@@ -387,7 +387,10 @@ function calculateMedian(values: number[]): number {
 }
 
 // Gerar arquivo Excel com múltiplas abas
-export function generateExcelFile(patients: PatientExportData[], filters: ExportFilters): Buffer {
+export async function generateExcelFile(patients: PatientExportData[], filters: ExportFilters): Promise<Buffer> {
+  // Dynamic import to reduce initial bundle size
+  const XLSX = await import('xlsx');
+
   const workbook = XLSX.utils.book_new();
 
   // Aba 1: Dados brutos
@@ -413,7 +416,10 @@ export function generateExcelFile(patients: PatientExportData[], filters: Export
 }
 
 // Gerar arquivo CSV
-export function generateCSVFile(patients: PatientExportData[], filters: ExportFilters): string {
+export async function generateCSVFile(patients: PatientExportData[], filters: ExportFilters): Promise<string> {
+  // Dynamic import to reduce initial bundle size
+  const XLSX = await import('xlsx');
+
   const rawData = formatRawData(patients, filters);
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.json_to_sheet(rawData);

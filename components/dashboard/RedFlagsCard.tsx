@@ -85,15 +85,16 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
       transition={{ duration: 0.4 }}
       className="mb-6"
     >
-      <Card className="border-4 border-red-500 bg-red-50 dark:bg-red-950/20 shadow-2xl">
+      <Card className="border-4 border-red-500 bg-red-50 dark:bg-red-950/20 shadow-2xl" role="region" aria-label="Alertas urgentes de pacientes" aria-live="polite">
         <CardHeader className="pb-4 bg-red-500 text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
+                aria-hidden="true"
               >
-                <AlertCircle className="h-8 w-8" />
+                <AlertCircle className="h-8 w-8" aria-hidden="true" />
               </motion.div>
               <span>
                 ALERTAS URGENTES
@@ -117,7 +118,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <Card className="border-2 border-red-300 hover:border-red-400 transition-all hover:shadow-lg">
+                  <Card className="border-2 border-red-300 hover:border-red-400 transition-all hover:shadow-lg" role="article" aria-label={`Alerta urgente: ${redFlag.patient.name}, ${getRiskLabel(redFlag.response.riskLevel)}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 space-y-3">
@@ -194,9 +195,10 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                             onClick={() => handleViewPatient(redFlag.patient.id, redFlag.id)}
                             className="bg-red-600 hover:bg-red-700 text-white font-bold gap-2"
                             size="lg"
+                            aria-label={`Ver detalhes urgentes de ${redFlag.patient.name}`}
                           >
                             VER AGORA
-                            <ExternalLink className="h-4 w-4" />
+                            <ExternalLink className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </div>
@@ -208,7 +210,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
           </AnimatePresence>
 
           {/* Informação adicional */}
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-300 rounded-lg">
+          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-300 rounded-lg" role="note">
             <p className="text-sm text-yellow-900 dark:text-yellow-100">
               <strong>Atenção:</strong> Estes pacientes apresentam sintomas que requerem avaliação urgente.
               Os alertas permanecem visíveis por 24 horas após a primeira visualização.

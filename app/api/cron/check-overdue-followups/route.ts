@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createNotification } from '@/lib/notifications/create-notification';
+import { logger } from "@/lib/logger";
 
 const CRON_SECRET = process.env.CRON_SECRET!;
 
@@ -20,14 +21,14 @@ export async function GET(request: NextRequest) {
     const providedSecret = authHeader?.replace('Bearer ', '');
 
     if (providedSecret !== CRON_SECRET) {
-      console.error('[OverdueCron] Unauthorized access attempt');
+      logger.error('[OverdueCron] Unauthorized access attempt');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    console.log('[OverdueCron] Starting overdue follow-up check...');
+    logger.info('Starting overdue follow-up check...');
 
     // Calcular data de 24 horas atrás
     const twentyFourHoursAgo = new Date();
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    console.log(`[OverdueCron] Found ${overdueFollowUps.length} overdue follow-ups`);
+    logger.debug(`[OverdueCron] Found ${overdueFollowUps.length} overdue follow-ups`);
 
     const results = {
       total: overdueFollowUps.length,
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
     // Processar cada follow-up atrasado
     for (const followUp of overdueFollowUps) {
       try {
-        console.log(
+        logger.debug(
           `[OverdueCron] Processing overdue follow-up D+${followUp.dayNumber} for patient ${followUp.patient.name}`
         );
 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
 
         // Se já notificou, pular
         if (existingNotification) {
-          console.log(`[OverdueCron] Already notified for follow-up ${followUp.id}`);
+          logger.debug(`[OverdueCron] Already notified for follow-up ${followUp.id}`);
           continue;
         }
 
@@ -109,9 +110,9 @@ export async function GET(request: NextRequest) {
         });
 
         results.notified++;
-        console.log(`[OverdueCron] Notification sent for follow-up ${followUp.id}`);
+        logger.debug(`[OverdueCron] Notification sent for follow-up ${followUp.id}`);
       } catch (error) {
-        console.error(`[OverdueCron] Error processing follow-up ${followUp.id}:`, error);
+        logger.error(`[OverdueCron] Error processing follow-up ${followUp.id}:`, error);
         results.failed++;
         results.errors.push({
           followUpId: followUp.id,
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log('[OverdueCron] Job completed:', results);
+    logger.info('completed:', results);
 
     return NextResponse.json({
       success: true,
@@ -128,7 +129,7 @@ export async function GET(request: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error('[OverdueCron] Job failed:', error);
+    logger.error('[OverdueCron] Job failed:', error);
     return NextResponse.json(
       {
         success: false,

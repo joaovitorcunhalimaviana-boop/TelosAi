@@ -13,6 +13,7 @@ import { markAsRead } from '@/lib/whatsapp';
 import { analyzeFollowUpResponse } from '@/lib/anthropic';
 import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
 import { sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
+import { rateLimit, getClientIP } from '@/lib/rate-limit';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -21,6 +22,23 @@ const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
  * Meta envia uma requisição GET para verificar o webhook
  */
 export async function GET(request: NextRequest) {
+  // Rate limiting: 100 req/min por IP
+  const ip = getClientIP(request);
+  const rateLimitResult = await rateLimit(ip, 100, 60);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+        }
+      }
+    );
+  }
+
   const searchParams = request.nextUrl.searchParams;
 
   const mode = searchParams.get('hub.mode');
@@ -44,6 +62,23 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 100 req/min por IP
+    const ip = getClientIP(request);
+    const rateLimitResult = await rateLimit(ip, 100, 60);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+          }
+        }
+      );
+    }
+
     const body = await request.json();
 
     console.log('Webhook received:', JSON.stringify(body, null, 2));

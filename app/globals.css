@@ -886,3 +886,145 @@
 .driver-popover-navigation-btns {
   pointer-events: all !important;
 }
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS - WCAG AA
+   ======================================== */
+
+/* Enhanced Focus Styles - Keyboard Navigation */
+@layer base {
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Visible focus ring for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid #2C74B3;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Enhanced focus for interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid #2C74B3;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(44, 116, 179, 0.2);
+  }
+
+  /* Focus within for container elements */
+  *:focus-within {
+    outline-color: #2C74B3;
+  }
+
+  /* High contrast focus for critical elements */
+  [role="alert"]:focus-visible,
+  [aria-live]:focus-visible {
+    outline: 3px solid #DC2626;
+    outline-offset: 2px;
+  }
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #0A2647;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #D4AF37;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    border-width: 2px !important;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    border: 2px solid currentColor !important;
+  }
+}
+
+/* Reduced motion support - already implemented via hook */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced color contrast for better accessibility */
+.text-high-contrast {
+  color: #000000;
+  font-weight: 600;
+}
+
+/* Focus trap for modals */
+[role="dialog"]:focus {
+  outline: none;
+}
+
+/* Ensure interactive elements are keyboard accessible */
+[onclick]:not(button):not(a):not([role]) {
+  cursor: pointer;
+}
+
+/* Live region announcements */
+[aria-live="polite"],
+[aria-live="assertive"] {
+  position: relative;
+}
+
+/* Better visibility for required fields */
+[aria-required="true"]::after,
+[required]::after {
+  content: " *";
+  color: #DC2626;
+  font-weight: bold;
+}
+
+/* Improved disabled state visibility */
+[disabled],
+[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(50%);
+}
+
+/* Focus indicator for custom checkboxes/radios */
+input[type="checkbox"]:focus-visible + label,
+input[type="radio"]:focus-visible + label {
+  outline: 2px solid #2C74B3;
+  outline-offset: 2px;
+}

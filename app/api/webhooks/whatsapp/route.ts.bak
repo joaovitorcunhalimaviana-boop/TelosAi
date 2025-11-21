@@ -12,7 +12,6 @@ import {
   updateConversationState
 } from "@/lib/conversation-manager"
 import { rateLimit, getClientIP } from "@/lib/rate-limit"
-import { logger } from "@/lib/logger"
 
 /**
  * Webhook do WhatsApp Business API
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
 
   const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
 
-  logger.debug("Webhook validation attempt", {
+  console.log("📞 Webhook validation attempt:", {
     mode,
     token,
     tokenMatch: token === verifyToken,
@@ -96,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Validar signature (protege contra requisições falsas)
     if (appSecret && !validateWhatsAppSignature(signature, rawBody, appSecret)) {
-      logger.error('Invalid webhook signature - rejecting request')
+      console.error('❌ Invalid webhook signature - rejecting request')
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 403 }
@@ -106,7 +105,7 @@ export async function POST(request: NextRequest) {
     // Parsear o body JSON após validação
     const body = JSON.parse(rawBody)
 
-    logger.debug("Webhook received", body)
+    console.log("📩 Webhook received:", JSON.stringify(body, null, 2))
 
     // Processa as mensagens recebidas
     if (body.object === "whatsapp_business_account") {
@@ -118,7 +117,7 @@ export async function POST(request: NextRequest) {
         const messages = value.messages
 
         for (const message of messages) {
-          logger.debug("Message received", {
+          console.log("📱 Message received:", {
             from: message.from,
             type: message.type,
             text: message.text?.body,
@@ -155,17 +154,17 @@ export async function POST(request: NextRequest) {
                   `entre em contato pelo telefone (83) 9166-4904.`
 
                 await sendMessage(message.from, response)
-                logger.debug("Response sent to unregistered patient")
+                console.log("✅ Response sent to unregistered patient")
                 continue
               }
 
-              logger.debug("Patient identified", { patientName: patient.name })
+              console.log(`📋 Patient identified: ${patient.name}`)
 
               // 2. Verificar se está aguardando para responder questionário
               const awaitingQuestionnaire = await isAwaitingQuestionnaire(message.from)
 
               if (awaitingQuestionnaire && userMessage.toLowerCase() === 'sim') {
-                logger.debug('Patient confirmed - starting questionnaire')
+                console.log('✅ Patient confirmed - starting questionnaire')
 
                 // Buscar cirurgia mais recente
                 const surgery = await prisma.surgery.findFirst({
@@ -176,7 +175,7 @@ export async function POST(request: NextRequest) {
                 if (surgery) {
                   // Iniciar coleta de respostas
                   await startQuestionnaireCollection(message.from, patient, surgery)
-                  logger.debug('Questionnaire started')
+                  console.log('📝 Questionnaire started')
                   continue
                 }
               }
@@ -185,20 +184,20 @@ export async function POST(request: NextRequest) {
               const conversation = await getOrCreateConversation(message.from, patient.id)
 
               if (conversation.state === 'collecting_answers') {
-                logger.debug('Processing questionnaire answer')
+                console.log('📝 Processing questionnaire answer')
 
                 try {
                   const result = await processQuestionnaireAnswer(message.from, userMessage)
 
                   if (result.completed) {
-                    logger.debug('Questionnaire completed')
+                    console.log('✅ Questionnaire completed')
                   } else {
-                    logger.debug('Next question sent')
+                    console.log('➡️ Next question sent')
                   }
 
                   continue
                 } catch (error) {
-                  logger.error('Error processing questionnaire answer', error)
+                  console.error('❌ Error processing questionnaire answer:', error)
                   // Continua para análise com IA como fallback
                 }
               }
@@ -213,7 +212,7 @@ export async function POST(request: NextRequest) {
               })
 
               // 6. Analisar mensagem com Claude AI
-              logger.debug('Analyzing message with Claude AI')
+              console.log('🤖 Analyzing message with Claude AI...')
               const analysis = await analyzePatientMessage(
                 userMessage,
                 patient,
@@ -221,7 +220,7 @@ export async function POST(request: NextRequest) {
                 patient.userId // Passa o userId do médico para buscar protocolos
               )
 
-              logger.debug("Analysis result", {
+              console.log(`📊 Analysis result:`, {
                 urgency: analysis.urgency,
                 category: analysis.category,
                 shouldNotifyDoctor: analysis.shouldNotifyDoctor
@@ -229,7 +228,7 @@ export async function POST(request: NextRequest) {
 
               // 7. Enviar resposta ao paciente
               await sendMessage(message.from, analysis.suggestedResponse)
-              logger.debug("Intelligent response sent to patient")
+              console.log("✅ Intelligent response sent to patient")
 
               // 8. Notificar médico se necessário
               if (analysis.shouldNotifyDoctor) {
@@ -244,15 +243,15 @@ export async function POST(request: NextRequest) {
 
                   try {
                     await sendMessage(doctorPhone, alertMessage)
-                    logger.debug("Doctor notified successfully")
+                    console.log("✅ Doctor notified successfully")
                   } catch (error) {
-                    logger.error("Error notifying doctor", error)
+                    console.error("❌ Error notifying doctor:", error)
                   }
                 }
               }
 
             } catch (error) {
-              logger.error("Error processing message", error)
+              console.error("❌ Error processing message:", error)
 
               // Fallback: resposta genérica de erro
               const response =
@@ -271,7 +270,7 @@ export async function POST(request: NextRequest) {
         const statuses = value.statuses
 
         for (const status of statuses) {
-          logger.debug("Message status update", {
+          console.log("📊 Message status update:", {
             id: status.id,
             status: status.status,
             timestamp: status.timestamp,
@@ -287,7 +286,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true }, { status: 200 })
 
   } catch (error) {
-    logger.error("Error processing webhook", error)
+    console.error("❌ Error processing webhook:", error)
 
     // 🔧 CORREÇÃO: Retornar 500 em caso de erro real
     // O Meta WhatsApp irá retentar automaticamente (com backoff exponencial)

@@ -10,6 +10,9 @@ import { analyzeFollowUpResponse } from '@/lib/anthropic';
 import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
 import { sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
 import { sendPushNotification } from '@/app/api/notifications/send/route';
+import { rateLimit, getClientIP } from '@/lib/rate-limit';
+import { invalidateDashboardStats } from '@/lib/cache-helpers';
+import { logger } from "@/lib/logger";
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -18,20 +21,37 @@ const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
  * Meta envia uma requisição GET para verificar o webhook
  */
 export async function GET(request: NextRequest) {
+  // Rate limiting: 100 req/min por IP
+  const ip = getClientIP(request);
+  const rateLimitResult = await rateLimit(ip, 100, 60);
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+        }
+      }
+    );
+  }
+
   const searchParams = request.nextUrl.searchParams;
 
   const mode = searchParams.get('hub.mode');
   const token = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  console.log('Webhook verification request:', { mode, token, challenge });
+  logger.debug('Webhook verification request', { mode, token, challenge });
 
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-    console.log('Webhook verified successfully');
+    logger.debug('Webhook verified successfully');
     return new NextResponse(challenge, { status: 200 });
   }
 
-  console.error('Webhook verification failed');
+  logger.error('Webhook verification failed');
   return NextResponse.json({ error: 'Verification failed' }, { status: 403 });
 }
 
@@ -41,13 +61,30 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 100 req/min por IP
+    const ip = getClientIP(request);
+    const rateLimitResult = await rateLimit(ip, 100, 60);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+          }
+        }
+      );
+    }
+
     const body = await request.json();
 
-    console.log('Webhook received:', JSON.stringify(body, null, 2));
+    logger.debug('Webhook received', JSON.stringify(body, null, 2));
 
     // Validar estrutura do webhook
     if (!body.object || body.object !== 'whatsapp_business_account') {
-      console.log('Not a WhatsApp webhook');
+      logger.debug('Not a WhatsApp webhook');
       return NextResponse.json({ status: 'ok' }, { status: 200 });
     }
 
@@ -62,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ status: 'ok' }, { status: 200 });
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    logger.error('Error processing webhook:', error);
     // Retornar 200 mesmo com erro para evitar retry infinito do Meta
     return NextResponse.json({ status: 'error', error: String(error) }, { status: 200 });
   }
@@ -83,7 +120,7 @@ async function processMessages(value: any) {
 
     // Marcar como lida
     await markAsRead(message.id).catch(err =>
-      console.error('Error marking as read:', err)
+      logger.error('Error marking as read:', err)
     );
 
     // Processar baseado no tipo de mensagem
@@ -92,7 +129,7 @@ async function processMessages(value: any) {
     } else if (message.type === 'interactive') {
       await processInteractiveMessage(message, contacts);
     } else {
-      console.log(`Message type ${message.type} not handled`);
+      logger.debug(`Message type ${message.type} not handled`);
     }
   }
 }
@@ -105,13 +142,13 @@ async function processTextMessage(message: any, contacts: any[]) {
     const phone = message.from;
     const text = message.text?.body || '';
 
-    console.log(`Processing text message from ${phone}: ${text}`);
+    logger.debug(`Processing text message from ${phone}: ${text}`);
 
     // Encontrar paciente pelo telefone
     const patient = await findPatientByPhone(phone);
 
     if (!patient) {
-      console.log(`Patient not found for phone ${phone}`);
+      logger.debug(`Patient not found for phone ${phone}`);
       // Enviar mensagem padrão
       await sendEmpatheticResponse(
         phone,
@@ -125,7 +162,7 @@ async function processTextMessage(message: any, contacts: any[]) {
     const pendingFollowUp = await findPendingFollowUp(patient.id);
 
     if (!pendingFollowUp) {
-      console.log(`No pending follow-up found for patient ${patient.id}`);
+      logger.debug(`No pending follow-up found for patient ${patient.id}`);
       // Enviar mensagem padrão
       await sendEmpatheticResponse(
         phone,
@@ -141,7 +178,7 @@ async function processTextMessage(message: any, contacts: any[]) {
 
     // Estado 1: Resposta "sim" ao template inicial
     if ((textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent') {
-      console.log('📋 Iniciando questionário interativo...');
+      logger.debug('📋 Iniciando questionário interativo...');
 
       // Criar uma resposta vazia para tracking
       const response = await prisma.followUpResponse.create({
@@ -164,6 +201,9 @@ async function processTextMessage(message: any, contacts: any[]) {
         },
       });
 
+      // Invalidate dashboard cache (nova resposta de follow-up)
+      invalidateDashboardStats();
+
       return;
     }
 
@@ -181,7 +221,7 @@ async function processTextMessage(message: any, contacts: any[]) {
     );
 
   } catch (error) {
-    console.error('Error processing text message:', error);
+    logger.error('Error processing text message:', error);
   }
 }
 
@@ -247,14 +287,14 @@ async function sendQuestionByNumber(phone: string, patient: any, questionNumber:
   const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === questionNumber);
 
   if (!question) {
-    console.error(`Pergunta ${questionNumber} não encontrada`);
+    logger.error(`Pergunta ${questionNumber} não encontrada`);
     return;
   }
 
   const message = `📋 *Pergunta ${question.number} de ${QUESTIONNAIRE_QUESTIONS.length}*\n\n${question.question}`;
 
   await sendEmpatheticResponse(phone, message);
-  console.log(`✅ Pergunta ${questionNumber} enviada para ${firstName}`);
+  logger.debug(`✅ Pergunta ${questionNumber} enviada para ${firstName}`);
 }
 
 /**
@@ -278,7 +318,7 @@ async function processQuestionnaireAnswer(
     });
 
     if (!existingResponse) {
-      console.error('Resposta não encontrada');
+      logger.error('Resposta não encontrada');
       return;
     }
 
@@ -289,7 +329,7 @@ async function processQuestionnaireAnswer(
     // Validar e salvar resposta
     const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === currentQuestion);
     if (!question) {
-      console.error(`Pergunta ${currentQuestion} não encontrada`);
+      logger.error(`Pergunta ${currentQuestion} não encontrada`);
       return;
     }
 
@@ -300,11 +340,11 @@ async function processQuestionnaireAnswer(
       answer: answer,
     });
 
-    console.log(`✅ Resposta ${currentQuestion} salva: ${answer}`);
+    logger.debug(`✅ Resposta ${currentQuestion} salva: ${answer}`);
 
     // Verificar se é a última pergunta
     if (currentQuestion >= QUESTIONNAIRE_QUESTIONS.length) {
-      console.log('📊 Questionário completo! Finalizando...');
+      logger.debug('📊 Questionário completo! Finalizando...');
       await finalizeQuestionnaire(followUp, patient, phone, data.answers, existingResponse.id);
       return;
     }
@@ -323,7 +363,7 @@ async function processQuestionnaireAnswer(
     await sendQuestionByNumber(phone, patient, data.currentQuestion);
 
   } catch (error) {
-    console.error('Error processing questionnaire answer:', error);
+    logger.error('Error processing questionnaire answer:', error);
     await sendEmpatheticResponse(
       phone,
       'Desculpe, houve um erro ao processar sua resposta. Por favor, tente novamente.'
@@ -342,7 +382,7 @@ async function finalizeQuestionnaire(
   responseId: string
 ) {
   try {
-    console.log('🔄 Finalizando questionário e analisando respostas...');
+    logger.debug('🔄 Finalizando questionário e analisando respostas...');
 
     // Converter respostas em formato estruturado
     const questionnaireData = convertAnswersToStructuredData(answers);
@@ -405,6 +445,9 @@ async function finalizeQuestionnaire(
       },
     });
 
+    // Invalidate dashboard cache (follow-up completado com análise de risco)
+    invalidateDashboardStats();
+
     // Enviar resposta empática ao paciente
     let responseMessage = `✅ *Questionário concluído!*\n\n${aiAnalysis.empatheticResponse}`;
     if (aiAnalysis.seekCareAdvice) {
@@ -420,7 +463,7 @@ async function finalizeQuestionnaire(
       url: `/paciente/${patient.id}`,
       tag: `patient-response-${responseId}`,
       requireInteraction: false,
-    }).catch(err => console.error('Error sending response push notification:', err));
+    }).catch(err => logger.error('Error sending response push notification:', err));
 
     // Alertar médico se risco alto ou crítico
     if (finalRiskLevel === 'high' || finalRiskLevel === 'critical') {
@@ -445,13 +488,13 @@ async function finalizeQuestionnaire(
         url: `/paciente/${patient.id}`,
         tag: `red-flag-${responseId}`,
         requireInteraction: true,
-      }).catch(err => console.error('Error sending push notification:', err));
+      }).catch(err => logger.error('Error sending push notification:', err));
     }
 
-    console.log(`✅ Questionário finalizado com sucesso para ${patient.name}`);
+    logger.debug(`✅ Questionário finalizado com sucesso para ${patient.name}`);
 
   } catch (error) {
-    console.error('Error finalizing questionnaire:', error);
+    logger.error('Error finalizing questionnaire:', error);
     await sendEmpatheticResponse(
       phone,
       'Obrigado por responder! Recebi suas informações e vou analisá-las com cuidado. ' +
@@ -496,7 +539,7 @@ async function processInteractiveMessage(message: any, contacts: any[]) {
     const phone = message.from;
     const interactive = message.interactive;
 
-    console.log(`Processing interactive message from ${phone}:`, interactive);
+    logger.debug(`Processing interactive message from ${phone}:`, interactive);
 
     // Extrair resposta baseada no tipo
     let response = '';
@@ -510,7 +553,7 @@ async function processInteractiveMessage(message: any, contacts: any[]) {
     await processTextMessage({ from: phone, text: { body: response } }, contacts);
 
   } catch (error) {
-    console.error('Error processing interactive message:', error);
+    logger.error('Error processing interactive message:', error);
   }
 }
 
@@ -549,10 +592,10 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
   }
 
   // Log para debug
-  console.log(`🔍 Buscando telefone: ${phone}`);
-  console.log(`   Normalizado: ${normalizedPhone}`);
-  console.log(`   Últimos 8: ${last8}`);
-  console.log(`   Paciente ${patient ? 'ENCONTRADO ✅' : 'NÃO encontrado ❌'}`);
+  logger.debug(`🔍 Buscando telefone: ${phone}`);
+  logger.debug(`   Normalizado: ${normalizedPhone}`);
+  logger.debug(`   Últimos 8: ${last8}`);
+  logger.debug(`   Paciente ${patient ? 'ENCONTRADO ✅' : 'NÃO encontrado ❌'}`);
 
   return patient;
 }
