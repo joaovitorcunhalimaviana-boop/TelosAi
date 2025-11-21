@@ -395,47 +395,61 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
       return patient
     }
 
-    // Log detalhado de falha
-    logger.error('❌ Paciente NÃO encontrado após todas as estratégias', {
-      phoneOriginal: phone,
-      phoneNormalized: normalizedPhone,
-      last11,
-      last9,
-      last8
-    })
-
-    // Buscar amostra para debug
-    const allPatients = await prisma.$queryRaw`
-      SELECT id, name, phone, REGEXP_REPLACE(phone, '[^0-9]', '', 'g') as phone_normalized
-      FROM "Patient"
-      WHERE "isActive" = true
-      LIMIT 5
-    ` as any[];
-
-    logger.debug('📋 Amostra de telefones no banco:', allPatients)
-
-    return null
+    // SQL não encontrou - tentar fallback JavaScript
+    logger.warn('⚠️ SQL não encontrou paciente, tentando fallback JavaScript...')
 
   } catch (error) {
     logger.error('❌ Erro na busca SQL:', error)
-
-    // Fallback: buscar todos e filtrar manualmente
     logger.debug('🔄 Tentando fallback com busca manual...')
+  }
+
+  // FALLBACK: buscar todos e filtrar manualmente (sempre executa se SQL falhar ou não encontrar)
+  try {
     const allPatients = await prisma.patient.findMany({
       where: { isActive: true },
       select: { id: true, name: true, phone: true, userId: true }
     })
+
+    logger.debug(`📋 Buscando entre ${allPatients.length} pacientes ativos via fallback`)
 
     for (const patient of allPatients) {
       const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
       if (patientPhoneNormalized.includes(last11) ||
           patientPhoneNormalized.includes(last9) ||
           patientPhoneNormalized.includes(last8)) {
-        logger.debug('✅ Paciente encontrado via fallback')
+        logger.debug('✅ Paciente encontrado via fallback JavaScript', {
+          patientId: patient.id,
+          patientName: patient.name,
+          patientPhone: patient.phone,
+          userId: patient.userId
+        })
         return patient
       }
     }
 
+    // Não encontrou nem com fallback - log detalhado
+    logger.error('❌ Paciente NÃO encontrado após SQL + fallback', {
+      phoneOriginal: phone,
+      phoneNormalized: normalizedPhone,
+      last11,
+      last9,
+      last8,
+      totalPatientsChecked: allPatients.length
+    })
+
+    // Mostrar amostra para debug
+    logger.debug('📋 Amostra de telefones (primeiros 5):',
+      allPatients.slice(0, 5).map(p => ({
+        name: p.name,
+        phone: p.phone,
+        normalized: p.phone.replace(/\D/g, '')
+      }))
+    )
+
+    return null
+
+  } catch (fallbackError) {
+    logger.error('❌ Erro fatal no fallback JavaScript:', fallbackError)
     return null
   }
 }
