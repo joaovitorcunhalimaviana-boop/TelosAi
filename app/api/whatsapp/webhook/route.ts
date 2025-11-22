@@ -202,7 +202,7 @@ async function processTextMessage(message: any, contacts: any[]) {
     console.log('Texto após trim():', JSON.stringify(text.trim()));
     console.log('Texto após toLowerCase():', JSON.stringify(textLower));
     console.log('Length do texto:', textLower.length);
-    console.log('Char codes:', Array.from(textLower).map(c => c.charCodeAt(0)));
+    console.log('Char codes:', Array.from(textLower).map((c: string) => c.charCodeAt(0)));
     console.log('');
     console.log('COMPARAÇÕES:');
     console.log('textLower === "sim":', textLower === 'sim');
@@ -743,7 +743,7 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
     where: {
       patientId,
       status: {
-        in: ['sent', 'pending'],
+        in: ['sent', 'pending', 'in_progress'],  // CRITICAL FIX: incluir in_progress
       },
     },
     include: {
