@@ -196,6 +196,15 @@ async function processTextMessage(message: any, contacts: any[]) {
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
 
+    console.log('📋 ========== VERIFICANDO "SIM" ==========');
+    console.log('Texto recebido:', text);
+    console.log('Texto normalizado:', textLower);
+    console.log('É "sim"?', textLower === 'sim');
+    console.log('Follow-up status:', pendingFollowUp.status);
+    console.log('Status é "sent"?', pendingFollowUp.status === 'sent');
+    console.log('Vai iniciar questionário?', (textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent');
+    console.log('========================================');
+
     logger.debug('📋 Checking if should start questionnaire', {
       textLower,
       isSimResponse: textLower === 'sim' || textLower === 's' || textLower === 'sim!',
