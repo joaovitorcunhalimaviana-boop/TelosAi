@@ -202,7 +202,7 @@ async function processTextMessage(message: any, contacts: any[]) {
     console.log('Texto após trim():', JSON.stringify(text.trim()));
     console.log('Texto após toLowerCase():', JSON.stringify(textLower));
     console.log('Length do texto:', textLower.length);
-    console.log('Char codes:', Array.from(textLower).map((c: string) => c.charCodeAt(0)));
+    console.log('Char codes:', Array.from(textLower as string).map(c => c.charCodeAt(0)));
     console.log('');
     console.log('COMPARAÇÕES:');
     console.log('textLower === "sim":', textLower === 'sim');
