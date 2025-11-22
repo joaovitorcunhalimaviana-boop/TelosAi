@@ -193,6 +193,15 @@ async function processTextMessage(message: any, contacts: any[]) {
       surgeryType: pendingFollowUp.surgery?.type
     });
 
+    // Verificação: Se já respondeu, não processar mais
+    if (pendingFollowUp.status === 'responded') {
+      await sendEmpatheticResponse(
+        phone,
+        `Você já completou o questionário. Obrigado!`
+      );
+      return;
+    }
+
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
 
@@ -235,36 +244,40 @@ async function processTextMessage(message: any, contacts: any[]) {
       followUpStatus: pendingFollowUp.status
     });
 
-    // Estado 1: Resposta "sim" ao template inicial
+    // Estado 1: Resposta "sim" ao template inicial - INICIAR COM IA
     if ((textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent') {
-      logger.debug('✅ Iniciando questionário interativo...', {
+      logger.debug('✅ Iniciando questionário com IA conversacional...', {
         patientName: patient.name,
         followUpId: pendingFollowUp.id
       });
 
       // Criar uma resposta vazia para tracking
-      const response = await prisma.followUpResponse.create({
+      await prisma.followUpResponse.create({
         data: {
           followUpId: pendingFollowUp.id,
           userId: patient.userId,
-          questionnaireData: JSON.stringify({ answers: [], currentQuestion: 1 }),
+          questionnaireData: JSON.stringify({
+            conversation: [],
+            extractedData: {},
+            completed: false
+          }),
           riskLevel: 'low',
         },
       });
-
-      // Enviar primeira pergunta
-      await sendQuestionByNumber(phone, patient, 1);
 
       // Atualizar follow-up para status "in_progress"
       await prisma.followUp.update({
         where: { id: pendingFollowUp.id },
         data: {
-          status: 'in_progress', // NOVO STATUS
+          status: 'in_progress',
         },
       });
 
-      // Invalidate dashboard cache (nova resposta de follow-up)
+      // Invalidate dashboard cache
       invalidateDashboardStats();
+
+      // Iniciar conversa com IA (primeira mensagem do paciente é "sim")
+      await processQuestionnaireAnswer(pendingFollowUp, patient, phone, text);
 
       return;
     }
@@ -290,166 +303,336 @@ async function processTextMessage(message: any, contacts: any[]) {
 }
 
 /**
- * Lista de perguntas do questionário
+ * URLs das Imagens Médicas
  */
-const QUESTIONNAIRE_QUESTIONS = [
-  {
-    number: 1,
-    question: 'Como está sua DOR hoje? (número de 0 a 10, onde 0 = sem dor e 10 = pior dor imaginável)',
-    field: 'painLevel',
-    type: 'number',
-  },
-  {
-    number: 2,
-    question: 'Você está com FEBRE? (responda sim ou não)',
-    field: 'fever',
-    type: 'boolean',
-  },
-  {
-    number: 3,
-    question: 'Está conseguindo URINAR normalmente? (responda sim ou não)',
-    field: 'urination',
-    type: 'boolean',
-  },
-  {
-    number: 4,
-    question: 'Já conseguiu EVACUAR (fazer cocô)? (responda sim ou não)',
-    field: 'bowelMovement',
-    type: 'boolean',
-  },
-  {
-    number: 5,
-    question: 'Tem algum SANGRAMENTO? (responda: nenhum, leve, moderado ou intenso)',
-    field: 'bleeding',
-    type: 'text',
-  },
-  {
-    number: 6,
-    question: 'Está conseguindo se ALIMENTAR bem? (responda sim ou não)',
-    field: 'eating',
-    type: 'boolean',
-  },
-  {
-    number: 7,
-    question: 'Tem alguma NÁUSEA ou VÔMITO? (responda sim ou não)',
-    field: 'nausea',
-    type: 'boolean',
-  },
-  {
-    number: 8,
-    question: 'Há algo mais que você gostaria de me contar sobre sua recuperação? (responda livremente ou "não")',
-    field: 'concerns',
-    type: 'text',
-  },
-];
+const MEDICAL_IMAGES = {
+  painScale: 'https://cdn.shopify.com/s/files/1/0679/5721/2746/files/escala-dor.jpg',
+  bristolScale: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYj8vKBnZMOYxL5TZzLQwZQwZQwZQwZQw',
+};
 
 /**
- * Envia pergunta específica por número
+ * Estrutura de dados pós-operatórios a serem coletados
  */
-async function sendQuestionByNumber(phone: string, patient: any, questionNumber: number) {
-  const firstName = patient.name.split(' ')[0];
-  const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === questionNumber);
-
-  if (!question) {
-    logger.error(`Pergunta ${questionNumber} não encontrada`);
-    return;
-  }
-
-  const message = `📋 *Pergunta ${question.number} de ${QUESTIONNAIRE_QUESTIONS.length}*\n\n${question.question}`;
-
-  await sendEmpatheticResponse(phone, message);
-  logger.debug(`✅ Pergunta ${questionNumber} enviada para ${firstName}`);
+interface PostOpData {
+  painLevel?: number; // 0-10
+  hasFever?: boolean;
+  feverDetails?: string;
+  canUrinate?: boolean;
+  urinationDetails?: string;
+  hadBowelMovement?: boolean;
+  bristolScale?: number; // 1-7
+  bleeding?: 'none' | 'mild' | 'moderate' | 'severe';
+  bleedingDetails?: string;
+  canEat?: boolean;
+  dietDetails?: string;
+  otherSymptoms?: string;
 }
 
 /**
- * Processa resposta do questionário interativo
+ * Resposta da IA Claude
+ */
+interface ClaudeAIResponse {
+  message: string;
+  needsImage?: 'pain_scale' | 'bristol_scale' | null;
+  dataCollected: Partial<PostOpData>;
+  completed: boolean;
+  needsClarification: boolean;
+  conversationPhase?: string;
+}
+
+/**
+ * Envia imagem de escala médica (dor ou Bristol)
+ */
+async function sendImageScale(phone: string, scaleType: 'pain_scale' | 'bristol_scale') {
+  try {
+    const { sendImage } = await import('@/lib/whatsapp');
+
+    const captions = {
+      pain_scale: '📊 *Escala de Dor*\n\nUse esta escala para avaliar sua dor de 0 a 10.',
+      bristol_scale: '📊 *Escala de Bristol*\n\nUse esta escala para classificar suas fezes de 1 a 7.',
+    };
+
+    const imageUrl = scaleType === 'pain_scale'
+      ? MEDICAL_IMAGES.painScale
+      : MEDICAL_IMAGES.bristolScale;
+
+    await sendImage(phone, imageUrl, captions[scaleType]);
+
+    logger.debug(`✅ Imagem ${scaleType} enviada para ${phone}`);
+  } catch (error) {
+    logger.error(`❌ Erro ao enviar imagem ${scaleType}:`, error);
+  }
+}
+
+/**
+ * Chama Claude API para conversação inteligente
+ */
+async function callClaudeAPI(
+  conversationHistory: any[],
+  userMessage: string,
+  patient: any,
+  surgeryType: string,
+  dayNumber: number
+): Promise<ClaudeAIResponse> {
+  try {
+    const { anthropic } = await import('@/lib/anthropic');
+
+    const SYSTEM_PROMPT = `Você é um assistente médico especializado em acompanhamento pós-operatório via WhatsApp.
+
+OBJETIVO: Coletar informações sobre a recuperação do paciente de forma NATURAL e EMPÁTICA.
+
+INFORMAÇÕES A COLETAR:
+1. Nível de dor (0-10) - ENVIAR imagem da escala ANTES de perguntar
+2. Presença de febre (sim/não + detalhes se sim)
+3. Capacidade de urinar normalmente (sim/não + detalhes se não)
+4. Evacuação (sim/não + escala Bristol de 1-7 se sim) - ENVIAR imagem da escala Bristol ANTES
+5. Sangramento (nenhum/leve/moderado/intenso + detalhes)
+6. Alimentação (conseguindo comer? + detalhes)
+7. Outros sintomas preocupantes
+
+REGRAS IMPORTANTES:
+- Seja CONVERSACIONAL e EMPÁTICO, não robótico
+- Explique termos médicos se o paciente perguntar (ex: "sangramento leve é apenas manchas")
+- Peça esclarecimentos se a resposta for ambígua
+- NÃO repita perguntas já respondidas
+- Sinalize quando precisa enviar imagens (needsImage: "pain_scale" ou "bristol_scale")
+- Ao coletar todas as informações, agradeça e finalize (completed: true)
+- Se o paciente tem dúvida, responda ANTES de avançar (needsClarification: true)
+
+CONTEXTO DO PACIENTE:
+- Nome: ${patient.name}
+- Cirurgia: ${surgeryType}
+- Dia pós-operatório: D+${dayNumber}
+
+FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
+{
+  "message": "mensagem empática para o paciente",
+  "needsImage": "pain_scale" | "bristol_scale" | null,
+  "dataCollected": {
+    "painLevel": number ou null,
+    "hasFever": boolean ou null,
+    "feverDetails": string ou null,
+    "canUrinate": boolean ou null,
+    "urinationDetails": string ou null,
+    "hadBowelMovement": boolean ou null,
+    "bristolScale": number ou null,
+    "bleeding": "none" | "mild" | "moderate" | "severe" ou null,
+    "bleedingDetails": string ou null,
+    "canEat": boolean ou null,
+    "dietDetails": string ou null,
+    "otherSymptoms": string ou null
+  },
+  "completed": boolean,
+  "needsClarification": boolean,
+  "conversationPhase": "greeting | collecting_pain | collecting_fever | ... | completed"
+}`;
+
+    // Construir mensagens para Claude
+    const messages = [
+      ...conversationHistory.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+      {
+        role: 'user',
+        content: userMessage,
+      },
+    ];
+
+    logger.debug('🤖 Chamando Claude API', {
+      historyLength: conversationHistory.length,
+      userMessage: userMessage.substring(0, 100),
+    });
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 2000,
+      temperature: 0.7, // Mais conversacional
+      system: SYSTEM_PROMPT,
+      messages,
+    });
+
+    const responseText = response.content[0].type === 'text'
+      ? response.content[0].text
+      : '';
+
+    logger.debug('🤖 Claude raw response:', responseText);
+
+    // Parse JSON response
+    const aiResponse: ClaudeAIResponse = JSON.parse(responseText);
+
+    logger.debug('✅ Claude response parsed:', {
+      completed: aiResponse.completed,
+      needsImage: aiResponse.needsImage,
+      phase: aiResponse.conversationPhase,
+    });
+
+    return aiResponse;
+  } catch (error) {
+    logger.error('❌ Erro ao chamar Claude API:', error);
+
+    // Fallback response
+    return {
+      message: 'Desculpe, tive um problema técnico. Pode repetir sua última resposta?',
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: false,
+    };
+  }
+}
+
+/**
+ * Processa resposta do questionário com IA conversacional
  */
 async function processQuestionnaireAnswer(
   followUp: any,
   patient: any,
   phone: string,
-  answer: string
+  message: string
 ) {
   try {
-    // Buscar a resposta em andamento
-    const existingResponse = await prisma.followUpResponse.findFirst({
-      where: {
-        followUpId: followUp.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    logger.debug('🔄 Processando resposta com IA conversacional...', {
+      patientId: patient.id,
+      followUpId: followUp.id,
+      message: message.substring(0, 100),
     });
 
-    if (!existingResponse) {
-      logger.error('Resposta não encontrada');
+    // 1. Buscar histórico de conversas
+    const response = await prisma.followUpResponse.findFirst({
+      where: { followUpId: followUp.id },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const questionnaireData = response?.questionnaireData
+      ? JSON.parse(response.questionnaireData)
+      : { conversation: [], extractedData: {}, completed: false };
+
+    const conversationHistory = questionnaireData.conversation || [];
+
+    // Se já completou, NÃO reiniciar questionário
+    if (questionnaireData.completed) {
+      logger.debug('⚠️ Questionário já completado - respondendo contextualmente');
+      await sendEmpatheticResponse(
+        phone,
+        `Olá ${patient.name.split(' ')[0]}! Você já completou o questionário de hoje. ` +
+        'Se tiver alguma preocupação adicional, entre em contato diretamente com o consultório.'
+      );
       return;
     }
 
-    // Parse dos dados atuais
-    const data = JSON.parse(existingResponse.questionnaireData);
-    const currentQuestion = data.currentQuestion || 1;
+    // Detectar perguntas do paciente (linha ~500)
+    const looksLikeQuestion = message.includes('?') ||
+      message.toLowerCase().includes('o que') ||
+      message.toLowerCase().includes('como');
 
-    // Validar e salvar resposta
-    const question = QUESTIONNAIRE_QUESTIONS.find(q => q.number === currentQuestion);
-    if (!question) {
-      logger.error(`Pergunta ${currentQuestion} não encontrada`);
-      return;
+    if (looksLikeQuestion && conversationHistory.length < 2) {
+      // IA vai responder a dúvida
+      logger.debug('Pergunta detectada - IA vai responder');
     }
 
-    // Adicionar resposta
-    data.answers.push({
-      question: question.number,
-      field: question.field,
-      answer: answer,
-    });
+    // 2. Chamar Claude API
+    const aiResponse = await callClaudeAPI(
+      conversationHistory,
+      message,
+      patient,
+      followUp.surgery.type,
+      followUp.dayNumber
+    );
 
-    logger.debug(`✅ Resposta ${currentQuestion} salva: ${answer}`);
-
-    // Verificar se é a última pergunta
-    if (currentQuestion >= QUESTIONNAIRE_QUESTIONS.length) {
-      logger.debug('📊 Questionário completo! Finalizando...');
-      await finalizeQuestionnaire(followUp, patient, phone, data.answers, existingResponse.id);
-      return;
+    // 3. Se precisa enviar imagem, enviar ANTES da resposta
+    if (aiResponse.needsImage) {
+      await sendImageScale(phone, aiResponse.needsImage);
+      // Pequeno delay para garantir ordem das mensagens
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    // Incrementar pergunta e salvar
-    data.currentQuestion = currentQuestion + 1;
+    // 4. Enviar resposta da IA
+    await sendEmpatheticResponse(phone, aiResponse.message);
 
-    await prisma.followUpResponse.update({
-      where: { id: existingResponse.id },
-      data: {
-        questionnaireData: JSON.stringify(data),
-      },
-    });
+    // 5. Atualizar histórico de conversação
+    conversationHistory.push(
+      { role: 'user', content: message },
+      { role: 'assistant', content: aiResponse.message }
+    );
 
-    // Enviar próxima pergunta
-    await sendQuestionByNumber(phone, patient, data.currentQuestion);
+    // Merge dados extraídos (preservar dados anteriores)
+    const mergedData = {
+      ...questionnaireData.extractedData,
+      ...aiResponse.dataCollected,
+    };
+
+    // 6. Atualizar banco de dados
+    const updatedQuestionnaireData = {
+      conversation: conversationHistory,
+      extractedData: mergedData,
+      completed: aiResponse.completed,
+      conversationPhase: aiResponse.conversationPhase,
+    };
+
+    if (response) {
+      await prisma.followUpResponse.update({
+        where: { id: response.id },
+        data: {
+          questionnaireData: JSON.stringify(updatedQuestionnaireData),
+        },
+      });
+    } else {
+      await prisma.followUpResponse.create({
+        data: {
+          followUpId: followUp.id,
+          userId: patient.userId,
+          questionnaireData: JSON.stringify(updatedQuestionnaireData),
+          riskLevel: 'low', // Será atualizado na finalização
+        },
+      });
+    }
+
+    // 7. Se completou, finalizar follow-up
+    if (aiResponse.completed) {
+      logger.debug('✅ Questionário completado via IA - finalizando...');
+      await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData, response?.id || '');
+    }
 
   } catch (error) {
-    logger.error('Error processing questionnaire answer:', error);
+    logger.error('❌ Erro ao processar resposta com IA:', error);
     await sendEmpatheticResponse(
       phone,
-      'Desculpe, houve um erro ao processar sua resposta. Por favor, tente novamente.'
+      'Desculpe, tive um problema ao processar sua resposta. Pode tentar novamente?'
     );
   }
 }
 
 /**
- * Finaliza o questionário e processa todas as respostas
+ * Finaliza questionário com análise via IA
  */
-async function finalizeQuestionnaire(
+async function finalizeQuestionnaireWithAI(
   followUp: any,
   patient: any,
   phone: string,
-  answers: any[],
+  extractedData: Partial<PostOpData>,
   responseId: string
 ) {
   try {
-    logger.debug('🔄 Finalizando questionário e analisando respostas...');
+    logger.debug('🔄 Finalizando questionário com IA e analisando respostas...');
 
-    // Converter respostas em formato estruturado
-    const questionnaireData = convertAnswersToStructuredData(answers);
+    // Converter PostOpData para QuestionnaireData (formato esperado pela análise)
+    // Mapear 'mild' para 'light' para compatibilidade com red-flags
+    const bleedingMap: Record<string, 'none' | 'light' | 'moderate' | 'severe'> = {
+      'none': 'none',
+      'mild': 'light',
+      'moderate': 'moderate',
+      'severe': 'severe',
+    };
+
+    const questionnaireData = {
+      painLevel: extractedData.painLevel,
+      fever: extractedData.hasFever,
+      urinaryRetention: extractedData.canUrinate === false,
+      bowelMovement: extractedData.hadBowelMovement,
+      bleeding: extractedData.bleeding ? bleedingMap[extractedData.bleeding] : 'none',
+      concerns: extractedData.otherSymptoms || '',
+    };
 
     // Detectar red flags deterministicamente
     const redFlags = detectRedFlags({
@@ -489,16 +672,31 @@ async function finalizeQuestionnaire(
       : deterministicRiskLevel;
 
     // Atualizar resposta no banco
-    await prisma.followUpResponse.update({
-      where: { id: responseId },
-      data: {
-        questionnaireData: JSON.stringify(questionnaireData),
-        aiAnalysis: JSON.stringify(aiAnalysis),
-        aiResponse: aiAnalysis.empatheticResponse,
-        riskLevel: finalRiskLevel,
-        redFlags: JSON.stringify(allRedFlags),
-      },
-    });
+    if (responseId) {
+      await prisma.followUpResponse.update({
+        where: { id: responseId },
+        data: {
+          aiAnalysis: JSON.stringify(aiAnalysis),
+          aiResponse: aiAnalysis.empatheticResponse,
+          riskLevel: finalRiskLevel,
+          redFlags: JSON.stringify(allRedFlags),
+        },
+      });
+    } else {
+      // Criar nova resposta se não existir
+      const newResponse = await prisma.followUpResponse.create({
+        data: {
+          followUpId: followUp.id,
+          userId: patient.userId,
+          questionnaireData: JSON.stringify(extractedData),
+          aiAnalysis: JSON.stringify(aiAnalysis),
+          aiResponse: aiAnalysis.empatheticResponse,
+          riskLevel: finalRiskLevel,
+          redFlags: JSON.stringify(allRedFlags),
+        },
+      });
+      responseId = newResponse.id;
+    }
 
     // Atualizar status do follow-up
     await prisma.followUp.update({
@@ -509,7 +707,7 @@ async function finalizeQuestionnaire(
       },
     });
 
-    // Invalidate dashboard cache (follow-up completado com análise de risco)
+    // Invalidate dashboard cache
     invalidateDashboardStats();
 
     // Enviar resposta empática ao paciente
@@ -558,7 +756,7 @@ async function finalizeQuestionnaire(
     logger.debug(`✅ Questionário finalizado com sucesso para ${patient.name}`);
 
   } catch (error) {
-    logger.error('Error finalizing questionnaire:', error);
+    logger.error('Error finalizing questionnaire with AI:', error);
     await sendEmpatheticResponse(
       phone,
       'Obrigado por responder! Recebi suas informações e vou analisá-las com cuidado. ' +
@@ -568,31 +766,15 @@ async function finalizeQuestionnaire(
 }
 
 /**
- * Converte array de respostas em dados estruturados
+ * Calcula nível de risco baseado nos dados coletados (helper function)
  */
-function convertAnswersToStructuredData(answers: any[]): any {
-  const data: any = {};
-
-  for (const ans of answers) {
-    const question = QUESTIONNAIRE_QUESTIONS.find(q => q.field === ans.field);
-    if (!question) continue;
-
-    const answerLower = ans.answer.toLowerCase().trim();
-
-    // Converter baseado no tipo
-    if (question.type === 'number') {
-      const num = parseInt(ans.answer);
-      if (!isNaN(num)) {
-        data[ans.field] = num;
-      }
-    } else if (question.type === 'boolean') {
-      data[ans.field] = answerLower.includes('sim') || answerLower === 's' || answerLower === 'yes';
-    } else {
-      data[ans.field] = ans.answer;
-    }
-  }
-
-  return data;
+function calculateRiskLevel(data: Partial<PostOpData>): 'low' | 'medium' | 'high' | 'critical' {
+  // Lógica simples de risco - será refinada pela IA depois
+  if (data.painLevel && data.painLevel >= 8) return 'high';
+  if (data.bleeding === 'severe') return 'critical';
+  if (data.hasFever) return 'medium';
+  if (!data.canUrinate) return 'high';
+  return 'low';
 }
 
 /**
