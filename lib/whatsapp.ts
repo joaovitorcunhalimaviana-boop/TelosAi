@@ -285,17 +285,34 @@ export async function sendFollowUpQuestionnaire(
     const patientFirstName = patient.name.split(' ')[0] || 'Paciente';
 
     // Componentes usando formato NAMED
-    const components = [
-      {
-        type: 'body',
-        parameters: [
-          {
-            type: 'text',
-            text: patientFirstName
-          }
-        ]
-      }
-    ];
+    let components: any[] = [];
+
+    if (templateName === 'day1') {
+      components = [
+        {
+          type: 'body',
+          parameters: [
+            {
+              type: 'text',
+              parameter_name: 'customer_name',
+              text: patientFirstName
+            }
+          ]
+        }
+      ];
+    } else {
+      components = [
+        {
+          type: 'body',
+          parameters: [
+            {
+              type: 'text',
+              text: patientFirstName
+            }
+          ]
+        }
+      ];
+    }
 
     // day1 usa 'en' (erro no template), otherdays usa 'pt_BR'
     const language = templateName === 'day1' ? 'en' : 'pt_BR';

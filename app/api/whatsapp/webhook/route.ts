@@ -245,7 +245,16 @@ async function processTextMessage(message: any, contacts: any[]) {
     });
 
     // Estado 1: Resposta "sim" ao template inicial - INICIAR COM IA
-    if ((textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent') {
+    // Broaden check to include 'sim' anywhere or other positive confirmations
+    const isPositiveResponse = textLower.includes('sim') ||
+      textLower === 's' ||
+      textLower.includes('ok') ||
+      textLower.includes('pode') ||
+      textLower.includes('claro') ||
+      textLower.includes('iniciar') ||
+      textLower.includes('começar');
+
+    if (isPositiveResponse && pendingFollowUp.status === 'sent') {
       logger.debug('✅ Iniciando questionário com IA conversacional...', {
         patientName: patient.name,
         followUpId: pendingFollowUp.id
@@ -879,8 +888,8 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
     for (const patient of allPatients) {
       const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
       if (patientPhoneNormalized.includes(last11) ||
-          patientPhoneNormalized.includes(last9) ||
-          patientPhoneNormalized.includes(last8)) {
+        patientPhoneNormalized.includes(last9) ||
+        patientPhoneNormalized.includes(last8)) {
         logger.debug('✅ Paciente encontrado via fallback JavaScript', {
           patientId: patient.id,
           patientName: patient.name,
@@ -933,7 +942,7 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
       surgery: true,
     },
     orderBy: {
-      scheduledDate: 'desc',
+      scheduledDate: 'asc', // Priorizar o follow-up mais antigo (D1 antes de D2)
     },
   });
 
@@ -983,8 +992,8 @@ function parseResponseText(text: string): any {
   // Retenção urinária
   if (textLower.includes('urina') || textLower.includes('xixi')) {
     data.urinaryRetention = textLower.includes('não consigo') ||
-                            textLower.includes('dificuldade') ||
-                            textLower.includes('retenção');
+      textLower.includes('dificuldade') ||
+      textLower.includes('retenção');
 
     // Tentar extrair horas
     const hoursMatch = text.match(/(\d+)\s*h/i);
@@ -996,7 +1005,7 @@ function parseResponseText(text: string): any {
   // Evacuação
   if (textLower.includes('evac') || textLower.includes('cocô')) {
     data.bowelMovement = !textLower.includes('não') &&
-                         !textLower.includes('ainda não');
+      !textLower.includes('ainda não');
   }
 
   // Náuseas/vômitos
