@@ -288,13 +288,14 @@ async function processTextMessage(message: any, contacts: any[]) {
       return;
     }
 
-    // Estado 3: Mensagem fora de contexto
+    // Estado 3: Mensagem fora de contexto (NÃO deveria chegar aqui se in_progress)
     console.log('⚠️ MENSAGEM FORA DE CONTEXTO - Enviando instrução para responder SIM');
+    console.log('Status do follow-up:', pendingFollowUp.status);
     await sendEmpatheticResponse(
       phone,
       `Olá ${patient.name.split(' ')[0]}! 👋\n\n` +
       `Para iniciar o questionário pós-operatório, por favor responda com a palavra *"sim"*.\n\n` +
-      `_(Versão do sistema: 2.0 - ${new Date().toLocaleTimeString('pt-BR')})_`
+      `_(Versão do sistema: 3.0 - ${new Date().toLocaleTimeString('pt-BR')})_`
     );
 
   } catch (error) {
