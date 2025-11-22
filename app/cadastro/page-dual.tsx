@@ -48,6 +48,7 @@ export default function CadastroPageDual() {
       )
     } else {
       alert(result.error || 'Erro ao cadastrar paciente')
+      throw new Error(result.error || 'Erro ao cadastrar paciente')
     }
   }
 
@@ -60,6 +61,7 @@ export default function CadastroPageDual() {
       )
     } else {
       alert(result.error || 'Erro ao cadastrar paciente')
+      throw new Error(result.error || 'Erro ao cadastrar paciente')
     }
   }
 
