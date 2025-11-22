@@ -196,14 +196,18 @@ async function processTextMessage(message: any, contacts: any[]) {
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
 
-    console.log('📋 ========== VERIFICANDO "SIM" ==========');
+    console.log('📋 ========== VERIFICANDO "SIM" - VERSÃO NOVA 2.0 ==========');
     console.log('Texto recebido:', text);
     console.log('Texto normalizado:', textLower);
     console.log('É "sim"?', textLower === 'sim');
+    console.log('Follow-up ID:', pendingFollowUp.id);
     console.log('Follow-up status:', pendingFollowUp.status);
+    console.log('Follow-up dayNumber:', pendingFollowUp.dayNumber);
     console.log('Status é "sent"?', pendingFollowUp.status === 'sent');
+    console.log('Paciente ID:', patient.id);
+    console.log('Paciente nome:', patient.name);
     console.log('Vai iniciar questionário?', (textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent');
-    console.log('========================================');
+    console.log('===========================================================');
 
     logger.debug('📋 Checking if should start questionnaire', {
       textLower,
@@ -252,10 +256,12 @@ async function processTextMessage(message: any, contacts: any[]) {
     }
 
     // Estado 3: Mensagem fora de contexto
+    console.log('⚠️ MENSAGEM FORA DE CONTEXTO - Enviando instrução para responder SIM');
     await sendEmpatheticResponse(
       phone,
-      `Olá ${patient.name.split(' ')[0]}! Não entendi sua mensagem. ` +
-      'Se você deseja iniciar o questionário, responda "sim".'
+      `Olá ${patient.name.split(' ')[0]}! 👋\n\n` +
+      `Para iniciar o questionário pós-operatório, por favor responda com a palavra *"sim"*.\n\n` +
+      `_(Versão do sistema: 2.0 - ${new Date().toLocaleTimeString('pt-BR')})_`
     );
 
   } catch (error) {
