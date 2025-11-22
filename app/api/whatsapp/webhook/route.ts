@@ -455,7 +455,7 @@ FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
     });
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 2000,
       temperature: 0.7, // Mais conversacional
       system: SYSTEM_PROMPT,
