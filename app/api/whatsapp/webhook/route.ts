@@ -196,17 +196,37 @@ async function processTextMessage(message: any, contacts: any[]) {
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
 
-    console.log('📋 ========== VERIFICANDO "SIM" - VERSÃO NOVA 2.0 ==========');
-    console.log('Texto recebido:', text);
-    console.log('Texto normalizado:', textLower);
-    console.log('É "sim"?', textLower === 'sim');
-    console.log('Follow-up ID:', pendingFollowUp.id);
-    console.log('Follow-up status:', pendingFollowUp.status);
-    console.log('Follow-up dayNumber:', pendingFollowUp.dayNumber);
-    console.log('Status é "sent"?', pendingFollowUp.status === 'sent');
-    console.log('Paciente ID:', patient.id);
-    console.log('Paciente nome:', patient.name);
-    console.log('Vai iniciar questionário?', (textLower === 'sim' || textLower === 's' || textLower === 'sim!') && pendingFollowUp.status === 'sent');
+    console.log('📋 ========== DEBUG ULTRA DETALHADO V3.0 ==========');
+    console.log('HORA:', new Date().toISOString());
+    console.log('Texto recebido RAW:', JSON.stringify(text));
+    console.log('Texto após trim():', JSON.stringify(text.trim()));
+    console.log('Texto após toLowerCase():', JSON.stringify(textLower));
+    console.log('Length do texto:', textLower.length);
+    console.log('Char codes:', Array.from(textLower).map(c => c.charCodeAt(0)));
+    console.log('');
+    console.log('COMPARAÇÕES:');
+    console.log('textLower === "sim":', textLower === 'sim');
+    console.log('textLower === "s":', textLower === 's');
+    console.log('textLower === "sim!":', textLower === 'sim!');
+    console.log('textLower.includes("sim"):', textLower.includes('sim'));
+    console.log('');
+    console.log('FOLLOW-UP:');
+    console.log('ID:', pendingFollowUp.id);
+    console.log('Status RAW:', JSON.stringify(pendingFollowUp.status));
+    console.log('Status === "sent":', pendingFollowUp.status === 'sent');
+    console.log('Status === "in_progress":', pendingFollowUp.status === 'in_progress');
+    console.log('Day Number:', pendingFollowUp.dayNumber);
+    console.log('');
+    console.log('PACIENTE:');
+    console.log('ID:', patient.id);
+    console.log('Nome:', patient.name);
+    console.log('');
+    console.log('CONDIÇÃO FINAL:');
+    const isSimResponse = (textLower === 'sim' || textLower === 's' || textLower === 'sim!');
+    const isSentStatus = pendingFollowUp.status === 'sent';
+    console.log('É resposta SIM?', isSimResponse);
+    console.log('Status é SENT?', isSentStatus);
+    console.log('VAI INICIAR QUESTIONÁRIO?', isSimResponse && isSentStatus);
     console.log('===========================================================');
 
     logger.debug('📋 Checking if should start questionnaire', {
