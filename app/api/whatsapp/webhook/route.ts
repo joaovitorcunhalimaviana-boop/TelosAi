@@ -481,13 +481,21 @@ FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
   } catch (error) {
     logger.error('❌ Erro ao chamar Claude API:', error);
 
-    // Fallback response
+    // Log detalhado do erro
+    if (error instanceof Error) {
+      logger.error('Error name:', error.name);
+      logger.error('Error message:', error.message);
+      logger.error('Error stack:', error.stack);
+    }
+
+    // Fallback response - iniciar questionário manualmente
     return {
-      message: 'Desculpe, tive um problema técnico. Pode repetir sua última resposta?',
-      needsImage: null,
+      message: `Olá ${patient.name.split(' ')[0]}! 👋\n\nVamos começar o acompanhamento do seu pós-operatório.\n\nPrimeiro, gostaria de saber: *como está sua dor neste momento?*\n\nPor favor, me diga um número de 0 a 10, onde:\n• 0 = sem dor\n• 10 = pior dor imaginável`,
+      needsImage: 'pain_scale',
       dataCollected: {},
       completed: false,
       needsClarification: false,
+      conversationPhase: 'collecting_pain'
     };
   }
 }
