@@ -2,7 +2,7 @@
 
 import { createFollowUpSchedule } from "@/lib/follow-up-scheduler"
 import { prisma } from '@/lib/prisma'
-import { fromBrasiliaTime } from '@/lib/date-utils'
+import { parseDateStringToBrasiliaTime } from '@/lib/date-utils'
 import { auth } from '@/lib/auth'
 
 // Tipos para os dados dos pacientes
@@ -54,7 +54,7 @@ export async function createSimplifiedPatient(data: SimplifiedPatientData) {
 
     // 2. Criar a cirurgia vinculada ao paciente
     // Converter a data do formulário (horário de Brasília) para UTC
-    const surgeryDate = fromBrasiliaTime(new Date(data.surgeryDate))
+    const surgeryDate = parseDateStringToBrasiliaTime(data.surgeryDate)
     const surgery = await prisma.surgery.create({
       data: {
         userId,
@@ -137,7 +137,7 @@ export async function createCompletePatient(data: CompletePatientData) {
 
     // 2. Criar a cirurgia vinculada ao paciente
     // Converter a data do formulário (horário de Brasília) para UTC
-    const surgeryDate = fromBrasiliaTime(new Date(data.surgeryDate))
+    const surgeryDate = parseDateStringToBrasiliaTime(data.surgeryDate)
     const surgery = await prisma.surgery.create({
       data: {
         userId,

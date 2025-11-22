@@ -63,3 +63,21 @@ export function formatBrasiliaDate(date: Date, format: 'short' | 'long' = 'short
     minute: '2-digit',
   });
 }
+
+/**
+ * Converte uma string de data (YYYY-MM-DD) do formulário para Date em UTC
+ * Trata a string como se fosse horário de Brasília e converte para UTC
+ *
+ * Exemplo: "2025-11-21" → 2025-11-21 00:00:00 BRT → 2025-11-21 03:00:00 UTC
+ */
+export function parseDateStringToBrasiliaTime(dateString: string): Date {
+  // Parse a data como se fosse Brasília (não UTC)
+  // Formato esperado: "YYYY-MM-DD"
+  const [year, month, day] = dateString.split('-').map(Number);
+
+  // Criar data no horário de Brasília (meia-noite)
+  const brasiliaDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+  // Converter para UTC mantendo o significado de "meia-noite em Brasília"
+  return fromBrasiliaTime(brasiliaDate);
+}
