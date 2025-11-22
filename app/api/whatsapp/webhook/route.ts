@@ -196,7 +196,7 @@ async function processTextMessage(message: any, contacts: any[]) {
     // Verificar se é início do questionário (resposta "sim" ao template)
     const textLower = text.toLowerCase().trim();
 
-    console.log('📋 ========== DEBUG ULTRA DETALHADO V3.0 ==========');
+    console.log('📋 ========== DEBUG ULTRA DETALHADO V4.0 FINAL ==========');
     console.log('HORA:', new Date().toISOString());
     console.log('Texto recebido RAW:', JSON.stringify(text));
     console.log('Texto após trim():', JSON.stringify(text.trim()));
