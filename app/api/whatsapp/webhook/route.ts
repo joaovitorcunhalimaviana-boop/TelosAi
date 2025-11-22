@@ -21,22 +21,22 @@ const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
  * Meta envia uma requisição GET para verificar o webhook
  */
 export async function GET(request: NextRequest) {
-  // Rate limiting: 100 req/min por IP
-  const ip = getClientIP(request);
-  const rateLimitResult = await rateLimit(ip, 100, 60);
+  // Rate limiting temporariamente desabilitado devido a erro no KV_REST_API_URL
+  // const ip = getClientIP(request);
+  // const rateLimitResult = await rateLimit(ip, 100, 60);
 
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      {
-        status: 429,
-        headers: {
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
-        }
-      }
-    );
-  }
+  // if (!rateLimitResult.success) {
+  //   return NextResponse.json(
+  //     { error: 'Too many requests' },
+  //     {
+  //       status: 429,
+  //       headers: {
+  //         'X-RateLimit-Remaining': '0',
+  //         'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+  //       }
+  //     }
+  //   );
+  // }
 
   const searchParams = request.nextUrl.searchParams;
 
@@ -61,22 +61,22 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting: 100 req/min por IP
-    const ip = getClientIP(request);
-    const rateLimitResult = await rateLimit(ip, 100, 60);
+    // Rate limiting temporariamente desabilitado devido a erro no KV_REST_API_URL
+    // const ip = getClientIP(request);
+    // const rateLimitResult = await rateLimit(ip, 100, 60);
 
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
-          }
-        }
-      );
-    }
+    // if (!rateLimitResult.success) {
+    //   return NextResponse.json(
+    //     { error: 'Too many requests' },
+    //     {
+    //       status: 429,
+    //       headers: {
+    //         'X-RateLimit-Remaining': '0',
+    //         'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
+    //       }
+    //     }
+    //   );
+    // }
 
     const body = await request.json();
 
