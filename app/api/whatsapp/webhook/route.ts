@@ -315,9 +315,11 @@ async function processTextMessage(message: any, contacts: any[]) {
 /**
  * URLs das Imagens Médicas
  */
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sistema-pos-operatorio-ajknwy9u3-joao-vitor-vianas-projects.vercel.app';
+
 const MEDICAL_IMAGES = {
-  painScale: 'https://cdn.shopify.com/s/files/1/0679/5721/2746/files/escala-dor.jpg',
-  bristolScale: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Bristol_Stool_Scale.png/800px-Bristol_Stool_Scale.png',
+  painScale: `${APP_URL}/escala-dor.png`,
+  bristolScale: `${APP_URL}/escala-bristol.png`,
 };
 
 /**
