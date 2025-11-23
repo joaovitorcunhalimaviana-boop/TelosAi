@@ -11,7 +11,7 @@ const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN!;
 
 export interface WhatsAppMessage {
   to: string;
-  type: 'text' | 'template' | 'interactive';
+  type: 'text' | 'template' | 'interactive' | 'image';
   text?: {
     body: string;
   };
@@ -28,6 +28,10 @@ export interface WhatsAppMessage {
       text: string;
     };
     action: any;
+  };
+  image?: {
+    link: string;
+    caption?: string;
   };
 }
 
@@ -482,5 +486,60 @@ export async function testWhatsAppConnection(): Promise<boolean> {
   } catch (error) {
     console.error('WhatsApp connection test failed:', error);
     return false;
+  }
+}
+/**
+ * Envia imagem via URL
+ */
+export async function sendImage(
+  to: string,
+  imageUrl: string,
+  caption?: string
+): Promise<WhatsAppResponse> {
+  try {
+    const formattedPhone = formatPhoneNumber(to);
+
+    console.log('🖼️ Sending WhatsApp image:', {
+      to: formattedPhone,
+      imageUrl,
+      caption
+    });
+
+    const payload: WhatsAppMessage = {
+      to: formattedPhone,
+      type: 'image',
+      image: {
+        link: imageUrl,
+        caption: caption
+      }
+    };
+
+    const response = await fetch(
+      `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          ...payload,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('❌ WhatsApp Image API Error:', error);
+      throw new Error(`WhatsApp Image API Error: ${JSON.stringify(error)}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ WhatsApp image sent successfully:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error sending WhatsApp image:', error);
+    throw error;
   }
 }
