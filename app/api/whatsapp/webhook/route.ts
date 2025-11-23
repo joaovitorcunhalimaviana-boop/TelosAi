@@ -317,7 +317,7 @@ async function processTextMessage(message: any, contacts: any[]) {
  */
 const MEDICAL_IMAGES = {
   painScale: 'https://cdn.shopify.com/s/files/1/0679/5721/2746/files/escala-dor.jpg',
-  bristolScale: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYj8vKBnZMOYxL5TZzLQwZQwZQwZQwZQw',
+  bristolScale: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Bristol_Stool_Scale.png/800px-Bristol_Stool_Scale.png',
 };
 
 /**
