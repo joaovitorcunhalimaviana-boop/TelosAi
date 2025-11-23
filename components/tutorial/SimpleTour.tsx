@@ -98,7 +98,13 @@ export function SimpleTour({ onClose }: { onClose: () => void }) {
           console.log('📍 Position updated:', { top, left, element: step.element });
         }, 300);
       } else {
-        console.error('❌ Element not found:', step.element);
+        console.warn('⚠️ Element not found:', step.element);
+        // Fallback: Centralizar na tela
+        const popoverWidth = 450;
+        const popoverHeight = 250;
+        const top = Math.max(10, window.innerHeight / 2 - popoverHeight / 2);
+        const left = Math.max(10, window.innerWidth / 2 - popoverWidth / 2);
+        setPosition({ top, left });
       }
     };
 
@@ -154,7 +160,7 @@ export function SimpleTour({ onClose }: { onClose: () => void }) {
           width: '450px',
           maxWidth: '90vw',
           boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-          zIndex: 999999,
+          zIndex: 2147483647, // Max z-index
           pointerEvents: 'all',
         }}
       >

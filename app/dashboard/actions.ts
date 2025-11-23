@@ -135,188 +135,188 @@ const getCachedDashboardPatientsInternal = unstable_cache(
       status: "active",
     }
 
-  // Filtro por tipo de cirurgia
-  if (filters.surgeryType && filters.surgeryType !== "all") {
-    whereClause.type = filters.surgeryType
-  }
+    // Filtro por tipo de cirurgia
+    if (filters.surgeryType && filters.surgeryType !== "all") {
+      whereClause.type = filters.surgeryType
+    }
 
-  // Filtro por completude de dados
-  if (filters.dataStatus === "incomplete") {
-    whereClause.dataCompleteness = {
-      lt: 100,
-    }
-  } else if (filters.dataStatus === "complete") {
-    whereClause.dataCompleteness = 100
-  } else if (filters.dataStatus === "research-incomplete") {
-    // This will be filtered post-query since it requires validation logic
-    if (!whereClause.patient) {
-      whereClause.patient = {}
-    }
-    whereClause.patient.isResearchParticipant = true
-  }
-
-  // Filtro por período
-  if (filters.period === "today") {
-    whereClause.date = {
-      gte: todayStart,
-      lte: todayEnd,
-    }
-  } else if (filters.period === "7days") {
-    whereClause.date = {
-      gte: subDays(today, 7),
-    }
-  } else if (filters.period === "30days") {
-    whereClause.date = {
-      gte: subDays(today, 30),
-    }
-  }
-
-  // Filtro por busca (nome ou telefone)
-  if (filters.search) {
-    whereClause.patient = {
-      OR: [
-        {
-          name: {
-            contains: filters.search,
-            mode: "insensitive",
-          },
-        },
-        {
-          phone: {
-            contains: filters.search,
-          },
-        },
-      ],
-    }
-  }
-
-  // Filtro por pesquisa
-  if (filters.researchFilter && filters.researchFilter !== "all") {
-    if (filters.researchFilter === "non-participants") {
-      // Pacientes que NÃO estão em nenhuma pesquisa
-      if (!whereClause.patient) {
-        whereClause.patient = {}
+    // Filtro por completude de dados
+    if (filters.dataStatus === "incomplete") {
+      whereClause.dataCompleteness = {
+        lt: 100,
       }
-      whereClause.patient.isResearchParticipant = false
-    } else {
-      // Filtrar por pesquisa específica (researchId)
-      // Precisamos buscar os grupos dessa pesquisa e filtrar pelos groupCodes
-      const researchGroups = await prisma.researchGroup.findMany({
-        where: {
-          researchId: filters.researchFilter,
-        },
-        select: {
-          groupCode: true,
-        },
-      })
-
-      const groupCodes = researchGroups.map(g => g.groupCode)
-
+    } else if (filters.dataStatus === "complete") {
+      whereClause.dataCompleteness = 100
+    } else if (filters.dataStatus === "research-incomplete") {
+      // This will be filtered post-query since it requires validation logic
       if (!whereClause.patient) {
         whereClause.patient = {}
       }
       whereClause.patient.isResearchParticipant = true
-      whereClause.patient.researchGroup = {
-        in: groupCodes,
+    }
+
+    // Filtro por período
+    if (filters.period === "today") {
+      whereClause.date = {
+        gte: todayStart,
+        lte: todayEnd,
+      }
+    } else if (filters.period === "7days") {
+      whereClause.date = {
+        gte: subDays(today, 7),
+      }
+    } else if (filters.period === "30days") {
+      whereClause.date = {
+        gte: subDays(today, 30),
       }
     }
-  }
 
-  const surgeries = await prisma.surgery.findMany({
-    where: whereClause,
-    include: {
-      patient: true,
-      followUps: {
-        orderBy: {
-          dayNumber: "desc",
-        },
-        take: 1,
-        include: {
-          responses: {
-            orderBy: {
-              createdAt: "desc",
+    // Filtro por busca (nome ou telefone)
+    if (filters.search) {
+      whereClause.patient = {
+        OR: [
+          {
+            name: {
+              contains: filters.search,
+              mode: "insensitive",
             },
-            take: 1,
+          },
+          {
+            phone: {
+              contains: filters.search,
+            },
+          },
+        ],
+      }
+    }
+
+    // Filtro por pesquisa
+    if (filters.researchFilter && filters.researchFilter !== "all") {
+      if (filters.researchFilter === "non-participants") {
+        // Pacientes que NÃO estão em nenhuma pesquisa
+        if (!whereClause.patient) {
+          whereClause.patient = {}
+        }
+        whereClause.patient.isResearchParticipant = false
+      } else {
+        // Filtrar por pesquisa específica (researchId)
+        // Precisamos buscar os grupos dessa pesquisa e filtrar pelos groupCodes
+        const researchGroups = await prisma.researchGroup.findMany({
+          where: {
+            researchId: filters.researchFilter,
+          },
+          select: {
+            groupCode: true,
+          },
+        })
+
+        const groupCodes = researchGroups.map(g => g.groupCode)
+
+        if (!whereClause.patient) {
+          whereClause.patient = {}
+        }
+        whereClause.patient.isResearchParticipant = true
+        whereClause.patient.researchGroup = {
+          in: groupCodes,
+        }
+      }
+    }
+
+    const surgeries = await prisma.surgery.findMany({
+      where: whereClause,
+      include: {
+        patient: true,
+        followUps: {
+          orderBy: {
+            dayNumber: "desc",
+          },
+          take: 1,
+          include: {
+            responses: {
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 1,
+            },
           },
         },
       },
-    },
-    orderBy: {
-      date: "desc",
-    },
-  })
+      orderBy: {
+        date: "desc",
+      },
+    })
 
-  // Transformar em PatientCards
-  const patientCards: PatientCard[] = surgeries.map((surgery) => {
-    const daysSinceSurgery = Math.floor(
-      (today.getTime() - surgery.date.getTime()) / (1000 * 60 * 60 * 24)
-    )
+    // Transformar em PatientCards
+    const patientCards: PatientCard[] = surgeries.map((surgery) => {
+      const daysSinceSurgery = Math.floor(
+        (today.getTime() - surgery.date.getTime()) / (1000 * 60 * 60 * 24)
+      )
 
-    const latestFollowUp = surgery.followUps[0]
-    const latestResponse = latestFollowUp?.responses[0]
+      const latestFollowUp = surgery.followUps[0]
+      const latestResponse = latestFollowUp?.responses[0]
 
-    let hasRedFlags = false
-    let redFlags: string[] = []
+      let hasRedFlags = false
+      let redFlags: string[] = []
 
-    if (latestResponse) {
-      hasRedFlags = latestResponse.riskLevel === "high" || latestResponse.riskLevel === "critical"
-      if (latestResponse.redFlags) {
-        try {
-          redFlags = JSON.parse(latestResponse.redFlags)
-        } catch {
-          redFlags = []
+      if (latestResponse) {
+        hasRedFlags = latestResponse.riskLevel === "high" || latestResponse.riskLevel === "critical"
+        if (latestResponse.redFlags) {
+          try {
+            redFlags = JSON.parse(latestResponse.redFlags)
+          } catch {
+            redFlags = []
+          }
         }
       }
-    }
 
-    // Determinar o dia do follow-up
-    let followUpDay = "D+0"
-    if (latestFollowUp) {
-      followUpDay = `D+${latestFollowUp.dayNumber}`
-    } else if (daysSinceSurgery > 0) {
-      followUpDay = `D+${daysSinceSurgery}`
-    }
+      // Determinar o dia do follow-up
+      let followUpDay = "D+0"
+      if (latestFollowUp) {
+        followUpDay = `D+${latestFollowUp.dayNumber}`
+      } else if (daysSinceSurgery > 0) {
+        followUpDay = `D+${daysSinceSurgery}`
+      }
 
-    // Validate research fields if participant
-    let researchDataComplete = true
-    let researchMissingFieldsCount = 0
+      // Validate research fields if participant
+      let researchDataComplete = true
+      let researchMissingFieldsCount = 0
 
-    if (surgery.patient.isResearchParticipant) {
-      const validation = validateResearchFields({
-        ...surgery.patient,
-        surgery: {
-          type: surgery.type,
-          date: surgery.date,
-          hospital: surgery.hospital,
-        }
-      })
-      researchDataComplete = validation.isComplete
-      researchMissingFieldsCount = validation.missingFields.length
-    }
+      if (surgery.patient.isResearchParticipant) {
+        const validation = validateResearchFields({
+          ...surgery.patient,
+          surgery: {
+            type: surgery.type,
+            date: surgery.date,
+            hospital: surgery.hospital,
+          }
+        })
+        researchDataComplete = validation.isComplete
+        researchMissingFieldsCount = validation.missingFields.length
+      }
 
-    return {
-      id: surgery.id,
-      patientName: surgery.patient.name,
-      phone: surgery.patient.phone, // Telefone para WhatsApp
-      surgeryType: surgery.type as SurgeryType,
-      surgeryDate: surgery.date,
-      daysSinceSurgery,
-      followUpDay,
-      status: surgery.status as "active" | "completed" | "cancelled",
-      dataCompleteness: surgery.dataCompleteness,
-      hasRedFlags,
-      redFlags,
-      patientId: surgery.patientId,
-      patientCreatedAt: surgery.patient.createdAt,
-      isResearchParticipant: surgery.patient.isResearchParticipant,
-      researchGroup: surgery.patient.researchGroup,
-      researchDataComplete,
-      researchMissingFieldsCount,
-      latestResponse: latestResponse ? {
-        riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical"
-      } : null,
-    }
-  })
+      return {
+        id: surgery.id,
+        patientName: surgery.patient.name,
+        phone: surgery.patient.phone, // Telefone para WhatsApp
+        surgeryType: surgery.type as SurgeryType,
+        surgeryDate: surgery.date,
+        daysSinceSurgery,
+        followUpDay,
+        status: surgery.status as "active" | "completed" | "cancelled",
+        dataCompleteness: surgery.dataCompleteness,
+        hasRedFlags,
+        redFlags,
+        patientId: surgery.patientId,
+        patientCreatedAt: surgery.patient.createdAt,
+        isResearchParticipant: surgery.patient.isResearchParticipant,
+        researchGroup: surgery.patient.researchGroup,
+        researchDataComplete,
+        researchMissingFieldsCount,
+        latestResponse: latestResponse ? {
+          riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical"
+        } : null,
+      }
+    })
 
     // Filter research-incomplete post-query
     if (filters.dataStatus === "research-incomplete") {
@@ -331,6 +331,11 @@ const getCachedDashboardPatientsInternal = unstable_cache(
     const duration = Date.now() - startTime
     console.log(`[CACHE] Dashboard patients computed in ${duration}ms (${patientCards.length} results)`)
     return patientCards
+  },
+  ['dashboard-patients-list'],
+  {
+    revalidate: 1, // Revalidate every second to ensure fresh data
+    tags: ['dashboard', 'dashboard-patients']
   }
 )
 
