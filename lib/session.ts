@@ -15,7 +15,7 @@ export async function requireAuth() {
 
 export async function requireAdmin() {
   const user = await requireAuth();
-  if (user.role !== "admin") {
+  if (user.role?.toLowerCase() !== "admin") {
     throw new Error("Acesso negado. Apenas administradores.");
   }
   return user;
