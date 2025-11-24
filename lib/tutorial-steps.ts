@@ -21,6 +21,7 @@ export interface TutorialMetadata {
   category: 'basico' | 'avancado' | 'estatisticas' | 'exportacao' | 'pesquisas';
   estimatedTime: number; // in minutes
   prerequisites?: TutorialId[];
+  route?: string;
 }
 
 export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
@@ -30,6 +31,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     description: 'Conheça seu painel de controle e funcionalidades principais',
     category: 'basico',
     estimatedTime: 3,
+    route: '/dashboard',
   },
   'patient-registration': {
     id: 'patient-registration',
@@ -37,6 +39,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     description: 'Aprenda a cadastrar e gerenciar pacientes rapidamente',
     category: 'basico',
     estimatedTime: 2,
+    route: '/cadastro',
   },
   'patient-management': {
     id: 'patient-management',
@@ -45,6 +48,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     category: 'basico',
     estimatedTime: 4,
     prerequisites: ['dashboard-tour'],
+    route: '/dashboard',
   },
   'research-creation': {
     id: 'research-creation',
@@ -53,6 +57,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     category: 'pesquisas',
     estimatedTime: 8,
     prerequisites: ['dashboard-tour'],
+    route: '/dashboard/pesquisas',
   },
   'research-assignment': {
     id: 'research-assignment',
@@ -61,6 +66,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     category: 'pesquisas',
     estimatedTime: 3,
     prerequisites: ['research-creation'],
+    route: '/dashboard',
   },
   'statistical-analysis': {
     id: 'statistical-analysis',
@@ -69,6 +75,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     category: 'estatisticas',
     estimatedTime: 12,
     prerequisites: ['research-creation'],
+    route: '/dashboard/pesquisas',
   },
   'data-export': {
     id: 'data-export',
@@ -77,6 +84,7 @@ export const tutorialMetadata: Record<TutorialId, TutorialMetadata> = {
     category: 'exportacao',
     estimatedTime: 5,
     prerequisites: ['statistical-analysis'],
+    route: '/exportar',
   },
 };
 

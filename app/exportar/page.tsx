@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Download, FileSpreadsheet, FileText, Database, ShieldCheck } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Database, ShieldCheck, BookOpen } from 'lucide-react';
 
 export default function ExportarPage() {
   // Estados dos filtros
@@ -126,7 +126,7 @@ export default function ExportarPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
+    <div id="export-page" className="container mx-auto p-6 max-w-5xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
           <Database className="h-8 w-8" />
@@ -200,7 +200,7 @@ export default function ExportarPage() {
         </Card>
 
         {/* Opções de Exportação */}
-        <Card>
+        <Card data-tutorial="export-options">
           <CardHeader>
             <CardTitle>Opções de Exportação</CardTitle>
             <CardDescription>
@@ -246,7 +246,7 @@ export default function ExportarPage() {
 
             <Separator />
 
-            <div className="space-y-2">
+            <div className="space-y-2" data-tutorial="export-format">
               <Label htmlFor="format">Formato de Exportação</Label>
               <div className="flex items-center gap-2">
                 <Select
@@ -374,9 +374,8 @@ export default function ExportarPage() {
                 />
                 <Label
                   htmlFor="field-identifiable"
-                  className={`text-sm font-normal cursor-pointer ${
-                    anonymize ? 'opacity-50' : ''
-                  }`}
+                  className={`text-sm font-normal cursor-pointer ${anonymize ? 'opacity-50' : ''
+                    }`}
                 >
                   Dados identificáveis (nome, CPF, telefone)
                   {anonymize && ' - Desabilitado quando anonimizado'}
@@ -413,6 +412,21 @@ export default function ExportarPage() {
           </Card>
         )}
 
+        {/* Citação Sugerida */}
+        <Card className="bg-slate-50 border-slate-200" data-tutorial="apa-citation">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base text-slate-700 flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Citação Sugerida (APA 7th)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <code className="text-sm text-slate-600 bg-white p-2 rounded border block">
+              Viana, J. V. (2025). <em>Dados Clínicos de Acompanhamento Pós-Operatório</em> [Base de dados]. Telos.AI.
+            </code>
+          </CardContent>
+        </Card>
+
         {/* Botão de Exportação */}
         <div className="flex justify-end">
           <Button
@@ -420,6 +434,7 @@ export default function ExportarPage() {
             onClick={handleExport}
             disabled={isExporting}
             className="min-w-48"
+            data-tutorial="download-btn"
           >
             <Download className="h-5 w-5 mr-2" />
             {isExporting ? 'Exportando...' : 'Exportar Dados'}

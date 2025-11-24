@@ -76,7 +76,7 @@ export default function CadastroPage() {
     <PrivateLayout>
       <div className="w-full">
         {/* Header */}
-        <div className="text-center mb-12 space-y-4">
+        <div id="registration-header" className="text-center mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-4">
             <svg
               className="w-4 h-4 text-telos-gold"

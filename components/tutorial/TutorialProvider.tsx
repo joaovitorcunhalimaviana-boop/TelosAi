@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useCallback, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { driver, DriveStep, Driver, Config } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import { TutorialId, getTutorialSteps, tutorialMetadata } from '@/lib/tutorial-steps';
@@ -36,6 +37,8 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
   const [driverInstance, setDriverInstance] = useState<Driver | null>(null);
   const [currentTutorial, setCurrentTutorial] = useState<TutorialId | null>(null);
   const [tutorialStartTime, setTutorialStartTime] = useState<number>(0);
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Custom styling for driver.js to match Telos.AI brand
   const defaultDriverConfig: Partial<Config> = {
@@ -161,6 +164,17 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
 
   const startTutorial = useCallback(
     (tutorialId: TutorialId, options: Partial<Config> = {}) => {
+      // Check if we need to navigate to a different route
+      const metadata = tutorialMetadata[tutorialId];
+      if (metadata?.route && pathname !== metadata.route) {
+        console.log(`Redirecting to ${metadata.route} for tutorial ${tutorialId}`);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('pending_tutorial', tutorialId);
+        }
+        router.push(metadata.route);
+        return;
+      }
+
       // Stop any existing tutorial
       if (driverInstance) {
         driverInstance.destroy();
@@ -293,7 +307,7 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
                 setTimeout(() => {
                   const rect = newNextBtn.getBoundingClientRect();
                   console.log('📏 Posição do novo botão:', rect);
-                  const elementAtPosition = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                  const elementAtPosition = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
                   console.log('🔍 Elemento na posição do novo botão:', elementAtPosition);
                   console.log('🔍 É o novo botão?', elementAtPosition === newNextBtn);
 
@@ -397,96 +411,111 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
       setDriverInstance(newDriver);
       newDriver.drive();
     },
-    [driverInstance, tutorialStartTime, analyticsManager]
-  );
-
-  const stopTutorial = useCallback(() => {
-    if (driverInstance) {
-      driverInstance.destroy();
-      setDriverInstance(null);
-      setCurrentTutorial(null);
-    }
-  }, [driverInstance]);
-
-  const skipTutorial = useCallback(
-    (tutorialId: TutorialId) => {
-      analyticsManager.skipTutorial(tutorialId);
-      stopTutorial();
     },
-    [analyticsManager, stopTutorial]
+[driverInstance, tutorialStartTime, analyticsManager, pathname, router]
   );
 
-  const resetTutorials = useCallback(() => {
-    analyticsManager.resetAllTutorials();
+// Check for pending tutorials after navigation
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const pendingTutorial = sessionStorage.getItem('pending_tutorial') as TutorialId | null;
+    if (pendingTutorial && pathname === tutorialMetadata[pendingTutorial]?.route) {
+      sessionStorage.removeItem('pending_tutorial');
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        startTutorial(pendingTutorial);
+      }, 1000);
+    }
+  }
+}, [pathname, startTutorial]);
+
+const stopTutorial = useCallback(() => {
+  if (driverInstance) {
+    driverInstance.destroy();
+    setDriverInstance(null);
+    setCurrentTutorial(null);
+  }
+}, [driverInstance]);
+
+const skipTutorial = useCallback(
+  (tutorialId: TutorialId) => {
+    analyticsManager.skipTutorial(tutorialId);
     stopTutorial();
-  }, [analyticsManager, stopTutorial]);
+  },
+  [analyticsManager, stopTutorial]
+);
 
-  const resetTutorial = useCallback(
-    (tutorialId: TutorialId) => {
-      analyticsManager.resetTutorial(tutorialId);
-    },
-    [analyticsManager]
-  );
+const resetTutorials = useCallback(() => {
+  analyticsManager.resetAllTutorials();
+  stopTutorial();
+}, [analyticsManager, stopTutorial]);
 
-  const isTutorialCompleted = useCallback(
-    (tutorialId: TutorialId) => {
-      return analyticsManager.isTutorialCompleted(tutorialId);
-    },
-    [analyticsManager]
-  );
+const resetTutorial = useCallback(
+  (tutorialId: TutorialId) => {
+    analyticsManager.resetTutorial(tutorialId);
+  },
+  [analyticsManager]
+);
 
-  const isOnboardingComplete = useCallback(() => {
-    return analyticsManager.isOnboardingComplete();
-  }, [analyticsManager]);
+const isTutorialCompleted = useCallback(
+  (tutorialId: TutorialId) => {
+    return analyticsManager.isTutorialCompleted(tutorialId);
+  },
+  [analyticsManager]
+);
 
-  const getSuggestedTutorial = useCallback(() => {
-    return analyticsManager.getSuggestedTutorial();
-  }, [analyticsManager]);
+const isOnboardingComplete = useCallback(() => {
+  return analyticsManager.isOnboardingComplete();
+}, [analyticsManager]);
 
-  const getCompletionRate = useCallback(() => {
-    return analyticsManager.getCompletionRate();
-  }, [analyticsManager]);
+const getSuggestedTutorial = useCallback(() => {
+  return analyticsManager.getSuggestedTutorial();
+}, [analyticsManager]);
 
-  const isFirstTimeUser = useCallback(() => {
-    return analyticsManager.isFirstTimeUser();
-  }, [analyticsManager]);
+const getCompletionRate = useCallback(() => {
+  return analyticsManager.getCompletionRate();
+}, [analyticsManager]);
 
-  // Auto-trigger dashboard tour for first-time users
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+const isFirstTimeUser = useCallback(() => {
+  return analyticsManager.isFirstTimeUser();
+}, [analyticsManager]);
 
-    // Check if on dashboard page and first time user
-    const isDashboard = window.location.pathname === '/dashboard';
-    if (isDashboard && isFirstTimeUser()) {
-      // Delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        if (analyticsManager.shouldShowTutorial('dashboard-tour')) {
-          startTutorial('dashboard-tour');
-        }
-      }, 1500);
+// Auto-trigger dashboard tour for first-time users
+useEffect(() => {
+  if (typeof window === 'undefined') return;
 
-      return () => clearTimeout(timer);
-    }
-  }, [isFirstTimeUser, analyticsManager, startTutorial]);
+  // Check if on dashboard page and first time user
+  const isDashboard = window.location.pathname === '/dashboard';
+  if (isDashboard && isFirstTimeUser()) {
+    // Delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      if (analyticsManager.shouldShowTutorial('dashboard-tour')) {
+        startTutorial('dashboard-tour');
+      }
+    }, 1500);
 
-  const value: TutorialContextType = {
-    startTutorial,
-    stopTutorial,
-    skipTutorial,
-    resetTutorials,
-    resetTutorial,
-    isTutorialCompleted,
-    isOnboardingComplete,
-    getSuggestedTutorial,
-    getCompletionRate,
-    isFirstTimeUser,
-    currentTutorial,
-    driverInstance,
-  };
+    return () => clearTimeout(timer);
+  }
+}, [isFirstTimeUser, analyticsManager, startTutorial]);
 
-  return (
-    <TutorialContext.Provider value={value}>
-      {children}
-    </TutorialContext.Provider>
-  );
+const value: TutorialContextType = {
+  startTutorial,
+  stopTutorial,
+  skipTutorial,
+  resetTutorials,
+  resetTutorial,
+  isTutorialCompleted,
+  isOnboardingComplete,
+  getSuggestedTutorial,
+  getCompletionRate,
+  isFirstTimeUser,
+  currentTutorial,
+  driverInstance,
+};
+
+return (
+  <TutorialContext.Provider value={value}>
+    {children}
+  </TutorialContext.Provider>
+);
 }

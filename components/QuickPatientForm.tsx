@@ -125,7 +125,7 @@ export function QuickPatientForm({ onSubmit }: QuickPatientFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Nome Completo */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-tutorial="patient-name">
         <Label htmlFor="name" className="text-base">
           Nome Completo *
         </Label>
@@ -144,7 +144,7 @@ export function QuickPatientForm({ onSubmit }: QuickPatientFormProps) {
       </div>
 
       {/* WhatsApp */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-tutorial="patient-phone">
         <Label htmlFor="phone" className="text-base">
           WhatsApp *
         </Label>
@@ -186,7 +186,7 @@ export function QuickPatientForm({ onSubmit }: QuickPatientFormProps) {
       </div>
 
       {/* Tipo de Cirurgia */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-tutorial="surgery-type">
         <Label htmlFor="surgeryType" className="text-base">
           Tipo de Cirurgia *
         </Label>
@@ -215,7 +215,7 @@ export function QuickPatientForm({ onSubmit }: QuickPatientFormProps) {
       </div>
 
       {/* Data da Cirurgia */}
-      <div className="space-y-2">
+      <div className="space-y-2" data-tutorial="surgery-date">
         <Label htmlFor="surgeryDate" className="text-base">
           Data da Cirurgia *
         </Label>
@@ -239,6 +239,7 @@ export function QuickPatientForm({ onSubmit }: QuickPatientFormProps) {
         type="submit"
         disabled={isSubmitting}
         className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg"
+        data-tutorial="submit-btn"
       >
         {isSubmitting ? (
           <span className="flex items-center gap-2">
