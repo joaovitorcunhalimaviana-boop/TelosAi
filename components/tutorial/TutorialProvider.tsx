@@ -411,111 +411,110 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
       setDriverInstance(newDriver);
       newDriver.drive();
     },
-    },
-[driverInstance, tutorialStartTime, analyticsManager, pathname, router]
+    [driverInstance, tutorialStartTime, analyticsManager, pathname, router]
   );
 
-// Check for pending tutorials after navigation
-useEffect(() => {
-  if (typeof window !== 'undefined') {
-    const pendingTutorial = sessionStorage.getItem('pending_tutorial') as TutorialId | null;
-    if (pendingTutorial && pathname === tutorialMetadata[pendingTutorial]?.route) {
-      sessionStorage.removeItem('pending_tutorial');
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        startTutorial(pendingTutorial);
-      }, 1000);
-    }
-  }
-}, [pathname, startTutorial]);
-
-const stopTutorial = useCallback(() => {
-  if (driverInstance) {
-    driverInstance.destroy();
-    setDriverInstance(null);
-    setCurrentTutorial(null);
-  }
-}, [driverInstance]);
-
-const skipTutorial = useCallback(
-  (tutorialId: TutorialId) => {
-    analyticsManager.skipTutorial(tutorialId);
-    stopTutorial();
-  },
-  [analyticsManager, stopTutorial]
-);
-
-const resetTutorials = useCallback(() => {
-  analyticsManager.resetAllTutorials();
-  stopTutorial();
-}, [analyticsManager, stopTutorial]);
-
-const resetTutorial = useCallback(
-  (tutorialId: TutorialId) => {
-    analyticsManager.resetTutorial(tutorialId);
-  },
-  [analyticsManager]
-);
-
-const isTutorialCompleted = useCallback(
-  (tutorialId: TutorialId) => {
-    return analyticsManager.isTutorialCompleted(tutorialId);
-  },
-  [analyticsManager]
-);
-
-const isOnboardingComplete = useCallback(() => {
-  return analyticsManager.isOnboardingComplete();
-}, [analyticsManager]);
-
-const getSuggestedTutorial = useCallback(() => {
-  return analyticsManager.getSuggestedTutorial();
-}, [analyticsManager]);
-
-const getCompletionRate = useCallback(() => {
-  return analyticsManager.getCompletionRate();
-}, [analyticsManager]);
-
-const isFirstTimeUser = useCallback(() => {
-  return analyticsManager.isFirstTimeUser();
-}, [analyticsManager]);
-
-// Auto-trigger dashboard tour for first-time users
-useEffect(() => {
-  if (typeof window === 'undefined') return;
-
-  // Check if on dashboard page and first time user
-  const isDashboard = window.location.pathname === '/dashboard';
-  if (isDashboard && isFirstTimeUser()) {
-    // Delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      if (analyticsManager.shouldShowTutorial('dashboard-tour')) {
-        startTutorial('dashboard-tour');
+  // Check for pending tutorials after navigation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const pendingTutorial = sessionStorage.getItem('pending_tutorial') as TutorialId | null;
+      if (pendingTutorial && pathname === tutorialMetadata[pendingTutorial]?.route) {
+        sessionStorage.removeItem('pending_tutorial');
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          startTutorial(pendingTutorial);
+        }, 1000);
       }
-    }, 1500);
+    }
+  }, [pathname, startTutorial]);
 
-    return () => clearTimeout(timer);
-  }
-}, [isFirstTimeUser, analyticsManager, startTutorial]);
+  const stopTutorial = useCallback(() => {
+    if (driverInstance) {
+      driverInstance.destroy();
+      setDriverInstance(null);
+      setCurrentTutorial(null);
+    }
+  }, [driverInstance]);
 
-const value: TutorialContextType = {
-  startTutorial,
-  stopTutorial,
-  skipTutorial,
-  resetTutorials,
-  resetTutorial,
-  isTutorialCompleted,
-  isOnboardingComplete,
-  getSuggestedTutorial,
-  getCompletionRate,
-  isFirstTimeUser,
-  currentTutorial,
-  driverInstance,
-};
+  const skipTutorial = useCallback(
+    (tutorialId: TutorialId) => {
+      analyticsManager.skipTutorial(tutorialId);
+      stopTutorial();
+    },
+    [analyticsManager, stopTutorial]
+  );
 
-return (
-  <TutorialContext.Provider value={value}>
-    {children}
-  </TutorialContext.Provider>
-);
+  const resetTutorials = useCallback(() => {
+    analyticsManager.resetAllTutorials();
+    stopTutorial();
+  }, [analyticsManager, stopTutorial]);
+
+  const resetTutorial = useCallback(
+    (tutorialId: TutorialId) => {
+      analyticsManager.resetTutorial(tutorialId);
+    },
+    [analyticsManager]
+  );
+
+  const isTutorialCompleted = useCallback(
+    (tutorialId: TutorialId) => {
+      return analyticsManager.isTutorialCompleted(tutorialId);
+    },
+    [analyticsManager]
+  );
+
+  const isOnboardingComplete = useCallback(() => {
+    return analyticsManager.isOnboardingComplete();
+  }, [analyticsManager]);
+
+  const getSuggestedTutorial = useCallback(() => {
+    return analyticsManager.getSuggestedTutorial();
+  }, [analyticsManager]);
+
+  const getCompletionRate = useCallback(() => {
+    return analyticsManager.getCompletionRate();
+  }, [analyticsManager]);
+
+  const isFirstTimeUser = useCallback(() => {
+    return analyticsManager.isFirstTimeUser();
+  }, [analyticsManager]);
+
+  // Auto-trigger dashboard tour for first-time users
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Check if on dashboard page and first time user
+    const isDashboard = window.location.pathname === '/dashboard';
+    if (isDashboard && isFirstTimeUser()) {
+      // Delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        if (analyticsManager.shouldShowTutorial('dashboard-tour')) {
+          startTutorial('dashboard-tour');
+        }
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstTimeUser, analyticsManager, startTutorial]);
+
+  const value: TutorialContextType = {
+    startTutorial,
+    stopTutorial,
+    skipTutorial,
+    resetTutorials,
+    resetTutorial,
+    isTutorialCompleted,
+    isOnboardingComplete,
+    getSuggestedTutorial,
+    getCompletionRate,
+    isFirstTimeUser,
+    currentTutorial,
+    driverInstance,
+  };
+
+  return (
+    <TutorialContext.Provider value={value}>
+      {children}
+    </TutorialContext.Provider>
+  );
 }
