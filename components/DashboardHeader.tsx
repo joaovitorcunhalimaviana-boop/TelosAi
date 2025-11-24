@@ -11,8 +11,12 @@ export function DashboardHeader() {
   const pathname = usePathname()
   const { data: session } = useSession()
 
+  const userRole = session?.user?.role?.toLowerCase() || '';
+  const isMedico = userRole === 'medico';
+  const isAdmin = userRole === 'admin';
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
+    <header id="dashboard-header" className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
         {/* Logo e Nome */}
         <Link href="/dashboard" className="group flex items-center gap-3">
@@ -42,7 +46,7 @@ export function DashboardHeader() {
             Dashboard
           </Link>
 
-          {(session?.user?.role === 'medico' || session?.user?.role === 'admin') && (
+          {(isMedico || isAdmin) && (
             <Link
               href="/dashboard/protocolos"
               className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/protocolos' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
@@ -54,13 +58,14 @@ export function DashboardHeader() {
 
           <Link
             href="/dashboard/pesquisas"
+            data-tutorial="research-btn"
             className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/pesquisas' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
               }`}
           >
             Pesquisas
           </Link>
 
-          {session?.user?.role === 'medico' && (
+          {isMedico && (
             <Link
               href="/dashboard/billing"
               className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/billing' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
@@ -70,7 +75,7 @@ export function DashboardHeader() {
             </Link>
           )}
 
-          {session?.user?.role === 'admin' && (
+          {isAdmin && (
             <Link
               href="/admin"
               className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/admin' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
@@ -94,7 +99,7 @@ export function DashboardHeader() {
                   {session.user.name}
                 </span>
                 <span className="text-xs text-gray-600 capitalize">
-                  {session.user.role === 'admin' ? 'Administrador' : 'Médico'}
+                  {isAdmin ? 'Administrador' : 'Médico'}
                 </span>
               </div>
             </div>

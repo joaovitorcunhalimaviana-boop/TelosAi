@@ -792,6 +792,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                               }`}
                             role="article"
                             aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
+                            data-tutorial="patient-card"
                           >
                             <CardHeader className="pb-3">
                               <div className="flex items-start justify-between gap-3">
@@ -885,7 +886,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                                 </div>
 
                                 {/* Completude de dados - Gamificada */}
-                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border">
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border" data-tutorial="patient-completeness">
                                   <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
                                       <span className={`text-lg ${getCompletenessMessage(patient.dataCompleteness).color} font-semibold`}>
@@ -947,7 +948,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                                 )}
 
                                 {/* Quick Action Buttons - WhatsApp & Phone */}
-                                <div className="flex gap-2 pb-2 border-b border-gray-200">
+                                <div className="flex gap-2 pb-2 border-b border-gray-200" data-tutorial="quick-actions">
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -971,7 +972,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
                                 </div>
 
                                 {/* Botões de ação */}
-                                <div className="space-y-2 pt-2">
+                                <div className="space-y-2 pt-2" data-tutorial="patient-actions">
                                   <div className="flex gap-2">
                                     <Button
                                       variant="outline"

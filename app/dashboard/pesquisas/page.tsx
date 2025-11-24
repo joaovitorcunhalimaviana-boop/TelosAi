@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText, ArrowLeft } from 'lucide-react';
 
 const surgeryTypes = [
   { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
@@ -250,7 +250,15 @@ export default function PesquisasPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2" style={{ color: '#0A2647' }}>
+          <h1 className="text-4xl font-bold mb-2 flex items-center" style={{ color: '#0A2647' }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push('/dashboard')}
+              className="mr-4 hover:bg-gray-100"
+            >
+              <ArrowLeft className="h-8 w-8" />
+            </Button>
             <FlaskConical className="inline-block mr-3 h-10 w-10" />
             Minhas Pesquisas
           </h1>
@@ -593,9 +601,8 @@ export default function PesquisasPage() {
           {researches.map((research) => (
             <Card
               key={research.id}
-              className={`border-2 ${
-                research.isActive ? 'border-green-200' : 'border-gray-200'
-              }`}
+              className={`border-2 ${research.isActive ? 'border-green-200' : 'border-gray-200'
+                }`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
