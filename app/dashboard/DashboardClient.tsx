@@ -43,7 +43,10 @@ import {
   Download,
   HelpCircle,
   BookOpen,
+  Filter,
+  X,
 } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { FadeIn, SlideIn, StaggerChildren, StaggerItem, CountUp, ScaleOnHover } from "@/components/animations"
@@ -355,76 +358,15 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
 
           {/* Botões de Ação */}
           <div className="flex flex-wrap gap-3 items-center">
-            {/* Link para Protocolos (médicos e admins) */}
-            {(userRole === "medico" || userRole === "admin") && (
-              <Link href="/dashboard/protocolos">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="shadow-sm gap-2 hover:opacity-80"
-                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
-                >
-                  <FileText className="h-5 w-5" />
-                  Protocolos
-                </Button>
-              </Link>
-            )}
-
-            {/* Link para Billing (médicos) */}
-            {userRole === "medico" && (
-              <Link href="/dashboard/billing">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="shadow-sm gap-2 hover:opacity-80"
-                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
-                >
-                  <DollarSign className="h-5 w-5" />
-                  Meu Plano
-                </Button>
-              </Link>
-            )}
-
-            {/* Link para Admin (admins) */}
-            {userRole === "admin" && (
-              <Link href="/admin">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="shadow-sm gap-2 hover:opacity-80"
-                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
-                >
-                  <Shield className="h-5 w-5" />
-                  Admin Dashboard
-                </Button>
-              </Link>
-            )}
-
-            {/* Pesquisas - Primary Button */}
-            <Link href="/dashboard/pesquisas">
-              <Button
-                size="lg"
-                variant="outline"
-                className="shadow-sm hover:opacity-80"
-                style={{ borderColor: '#0A2647', color: '#0A2647' }}
-                data-tutorial="research-btn"
-              >
-                <FlaskConical className="mr-2 h-5 w-5" />
-                Pesquisas
-              </Button>
-            </Link>
-
-            {/* Menu de Navegação Completo */}
+            {/* Menu de Ferramentas */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  size="lg"
                   variant="outline"
-                  className="shadow-sm gap-2 hover:bg-gray-50"
-                  style={{ borderColor: '#0A2647', color: '#0A2647' }}
+                  className="gap-2 hover:bg-gray-50 border-gray-200 text-gray-700"
                 >
-                  <MoreVertical className="h-5 w-5" />
-                  Menu
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="hidden sm:inline">Ferramentas</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -470,7 +412,7 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
             <Link href="/cadastro">
               <Button
                 size="lg"
-                className="shadow-lg font-semibold hover:opacity-90 transition-opacity"
+                className="shadow-md font-semibold hover:opacity-90 transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: '#D4AF37', color: '#0A2647' }}
                 data-tutorial="new-patient-btn"
               >
@@ -595,211 +537,190 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
           onView={markAsViewed}
         />
 
-        {/* Filtros e Busca */}
+        {/* Compact Filter Toolbar */}
         <SlideIn direction="down" delay={0.7}>
-          <Card className="mb-6 border-2 shadow-sm" data-tutorial="search-filters">
-            <CardHeader style={{ backgroundColor: '#F5F7FA' }}>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2" style={{ color: '#0A2647' }}>
-                  <Search className="h-5 w-5" aria-hidden="true" />
-                  Buscar e Filtrar Pacientes
-                </CardTitle>
-                <Badge variant="secondary" className="text-base px-3 py-1">
-                  {patients.length} {patients.length === 1 ? "resultado" : "resultados"}
-                </Badge>
-              </div>
-            </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              {/* Busca Principal */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <div className="bg-white rounded-xl border shadow-sm p-4 mb-6 flex flex-col gap-4" data-tutorial="search-filters">
+            <div className="flex items-center gap-3">
+              {/* Search Bar */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nome ou telefone do paciente..."
+                  placeholder="Buscar por nome ou telefone..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-10 h-12 text-base border-2 focus:border-blue-400"
-                  aria-label="Buscar pacientes por nome ou telefone"
+                  className="pl-9 h-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
                 />
               </div>
 
-              {/* Filtros em Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="surgery-type-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                    Tipo de Cirurgia
-                  </label>
-                  <Select
-                    value={filters.surgeryType || "all"}
-                    onValueChange={(value) =>
-                      handleFilterChange("surgeryType", value as any)
-                    }
-                  >
-                    <SelectTrigger id="surgery-type-filter" className="w-full h-10 border-2" aria-label="Filtrar por tipo de cirurgia">
-                      <SelectValue placeholder="Todos os tipos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os tipos</SelectItem>
-                      <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
-                      <SelectItem value="fistula">Fístula Anal</SelectItem>
-                      <SelectItem value="fissura">Fissura Anal</SelectItem>
-                      <SelectItem value="pilonidal">Doença Pilonidal</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="data-status-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                    Status do Cadastro
-                  </label>
-                  <Select
-                    value={filters.dataStatus || "all"}
-                    onValueChange={(value) => handleFilterChange("dataStatus", value)}
-                  >
-                    <SelectTrigger id="data-status-filter" className="w-full h-10 border-2" aria-label="Filtrar por status do cadastro">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="incomplete">Cadastro Incompleto</SelectItem>
-                      <SelectItem value="complete">Cadastro Completo</SelectItem>
-                      <SelectItem value="research-incomplete">Pesquisa - Dados Incompletos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="period-filter" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                    Período
-                  </label>
-                  <Select
-                    value={filters.period || "all"}
-                    onValueChange={(value) => handleFilterChange("period", value)}
-                  >
-                    <SelectTrigger id="period-filter" className="w-full h-10 border-2" aria-label="Filtrar por período">
-                      <SelectValue placeholder="Todos os períodos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os períodos</SelectItem>
-                      <SelectItem value="today">Cirurgias de Hoje</SelectItem>
-                      <SelectItem value="7days">Últimos 7 dias</SelectItem>
-                      <SelectItem value="30days">Últimos 30 dias</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="research-filter" className="text-sm font-semibold flex items-center gap-1.5" style={{ color: '#7C3AED' }}>
-                    <FlaskConical className="h-4 w-4" aria-hidden="true" />
-                    Pesquisas
-                  </label>
-                  <Select
-                    value={filters.researchFilter || "all"}
-                    onValueChange={(value) => handleFilterChange("researchFilter", value)}
-                  >
-                    <SelectTrigger id="research-filter" className="w-full h-10 border-2 border-purple-300 focus:border-purple-500" aria-label="Filtrar por pesquisa">
-                      <SelectValue placeholder="Todas as pesquisas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">
-                        <div className="flex items-center justify-between w-full gap-2">
-                          <span>Todos os pacientes</span>
-                          {researchStats && (
-                            <Badge variant="secondary" className="ml-2">
-                              {researchStats.totalPatients}
-                            </Badge>
-                          )}
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="non-participants">
-                        <div className="flex items-center justify-between w-full gap-2">
-                          <span>Não participantes</span>
-                          {researchStats && (
-                            <Badge variant="outline" className="ml-2">
-                              {researchStats.nonParticipants}
-                            </Badge>
-                          )}
-                        </div>
-                      </SelectItem>
-                      {researchStats?.researches.map((research) => (
-                        <SelectItem key={research.researchId} value={research.researchId}>
-                          <div className="flex items-center justify-between w-full gap-2">
-                            <span className="truncate">{research.researchTitle}</span>
-                            <Badge
-                              className="ml-2 shrink-0"
-                              style={{ backgroundColor: '#7C3AED', color: 'white' }}
-                            >
-                              {research.patientCount}
-                            </Badge>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Active Filters Summary */}
-              {(filters.surgeryType !== "all" || filters.dataStatus !== "all" || filters.period !== "all" || filters.researchFilter !== "all" || searchInput) && (
-                <div className="flex items-center gap-2 pt-2 border-t">
-                  <span className="text-sm text-gray-600">Filtros ativos:</span>
-                  {filters.surgeryType !== "all" && (
-                    <Badge variant="outline" className="gap-1">
-                      {getSurgeryTypeLabel(filters.surgeryType as SurgeryType)}
-                    </Badge>
-                  )}
-                  {filters.dataStatus === "incomplete" && (
-                    <Badge variant="outline">Incompleto</Badge>
-                  )}
-                  {filters.dataStatus === "complete" && (
-                    <Badge variant="outline">Completo</Badge>
-                  )}
-                  {filters.dataStatus === "research-incomplete" && (
-                    <Badge variant="outline" className="gap-1">
-                      <FlaskConical className="h-3 w-3" />
-                      Pesquisa Incompleta
-                    </Badge>
-                  )}
-                  {filters.period === "today" && (
-                    <Badge variant="outline">Hoje</Badge>
-                  )}
-                  {filters.period === "7days" && (
-                    <Badge variant="outline">7 dias</Badge>
-                  )}
-                  {filters.period === "30days" && (
-                    <Badge variant="outline">30 dias</Badge>
-                  )}
-                  {filters.researchFilter === "non-participants" && (
-                    <Badge variant="outline" className="gap-1" style={{ borderColor: '#7C3AED', color: '#7C3AED' }}>
-                      <FlaskConical className="h-3 w-3" />
-                      Não participantes
-                    </Badge>
-                  )}
-                  {filters.researchFilter && filters.researchFilter !== "all" && filters.researchFilter !== "non-participants" && (
-                    <Badge variant="outline" className="gap-1" style={{ borderColor: '#7C3AED', color: '#7C3AED' }}>
-                      <FlaskConical className="h-3 w-3" />
-                      {researchStats?.researches.find(r => r.researchId === filters.researchFilter)?.researchTitle || "Pesquisa"}
-                    </Badge>
-                  )}
-                  {searchInput && (
-                    <Badge variant="outline">Busca: "{searchInput}"</Badge>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: "", researchFilter: "all" })
-                      setSearchInput("")
-                    }}
-                    className="text-xs ml-auto"
-                  >
-                    Limpar filtros
+              {/* Filter Popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="gap-2 border-dashed text-gray-600 hover:text-gray-900">
+                    <Filter className="h-4 w-4" />
+                    Filtros
+                    {(filters.surgeryType !== "all" || filters.dataStatus !== "all" || filters.period !== "all" || filters.researchFilter !== "all") && (
+                      <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] bg-gray-100 text-gray-900">
+                        {[
+                          filters.surgeryType !== "all",
+                          filters.dataStatus !== "all",
+                          filters.period !== "all",
+                          filters.researchFilter !== "all"
+                        ].filter(Boolean).length}
+                      </Badge>
+                    )}
                   </Button>
-                </div>
-              )}
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-4" align="end">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium leading-none">Filtros Avançados</h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
+                        onClick={() => setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: searchInput, researchFilter: "all" })}
+                      >
+                        Limpar
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Tipo de Cirurgia</label>
+                      <Select
+                        value={filters.surgeryType || "all"}
+                        onValueChange={(value) => handleFilterChange("surgeryType", value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Todos os tipos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os tipos</SelectItem>
+                          <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
+                          <SelectItem value="fistula">Fístula Anal</SelectItem>
+                          <SelectItem value="fissura">Fissura Anal</SelectItem>
+                          <SelectItem value="pilonidal">Doença Pilonidal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Status do Cadastro</label>
+                      <Select
+                        value={filters.dataStatus || "all"}
+                        onValueChange={(value) => handleFilterChange("dataStatus", value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Todos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          <SelectItem value="incomplete">Cadastro Incompleto</SelectItem>
+                          <SelectItem value="complete">Cadastro Completo</SelectItem>
+                          <SelectItem value="research-incomplete">Pesquisa - Incompleto</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Período</label>
+                      <Select
+                        value={filters.period || "all"}
+                        onValueChange={(value) => handleFilterChange("period", value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Todos os períodos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os períodos</SelectItem>
+                          <SelectItem value="today">Cirurgias de Hoje</SelectItem>
+                          <SelectItem value="7days">Últimos 7 dias</SelectItem>
+                          <SelectItem value="30days">Últimos 30 dias</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-purple-600 flex items-center gap-1">
+                        <FlaskConical className="h-3 w-3" /> Pesquisas
+                      </label>
+                      <Select
+                        value={filters.researchFilter || "all"}
+                        onValueChange={(value) => handleFilterChange("researchFilter", value)}
+                      >
+                        <SelectTrigger className="h-9 border-purple-200 focus:border-purple-400">
+                          <SelectValue placeholder="Todas as pesquisas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os pacientes</SelectItem>
+                          <SelectItem value="non-participants">Não participantes</SelectItem>
+                          {researchStats?.researches.map((research) => (
+                            <SelectItem key={research.researchId} value={research.researchId}>
+                              {research.researchTitle}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Active Filters Summary */}
+            {(filters.surgeryType !== "all" || filters.dataStatus !== "all" || filters.period !== "all" || filters.researchFilter !== "all" || searchInput) && (
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-dashed">
+                <span className="text-xs text-muted-foreground mr-1">Filtros ativos:</span>
+
+                {filters.surgeryType !== "all" && (
+                  <Badge variant="secondary" className="gap-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                    {getSurgeryTypeLabel(filters.surgeryType as SurgeryType)}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("surgeryType", "all")} />
+                  </Badge>
+                )}
+
+                {filters.dataStatus !== "all" && (
+                  <Badge variant="secondary" className="gap-1 bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200">
+                    {filters.dataStatus === "incomplete" ? "Incompleto" : filters.dataStatus === "complete" ? "Completo" : "Pesquisa Incompleta"}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("dataStatus", "all")} />
+                  </Badge>
+                )}
+
+                {filters.period !== "all" && (
+                  <Badge variant="secondary" className="gap-1 bg-green-50 text-green-700 hover:bg-green-100 border-green-200">
+                    {filters.period === "today" ? "Hoje" : filters.period === "7days" ? "7 dias" : "30 dias"}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("period", "all")} />
+                  </Badge>
+                )}
+
+                {filters.researchFilter !== "all" && (
+                  <Badge variant="secondary" className="gap-1 bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200">
+                    <FlaskConical className="h-3 w-3" />
+                    {filters.researchFilter === "non-participants" ? "Não participantes" : researchStats?.researches.find(r => r.researchId === filters.researchFilter)?.researchTitle || "Pesquisa"}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("researchFilter", "all")} />
+                  </Badge>
+                )}
+
+                {searchInput && (
+                  <Badge variant="secondary" className="gap-1 bg-gray-100 text-gray-700">
+                    "{searchInput}"
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchInput("")} />
+                  </Badge>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: "", researchFilter: "all" })
+                    setSearchInput("")
+                  }}
+                  className="text-xs ml-auto h-6 px-2 text-muted-foreground hover:text-destructive"
+                >
+                  Limpar tudo
+                </Button>
+              </div>
+            )}
+          </div>
         </SlideIn>
 
         {/* Seção de Pacientes em Acompanhamento */}
@@ -853,247 +774,247 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
               staggerDelay={0.05}
             >
               <AnimatePresence mode="popLayout">
-              {patients.map((patient, index) => {
-                const riskLevel = getPatientRiskLevel(patient)
-                const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
-                return (
-                <StaggerItem key={patient.id}>
-                  <motion.div
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ScaleOnHover scale={1.02}>
-                      <Card
-                        className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative ${
-                          isCritical ? 'bg-red-50 border-l-4 border-l-red-600' : ''
-                        }`}
-                        role="article"
-                        aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
+                {patients.map((patient, index) => {
+                  const riskLevel = getPatientRiskLevel(patient)
+                  const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
+                  return (
+                    <StaggerItem key={patient.id}>
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
                       >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-2 mb-1">
-                          <CardTitle className="text-lg flex-1">
-                            {patient.patientName}
-                          </CardTitle>
-                          {/* NEW Badge - Positioned prominently */}
-                          {isPatientNew(patient.patientCreatedAt) && (
-                            <Badge
-                              className="badge-pulse font-semibold text-xs px-2 py-1 shrink-0"
-                              style={{
-                                backgroundColor: '#D4AF37',
-                                color: '#0A2647',
-                                border: '2px solid #B8941F',
-                                boxShadow: '0 2px 8px rgba(212, 175, 55, 0.3)'
-                              }}
-                            >
-                              NOVO
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">
-                            {getSurgeryTypeLabel(patient.surgeryType)}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {patient.followUpDay}
-                          </Badge>
-                          <Badge
-                            variant={
-                              patient.status === "active" ? "default" : "secondary"
-                            }
-                            className={
-                              patient.status === "active"
-                                ? "bg-green-500 hover:bg-green-600"
-                                : ""
-                            }
+                        <ScaleOnHover scale={1.02}>
+                          <Card
+                            className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative ${isCritical ? 'bg-red-50 border-l-4 border-l-red-600' : ''
+                              }`}
+                            role="article"
+                            aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
                           >
-                            {patient.status === "active" ? "Ativo" : "Inativo"}
-                          </Badge>
-                          {/* Research Participant Badge */}
-                          {patient.isResearchParticipant && patient.researchGroup && (
-                            <Badge
-                              className="text-xs font-semibold gap-1.5 px-2.5 py-1"
-                              style={{
-                                backgroundColor: '#7C3AED',
-                                color: 'white',
-                                border: '1px solid #6D28D9'
-                              }}
-                            >
-                              <FlaskConical className="h-3 w-3" />
-                              Grupo {patient.researchGroup}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="flex items-start gap-2 mb-1">
+                                    <CardTitle className="text-lg flex-1">
+                                      {patient.patientName}
+                                    </CardTitle>
+                                    {/* NEW Badge - Positioned prominently */}
+                                    {isPatientNew(patient.patientCreatedAt) && (
+                                      <Badge
+                                        className="badge-pulse font-semibold text-xs px-2 py-1 shrink-0"
+                                        style={{
+                                          backgroundColor: '#D4AF37',
+                                          color: '#0A2647',
+                                          border: '2px solid #B8941F',
+                                          boxShadow: '0 2px 8px rgba(212, 175, 55, 0.3)'
+                                        }}
+                                      >
+                                        NOVO
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      {getSurgeryTypeLabel(patient.surgeryType)}
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {patient.followUpDay}
+                                    </Badge>
+                                    <Badge
+                                      variant={
+                                        patient.status === "active" ? "default" : "secondary"
+                                      }
+                                      className={
+                                        patient.status === "active"
+                                          ? "bg-green-500 hover:bg-green-600"
+                                          : ""
+                                      }
+                                    >
+                                      {patient.status === "active" ? "Ativo" : "Inativo"}
+                                    </Badge>
+                                    {/* Research Participant Badge */}
+                                    {patient.isResearchParticipant && patient.researchGroup && (
+                                      <Badge
+                                        className="text-xs font-semibold gap-1.5 px-2.5 py-1"
+                                        style={{
+                                          backgroundColor: '#7C3AED',
+                                          color: 'white',
+                                          border: '1px solid #6D28D9'
+                                        }}
+                                      >
+                                        <FlaskConical className="h-3 w-3" />
+                                        Grupo {patient.researchGroup}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardHeader>
 
-                  <CardContent>
-                    {/* Research Data Warning */}
-                    {patient.isResearchParticipant && !patient.researchDataComplete && (
-                      <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-4" role="status" aria-live="polite">
-                        <div className="flex items-start gap-2">
-                          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                          <div className="flex-1">
-                            <p className="font-semibold text-red-900 text-sm mb-1">
-                              Dados de Pesquisa Incompletos
-                            </p>
-                            <p className="text-xs text-red-800">
-                              Faltam {patient.researchMissingFieldsCount} campo{patient.researchMissingFieldsCount > 1 ? 's' : ''} obrigatório{patient.researchMissingFieldsCount > 1 ? 's' : ''} para pesquisa
-                            </p>
-                          </div>
-                          <Badge variant="destructive" className="text-xs shrink-0">
-                            {patient.researchMissingFieldsCount}
-                          </Badge>
-                        </div>
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      {/* Data da cirurgia */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" aria-hidden="true" />
-                        <span>
-                          {format(new Date(patient.surgeryDate), "dd 'de' MMMM 'de' yyyy", {
-                            locale: ptBR,
-                          })}
-                        </span>
-                      </div>
-
-                      {/* Completude de dados - Gamificada */}
-                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-lg ${getCompletenessMessage(patient.dataCompleteness).color} font-semibold`}>
-                              {getCompletenessMessage(patient.dataCompleteness).icon}
-                            </span>
-                            <span className="text-sm font-semibold text-gray-700">
-                              Completude de dados
-                            </span>
-                          </div>
-                          <Badge
-                            variant={getCompletenessVariant(patient.dataCompleteness)}
-                            className="text-sm font-bold"
-                          >
-                            {patient.dataCompleteness}%
-                          </Badge>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
-                            <div
-                              className={`h-3 rounded-full transition-all duration-500 ${getCompletenessColor(
-                                patient.dataCompleteness
-                              )} relative`}
-                              style={{ width: `${patient.dataCompleteness}%` }}
-                            >
-                              {patient.dataCompleteness > 10 && (
-                                <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                            <CardContent>
+                              {/* Research Data Warning */}
+                              {patient.isResearchParticipant && !patient.researchDataComplete && (
+                                <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-4" role="status" aria-live="polite">
+                                  <div className="flex items-start gap-2">
+                                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                    <div className="flex-1">
+                                      <p className="font-semibold text-red-900 text-sm mb-1">
+                                        Dados de Pesquisa Incompletos
+                                      </p>
+                                      <p className="text-xs text-red-800">
+                                        Faltam {patient.researchMissingFieldsCount} campo{patient.researchMissingFieldsCount > 1 ? 's' : ''} obrigatório{patient.researchMissingFieldsCount > 1 ? 's' : ''} para pesquisa
+                                      </p>
+                                    </div>
+                                    <Badge variant="destructive" className="text-xs shrink-0">
+                                      {patient.researchMissingFieldsCount}
+                                    </Badge>
+                                  </div>
+                                </div>
                               )}
-                            </div>
-                          </div>
-                          <p className={`text-xs font-medium ${getCompletenessMessage(patient.dataCompleteness).color}`}>
-                            {getCompletenessMessage(patient.dataCompleteness).text}
-                            {patient.dataCompleteness < 100 && ` • ${100 - patient.dataCompleteness}% restante`}
-                          </p>
-                        </div>
-                      </div>
+                              <div className="space-y-3">
+                                {/* Data da cirurgia */}
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Calendar className="h-4 w-4" aria-hidden="true" />
+                                  <span>
+                                    {format(new Date(patient.surgeryDate), "dd 'de' MMMM 'de' yyyy", {
+                                      locale: ptBR,
+                                    })}
+                                  </span>
+                                </div>
 
-                      {/* Red flags */}
-                      {patient.hasRedFlags && (
-                        <div className="bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-800 rounded-lg p-3" role="alert">
-                          <div className="flex items-start gap-2">
-                            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                            <div>
-                              <p className="font-semibold text-red-900 dark:text-red-100 text-sm mb-1">
-                                ALERTA
-                              </p>
-                              {patient.redFlags.length > 0 && (
-                                <ul className="text-xs text-red-800 dark:text-red-200 space-y-0.5">
-                                  {patient.redFlags.slice(0, 2).map((flag, idx) => (
-                                    <li key={idx}>• {flag}</li>
-                                  ))}
-                                  {patient.redFlags.length > 2 && (
-                                    <li>• +{patient.redFlags.length - 2} mais</li>
+                                {/* Completude de dados - Gamificada */}
+                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-lg ${getCompletenessMessage(patient.dataCompleteness).color} font-semibold`}>
+                                        {getCompletenessMessage(patient.dataCompleteness).icon}
+                                      </span>
+                                      <span className="text-sm font-semibold text-gray-700">
+                                        Completude de dados
+                                      </span>
+                                    </div>
+                                    <Badge
+                                      variant={getCompletenessVariant(patient.dataCompleteness)}
+                                      className="text-sm font-bold"
+                                    >
+                                      {patient.dataCompleteness}%
+                                    </Badge>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
+                                      <div
+                                        className={`h-3 rounded-full transition-all duration-500 ${getCompletenessColor(
+                                          patient.dataCompleteness
+                                        )} relative`}
+                                        style={{ width: `${patient.dataCompleteness}%` }}
+                                      >
+                                        {patient.dataCompleteness > 10 && (
+                                          <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <p className={`text-xs font-medium ${getCompletenessMessage(patient.dataCompleteness).color}`}>
+                                      {getCompletenessMessage(patient.dataCompleteness).text}
+                                      {patient.dataCompleteness < 100 && ` • ${100 - patient.dataCompleteness}% restante`}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Red flags */}
+                                {patient.hasRedFlags && (
+                                  <div className="bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-800 rounded-lg p-3" role="alert">
+                                    <div className="flex items-start gap-2">
+                                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                                      <div>
+                                        <p className="font-semibold text-red-900 dark:text-red-100 text-sm mb-1">
+                                          ALERTA
+                                        </p>
+                                        {patient.redFlags.length > 0 && (
+                                          <ul className="text-xs text-red-800 dark:text-red-200 space-y-0.5">
+                                            {patient.redFlags.slice(0, 2).map((flag, idx) => (
+                                              <li key={idx}>• {flag}</li>
+                                            ))}
+                                            {patient.redFlags.length > 2 && (
+                                              <li>• +{patient.redFlags.length - 2} mais</li>
+                                            )}
+                                          </ul>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Quick Action Buttons - WhatsApp & Phone */}
+                                <div className="flex gap-2 pb-2 border-b border-gray-200">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 gap-2 border-green-500 text-green-700 hover:bg-green-50"
+                                    onClick={() => handleWhatsAppClick(patient.phone, patient.patientName)}
+                                    aria-label={`Enviar mensagem no WhatsApp para ${patient.patientName}`}
+                                  >
+                                    <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                                    WhatsApp
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1 gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
+                                    onClick={() => handlePhoneClick(patient.phone)}
+                                    aria-label={`Ligar para ${patient.patientName}`}
+                                  >
+                                    <Phone className="h-4 w-4" aria-hidden="true" />
+                                    Ligar
+                                  </Button>
+                                </div>
+
+                                {/* Botões de ação */}
+                                <div className="space-y-2 pt-2">
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="flex-1"
+                                      onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
+                                      aria-label={`Ver detalhes de ${patient.patientName}`}
+                                    >
+                                      Ver Detalhes
+                                    </Button>
+                                    {patient.dataCompleteness < 100 && (
+                                      <Button
+                                        variant="default"
+                                        size="sm"
+                                        className="flex-1"
+                                        onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
+                                        aria-label={`Completar cadastro de ${patient.patientName}`}
+                                      >
+                                        Completar Cadastro
+                                      </Button>
+                                    )}
+                                  </div>
+                                  {researches.length > 0 && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+                                      onClick={() => handleOpenResearchModal(patient.id)}
+                                      aria-label={`Adicionar ${patient.patientName} à pesquisa`}
+                                    >
+                                      <FlaskConical className="mr-2 h-4 w-4" aria-hidden="true" />
+                                      Adicionar à Pesquisa
+                                    </Button>
                                   )}
-                                </ul>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Quick Action Buttons - WhatsApp & Phone */}
-                      <div className="flex gap-2 pb-2 border-b border-gray-200">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 gap-2 border-green-500 text-green-700 hover:bg-green-50"
-                          onClick={() => handleWhatsAppClick(patient.phone, patient.patientName)}
-                          aria-label={`Enviar mensagem no WhatsApp para ${patient.patientName}`}
-                        >
-                          <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                          WhatsApp
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
-                          onClick={() => handlePhoneClick(patient.phone)}
-                          aria-label={`Ligar para ${patient.patientName}`}
-                        >
-                          <Phone className="h-4 w-4" aria-hidden="true" />
-                          Ligar
-                        </Button>
-                      </div>
-
-                      {/* Botões de ação */}
-                      <div className="space-y-2 pt-2">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
-                            aria-label={`Ver detalhes de ${patient.patientName}`}
-                          >
-                            Ver Detalhes
-                          </Button>
-                          {patient.dataCompleteness < 100 && (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="flex-1"
-                              onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
-                              aria-label={`Completar cadastro de ${patient.patientName}`}
-                            >
-                              Completar Cadastro
-                            </Button>
-                          )}
-                        </div>
-                        {researches.length > 0 && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
-                            onClick={() => handleOpenResearchModal(patient.id)}
-                            aria-label={`Adicionar ${patient.patientName} à pesquisa`}
-                          >
-                            <FlaskConical className="mr-2 h-4 w-4" aria-hidden="true" />
-                            Adicionar à Pesquisa
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                    </ScaleOnHover>
-                  </motion.div>
-                </StaggerItem>
-              )})}
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </ScaleOnHover>
+                      </motion.div>
+                    </StaggerItem>
+                  )
+                })}
               </AnimatePresence>
             </StaggerChildren>
           )}
@@ -1221,6 +1142,6 @@ export default function DashboardClient({ userRole }: DashboardClientProps) {
           }} />
         )}
       </div>
-    </div>
+    </div >
   )
 }

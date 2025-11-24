@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, UserPlus, FileText, Menu } from 'lucide-react';
+import { Home, UserPlus, FileText, Menu, FlaskConical, Download } from 'lucide-react';
 import { useState } from 'react';
 
 export function BottomNav() {
@@ -135,8 +135,30 @@ export function BottomNav() {
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-600" />
+                  <Download className="w-5 h-5 text-gray-600" />
                   <span className="text-gray-900 font-medium">Exportar Dados</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/protocolos"
+                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setShowMenu(false)}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-gray-600" />
+                  <span className="text-gray-900 font-medium">Protocolos</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/pesquisas"
+                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setShowMenu(false)}
+              >
+                <div className="flex items-center gap-3">
+                  <FlaskConical className="w-5 h-5 text-gray-600" />
+                  <span className="text-gray-900 font-medium">Pesquisas</span>
                 </div>
               </Link>
             </div>

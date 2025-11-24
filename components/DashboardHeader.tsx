@@ -32,6 +32,55 @@ export function DashboardHeader() {
           </div>
         </Link>
 
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6 mx-6">
+          <Link
+            href="/dashboard"
+            className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              }`}
+          >
+            Dashboard
+          </Link>
+
+          {(session?.user?.role === 'medico' || session?.user?.role === 'admin') && (
+            <Link
+              href="/dashboard/protocolos"
+              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/protocolos' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+                }`}
+            >
+              Protocolos
+            </Link>
+          )}
+
+          <Link
+            href="/dashboard/pesquisas"
+            className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/pesquisas' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              }`}
+          >
+            Pesquisas
+          </Link>
+
+          {session?.user?.role === 'medico' && (
+            <Link
+              href="/dashboard/billing"
+              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/billing' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+                }`}
+            >
+              Meu Plano
+            </Link>
+          )}
+
+          {session?.user?.role === 'admin' && (
+            <Link
+              href="/admin"
+              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/admin' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+                }`}
+            >
+              Admin
+            </Link>
+          )}
+        </nav>
+
         {/* User Menu */}
         <div className="flex items-center gap-4">
           {/* Notificações */}
