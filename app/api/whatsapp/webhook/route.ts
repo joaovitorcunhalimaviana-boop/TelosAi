@@ -385,7 +385,7 @@ interface PostOpData {
   bleedingDetails?: string;
 
   // ANALGÉSICOS - esquema de medicação para dor
-  takingPrescribedMeds?: boolean; // Está tomando as medicações prescritas (dipirona + anti-inflamatório)?
+  takingPrescribedMeds?: boolean; // Está tomando as medicações prescritas?
   prescribedMedsDetails?: string; // Detalhes sobre as medicações prescritas
   takingExtraMeds?: boolean; // Precisou tomar algo ALÉM do prescrito?
   extraMedsDetails?: string; // Quais medicações extras está tomando
@@ -494,11 +494,12 @@ CONTEXTO DO PACIENTE:
    - Campo: bleeding
 
 6. **ANALGÉSICOS** (uso de medicações para dor)
-   - Perguntar: "Você está tomando as medicações para dor que foram receitadas (dipirona, anti-inflamatório)?"
+   - Perguntar: "Você está tomando as medicações para dor que foram receitadas?"
    - Se SIM: "Está tomando certinho nos horários?"
    - Perguntar: "Precisou tomar alguma outra medicação para dor além das receitadas?"
    - Se SIM: "Qual medicação tomou?"
    - Campos: takingPrescribedMeds, prescribedMedsDetails, takingExtraMeds, extraMedsDetails
+   - NOTA: Não mencionar medicações específicas (cada médico tem seu protocolo)
 
 7. **SECREÇÃO PURULENTA** (APENAS A PARTIR DE D+3)
    - SE dayNumber >= 3:
@@ -700,7 +701,7 @@ function determineCurrentPhase(conversationHistory: any[], dayNumber?: number): 
   }
 
   // Medicações prescritas
-  if (lastAssistantMsg.includes('medicações') || lastAssistantMsg.includes('dipirona') || lastAssistantMsg.includes('anti-inflamatório') || lastAssistantMsg.includes('tomando') && lastAssistantMsg.includes('dor')) {
+  if (lastAssistantMsg.includes('medicações') && lastAssistantMsg.includes('receitadas') || lastAssistantMsg.includes('tomando') && lastAssistantMsg.includes('medicações')) {
     return 'collecting_meds_prescribed';
   }
 
@@ -1109,7 +1110,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   if (currentPhase === 'collecting_bleeding') {
     if (isNo || msg.includes('nenhum') || msg.includes('zero')) {
       return {
-        message: `Ótimo, sem sangramento. Agora sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
+        message: `Ótimo, sem sangramento. Agora sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
         needsImage: null,
         dataCollected: { bleeding: 'none' },
         completed: false,
@@ -1119,7 +1120,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('leve') || msg.includes('pouco') || msg.includes('papel') || msg.includes('gotas')) {
       return {
-        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
+        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
         needsImage: null,
         dataCollected: { bleeding: 'mild' },
         completed: false,
@@ -1129,7 +1130,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('moderado') || msg.includes('roupa') || msg.includes('médio')) {
       return {
-        message: `Entendi, sangramento moderado. Fique atento se aumentar. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
+        message: `Entendi, sangramento moderado. Fique atento se aumentar. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
         needsImage: null,
         dataCollected: { bleeding: 'moderate' },
         completed: false,
@@ -1139,7 +1140,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('intenso') || msg.includes('muito') || msg.includes('forte') || msg.includes('vaso')) {
       return {
-        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
+        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
         needsImage: null,
         dataCollected: { bleeding: 'severe' },
         completed: false,
@@ -1168,7 +1169,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   }
 
   // ========================================
-  // FASE 10: MEDICAÇÕES PRESCRITAS (dipirona + anti-inflamatório)
+  // FASE 10: MEDICAÇÕES PRESCRITAS
   // ========================================
   if (currentPhase === 'collecting_meds_prescribed') {
     if (isYes || msg.includes('tomando') || msg.includes('tomo') || msg.includes('certinho') || msg.includes('horários')) {
@@ -1202,7 +1203,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
     return {
-      message: `Desculpe, não entendi. Você está tomando as medicações para dor que foram receitadas (dipirona, anti-inflamatório)? Responda sim ou não.`,
+      message: `Desculpe, não entendi. Você está tomando as medicações para dor que foram receitadas? Responda sim ou não.`,
       needsImage: null,
       dataCollected: {},
       completed: false,
