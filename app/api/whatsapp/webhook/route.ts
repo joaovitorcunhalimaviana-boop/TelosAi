@@ -260,21 +260,49 @@ async function processTextMessage(message: any, contacts: any[]) {
         followUpId: pendingFollowUp.id
       });
 
-      // Criar uma resposta vazia para tracking
+      // Calcular dia pós-operatório
+      const daysPostOp = Math.floor((Date.now() - pendingFollowUp.surgery.date.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const firstName = patient.name.split(' ')[0];
+
+      // Mensagem inicial de saudação + pergunta sobre dor
+      const initialMessage = `Olá ${firstName}! 👋
+
+Espero que esteja se recuperando bem da sua ${pendingFollowUp.surgery.type}.
+
+Vamos conversar um pouquinho sobre como você está se sentindo hoje, no seu ${daysPostOp}º dia após a cirurgia.
+
+Para começar, gostaria de saber: *em uma escala de 0 a 10*, onde 0 é "sem dor" e 10 é "a pior dor imaginável", qual o nível de dor que você está sentindo agora?
+
+Leve em consideração a escala de dor abaixo:`;
+
+      // 1. PRIMEIRO: Enviar mensagem de saudação + pergunta
+      logger.debug('📝 Enviando saudação inicial...');
+      await sendEmpatheticResponse(phone, initialMessage);
+
+      // 2. SEGUNDO: Enviar imagem da escala de dor
+      await new Promise(resolve => setTimeout(resolve, 500));
+      logger.debug('📊 Enviando escala de dor...');
+      await sendImageScale(phone, 'pain_scale');
+
+      // 3. Criar registro de resposta com a conversa inicial
       await prisma.followUpResponse.create({
         data: {
           followUpId: pendingFollowUp.id,
           userId: patient.userId,
           questionnaireData: JSON.stringify({
-            conversation: [],
+            conversation: [
+              { role: 'user', content: text },
+              { role: 'assistant', content: initialMessage }
+            ],
             extractedData: {},
-            completed: false
+            completed: false,
+            conversationPhase: 'collecting_pain'
           }),
           riskLevel: 'low',
         },
       });
 
-      // Atualizar follow-up para status "in_progress"
+      // 4. Atualizar follow-up para status "in_progress"
       await prisma.followUp.update({
         where: { id: pendingFollowUp.id },
         data: {
@@ -285,13 +313,7 @@ async function processTextMessage(message: any, contacts: any[]) {
       // Invalidate dashboard cache
       invalidateDashboardStats();
 
-      // Enviar escala de dor PRIMEIRO (antes da primeira pergunta)
-      logger.debug('📊 Enviando escala de dor antes da primeira pergunta...');
-      await sendImageScale(phone, 'pain_scale');
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar para garantir ordem
-
-      // Iniciar conversa com IA (primeira mensagem do paciente é "sim")
-      await processQuestionnaireAnswer(pendingFollowUp, patient, phone, text);
+      logger.debug('✅ Questionário iniciado - aguardando resposta do paciente sobre dor');
 
       return;
     }
@@ -389,13 +411,15 @@ async function callClaudeAPI(
   userMessage: string,
   patient: any,
   surgeryType: string,
-  dayNumber: number
+  dayNumber: number,
+  savedPhase?: string // Fase salva no banco (mais confiável)
 ): Promise<ClaudeAIResponse> {
   try {
     const { anthropic } = await import('@/lib/anthropic');
 
-    // Determinar fase atual baseado no histórico
-    const currentPhase = determineCurrentPhase(conversationHistory);
+    // Usar fase salva no banco se disponível, senão determinar pelo histórico
+    const currentPhase = savedPhase || determineCurrentPhase(conversationHistory);
+    logger.debug('🎯 Fase para IA:', currentPhase);
 
     const SYSTEM_PROMPT = `Você é um assistente médico especializado em acompanhamento pós-operatório via WhatsApp.
 
@@ -1049,24 +1073,28 @@ async function processQuestionnaireAnswer(
       logger.debug('Pergunta detectada - IA vai responder');
     }
 
-    // 2. Chamar Claude API
+    // 2. Obter fase atual salva no banco (mais confiável)
+    const savedPhase = questionnaireData.conversationPhase || 'collecting_pain';
+    logger.debug('📍 Fase atual:', savedPhase);
+
+    // 3. Chamar Claude API com a fase atual
     const aiResponse = await callClaudeAPI(
       conversationHistory,
       message,
       patient,
       followUp.surgery.type,
-      followUp.dayNumber
+      followUp.dayNumber,
+      savedPhase // Passar fase salva para a IA
     );
 
-    // 3. Se precisa enviar imagem, enviar ANTES da resposta
-    if (aiResponse.needsImage) {
-      await sendImageScale(phone, aiResponse.needsImage);
-      // Pequeno delay para garantir ordem das mensagens
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-    // 4. Enviar resposta da IA
+    // 4. PRIMEIRO: Enviar resposta da IA (texto)
     await sendEmpatheticResponse(phone, aiResponse.message);
+
+    // 5. SEGUNDO: Se precisa enviar imagem, enviar DEPOIS do texto
+    if (aiResponse.needsImage) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await sendImageScale(phone, aiResponse.needsImage);
+    }
 
     // 5. Atualizar histórico de conversação
     conversationHistory.push(
