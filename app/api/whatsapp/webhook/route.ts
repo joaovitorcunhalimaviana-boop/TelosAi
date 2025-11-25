@@ -384,9 +384,15 @@ interface PostOpData {
   bleeding?: 'none' | 'mild' | 'moderate' | 'severe';
   bleedingDetails?: string;
 
-  // ALIMENTAÇÃO
-  canEat?: boolean;
-  dietDetails?: string;
+  // ANALGÉSICOS - esquema de medicação para dor
+  takingPrescribedMeds?: boolean; // Está tomando as medicações prescritas (dipirona + anti-inflamatório)?
+  prescribedMedsDetails?: string; // Detalhes sobre as medicações prescritas
+  takingExtraMeds?: boolean; // Precisou tomar algo ALÉM do prescrito?
+  extraMedsDetails?: string; // Quais medicações extras está tomando
+
+  // SECREÇÃO PURULENTA (apenas D+3 em diante)
+  hasPurulentDischarge?: boolean; // Tem saída de secreção purulenta?
+  purulentDischargeDetails?: string;
 
   // OUTROS
   otherSymptoms?: string;
@@ -394,6 +400,8 @@ interface PostOpData {
   // Campos legados (manter para compatibilidade)
   painLevel?: number; // Mapeado para painAtRest
   hadBowelMovement?: boolean; // Mapeado para hadBowelMovementSinceLastContact
+  canEat?: boolean; // Legado - não usar mais
+  dietDetails?: string; // Legado - não usar mais
 }
 
 /**
@@ -485,11 +493,23 @@ CONTEXTO DO PACIENTE:
 5. **SANGRAMENTO** (nenhum/leve/moderado/intenso)
    - Campo: bleeding
 
-6. **ALIMENTAÇÃO**
-   - Campo: canEat
+6. **ANALGÉSICOS** (uso de medicações para dor)
+   - Perguntar: "Você está tomando as medicações para dor que foram receitadas (dipirona, anti-inflamatório)?"
+   - Se SIM: "Está tomando certinho nos horários?"
+   - Perguntar: "Precisou tomar alguma outra medicação para dor além das receitadas?"
+   - Se SIM: "Qual medicação tomou?"
+   - Campos: takingPrescribedMeds, prescribedMedsDetails, takingExtraMeds, extraMedsDetails
 
-7. **OUTRAS PREOCUPAÇÕES**
+7. **SECREÇÃO PURULENTA** (APENAS A PARTIR DE D+3)
+   - SE dayNumber >= 3:
+     - Perguntar: "Você notou saída de alguma secreção amarelada ou esverdeada com mau cheiro (pus) no local da cirurgia?"
+     - Explicar: Secreção aquosa/clara é normal na cicatrização, mas secreção purulenta (amarela/verde com cheiro) não é.
+   - Campo: hasPurulentDischarge, purulentDischargeDetails
+
+8. **OUTRAS PREOCUPAÇÕES**
    - Campo: otherSymptoms
+
+NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não têm problemas de alimentação.
 
 === REGRAS CRÍTICAS ===
 
@@ -523,7 +543,12 @@ CONTEXTO DO PACIENTE:
     "bowelMovementTime": null,
     "bristolScale": null,
     "bleeding": null,
-    "canEat": null,
+    "takingPrescribedMeds": null,
+    "prescribedMedsDetails": null,
+    "takingExtraMeds": null,
+    "extraMedsDetails": null,
+    "hasPurulentDischarge": null,
+    "purulentDischargeDetails": null,
     "otherSymptoms": null
   },
   "completed": false,
@@ -540,7 +565,9 @@ FASES VÁLIDAS:
 - collecting_pain_during_bm (dor durante evacuação)
 - collecting_bristol
 - collecting_bleeding
-- collecting_diet
+- collecting_meds_prescribed (medicações prescritas)
+- collecting_meds_extra (medicações extras)
+- collecting_purulent_discharge (secreção purulenta - apenas D+3)
 - collecting_concerns
 - completed`;
 
@@ -624,7 +651,7 @@ FASES VÁLIDAS:
 
 /**
  * Determina a fase atual da conversa baseado no histórico
- * FASES:
+ * FASES ATUALIZADAS (sem alimentação):
  * 1. collecting_pain_at_rest - Dor em repouso
  * 2. collecting_fever - Febre
  * 3. collecting_fever_temp - Temperatura da febre
@@ -635,10 +662,12 @@ FASES VÁLIDAS:
  * 8. collecting_pain_during_bm - Dor DURANTE evacuação
  * 9. collecting_bristol - Escala Bristol
  * 10. collecting_bleeding - Sangramento
- * 11. collecting_diet - Alimentação
- * 12. collecting_concerns - Preocupações
+ * 11. collecting_meds_prescribed - Medicações prescritas (dipirona, anti-inflamatório)
+ * 12. collecting_meds_extra - Medicações extras além das prescritas
+ * 13. collecting_purulent_discharge - Secreção purulenta (apenas D+3)
+ * 14. collecting_concerns - Preocupações
  */
-function determineCurrentPhase(conversationHistory: any[]): string {
+function determineCurrentPhase(conversationHistory: any[], dayNumber?: number): string {
   // Se não há histórico ou só tem mensagem inicial, estamos coletando dor em repouso
   if (conversationHistory.length === 0) return 'collecting_pain_at_rest';
   if (conversationHistory.length <= 2) return 'collecting_pain_at_rest';
@@ -660,9 +689,19 @@ function determineCurrentPhase(conversationHistory: any[]): string {
     return 'collecting_concerns';
   }
 
-  // Alimentação
-  if (lastAssistantMsg.includes('alimentação') || lastAssistantMsg.includes('comer') || lastAssistantMsg.includes('comendo')) {
-    return 'collecting_diet';
+  // Secreção purulenta (D+3)
+  if (lastAssistantMsg.includes('secreção') || lastAssistantMsg.includes('pus') || lastAssistantMsg.includes('purulenta')) {
+    return 'collecting_purulent_discharge';
+  }
+
+  // Medicações extras (além das prescritas)
+  if (lastAssistantMsg.includes('além') || lastAssistantMsg.includes('outra medicação') || lastAssistantMsg.includes('qual medicação tomou')) {
+    return 'collecting_meds_extra';
+  }
+
+  // Medicações prescritas
+  if (lastAssistantMsg.includes('medicações') || lastAssistantMsg.includes('dipirona') || lastAssistantMsg.includes('anti-inflamatório') || lastAssistantMsg.includes('tomando') && lastAssistantMsg.includes('dor')) {
+    return 'collecting_meds_prescribed';
   }
 
   // Sangramento
@@ -726,7 +765,9 @@ function determineCurrentPhase(conversationHistory: any[]): string {
     'collecting_pain_during_bm',
     'collecting_bristol',
     'collecting_bleeding',
-    'collecting_diet',
+    'collecting_meds_prescribed',
+    'collecting_meds_extra',
+    'collecting_purulent_discharge', // Só D+3, mas está no fallback
     'collecting_concerns'
   ];
 
@@ -737,7 +778,7 @@ function determineCurrentPhase(conversationHistory: any[]): string {
  * Interpreta resposta localmente quando a API falha
  * IMPORTANTE: Esta função é CONSERVADORA - só avança quando TEM CERTEZA da resposta
  *
- * FLUXO COMPLETO:
+ * FLUXO COMPLETO (ATUALIZADO - sem alimentação):
  * 1. collecting_pain_at_rest - Dor em repouso (0-10)
  * 2. collecting_fever - Febre (sim/não)
  * 3. collecting_fever_temp - Temperatura (se teve febre)
@@ -747,8 +788,11 @@ function determineCurrentPhase(conversationHistory: any[]): string {
  * 7. collecting_pain_during_bm - Dor DURANTE evacuação (0-10) + IMAGEM
  * 8. collecting_bristol - Escala Bristol (1-7) + IMAGEM
  * 9. collecting_bleeding - Sangramento
- * 10. collecting_diet - Alimentação
- * 11. collecting_concerns - Preocupações finais
+ * 10. collecting_meds_prescribed - Medicações prescritas (dipirona, anti-inflamatório)
+ * 11. collecting_meds_extra - Medicações extras além das prescritas
+ * 11b. collecting_meds_extra_details - Detalhes das medicações extras (qual medicação)
+ * 12. collecting_purulent_discharge - Secreção purulenta (APENAS D+3 em diante)
+ * 13. collecting_concerns - Preocupações finais
  */
 function interpretResponseLocally(userMessage: string, conversationHistory: any[]): ClaudeAIResponse | null {
   const msg = userMessage.trim().toLowerCase();
@@ -1065,42 +1109,42 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   if (currentPhase === 'collecting_bleeding') {
     if (isNo || msg.includes('nenhum') || msg.includes('zero')) {
       return {
-        message: `Ótimo, sem sangramento. E como está sua alimentação? Está conseguindo comer normalmente?`,
+        message: `Ótimo, sem sangramento. Agora sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
         needsImage: null,
         dataCollected: { bleeding: 'none' },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_diet'
+        conversationPhase: 'collecting_meds_prescribed'
       };
     }
     if (msg.includes('leve') || msg.includes('pouco') || msg.includes('papel') || msg.includes('gotas')) {
       return {
-        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. E como está sua alimentação?`,
+        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
         needsImage: null,
         dataCollected: { bleeding: 'mild' },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_diet'
+        conversationPhase: 'collecting_meds_prescribed'
       };
     }
     if (msg.includes('moderado') || msg.includes('roupa') || msg.includes('médio')) {
       return {
-        message: `Entendi, sangramento moderado. Fique atento se aumentar. E como está sua alimentação?`,
+        message: `Entendi, sangramento moderado. Fique atento se aumentar. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
         needsImage: null,
         dataCollected: { bleeding: 'moderate' },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_diet'
+        conversationPhase: 'collecting_meds_prescribed'
       };
     }
     if (msg.includes('intenso') || msg.includes('muito') || msg.includes('forte') || msg.includes('vaso')) {
       return {
-        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. E como está sua alimentação?`,
+        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. Sobre suas medicações para dor: você está tomando a dipirona e o anti-inflamatório que foram receitados?`,
         needsImage: null,
         dataCollected: { bleeding: 'severe' },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_diet'
+        conversationPhase: 'collecting_meds_prescribed'
       };
     }
     if (isYes) {
@@ -1124,41 +1168,165 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   }
 
   // ========================================
-  // FASE 10: ALIMENTAÇÃO
+  // FASE 10: MEDICAÇÕES PRESCRITAS (dipirona + anti-inflamatório)
   // ========================================
-  if (currentPhase === 'collecting_diet') {
-    if (isYes || msg.includes('normal') || msg.includes('bem') || msg.includes('tranquilo')) {
+  if (currentPhase === 'collecting_meds_prescribed') {
+    if (isYes || msg.includes('tomando') || msg.includes('tomo') || msg.includes('certinho') || msg.includes('horários')) {
       return {
-        message: `Perfeito! Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        message: `Ótimo que está tomando as medicações certinho! E você precisou tomar alguma *outra* medicação para dor, além das que foram receitadas?`,
         needsImage: null,
-        dataCollected: { canEat: true },
+        dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: msg.includes('certinho') ? 'tomando nos horários' : undefined },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_meds_extra'
+      };
+    }
+    if (isNo || msg.includes('não estou') || msg.includes('esqueci') || msg.includes('parei')) {
+      return {
+        message: `Entendi. É importante tomar as medicações nos horários prescritos para controlar a dor. E você tomou alguma *outra* medicação para dor por conta própria?`,
+        needsImage: null,
+        dataCollected: { takingPrescribedMeds: false, prescribedMedsDetails: userMessage },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_meds_extra'
+      };
+    }
+    if (msg.includes('algumas') || msg.includes('às vezes') || msg.includes('as vezes')) {
+      return {
+        message: `Entendi que está tomando algumas vezes. Tente manter os horários para um melhor controle da dor. Você precisou tomar alguma *outra* medicação além das receitadas?`,
+        needsImage: null,
+        dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: 'tomando irregularmente' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_meds_extra'
+      };
+    }
+    return {
+      message: `Desculpe, não entendi. Você está tomando as medicações para dor que foram receitadas (dipirona, anti-inflamatório)? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_meds_prescribed'
+    };
+  }
+
+  // ========================================
+  // FASE 11: MEDICAÇÕES EXTRAS (além das prescritas)
+  // ========================================
+  if (currentPhase === 'collecting_meds_extra') {
+    if (isNo || msg.includes('não precisei') || msg.includes('só as receitadas') || msg.includes('apenas')) {
+      // Verificar se precisa perguntar sobre secreção purulenta (D+3)
+      // Como não temos acesso ao dayNumber aqui, vamos para concerns
+      // A IA vai verificar se precisa perguntar sobre secreção
+      return {
+        message: `Perfeito, só as medicações receitadas. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        needsImage: null,
+        dataCollected: { takingExtraMeds: false },
         completed: false,
         needsClarification: false,
         conversationPhase: 'collecting_concerns'
       };
     }
-    if (isNo || msg.includes('dificuldade') || msg.includes('náusea') || msg.includes('vômito')) {
+    if (isYes || msg.includes('tomei') || msg.includes('comprei') || msg.includes('tramadol') || msg.includes('tylenol') || msg.includes('paracetamol') || msg.includes('morfina') || msg.includes('codeína')) {
+      // Se já mencionou qual medicação, registrar
+      const mentionedMeds = [];
+      if (msg.includes('tramadol')) mentionedMeds.push('tramadol');
+      if (msg.includes('tylenol') || msg.includes('paracetamol')) mentionedMeds.push('paracetamol');
+      if (msg.includes('morfina')) mentionedMeds.push('morfina');
+      if (msg.includes('codeína') || msg.includes('codeina')) mentionedMeds.push('codeína');
+
+      if (mentionedMeds.length > 0) {
+        return {
+          message: `Entendi, está tomando ${mentionedMeds.join(', ')} além das medicações prescritas. Vou registrar isso. Última pergunta: tem alguma outra preocupação ou sintoma?`,
+          needsImage: null,
+          dataCollected: { takingExtraMeds: true, extraMedsDetails: mentionedMeds.join(', ') },
+          completed: false,
+          needsClarification: false,
+          conversationPhase: 'collecting_concerns'
+        };
+      }
+
       return {
-        message: `Entendo que está com dificuldade para comer. Tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        message: `Entendi que precisou de algo a mais. Qual medicação você está tomando além das receitadas?`,
         needsImage: null,
-        dataCollected: { canEat: false, dietDetails: userMessage },
+        dataCollected: { takingExtraMeds: true },
+        completed: false,
+        needsClarification: true,
+        conversationPhase: 'collecting_meds_extra_details'
+      };
+    }
+    return {
+      message: `Desculpe, não entendi. Você precisou tomar alguma outra medicação para dor além das que foram receitadas? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_meds_extra'
+    };
+  }
+
+  // ========================================
+  // FASE 11b: DETALHES DAS MEDICAÇÕES EXTRAS
+  // ========================================
+  if (currentPhase === 'collecting_meds_extra_details') {
+    return {
+      message: `Entendi, vou registrar: ${userMessage}. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+      needsImage: null,
+      dataCollected: { takingExtraMeds: true, extraMedsDetails: userMessage },
+      completed: false,
+      needsClarification: false,
+      conversationPhase: 'collecting_concerns'
+    };
+  }
+
+  // ========================================
+  // FASE 12: SECREÇÃO PURULENTA (apenas D+3 em diante)
+  // NOTA: Esta fase só é ativada pela IA quando dayNumber >= 3
+  // ========================================
+  if (currentPhase === 'collecting_purulent_discharge') {
+    if (isNo || msg.includes('não') || msg.includes('nenhuma') || msg.includes('limpo') || msg.includes('normal')) {
+      return {
+        message: `Ótimo, sem sinais de secreção anormal. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        needsImage: null,
+        dataCollected: { hasPurulentDischarge: false },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_concerns'
+      };
+    }
+    if (isYes || msg.includes('pus') || msg.includes('amarela') || msg.includes('verde') || msg.includes('cheiro') || msg.includes('fede')) {
+      return {
+        message: `⚠️ Secreção purulenta pode indicar infecção e precisa ser avaliada. Vou registrar isso e o Dr. João Vitor vai analisar. Tem alguma outra preocupação?`,
+        needsImage: null,
+        dataCollected: { hasPurulentDischarge: true, purulentDischargeDetails: userMessage },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_concerns'
+      };
+    }
+    if (msg.includes('clara') || msg.includes('aquosa') || msg.includes('serosa') || msg.includes('transparente')) {
+      return {
+        message: `Secreção clara/aquosa é normal na cicatrização, faz parte do processo. Última pergunta: tem alguma outra preocupação ou sintoma?`,
+        needsImage: null,
+        dataCollected: { hasPurulentDischarge: false, purulentDischargeDetails: 'secreção serosa (normal)' },
         completed: false,
         needsClarification: false,
         conversationPhase: 'collecting_concerns'
       };
     }
     return {
-      message: `Desculpe, não entendi. Você está conseguindo comer normalmente? Responda sim ou não.`,
+      message: `Desculpe, não entendi. Você notou saída de secreção amarelada/esverdeada com mau cheiro (pus) no local da cirurgia? Responda sim ou não.\n\n_Obs: Secreção clara/aquosa é normal._`,
       needsImage: null,
       dataCollected: {},
       completed: false,
       needsClarification: true,
-      conversationPhase: 'collecting_diet'
+      conversationPhase: 'collecting_purulent_discharge'
     };
   }
 
   // ========================================
-  // FASE 11: PREOCUPAÇÕES (final)
+  // FASE 13: PREOCUPAÇÕES (final)
   // ========================================
   if (currentPhase === 'collecting_concerns') {
     const hasConcerns = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
