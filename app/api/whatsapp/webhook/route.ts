@@ -285,6 +285,11 @@ async function processTextMessage(message: any, contacts: any[]) {
       // Invalidate dashboard cache
       invalidateDashboardStats();
 
+      // Enviar escala de dor PRIMEIRO (antes da primeira pergunta)
+      logger.debug('📊 Enviando escala de dor antes da primeira pergunta...');
+      await sendImageScale(phone, 'pain_scale');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Aguardar para garantir ordem
+
       // Iniciar conversa com IA (primeira mensagem do paciente é "sim")
       await processQuestionnaireAnswer(pendingFollowUp, patient, phone, text);
 
@@ -389,55 +394,74 @@ async function callClaudeAPI(
   try {
     const { anthropic } = await import('@/lib/anthropic');
 
+    // Determinar fase atual baseado no histórico
+    const currentPhase = determineCurrentPhase(conversationHistory);
+
     const SYSTEM_PROMPT = `Você é um assistente médico especializado em acompanhamento pós-operatório via WhatsApp.
 
 OBJETIVO: Coletar informações sobre a recuperação do paciente de forma NATURAL e EMPÁTICA.
-
-INFORMAÇÕES A COLETAR:
-1. Nível de dor (0-10) - ENVIAR imagem da escala ANTES de perguntar
-2. Presença de febre (sim/não + detalhes se sim)
-3. Capacidade de urinar normalmente (sim/não + detalhes se não)
-4. Evacuação (sim/não + escala Bristol de 1-7 se sim) - ENVIAR imagem da escala Bristol ANTES
-5. Sangramento (nenhum/leve/moderado/intenso + detalhes)
-6. Alimentação (conseguindo comer? + detalhes)
-7. Outros sintomas preocupantes
-
-REGRAS IMPORTANTES:
-- Seja CONVERSACIONAL e EMPÁTICO, não robótico
-- Explique termos médicos se o paciente perguntar (ex: "sangramento leve é apenas manchas")
-- Peça esclarecimentos se a resposta for ambígua
-- NÃO repita perguntas já respondidas
-- Sinalize quando precisa enviar imagens (needsImage: "pain_scale" ou "bristol_scale")
-- Ao coletar todas as informações, agradeça e finalize (completed: true)
-- Se o paciente tem dúvida, responda ANTES de avançar (needsClarification: true)
 
 CONTEXTO DO PACIENTE:
 - Nome: ${patient.name}
 - Cirurgia: ${surgeryType}
 - Dia pós-operatório: D+${dayNumber}
+- Fase atual da conversa: ${currentPhase}
 
-FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
+INFORMAÇÕES A COLETAR (em ordem):
+1. Nível de dor (0-10)
+2. Presença de febre (sim/não + temperatura se sim)
+3. Capacidade de urinar normalmente (sim/não)
+4. Evacuação (sim/não + escala Bristol de 1-7 se sim)
+5. Sangramento (nenhum/leve/moderado/intenso)
+6. Alimentação (conseguindo comer?)
+7. Outros sintomas ou preocupações
+
+REGRAS CRÍTICAS:
+1. INTERPRETE A RESPOSTA DO PACIENTE:
+   - Se ele responder "8" para uma pergunta sobre dor, entenda que é a nota 8 de 0-10
+   - Se ele responder "média", "moderada", peça gentilmente o número específico
+   - Se ele responder "sim" ou "não", registre e avance para próxima pergunta
+
+2. NUNCA REPITA A MESMA PERGUNTA se o paciente já respondeu adequadamente
+   - Se recebeu resposta numérica para dor (ex: "8"), REGISTRE e AVANCE
+
+3. SEJA FLEXÍVEL na interpretação:
+   - "8" = painLevel: 8
+   - "oito" = painLevel: 8
+   - "dor 8" = painLevel: 8
+   - "nota 8" = painLevel: 8
+
+4. Se resposta ambígua, peça esclarecimento UMA vez, depois aceite o melhor entendimento
+
+5. Ao coletar todas as informações, finalize (completed: true)
+
+RESPONDA APENAS COM JSON VÁLIDO (sem texto antes ou depois):
 {
-  "message": "mensagem empática para o paciente",
-  "needsImage": "pain_scale" | "bristol_scale" | null,
+  "message": "sua resposta empática ao paciente",
+  "needsImage": null,
   "dataCollected": {
-    "painLevel": number ou null,
-    "hasFever": boolean ou null,
-    "feverDetails": string ou null,
-    "canUrinate": boolean ou null,
-    "urinationDetails": string ou null,
-    "hadBowelMovement": boolean ou null,
-    "bristolScale": number ou null,
-    "bleeding": "none" | "mild" | "moderate" | "severe" ou null,
-    "bleedingDetails": string ou null,
-    "canEat": boolean ou null,
-    "dietDetails": string ou null,
-    "otherSymptoms": string ou null
+    "painLevel": null,
+    "hasFever": null,
+    "feverDetails": null,
+    "canUrinate": null,
+    "urinationDetails": null,
+    "hadBowelMovement": null,
+    "bristolScale": null,
+    "bleeding": null,
+    "bleedingDetails": null,
+    "canEat": null,
+    "dietDetails": null,
+    "otherSymptoms": null
   },
-  "completed": boolean,
-  "needsClarification": boolean,
-  "conversationPhase": "greeting | collecting_pain | collecting_fever | ... | completed"
-}`;
+  "completed": false,
+  "needsClarification": false,
+  "conversationPhase": "collecting_pain"
+}
+
+IMPORTANTE:
+- Preencha APENAS os campos que você conseguiu extrair da resposta atual
+- Se o paciente disse "8" e você estava perguntando sobre dor, coloque painLevel: 8
+- Avance para a próxima pergunta após registrar a resposta`;
 
     // Construir mensagens para Claude
     const messages = [
@@ -454,12 +478,13 @@ FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
     logger.debug('🤖 Chamando Claude API', {
       historyLength: conversationHistory.length,
       userMessage: userMessage.substring(0, 100),
+      currentPhase,
     });
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2000,
-      temperature: 0.7, // Mais conversacional
+      temperature: 0.5, // Mais consistente para seguir instruções
       system: SYSTEM_PROMPT,
       messages,
     });
@@ -470,13 +495,19 @@ FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
 
     logger.debug('🤖 Claude raw response:', responseText);
 
-    // Parse JSON response
-    const aiResponse: ClaudeAIResponse = JSON.parse(responseText);
+    // Tentar extrair JSON da resposta (pode ter texto antes/depois)
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON found in Claude response');
+    }
+
+    const aiResponse: ClaudeAIResponse = JSON.parse(jsonMatch[0]);
 
     logger.debug('✅ Claude response parsed:', {
       completed: aiResponse.completed,
       needsImage: aiResponse.needsImage,
       phase: aiResponse.conversationPhase,
+      dataCollected: aiResponse.dataCollected,
     });
 
     return aiResponse;
@@ -490,16 +521,337 @@ FORMATO DE RESPOSTA (RETORNE APENAS JSON VÁLIDO):
       logger.error('Error stack:', error.stack);
     }
 
-    // Fallback response - iniciar questionário manualmente
+    // FALLBACK INTELIGENTE: Tentar interpretar a resposta localmente
+    const localInterpretation = interpretResponseLocally(userMessage, conversationHistory);
+
+    if (localInterpretation) {
+      logger.debug('🔄 Usando interpretação local:', localInterpretation);
+      return localInterpretation;
+    }
+
+    // Último recurso: pedir para repetir (mas NÃO reiniciar questionário)
     return {
-      message: `Olá ${patient.name.split(' ')[0]}! 👋\n\nVamos começar o acompanhamento do seu pós-operatório.\n\nPrimeiro, gostaria de saber: *como está sua dor neste momento?*\n\nPor favor, me diga um número de 0 a 10, onde:\n• 0 = sem dor\n• 10 = pior dor imaginável`,
-      needsImage: 'pain_scale',
+      message: `Desculpe, não consegui processar sua resposta. Pode repetir de forma mais direta?\n\nPor exemplo, se for sobre dor, me diga apenas o número de 0 a 10.`,
+      needsImage: null,
       dataCollected: {},
       completed: false,
-      needsClarification: false,
-      conversationPhase: 'collecting_pain'
+      needsClarification: true,
+      conversationPhase: determineCurrentPhase(conversationHistory)
     };
   }
+}
+
+/**
+ * Determina a fase atual da conversa baseado no histórico
+ */
+function determineCurrentPhase(conversationHistory: any[]): string {
+  // Se não há histórico ou só tem mensagem inicial, estamos coletando dor
+  if (conversationHistory.length === 0) return 'collecting_pain';
+  if (conversationHistory.length <= 2) return 'collecting_pain'; // Ainda na primeira pergunta
+
+  // Analisar as últimas mensagens do assistente para determinar fase
+  const assistantMessages = conversationHistory
+    .filter(m => m.role === 'assistant')
+    .map(m => m.content.toLowerCase());
+
+  if (assistantMessages.length === 0) return 'collecting_pain';
+
+  const lastAssistantMsg = assistantMessages[assistantMessages.length - 1];
+
+  // Verificar qual foi a última pergunta feita pelo assistente
+  if (lastAssistantMsg.includes('preocupação') || lastAssistantMsg.includes('sintoma') || lastAssistantMsg.includes('última pergunta')) {
+    return 'collecting_concerns';
+  }
+  if (lastAssistantMsg.includes('alimentação') || lastAssistantMsg.includes('comer') || lastAssistantMsg.includes('comendo')) {
+    return 'collecting_diet';
+  }
+  if (lastAssistantMsg.includes('sangr')) {
+    return 'collecting_bleeding';
+  }
+  // Bristol Scale (pergunta sobre consistência das fezes)
+  if (lastAssistantMsg.includes('bristol') || lastAssistantMsg.includes('1 a 7') || lastAssistantMsg.includes('consistência')) {
+    return 'collecting_bristol';
+  }
+  if (lastAssistantMsg.includes('evacu') || lastAssistantMsg.includes('cocô') || lastAssistantMsg.includes('fezes')) {
+    return 'collecting_bowel';
+  }
+  if (lastAssistantMsg.includes('urin') || lastAssistantMsg.includes('xixi')) {
+    return 'collecting_urination';
+  }
+  // Temperatura da febre (pergunta qual foi a temperatura)
+  if (lastAssistantMsg.includes('qual foi') && lastAssistantMsg.includes('temperatura')) {
+    return 'collecting_fever_temp';
+  }
+  if (lastAssistantMsg.includes('medir') && lastAssistantMsg.includes('temperatura')) {
+    return 'collecting_fever_temp';
+  }
+  if (lastAssistantMsg.includes('febre')) {
+    return 'collecting_fever';
+  }
+  if (lastAssistantMsg.includes('dor') || lastAssistantMsg.includes('0 a 10')) {
+    return 'collecting_pain';
+  }
+
+  // Fallback: verificar progresso pelo número de trocas
+  const exchanges = Math.floor(conversationHistory.length / 2);
+  const phases = ['collecting_pain', 'collecting_fever', 'collecting_urination', 'collecting_bowel', 'collecting_bleeding', 'collecting_diet', 'collecting_concerns'];
+
+  return phases[Math.min(exchanges, phases.length - 1)];
+}
+
+/**
+ * Interpreta resposta localmente quando a API falha
+ */
+function interpretResponseLocally(userMessage: string, conversationHistory: any[]): ClaudeAIResponse | null {
+  const msg = userMessage.trim().toLowerCase();
+  const currentPhase = determineCurrentPhase(conversationHistory);
+
+  // Mapeamento de números por extenso
+  const numberWords: Record<string, number> = {
+    'zero': 0, 'um': 1, 'uma': 1, 'dois': 2, 'duas': 2, 'três': 3, 'tres': 3,
+    'quatro': 4, 'cinco': 5, 'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9, 'dez': 10
+  };
+
+  // Tentar extrair número (dígitos ou por extenso)
+  let number: number | null = null;
+  const numberMatch = msg.match(/\d+/);
+  if (numberMatch) {
+    number = parseInt(numberMatch[0]);
+  } else {
+    // Tentar por extenso
+    for (const [word, value] of Object.entries(numberWords)) {
+      if (msg.includes(word)) {
+        number = value;
+        break;
+      }
+    }
+  }
+
+  // Fase de coleta de dor
+  if (currentPhase === 'collecting_pain' || currentPhase === 'greeting') {
+    if (number !== null && number >= 0 && number <= 10) {
+      return {
+        message: `Entendi, sua dor está em ${number}/10. ${number >= 7 ? 'Percebo que está com bastante desconforto. ' : ''}Agora me conta: você teve febre?`,
+        needsImage: null,
+        dataCollected: { painLevel: number },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_fever'
+      };
+    }
+
+    // Respostas textuais para dor
+    if (msg.includes('média') || msg.includes('moderada') || msg.includes('razoável')) {
+      return {
+        message: `Entendo que está com dor moderada. Para eu registrar certinho, pode me dizer um número de 0 a 10?\n\n0 = sem dor\n10 = pior dor imaginável`,
+        needsImage: null,
+        dataCollected: {},
+        completed: false,
+        needsClarification: true,
+        conversationPhase: 'collecting_pain'
+      };
+    }
+  }
+
+  // Fase de febre
+  if (currentPhase === 'collecting_fever') {
+    if (msg.includes('não') || msg.includes('nao') || msg === 'n') {
+      return {
+        message: `Ótimo, sem febre. E você está conseguindo urinar normalmente?`,
+        needsImage: null,
+        dataCollected: { hasFever: false },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_urination'
+      };
+    }
+    if (msg.includes('sim') || msg === 's') {
+      return {
+        message: `Você conseguiu medir a temperatura? Qual foi?`,
+        needsImage: null,
+        dataCollected: { hasFever: true },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_fever_temp'
+      };
+    }
+  }
+
+  // Fase de temperatura da febre
+  if (currentPhase === 'collecting_fever_temp') {
+    // Tentar extrair temperatura (37.5, 38, 39, etc)
+    const tempMatch = msg.match(/(\d+)[,.]?(\d*)/);
+    if (tempMatch) {
+      const temp = parseFloat(tempMatch[1] + (tempMatch[2] ? '.' + tempMatch[2] : ''));
+      const isHighFever = temp >= 38;
+      return {
+        message: isHighFever
+          ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} E você está conseguindo urinar normalmente?`
+          : `Entendi, ${temp}°C. E você está conseguindo urinar normalmente?`,
+        needsImage: null,
+        dataCollected: { hasFever: true, feverDetails: `${temp}°C` },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_urination'
+      };
+    }
+    // Se não mediu
+    if (msg.includes('não medi') || msg.includes('nao medi') || msg.includes('não sei') || msg.includes('nao sei')) {
+      return {
+        message: `Tudo bem. Fique atento e meça se possível. E você está conseguindo urinar normalmente?`,
+        needsImage: null,
+        dataCollected: { hasFever: true, feverDetails: 'não mediu' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_urination'
+      };
+    }
+  }
+
+  // Fase de urina
+  if (currentPhase === 'collecting_urination') {
+    if (msg.includes('sim') || msg === 's' || msg.includes('normal')) {
+      return {
+        message: `Perfeito! E você conseguiu evacuar desde a última vez que conversamos?`,
+        needsImage: null,
+        dataCollected: { canUrinate: true },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_bowel'
+      };
+    }
+    if (msg.includes('não') || msg.includes('nao') || msg === 'n' || msg.includes('dificuldade')) {
+      return {
+        message: `Entendo. Está tendo dificuldade para urinar? Me conta o que está acontecendo.`,
+        needsImage: null,
+        dataCollected: { canUrinate: false },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_urination_details'
+      };
+    }
+  }
+
+  // Fase de evacuação
+  if (currentPhase === 'collecting_bowel') {
+    if (msg.includes('sim') || msg === 's') {
+      return {
+        message: `Que bom! Como estavam as fezes? Na escala de Bristol (1 a 7), qual número mais se parece?`,
+        needsImage: 'bristol_scale',
+        dataCollected: { hadBowelMovement: true },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_bristol'
+      };
+    }
+    if (msg.includes('não') || msg.includes('nao') || msg === 'n') {
+      return {
+        message: `Tudo bem, é comum nos primeiros dias. Você está tendo sangramento?`,
+        needsImage: null,
+        dataCollected: { hadBowelMovement: false },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_bleeding'
+      };
+    }
+  }
+
+  // Fase de Bristol
+  if (currentPhase === 'collecting_bristol') {
+    if (number !== null && number >= 1 && number <= 7) {
+      return {
+        message: `Entendi, tipo ${number} na escala de Bristol. ${number <= 2 ? 'Fezes mais duras podem indicar constipação. ' : number >= 6 ? 'Fezes mais líquidas podem indicar diarreia. ' : ''}Você está tendo sangramento?`,
+        needsImage: null,
+        dataCollected: { hadBowelMovement: true, bristolScale: number },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_bleeding'
+      };
+    }
+  }
+
+  // Fase de sangramento
+  if (currentPhase === 'collecting_bleeding') {
+    if (msg.includes('não') || msg.includes('nao') || msg === 'n' || msg.includes('nenhum') || msg.includes('zero') || msg === '0') {
+      return {
+        message: `Ótimo, sem sangramento. E como está sua alimentação? Está conseguindo comer normalmente?`,
+        needsImage: null,
+        dataCollected: { bleeding: 'none' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_diet'
+      };
+    }
+    if (msg.includes('leve') || msg.includes('pouco') || msg.includes('papel') || msg.includes('gotas')) {
+      return {
+        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. E como está sua alimentação?`,
+        needsImage: null,
+        dataCollected: { bleeding: 'mild' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_diet'
+      };
+    }
+    if (msg.includes('moderado') || msg.includes('roupa') || msg.includes('médio')) {
+      return {
+        message: `Entendi, sangramento moderado. Fique atento se aumentar. E como está sua alimentação?`,
+        needsImage: null,
+        dataCollected: { bleeding: 'moderate' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_diet'
+      };
+    }
+    if (msg.includes('intenso') || msg.includes('muito') || msg.includes('forte') || msg.includes('vaso')) {
+      return {
+        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. E como está sua alimentação?`,
+        needsImage: null,
+        dataCollected: { bleeding: 'severe' },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_diet'
+      };
+    }
+    // Resposta genérica "sim" para sangramento
+    if (msg.includes('sim') || msg === 's') {
+      return {
+        message: `Entendi que está sangrando. Pode me dizer se é leve (só no papel), moderado (mancha a roupa) ou intenso (encheu o vaso)?`,
+        needsImage: null,
+        dataCollected: {},
+        completed: false,
+        needsClarification: true,
+        conversationPhase: 'collecting_bleeding'
+      };
+    }
+  }
+
+  // Fase de alimentação
+  if (currentPhase === 'collecting_diet') {
+    if (msg.includes('sim') || msg === 's' || msg.includes('normal') || msg.includes('bem')) {
+      return {
+        message: `Perfeito! Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        needsImage: null,
+        dataCollected: { canEat: true },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_concerns'
+      };
+    }
+  }
+
+  // Fase de preocupações (final)
+  if (currentPhase === 'collecting_concerns') {
+    return {
+      message: `Obrigada por compartilhar! Registrei todas as informações. O Dr. João Vitor vai analisar e, se necessário, entrará em contato. Boa recuperação! 💙`,
+      needsImage: null,
+      dataCollected: { otherSymptoms: userMessage },
+      completed: true,
+      needsClarification: false,
+      conversationPhase: 'completed'
+    };
+  }
+
+  return null; // Não conseguiu interpretar
 }
 
 /**
