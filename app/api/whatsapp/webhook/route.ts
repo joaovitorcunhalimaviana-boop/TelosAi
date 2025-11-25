@@ -128,9 +128,72 @@ async function processMessages(value: any) {
       await processTextMessage(message, contacts);
     } else if (message.type === 'interactive') {
       await processInteractiveMessage(message, contacts);
+    } else if (['audio', 'image', 'video', 'document', 'sticker', 'location', 'contacts'].includes(message.type)) {
+      // Mensagens não-texto: orientar paciente a escrever
+      await processUnsupportedMessage(message, contacts);
     } else {
       logger.debug(`Message type ${message.type} not handled`);
     }
+  }
+}
+
+/**
+ * Processa mensagens não suportadas (áudio, imagem, vídeo, etc.)
+ * Orienta o paciente a enviar mensagem de texto escrito
+ */
+async function processUnsupportedMessage(message: any, contacts: any[]) {
+  try {
+    const phone = message.from;
+    const messageType = message.type;
+
+    logger.debug(`Processing unsupported message type from ${phone}: ${messageType}`);
+
+    // Encontrar paciente pelo telefone
+    const patient = await findPatientByPhone(phone);
+
+    // Mensagem personalizada baseada no tipo
+    let typeDescription = '';
+    switch (messageType) {
+      case 'audio':
+        typeDescription = 'áudio';
+        break;
+      case 'image':
+        typeDescription = 'imagem';
+        break;
+      case 'video':
+        typeDescription = 'vídeo';
+        break;
+      case 'document':
+        typeDescription = 'documento';
+        break;
+      case 'sticker':
+        typeDescription = 'figurinha';
+        break;
+      case 'location':
+        typeDescription = 'localização';
+        break;
+      case 'contacts':
+        typeDescription = 'contato';
+        break;
+      default:
+        typeDescription = 'este tipo de mensagem';
+    }
+
+    const firstName = patient ? patient.name.split(' ')[0] : '';
+    const greeting = firstName ? `${firstName}, ` : '';
+
+    const orientationMessage = `${greeting}recebi seu ${typeDescription}, mas infelizmente não consigo processar esse tipo de mensagem.
+
+Por favor, *escreva sua resposta em texto* para que eu possa registrar corretamente.
+
+Se precisar informar algo sobre sua recuperação, digite a resposta por escrito.`;
+
+    await sendEmpatheticResponse(phone, orientationMessage);
+
+    logger.debug(`✅ Orientação enviada para ${phone} sobre mensagem tipo ${messageType}`);
+
+  } catch (error) {
+    logger.error('Error processing unsupported message:', error);
   }
 }
 
