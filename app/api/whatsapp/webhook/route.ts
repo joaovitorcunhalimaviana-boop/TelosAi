@@ -480,8 +480,9 @@ CONTEXTO DO PACIENTE:
 3. **URINA** (conseguindo urinar?)
    - Campo: canUrinate
 
-4. **EVACUAÇÃO** (desde última conversa)
-   - Perguntar: "Você evacuou desde a última vez que conversamos?"
+4. **EVACUAÇÃO**
+   - SE dayNumber == 1 (primeira conversa): Perguntar "Você já evacuou após a cirurgia?"
+   - SE dayNumber >= 2 (conversas seguintes): Perguntar "Você evacuou desde a nossa última conversa?"
    - Se SIM:
      a) Perguntar HORA aproximada: "Mais ou menos que horas foi?"
      b) Perguntar DOR DURANTE EVACUAÇÃO (0-10): "Qual foi sua dor durante a evacuação?"
@@ -519,7 +520,8 @@ NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não
    - painDuringBowelMovement: dor durante/após evacuar
 
 2. Quando perguntar sobre EVACUAÇÃO:
-   - Use "desde a última vez que conversamos" ou "desde nossa última conversa"
+   - SE dayNumber == 1: Use "Você já evacuou após a cirurgia?" (primeira conversa)
+   - SE dayNumber >= 2: Use "Você evacuou desde a nossa última conversa?"
    - Se evacuou, pergunte a HORA ("mais ou menos que horas?")
    - Se evacuou, pergunte a DOR DURANTE a evacuação E ENVIE A ESCALA DE DOR
    - Se evacuou, pergunte BRISTOL E ENVIE A ESCALA DE BRISTOL
@@ -529,6 +531,12 @@ NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não
    - Perguntar sobre Bristol/fezes: needsImage: "bristol_scale"
 
 4. NUNCA REPITA pergunta já respondida
+
+5. LINGUAGEM - Use linguagem SIMPLES mas FORMAL:
+   - NÃO use gírias ou expressões informais (ex: "okay", "beleza", "show")
+   - Use "Ótimo", "Entendi", "Certo" ao invés de gírias
+   - Pacientes podem ser de diferentes perfis, inclusive do interior
+   - Seja cordial mas profissional
 
 === FORMATO DE RESPOSTA (JSON) ===
 {
@@ -631,7 +639,7 @@ FASES VÁLIDAS:
     }
 
     // FALLBACK INTELIGENTE: Tentar interpretar a resposta localmente
-    const localInterpretation = interpretResponseLocally(userMessage, conversationHistory);
+    const localInterpretation = interpretResponseLocally(userMessage, conversationHistory, dayNumber);
 
     if (localInterpretation) {
       logger.debug('🔄 Usando interpretação local:', localInterpretation);
@@ -784,18 +792,18 @@ function determineCurrentPhase(conversationHistory: any[], dayNumber?: number): 
  * 2. collecting_fever - Febre (sim/não)
  * 3. collecting_fever_temp - Temperatura (se teve febre)
  * 4. collecting_urination - Urina normal (sim/não)
- * 5. collecting_bowel - Evacuou desde última conversa (sim/não)
+ * 5. collecting_bowel - Evacuou (D+1: "após a cirurgia" / D+2+: "desde nossa última conversa")
  * 6. collecting_bowel_time - Hora da evacuação (se evacuou)
  * 7. collecting_pain_during_bm - Dor DURANTE evacuação (0-10) + IMAGEM
  * 8. collecting_bristol - Escala Bristol (1-7) + IMAGEM
  * 9. collecting_bleeding - Sangramento
- * 10. collecting_meds_prescribed - Medicações prescritas (dipirona, anti-inflamatório)
+ * 10. collecting_meds_prescribed - Medicações prescritas
  * 11. collecting_meds_extra - Medicações extras além das prescritas
  * 11b. collecting_meds_extra_details - Detalhes das medicações extras (qual medicação)
  * 12. collecting_purulent_discharge - Secreção purulenta (APENAS D+3 em diante)
  * 13. collecting_concerns - Preocupações finais
  */
-function interpretResponseLocally(userMessage: string, conversationHistory: any[]): ClaudeAIResponse | null {
+function interpretResponseLocally(userMessage: string, conversationHistory: any[], dayNumber: number = 1): ClaudeAIResponse | null {
   const msg = userMessage.trim().toLowerCase();
   const currentPhase = determineCurrentPhase(conversationHistory);
 
@@ -959,9 +967,14 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // FASE 4: URINA
   // ========================================
   if (currentPhase === 'collecting_urination') {
+    // Pergunta de evacuação diferente para D+1 (primeira conversa) vs D+2+ (conversas seguintes)
+    const bowelQuestion = dayNumber === 1
+      ? `Você já evacuou após a cirurgia?`
+      : `Você evacuou desde a nossa última conversa?`;
+
     if (isYes || msg.includes('normal') || msg.includes('normalmente') || msg.includes('tranquilo')) {
       return {
-        message: `Perfeito! E você evacuou desde a última vez que conversamos?`,
+        message: `Ótimo! ${bowelQuestion}`,
         needsImage: null,
         dataCollected: { canUrinate: true },
         completed: false,
@@ -993,8 +1006,13 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // FASE 4b: DETALHES DA URINA
   // ========================================
   if (currentPhase === 'collecting_urination_details') {
+    // Pergunta de evacuação diferente para D+1 vs D+2+
+    const bowelQuestion = dayNumber === 1
+      ? `Você já evacuou após a cirurgia?`
+      : `Você evacuou desde a nossa última conversa?`;
+
     return {
-      message: `Entendi, vou registrar isso. E você evacuou desde a última vez que conversamos?`,
+      message: `Entendi, vou registrar isso. ${bowelQuestion}`,
       needsImage: null,
       dataCollected: { canUrinate: false, urinationDetails: userMessage },
       completed: false,
@@ -1004,12 +1022,14 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   }
 
   // ========================================
-  // FASE 5: EVACUAÇÃO (desde última conversa)
+  // FASE 5: EVACUAÇÃO
+  // D+1: "Você já evacuou após a cirurgia?"
+  // D+2+: "Você evacuou desde a nossa última conversa?"
   // ========================================
   if (currentPhase === 'collecting_bowel') {
     if (isYes) {
       return {
-        message: `Que bom que evacuou! Mais ou menos que horas foi a evacuação?`,
+        message: `Que bom que evacuou! Mais ou menos que horas foi?`,
         needsImage: null,
         dataCollected: { hadBowelMovementSinceLastContact: true },
         completed: false,
@@ -1027,8 +1047,14 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bleeding'
       };
     }
+
+    // Clarificação também diferente para D+1 vs D+2+
+    const clarification = dayNumber === 1
+      ? `Desculpe, não entendi. Você já evacuou após a cirurgia? Responda sim ou não.`
+      : `Desculpe, não entendi. Você evacuou desde a nossa última conversa? Responda sim ou não.`;
+
     return {
-      message: `Desculpe, não entendi. Você evacuou desde a última vez que conversamos? Responda sim ou não.`,
+      message: clarification,
       needsImage: null,
       dataCollected: {},
       completed: false,
