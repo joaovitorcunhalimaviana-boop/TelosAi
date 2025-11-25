@@ -575,6 +575,9 @@ function determineCurrentPhase(conversationHistory: any[]): string {
   if (lastAssistantMsg.includes('evacu') || lastAssistantMsg.includes('cocô') || lastAssistantMsg.includes('fezes')) {
     return 'collecting_bowel';
   }
+  if (lastAssistantMsg.includes('dificuldade para urinar') || lastAssistantMsg.includes('o que está acontecendo')) {
+    return 'collecting_urination_details';
+  }
   if (lastAssistantMsg.includes('urin') || lastAssistantMsg.includes('xixi')) {
     return 'collecting_urination';
   }
@@ -601,10 +604,14 @@ function determineCurrentPhase(conversationHistory: any[]): string {
 
 /**
  * Interpreta resposta localmente quando a API falha
+ * IMPORTANTE: Esta função é CONSERVADORA - só avança quando TEM CERTEZA da resposta
+ * Se não entender, SEMPRE pede esclarecimento na MESMA fase
  */
 function interpretResponseLocally(userMessage: string, conversationHistory: any[]): ClaudeAIResponse | null {
   const msg = userMessage.trim().toLowerCase();
   const currentPhase = determineCurrentPhase(conversationHistory);
+
+  logger.debug('🔄 interpretResponseLocally:', { msg, currentPhase });
 
   // Mapeamento de números por extenso
   const numberWords: Record<string, number> = {
@@ -614,21 +621,32 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
 
   // Tentar extrair número (dígitos ou por extenso)
   let number: number | null = null;
-  const numberMatch = msg.match(/\d+/);
+  const numberMatch = msg.match(/\b(\d+)\b/); // \b para word boundary
   if (numberMatch) {
-    number = parseInt(numberMatch[0]);
+    number = parseInt(numberMatch[1]);
   } else {
     // Tentar por extenso
     for (const [word, value] of Object.entries(numberWords)) {
-      if (msg.includes(word)) {
+      // Usar word boundary para evitar falsos positivos
+      const regex = new RegExp(`\\b${word}\\b`);
+      if (regex.test(msg)) {
         number = value;
         break;
       }
     }
   }
 
-  // Fase de coleta de dor
+  // Detectar sim/não de forma mais precisa
+  const isYes = /^(sim|s|yes|claro|ok|isso|positivo|afirmativo)$/i.test(msg.trim()) ||
+                /\b(sim|yes|claro)\b/i.test(msg);
+  const isNo = /^(não|nao|n|no|nope|negativo)$/i.test(msg.trim()) ||
+               /\b(não|nao|nunca)\b/i.test(msg);
+
+  // ========================================
+  // FASE: COLETA DE DOR (0-10)
+  // ========================================
   if (currentPhase === 'collecting_pain' || currentPhase === 'greeting') {
+    // SÓ aceita se for um NÚMERO válido de 0 a 10
     if (number !== null && number >= 0 && number <= 10) {
       return {
         message: `Entendi, sua dor está em ${number}/10. ${number >= 7 ? 'Percebo que está com bastante desconforto. ' : ''}Agora me conta: você teve febre?`,
@@ -640,22 +658,36 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
 
-    // Respostas textuais para dor
-    if (msg.includes('média') || msg.includes('moderada') || msg.includes('razoável')) {
+    // Respostas textuais vagas - pedir número específico
+    if (msg.includes('média') || msg.includes('moderada') || msg.includes('razoável') ||
+        msg.includes('forte') || msg.includes('fraca') || msg.includes('leve') ||
+        msg.includes('muita') || msg.includes('pouca') || msg.includes('bastante')) {
       return {
-        message: `Entendo que está com dor moderada. Para eu registrar certinho, pode me dizer um número de 0 a 10?\n\n0 = sem dor\n10 = pior dor imaginável`,
-        needsImage: null,
+        message: `Entendo. Mas para eu registrar certinho, preciso de um número.\n\nOlhando a escala de dor que enviei, qual número de 0 a 10 representa sua dor agora?\n\n0 = sem dor nenhuma\n10 = pior dor imaginável`,
+        needsImage: 'pain_scale',
         dataCollected: {},
         completed: false,
         needsClarification: true,
         conversationPhase: 'collecting_pain'
       };
     }
+
+    // QUALQUER outra resposta que não seja número - pedir esclarecimento
+    return {
+      message: `Desculpe, não entendi. Preciso que você me diga um número de 0 a 10 para sua dor.\n\nOlhe a escala de dor que enviei e me diga: qual número representa sua dor agora?`,
+      needsImage: 'pain_scale',
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_pain'
+    };
   }
 
-  // Fase de febre
+  // ========================================
+  // FASE: FEBRE (sim/não)
+  // ========================================
   if (currentPhase === 'collecting_fever') {
-    if (msg.includes('não') || msg.includes('nao') || msg === 'n') {
+    if (isNo) {
       return {
         message: `Ótimo, sem febre. E você está conseguindo urinar normalmente?`,
         needsImage: null,
@@ -665,7 +697,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_urination'
       };
     }
-    if (msg.includes('sim') || msg === 's') {
+    if (isYes) {
       return {
         message: `Você conseguiu medir a temperatura? Qual foi?`,
         needsImage: null,
@@ -675,28 +707,42 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_fever_temp'
       };
     }
+    // Não entendeu - repetir pergunta
+    return {
+      message: `Desculpe, não entendi. Você teve febre? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_fever'
+    };
   }
 
-  // Fase de temperatura da febre
+  // ========================================
+  // FASE: TEMPERATURA DA FEBRE
+  // ========================================
   if (currentPhase === 'collecting_fever_temp') {
     // Tentar extrair temperatura (37.5, 38, 39, etc)
     const tempMatch = msg.match(/(\d+)[,.]?(\d*)/);
     if (tempMatch) {
       const temp = parseFloat(tempMatch[1] + (tempMatch[2] ? '.' + tempMatch[2] : ''));
-      const isHighFever = temp >= 38;
-      return {
-        message: isHighFever
-          ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} E você está conseguindo urinar normalmente?`
-          : `Entendi, ${temp}°C. E você está conseguindo urinar normalmente?`,
-        needsImage: null,
-        dataCollected: { hasFever: true, feverDetails: `${temp}°C` },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_urination'
-      };
+      if (temp >= 35 && temp <= 42) { // Temperatura plausível
+        const isHighFever = temp >= 38;
+        return {
+          message: isHighFever
+            ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} E você está conseguindo urinar normalmente?`
+            : `Entendi, ${temp}°C. E você está conseguindo urinar normalmente?`,
+          needsImage: null,
+          dataCollected: { hasFever: true, feverDetails: `${temp}°C` },
+          completed: false,
+          needsClarification: false,
+          conversationPhase: 'collecting_urination'
+        };
+      }
     }
     // Se não mediu
-    if (msg.includes('não medi') || msg.includes('nao medi') || msg.includes('não sei') || msg.includes('nao sei')) {
+    if (msg.includes('não medi') || msg.includes('nao medi') || msg.includes('não sei') ||
+        msg.includes('nao sei') || msg.includes('não lembro') || msg.includes('nao lembro')) {
       return {
         message: `Tudo bem. Fique atento e meça se possível. E você está conseguindo urinar normalmente?`,
         needsImage: null,
@@ -706,13 +752,24 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_urination'
       };
     }
+    // Não entendeu
+    return {
+      message: `Não entendi a temperatura. Por favor, me diga o valor em graus (ex: 37.5 ou 38).`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_fever_temp'
+    };
   }
 
-  // Fase de urina
+  // ========================================
+  // FASE: URINA (sim/não)
+  // ========================================
   if (currentPhase === 'collecting_urination') {
-    if (msg.includes('sim') || msg === 's' || msg.includes('normal')) {
+    if (isYes || msg.includes('normal') || msg.includes('normalmente') || msg.includes('tranquilo')) {
       return {
-        message: `Perfeito! E você conseguiu evacuar desde a última vez que conversamos?`,
+        message: `Perfeito! E você conseguiu evacuar desde a cirurgia?`,
         needsImage: null,
         dataCollected: { canUrinate: true },
         completed: false,
@@ -720,7 +777,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bowel'
       };
     }
-    if (msg.includes('não') || msg.includes('nao') || msg === 'n' || msg.includes('dificuldade')) {
+    if (isNo || msg.includes('dificuldade') || msg.includes('difícil') || msg.includes('problema')) {
       return {
         message: `Entendo. Está tendo dificuldade para urinar? Me conta o que está acontecendo.`,
         needsImage: null,
@@ -730,13 +787,39 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_urination_details'
       };
     }
+    // Não entendeu
+    return {
+      message: `Desculpe, não entendi. Você está conseguindo urinar normalmente? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_urination'
+    };
   }
 
-  // Fase de evacuação
+  // ========================================
+  // FASE: DETALHES DA URINA
+  // ========================================
+  if (currentPhase === 'collecting_urination_details') {
+    // Aceita qualquer explicação e avança
+    return {
+      message: `Entendi, vou registrar isso. E você conseguiu evacuar desde a cirurgia?`,
+      needsImage: null,
+      dataCollected: { canUrinate: false, urinationDetails: userMessage },
+      completed: false,
+      needsClarification: false,
+      conversationPhase: 'collecting_bowel'
+    };
+  }
+
+  // ========================================
+  // FASE: EVACUAÇÃO (sim/não)
+  // ========================================
   if (currentPhase === 'collecting_bowel') {
-    if (msg.includes('sim') || msg === 's') {
+    if (isYes) {
       return {
-        message: `Que bom! Como estavam as fezes? Na escala de Bristol (1 a 7), qual número mais se parece?`,
+        message: `Que bom! Vou enviar a Escala de Bristol. Olhe a imagem e me diga: qual número (1 a 7) mais se parece com suas fezes?`,
         needsImage: 'bristol_scale',
         dataCollected: { hadBowelMovement: true },
         completed: false,
@@ -744,7 +827,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bristol'
       };
     }
-    if (msg.includes('não') || msg.includes('nao') || msg === 'n') {
+    if (isNo || msg.includes('ainda não') || msg.includes('ainda nao')) {
       return {
         message: `Tudo bem, é comum nos primeiros dias. Você está tendo sangramento?`,
         needsImage: null,
@@ -754,9 +837,20 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bleeding'
       };
     }
+    // Não entendeu
+    return {
+      message: `Desculpe, não entendi. Você conseguiu evacuar desde a cirurgia? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_bowel'
+    };
   }
 
-  // Fase de Bristol
+  // ========================================
+  // FASE: BRISTOL (1-7)
+  // ========================================
   if (currentPhase === 'collecting_bristol') {
     if (number !== null && number >= 1 && number <= 7) {
       return {
@@ -768,11 +862,22 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bleeding'
       };
     }
+    // Não entendeu - pedir número com imagem
+    return {
+      message: `Não entendi. Por favor, olhe a imagem da Escala de Bristol que enviei e me diga qual número de 1 a 7 mais se parece com suas fezes.`,
+      needsImage: 'bristol_scale',
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_bristol'
+    };
   }
 
-  // Fase de sangramento
+  // ========================================
+  // FASE: SANGRAMENTO
+  // ========================================
   if (currentPhase === 'collecting_bleeding') {
-    if (msg.includes('não') || msg.includes('nao') || msg === 'n' || msg.includes('nenhum') || msg.includes('zero') || msg === '0') {
+    if (isNo || msg.includes('nenhum') || msg.includes('zero')) {
       return {
         message: `Ótimo, sem sangramento. E como está sua alimentação? Está conseguindo comer normalmente?`,
         needsImage: null,
@@ -812,10 +917,9 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_diet'
       };
     }
-    // Resposta genérica "sim" para sangramento
-    if (msg.includes('sim') || msg === 's') {
+    if (isYes) {
       return {
-        message: `Entendi que está sangrando. Pode me dizer se é leve (só no papel), moderado (mancha a roupa) ou intenso (encheu o vaso)?`,
+        message: `Entendi que está tendo sangramento. Pode me dizer a intensidade?\n\n- Leve: só no papel higiênico\n- Moderado: mancha a roupa\n- Intenso: encheu o vaso`,
         needsImage: null,
         dataCollected: {},
         completed: false,
@@ -823,11 +927,22 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_bleeding'
       };
     }
+    // Não entendeu
+    return {
+      message: `Desculpe, não entendi. Você está tendo sangramento? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_bleeding'
+    };
   }
 
-  // Fase de alimentação
+  // ========================================
+  // FASE: ALIMENTAÇÃO
+  // ========================================
   if (currentPhase === 'collecting_diet') {
-    if (msg.includes('sim') || msg === 's' || msg.includes('normal') || msg.includes('bem')) {
+    if (isYes || msg.includes('normal') || msg.includes('bem') || msg.includes('tranquilo')) {
       return {
         message: `Perfeito! Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
         needsImage: null,
@@ -837,21 +952,52 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         conversationPhase: 'collecting_concerns'
       };
     }
+    if (isNo || msg.includes('dificuldade') || msg.includes('náusea') || msg.includes('vômito')) {
+      return {
+        message: `Entendo que está com dificuldade para comer. Tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        needsImage: null,
+        dataCollected: { canEat: false, dietDetails: userMessage },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_concerns'
+      };
+    }
+    // Não entendeu
+    return {
+      message: `Desculpe, não entendi. Você está conseguindo comer normalmente? Responda sim ou não.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_diet'
+    };
   }
 
-  // Fase de preocupações (final)
+  // ========================================
+  // FASE: PREOCUPAÇÕES (final)
+  // ========================================
   if (currentPhase === 'collecting_concerns') {
+    // Aceita qualquer resposta como preocupação
+    const hasConcerns = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
     return {
       message: `Obrigada por compartilhar! Registrei todas as informações. O Dr. João Vitor vai analisar e, se necessário, entrará em contato. Boa recuperação! 💙`,
       needsImage: null,
-      dataCollected: { otherSymptoms: userMessage },
+      dataCollected: { otherSymptoms: hasConcerns ? userMessage : undefined },
       completed: true,
       needsClarification: false,
       conversationPhase: 'completed'
     };
   }
 
-  return null; // Não conseguiu interpretar
+  // Se chegou aqui, não conseguiu interpretar - NÃO avança, pede esclarecimento
+  return {
+    message: `Desculpe, não consegui entender sua resposta. Pode repetir de forma mais clara?`,
+    needsImage: null,
+    dataCollected: {},
+    completed: false,
+    needsClarification: true,
+    conversationPhase: currentPhase
+  };
 }
 
 /**
