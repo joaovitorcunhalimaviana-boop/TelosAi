@@ -198,6 +198,7 @@ model Surgery {
   predictedRiskLevel     String?
   firstBowelMovementDate DateTime?
   firstBowelMovementDay  Int?
+  firstBowelMovementTime String?
   hadFirstBowelMovement  Boolean             @default(false)
   anesthesia             Anesthesia?
   consentTerms           ConsentTerm[]

@@ -433,14 +433,10 @@ interface PostOpData {
   hasFever?: boolean;
   feverDetails?: string;
 
-  // URINA
-  canUrinate?: boolean;
-  urinationDetails?: string;
-
   // EVACUAÇÃO - dados detalhados
   hadBowelMovementSinceLastContact?: boolean; // Evacuou desde última conversa?
   bowelMovementTime?: string; // Hora aproximada da evacuação (para primeira evacuação)
-  bristolScale?: number; // 1-7 - Escala de Bristol
+  bristolScale?: number; // 1-7 - Escala de Bristol (APENAS D+5 e D+10)
   isFirstBowelMovement?: boolean; // Flag se é a primeira evacuação pós-op
 
   // SANGRAMENTO
@@ -460,11 +456,19 @@ interface PostOpData {
   // OUTROS
   otherSymptoms?: string;
 
+  // PESQUISA DE SATISFAÇÃO (apenas D+14)
+  painControlSatisfaction?: number; // 0-10 - Satisfação com controle da dor
+  aiFollowUpSatisfaction?: number; // 0-10 - Satisfação com acompanhamento IA
+  npsScore?: number; // 0-10 - Net Promoter Score (recomendaria?)
+  feedback?: string; // Feedback aberto opcional
+
   // Campos legados (manter para compatibilidade)
   painLevel?: number; // Mapeado para painAtRest
   hadBowelMovement?: boolean; // Mapeado para hadBowelMovementSinceLastContact
   canEat?: boolean; // Legado - não usar mais
   dietDetails?: string; // Legado - não usar mais
+  canUrinate?: boolean; // Legado - removido do fluxo
+  urinationDetails?: string; // Legado - removido do fluxo
 }
 
 /**
@@ -540,10 +544,7 @@ CONTEXTO DO PACIENTE:
 2. **FEBRE** (sim/não + temperatura)
    - Campo: hasFever, feverDetails
 
-3. **URINA** (conseguindo urinar?)
-   - Campo: canUrinate
-
-4. **EVACUAÇÃO**
+3. **EVACUAÇÃO**
    - SE dayNumber == 1 (primeira conversa): Perguntar "Você já evacuou após a cirurgia?"
    - SE dayNumber >= 2 (conversas seguintes): Perguntar "Você evacuou desde a nossa última conversa?"
    - Se SIM:
@@ -553,11 +554,12 @@ CONTEXTO DO PACIENTE:
      c) Perguntar BRISTOL (1-7): "Como estava a consistência das fezes?"
         -> ENVIAR IMAGEM DA ESCALA DE BRISTOL (needsImage: "bristol_scale")
    - Campos: hadBowelMovementSinceLastContact, bowelMovementTime, painDuringBowelMovement, bristolScale
+   - BRISTOL apenas em D+5 e D+10 (não perguntar em outros dias)
 
-5. **SANGRAMENTO** (nenhum/leve/moderado/intenso)
+4. **SANGRAMENTO** (nenhum/leve/moderado/intenso)
    - Campo: bleeding
 
-6. **ANALGÉSICOS** (uso de medicações para dor)
+5. **ANALGÉSICOS** (uso de medicações para dor)
    - Perguntar: "Você está tomando as medicações para dor que foram receitadas?"
    - Se SIM: "Está tomando certinho nos horários?"
    - Perguntar: "Precisou tomar alguma outra medicação para dor além das receitadas?"
@@ -565,16 +567,25 @@ CONTEXTO DO PACIENTE:
    - Campos: takingPrescribedMeds, prescribedMedsDetails, takingExtraMeds, extraMedsDetails
    - NOTA: Não mencionar medicações específicas (cada médico tem seu protocolo)
 
-7. **SECREÇÃO PURULENTA** (APENAS A PARTIR DE D+3)
+6. **SECREÇÃO PURULENTA** (APENAS A PARTIR DE D+3)
    - SE dayNumber >= 3:
      - Perguntar: "Você notou saída de alguma secreção amarelada ou esverdeada com mau cheiro (pus) no local da cirurgia?"
      - Explicar: Secreção aquosa/clara é normal na cicatrização, mas secreção purulenta (amarela/verde com cheiro) não é.
    - Campo: hasPurulentDischarge, purulentDischargeDetails
 
-8. **OUTRAS PREOCUPAÇÕES**
+7. **OUTRAS PREOCUPAÇÕES**
    - Campo: otherSymptoms
 
+8. **PESQUISA DE SATISFAÇÃO** (APENAS NO D+14 - último dia)
+   - SE dayNumber == 14:
+     a) Satisfação com analgesia (0-10): "De 0 a 10, quão satisfeito você está com o controle da dor durante todo o período pós-operatório?"
+     b) Satisfação com acompanhamento IA (0-10): "De 0 a 10, como você avalia este acompanhamento pós-operatório por WhatsApp com inteligência artificial?"
+     c) NPS (0-10): "De 0 a 10, qual a probabilidade de você recomendar este acompanhamento por WhatsApp a um amigo ou familiar?"
+     d) Feedback aberto (opcional): "Gostaria de deixar algum comentário ou sugestão sobre o acompanhamento? (opcional)"
+   - Campos: painControlSatisfaction, aiFollowUpSatisfaction, npsScore, feedback
+
 NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não têm problemas de alimentação.
+NOTA: NÃO perguntar sobre urina - foi removido do fluxo.
 
 === REGRAS CRÍTICAS ===
 
@@ -631,17 +642,24 @@ NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não
 FASES VÁLIDAS:
 - collecting_pain_at_rest (dor em repouso)
 - collecting_fever
-- collecting_urination
 - collecting_bowel (se evacuou desde última conversa)
 - collecting_bowel_time (hora da evacuação)
 - collecting_pain_during_bm (dor durante evacuação)
-- collecting_bristol
+- collecting_bristol (APENAS D+5 e D+10)
 - collecting_bleeding
 - collecting_meds_prescribed (medicações prescritas)
 - collecting_meds_extra (medicações extras)
 - collecting_purulent_discharge (secreção purulenta - apenas D+3)
 - collecting_concerns
-- completed`;
+- collecting_satisfaction_pain (satisfação analgesia - APENAS D+14)
+- collecting_satisfaction_ai (satisfação IA - APENAS D+14)
+- collecting_nps (NPS - APENAS D+14)
+- collecting_feedback (feedback aberto - APENAS D+14)
+- completed
+
+IMPORTANTE SOBRE BRISTOL:
+- APENAS perguntar Bristol em D+5 e D+10
+- Em outros dias, após dor durante evacuação, pular direto para sangramento`;
 
     // Construir mensagens para Claude
     const messages = [
@@ -955,14 +973,19 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // FASE 2: FEBRE (sim/não)
   // ========================================
   if (currentPhase === 'collecting_fever') {
+    // Pergunta de evacuação diferente para D+1 vs D+2+
+    const bowelQuestion = dayNumber === 1
+      ? `Você já evacuou após a cirurgia?`
+      : `Você evacuou desde a nossa última conversa?`;
+
     if (isNo) {
       return {
-        message: `Ótimo, sem febre. E você está conseguindo urinar normalmente?`,
+        message: `Ótimo, sem febre. ${bowelQuestion}`,
         needsImage: null,
         dataCollected: { hasFever: false },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_urination'
+        conversationPhase: 'collecting_bowel'
       };
     }
     if (isYes) {
@@ -989,6 +1012,11 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // FASE 3: TEMPERATURA DA FEBRE
   // ========================================
   if (currentPhase === 'collecting_fever_temp') {
+    // Pergunta de evacuação diferente para D+1 vs D+2+
+    const bowelQuestion = dayNumber === 1
+      ? `Você já evacuou após a cirurgia?`
+      : `Você evacuou desde a nossa última conversa?`;
+
     const tempMatch = msg.match(/(\d+)[,.]?(\d*)/);
     if (tempMatch) {
       const temp = parseFloat(tempMatch[1] + (tempMatch[2] ? '.' + tempMatch[2] : ''));
@@ -996,24 +1024,24 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
         const isHighFever = temp >= 38;
         return {
           message: isHighFever
-            ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} E você está conseguindo urinar normalmente?`
-            : `Entendi, ${temp}°C. E você está conseguindo urinar normalmente?`,
+            ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} ${bowelQuestion}`
+            : `Entendi, ${temp}°C. ${bowelQuestion}`,
           needsImage: null,
           dataCollected: { hasFever: true, feverDetails: `${temp}°C` },
           completed: false,
           needsClarification: false,
-          conversationPhase: 'collecting_urination'
+          conversationPhase: 'collecting_bowel'
         };
       }
     }
     if (msg.includes('não medi') || msg.includes('nao medi') || msg.includes('não sei') || msg.includes('nao sei')) {
       return {
-        message: `Tudo bem. Fique atento e meça se possível. E você está conseguindo urinar normalmente?`,
+        message: `Tudo bem. Fique atento e meça se possível. ${bowelQuestion}`,
         needsImage: null,
         dataCollected: { hasFever: true, feverDetails: 'não mediu' },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_urination'
+        conversationPhase: 'collecting_bowel'
       };
     }
     return {
@@ -1027,65 +1055,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   }
 
   // ========================================
-  // FASE 4: URINA
-  // ========================================
-  if (currentPhase === 'collecting_urination') {
-    // Pergunta de evacuação diferente para D+1 (primeira conversa) vs D+2+ (conversas seguintes)
-    const bowelQuestion = dayNumber === 1
-      ? `Você já evacuou após a cirurgia?`
-      : `Você evacuou desde a nossa última conversa?`;
-
-    if (isYes || msg.includes('normal') || msg.includes('normalmente') || msg.includes('tranquilo')) {
-      return {
-        message: `Ótimo! ${bowelQuestion}`,
-        needsImage: null,
-        dataCollected: { canUrinate: true },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bowel'
-      };
-    }
-    if (isNo || msg.includes('dificuldade') || msg.includes('difícil') || msg.includes('problema')) {
-      return {
-        message: `Entendo. Está tendo dificuldade para urinar? Me conta o que está acontecendo.`,
-        needsImage: null,
-        dataCollected: { canUrinate: false },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_urination_details'
-      };
-    }
-    return {
-      message: `Desculpe, não entendi. Você está conseguindo urinar normalmente? Responda sim ou não.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_urination'
-    };
-  }
-
-  // ========================================
-  // FASE 4b: DETALHES DA URINA
-  // ========================================
-  if (currentPhase === 'collecting_urination_details') {
-    // Pergunta de evacuação diferente para D+1 vs D+2+
-    const bowelQuestion = dayNumber === 1
-      ? `Você já evacuou após a cirurgia?`
-      : `Você evacuou desde a nossa última conversa?`;
-
-    return {
-      message: `Entendi, vou registrar isso. ${bowelQuestion}`,
-      needsImage: null,
-      dataCollected: { canUrinate: false, urinationDetails: userMessage },
-      completed: false,
-      needsClarification: false,
-      conversationPhase: 'collecting_bowel'
-    };
-  }
-
-  // ========================================
-  // FASE 5: EVACUAÇÃO
+  // FASE 3: EVACUAÇÃO (URINA FOI REMOVIDA DO FLUXO)
   // D+1: "Você já evacuou após a cirurgia?"
   // D+2+: "Você evacuou desde a nossa última conversa?"
   // ========================================
@@ -1146,15 +1116,30 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // FASE 7: DOR DURANTE EVACUAÇÃO (0-10)
   // ========================================
   if (currentPhase === 'collecting_pain_during_bm') {
+    // Bristol APENAS em D+5 e D+10
+    const shouldAskBristol = dayNumber === 5 || dayNumber === 10;
+
     if (number !== null && number >= 0 && number <= 10) {
-      return {
-        message: `Entendi, dor ${number}/10 durante a evacuação. ${number >= 7 ? 'Sei que está sendo difícil. ' : ''}Agora me conta: como estava a consistência das fezes?\n\nOlhe a escala de Bristol abaixo e me diga qual número (1 a 7) mais se parece:`,
-        needsImage: 'bristol_scale',
-        dataCollected: { painDuringBowelMovement: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bristol'
-      };
+      if (shouldAskBristol) {
+        return {
+          message: `Entendi, dor ${number}/10 durante a evacuação. ${number >= 7 ? 'Sei que está sendo difícil. ' : ''}Agora me conta: como estava a consistência das fezes?\n\nOlhe a escala de Bristol abaixo e me diga qual número (1 a 7) mais se parece:`,
+          needsImage: 'bristol_scale',
+          dataCollected: { painDuringBowelMovement: number },
+          completed: false,
+          needsClarification: false,
+          conversationPhase: 'collecting_bristol'
+        };
+      } else {
+        // Pular Bristol, ir direto para sangramento
+        return {
+          message: `Entendi, dor ${number}/10 durante a evacuação. ${number >= 7 ? 'Sei que está sendo difícil. ' : ''}Você está tendo sangramento?`,
+          needsImage: null,
+          dataCollected: { painDuringBowelMovement: number },
+          completed: false,
+          needsClarification: false,
+          conversationPhase: 'collecting_bleeding'
+        };
+      }
     }
     return {
       message: `Preciso que você me diga um número de 0 a 10 para a dor DURANTE a evacuação.\n\nOlhe a escala de dor:`,
@@ -1416,14 +1401,139 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   }
 
   // ========================================
-  // FASE 13: PREOCUPAÇÕES (final)
+  // FASE 13: PREOCUPAÇÕES
   // ========================================
   if (currentPhase === 'collecting_concerns') {
     const hasConcerns = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
+
+    // Se é D+14, ir para pesquisa de satisfação
+    if (dayNumber === 14) {
+      return {
+        message: `Registrei suas informações. ${hasConcerns ? '' : ''}
+
+Agora, vamos fazer algumas perguntas finais sobre sua experiência durante o acompanhamento.
+
+*De 0 a 10, quão satisfeito você está com o controle da dor durante todo o período pós-operatório?*
+
+(0 = Muito insatisfeito, 10 = Muito satisfeito)`,
+        needsImage: null,
+        dataCollected: { otherSymptoms: hasConcerns ? userMessage : undefined },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_satisfaction_pain'
+      };
+    }
+
+    // Dias normais (não D+14): finalizar
     return {
-      message: `Obrigada por compartilhar! Registrei todas as informações. O Dr. João Vitor vai analisar e, se necessário, entrará em contato. Boa recuperação! 💙`,
+      message: `Obrigado por compartilhar! Registrei todas as informações. Seu médico vai analisar e, se necessário, entrará em contato. Boa recuperação! 💙`,
       needsImage: null,
       dataCollected: { otherSymptoms: hasConcerns ? userMessage : undefined },
+      completed: true,
+      needsClarification: false,
+      conversationPhase: 'completed'
+    };
+  }
+
+  // ========================================
+  // FASE 14: SATISFAÇÃO COM ANALGESIA (APENAS D+14)
+  // ========================================
+  if (currentPhase === 'collecting_satisfaction_pain') {
+    if (number !== null && number >= 0 && number <= 10) {
+      return {
+        message: `Entendi, satisfação ${number}/10 com o controle da dor.
+
+*De 0 a 10, como você avalia este acompanhamento pós-operatório por WhatsApp com inteligência artificial?*
+
+(0 = Muito ruim, 10 = Excelente)`,
+        needsImage: null,
+        dataCollected: { painControlSatisfaction: number },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_satisfaction_ai'
+      };
+    }
+    return {
+      message: `Por favor, me diga um número de 0 a 10 para sua satisfação com o controle da dor.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_satisfaction_pain'
+    };
+  }
+
+  // ========================================
+  // FASE 15: SATISFAÇÃO COM ACOMPANHAMENTO IA (APENAS D+14)
+  // ========================================
+  if (currentPhase === 'collecting_satisfaction_ai') {
+    if (number !== null && number >= 0 && number <= 10) {
+      return {
+        message: `Avaliação ${number}/10 para o acompanhamento por IA.
+
+*De 0 a 10, qual a probabilidade de você recomendar este acompanhamento por WhatsApp a um amigo ou familiar que fosse fazer uma cirurgia similar?*
+
+(0 = Não recomendaria, 10 = Recomendaria com certeza)`,
+        needsImage: null,
+        dataCollected: { aiFollowUpSatisfaction: number },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_nps'
+      };
+    }
+    return {
+      message: `Por favor, me diga um número de 0 a 10 para avaliar o acompanhamento por IA.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_satisfaction_ai'
+    };
+  }
+
+  // ========================================
+  // FASE 16: NPS - NET PROMOTER SCORE (APENAS D+14)
+  // ========================================
+  if (currentPhase === 'collecting_nps') {
+    if (number !== null && number >= 0 && number <= 10) {
+      return {
+        message: `Probabilidade de recomendação: ${number}/10.
+
+Por último, *gostaria de deixar algum comentário ou sugestão sobre o acompanhamento?*
+
+(Pode escrever livremente ou responder "não" se preferir)`,
+        needsImage: null,
+        dataCollected: { npsScore: number },
+        completed: false,
+        needsClarification: false,
+        conversationPhase: 'collecting_feedback'
+      };
+    }
+    return {
+      message: `Por favor, me diga um número de 0 a 10 para a probabilidade de recomendação.`,
+      needsImage: null,
+      dataCollected: {},
+      completed: false,
+      needsClarification: true,
+      conversationPhase: 'collecting_nps'
+    };
+  }
+
+  // ========================================
+  // FASE 17: FEEDBACK ABERTO (APENAS D+14) - FINAL
+  // ========================================
+  if (currentPhase === 'collecting_feedback') {
+    const hasFeedback = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
+    return {
+      message: `*Muito obrigado por participar do acompanhamento pós-operatório!* 🎉
+
+${hasFeedback ? 'Agradecemos seu feedback, ele é muito importante para melhorarmos o sistema.' : ''}
+
+Todas as informações foram registradas. Seu médico receberá um relatório completo do seu acompanhamento.
+
+Desejamos uma excelente recuperação! 💙`,
+      needsImage: null,
+      dataCollected: { feedback: hasFeedback ? userMessage : undefined },
       completed: true,
       needsClarification: false,
       conversationPhase: 'completed'
@@ -1588,7 +1698,9 @@ async function finalizeQuestionnaireWithAI(
         followUp.surgeryId,
         followUp.dayNumber,
         extractedData.painDuringBowelMovement || 0,
-        extractedData.bristolScale || 4 // Default Bristol 4 (normal)
+        extractedData.bristolScale || 4, // Default Bristol 4 (normal)
+        new Date(),
+        extractedData.bowelMovementTime || undefined
       );
       logger.debug('✅ Primeira evacuação registrada!', {
         dayNumber: followUp.dayNumber,
@@ -1738,6 +1850,118 @@ async function finalizeQuestionnaireWithAI(
         tag: `red-flag-${responseId}`,
         requireInteraction: true,
       }).catch(err => logger.error('Error sending push notification:', err));
+    }
+
+    // ============================================
+    // ENVIAR RELATÓRIO FINAL NO D+14
+    // ============================================
+    if (followUp.dayNumber === 14) {
+      try {
+        logger.debug('📋 D+14 concluído - gerando relatório final...');
+
+        // Buscar dados do médico
+        const doctor = await prisma.user.findUnique({
+          where: { id: patient.userId },
+          select: { whatsapp: true, nomeCompleto: true }
+        });
+
+        if (doctor?.whatsapp) {
+          // Buscar dados completos do paciente (incluindo researchGroup)
+          const fullPatient = await prisma.patient.findUnique({
+            where: { id: patient.id },
+            select: { researchGroup: true }
+          });
+
+          // Buscar todos os follow-ups do paciente para trajetória de dor
+          const allFollowUps = await prisma.followUp.findMany({
+            where: {
+              surgeryId: followUp.surgeryId,
+              status: 'responded'
+            },
+            include: {
+              responses: true
+            },
+            orderBy: { dayNumber: 'asc' }
+          });
+
+          // Construir trajetória de dor
+          const painTrajectory: Array<{day: number; painAtRest: number | null; painDuringBowel: number | null}> = [];
+          let maxPainAtRest = 0;
+          let totalPainAtRest = 0;
+          let countPainAtRest = 0;
+          let peakPainDay = 1;
+          const complications: string[] = [];
+
+          for (const fu of allFollowUps) {
+            const response = fu.responses[0];
+            if (response) {
+              const data = response.questionnaireData ? JSON.parse(response.questionnaireData) : {};
+              const extracted = data.extractedData || data;
+
+              const painAtRest = extracted.painAtRest ?? extracted.painLevel ?? null;
+              const painDuringBowel = extracted.painDuringBowelMovement ?? null;
+
+              painTrajectory.push({
+                day: fu.dayNumber,
+                painAtRest,
+                painDuringBowel
+              });
+
+              if (painAtRest !== null) {
+                totalPainAtRest += painAtRest;
+                countPainAtRest++;
+                if (painAtRest > maxPainAtRest) {
+                  maxPainAtRest = painAtRest;
+                  peakPainDay = fu.dayNumber;
+                }
+              }
+
+              // Verificar complicações
+              if (extracted.hasFever) complications.push(`Febre D+${fu.dayNumber}`);
+              if (extracted.bleeding === 'severe' || extracted.bleeding === 'moderate') {
+                complications.push(`Sangramento ${extracted.bleeding} D+${fu.dayNumber}`);
+              }
+              if (extracted.hasPurulentDischarge) {
+                complications.push(`Secreção purulenta D+${fu.dayNumber}`);
+              }
+            }
+          }
+
+          // Dados de satisfação do D+14
+          const satisfaction = {
+            painControlSatisfaction: extractedData.painControlSatisfaction,
+            aiFollowUpSatisfaction: extractedData.aiFollowUpSatisfaction,
+            npsScore: extractedData.npsScore,
+            feedback: extractedData.feedback
+          };
+
+          // Importar e chamar sendFinalReport
+          const { sendFinalReport } = await import('@/lib/whatsapp');
+          await sendFinalReport(doctor.whatsapp, {
+            patientName: patient.name,
+            surgeryType: followUp.surgery.type,
+            surgeryDate: followUp.surgery.date,
+            researchGroup: fullPatient?.researchGroup || undefined,
+            painTrajectory,
+            firstBowelMovementDay: followUp.surgery.firstBowelMovementDay,
+            firstBowelMovementTime: followUp.surgery.firstBowelMovementTime || undefined,
+            maxPainAtRest,
+            avgPainAtRest: countPainAtRest > 0 ? totalPainAtRest / countPainAtRest : 0,
+            peakPainDay,
+            complications,
+            adherenceRate: (allFollowUps.length / 7) * 100, // 7 follow-ups esperados
+            completedFollowUps: allFollowUps.length,
+            totalFollowUps: 7,
+            satisfaction
+          });
+
+          logger.debug('✅ Relatório final enviado para o médico');
+        } else {
+          logger.warn('⚠️ Médico sem WhatsApp cadastrado - relatório final não enviado');
+        }
+      } catch (reportError) {
+        logger.error('❌ Erro ao enviar relatório final:', reportError);
+      }
     }
 
     logger.debug(`✅ Questionário finalizado com sucesso para ${patient.name}`);

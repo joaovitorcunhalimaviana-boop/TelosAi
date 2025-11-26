@@ -87,14 +87,16 @@ export async function recordFirstBowelMovement(
   dayNumber: number,
   painDuringBowelMovement: number,
   stoolConsistency: number, // Bristol Scale 1-7
-  timestamp: Date = new Date()
+  timestamp: Date = new Date(),
+  bowelMovementTime?: string // Hora aproximada da evacuação
 ): Promise<void> {
   await prisma.surgery.update({
     where: { id: surgeryId },
     data: {
       hadFirstBowelMovement: true,
       firstBowelMovementDate: timestamp,
-      firstBowelMovementDay: dayNumber
+      firstBowelMovementDay: dayNumber,
+      firstBowelMovementTime: bowelMovementTime || null
     }
   });
 
@@ -102,6 +104,7 @@ export async function recordFirstBowelMovement(
     surgeryId,
     dayNumber,
     timestamp,
+    bowelMovementTime,
     painDuringBowelMovement,
     stoolConsistency
   });

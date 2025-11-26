@@ -488,3 +488,173 @@ export async function testWhatsAppConnection(): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Envia mensagem genérica para o médico via WhatsApp
+ * Usa o campo User.whatsapp para enviar
+ */
+export async function sendWhatsAppToDoctor(
+  doctorPhone: string,
+  message: string
+): Promise<boolean> {
+  if (!doctorPhone) {
+    console.warn('⚠️ Doctor phone number not provided. Message not sent.');
+    return false;
+  }
+
+  try {
+    await sendMessage(doctorPhone, message);
+    console.log('✅ Message sent to doctor successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending message to doctor:', error);
+    return false;
+  }
+}
+
+/**
+ * Envia lembrete ao paciente que não respondeu o follow-up
+ */
+export async function sendPatientReminder(
+  patientPhone: string,
+  patientName: string
+): Promise<boolean> {
+  const firstName = patientName.split(' ')[0] || 'Paciente';
+
+  const message = `Olá, ${firstName}! 👋\n\n` +
+    `Ainda não recebi sua resposta sobre o acompanhamento de hoje.\n\n` +
+    `Poderia responder quando tiver um momento? Suas respostas são muito importantes para acompanharmos sua recuperação. 🙏`;
+
+  try {
+    await sendMessage(patientPhone, message);
+    console.log(`✅ Reminder sent to patient: ${patientName}`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Error sending reminder to patient ${patientName}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Notifica o médico que o paciente não respondeu o follow-up
+ */
+export async function notifyDoctorUnanswered(
+  doctorPhone: string,
+  patientName: string,
+  dayNumber: number
+): Promise<boolean> {
+  const message = `⚠️ *PACIENTE NÃO RESPONDEU*\n\n` +
+    `Paciente: ${patientName}\n` +
+    `Dia: D+${dayNumber}\n\n` +
+    `O paciente não respondeu o acompanhamento de hoje após 6 horas.\n` +
+    `Recomendamos entrar em contato para verificar se está tudo bem.`;
+
+  return await sendWhatsAppToDoctor(doctorPhone, message);
+}
+
+/**
+ * Envia relatório final do acompanhamento D+14 para o médico
+ */
+export async function sendFinalReport(
+  doctorPhone: string,
+  reportData: {
+    patientName: string;
+    surgeryType: string;
+    surgeryDate: Date;
+    researchGroup?: string;
+    painTrajectory: Array<{
+      day: number;
+      painAtRest: number | null;
+      painDuringBowel: number | null;
+    }>;
+    firstBowelMovementDay: number | null;
+    firstBowelMovementTime?: string;
+    maxPainAtRest: number;
+    avgPainAtRest: number;
+    peakPainDay: number;
+    complications: string[];
+    adherenceRate: number;
+    completedFollowUps: number;
+    totalFollowUps: number;
+    // Dados de satisfação D+14
+    satisfaction?: {
+      painControlSatisfaction?: number;
+      aiFollowUpSatisfaction?: number;
+      npsScore?: number;
+      feedback?: string;
+    };
+  }
+): Promise<boolean> {
+  const {
+    patientName, surgeryType, surgeryDate, researchGroup,
+    painTrajectory, firstBowelMovementDay, firstBowelMovementTime,
+    maxPainAtRest, avgPainAtRest, peakPainDay, complications,
+    adherenceRate, completedFollowUps, totalFollowUps, satisfaction
+  } = reportData;
+
+  // Formatar data da cirurgia
+  const formattedDate = surgeryDate.toLocaleDateString('pt-BR');
+
+  // Construir trajetória de dor
+  let painTable = '';
+  for (const entry of painTrajectory) {
+    const restPain = entry.painAtRest !== null ? `${entry.painAtRest}/10` : '-';
+    const bowelPain = entry.painDuringBowel !== null ? `${entry.painDuringBowel}/10` : '-';
+    painTable += `D+${entry.day}: ${restPain} | ${bowelPain}\n`;
+  }
+
+  // Construir mensagem
+  let message = `📋 *RELATÓRIO FINAL - ${patientName}*\n\n`;
+  message += `🏥 ${surgeryType} - ${formattedDate}\n`;
+
+  if (researchGroup) {
+    message += `📊 Grupo: ${researchGroup}\n`;
+  }
+
+  message += `\n📈 *TRAJETÓRIA DE DOR:*\n`;
+  message += `       Repouso | Evacuação\n`;
+  message += painTable;
+
+  message += `\n📊 *RESUMO:*\n`;
+
+  if (firstBowelMovementDay !== null) {
+    message += `• Primeira evacuação: D+${firstBowelMovementDay}`;
+    if (firstBowelMovementTime) {
+      message += ` às ${firstBowelMovementTime}`;
+    }
+    message += `\n`;
+  }
+
+  message += `• Pico de dor: D+${peakPainDay} (${maxPainAtRest}/10)\n`;
+  message += `• Dor média: ${avgPainAtRest.toFixed(1)}/10\n`;
+
+  if (complications.length > 0) {
+    message += `\n⚠️ *INTERCORRÊNCIAS:*\n`;
+    complications.forEach(comp => {
+      message += `• ${comp}\n`;
+    });
+  }
+
+  message += `\n✅ Adesão: ${adherenceRate.toFixed(0)}% (${completedFollowUps}/${totalFollowUps} follow-ups)\n`;
+
+  // Adicionar dados de satisfação se disponíveis
+  if (satisfaction) {
+    message += `\n📝 *SATISFAÇÃO:*\n`;
+    if (satisfaction.painControlSatisfaction !== undefined) {
+      message += `• Controle da dor: ${satisfaction.painControlSatisfaction}/10\n`;
+    }
+    if (satisfaction.aiFollowUpSatisfaction !== undefined) {
+      message += `• Acompanhamento IA: ${satisfaction.aiFollowUpSatisfaction}/10\n`;
+    }
+    if (satisfaction.npsScore !== undefined) {
+      const npsCategory = satisfaction.npsScore >= 9 ? 'Promotor' :
+                          satisfaction.npsScore >= 7 ? 'Passivo' : 'Detrator';
+      message += `• NPS: ${satisfaction.npsScore}/10 (${npsCategory})\n`;
+    }
+    if (satisfaction.feedback) {
+      message += `• Feedback: "${satisfaction.feedback}"\n`;
+    }
+  }
+
+  return await sendWhatsAppToDoctor(doctorPhone, message);
+}
