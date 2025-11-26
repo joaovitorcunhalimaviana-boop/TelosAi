@@ -13,6 +13,13 @@ import { sendPushNotification } from '@/app/api/notifications/send/route';
 import { rateLimit, getClientIP } from '@/lib/rate-limit';
 import { invalidateDashboardStats } from '@/lib/cache-helpers';
 import { logger } from "@/lib/logger";
+import {
+  validateClaudeResponse,
+  validateQuestionnaireData,
+  validatePostOpData,
+  validatePostOpDataByDay,
+  parseJSONSafely,
+} from '@/lib/api-validation';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -699,16 +706,43 @@ IMPORTANTE SOBRE BRISTOL:
       throw new Error('No JSON found in Claude response');
     }
 
-    const aiResponse: ClaudeAIResponse = JSON.parse(jsonMatch[0]);
+    // Parse e validar resposta da IA
+    const parsedJson = JSON.parse(jsonMatch[0]);
+    const validatedResponse = validateClaudeResponse(parsedJson);
 
-    logger.debug('✅ Claude response parsed:', {
-      completed: aiResponse.completed,
-      needsImage: aiResponse.needsImage,
-      phase: aiResponse.conversationPhase,
-      dataCollected: aiResponse.dataCollected,
+    if (!validatedResponse) {
+      logger.error('❌ Claude response validation failed, using parsed data with defaults');
+      // Usar dados parseados com valores default se validação falhar
+      const aiResponse: ClaudeAIResponse = {
+        message: parsedJson.message || 'Desculpe, tive um problema. Pode repetir?',
+        needsImage: parsedJson.needsImage || null,
+        dataCollected: parsedJson.dataCollected || {},
+        completed: parsedJson.completed || false,
+        needsClarification: parsedJson.needsClarification || false,
+        conversationPhase: parsedJson.conversationPhase || currentPhase,
+      };
+      return aiResponse;
+    }
+
+    // Validar dados coletados específicos para o dia
+    if (validatedResponse.dataCollected && Object.keys(validatedResponse.dataCollected).length > 0) {
+      const dayValidation = validatePostOpDataByDay(validatedResponse.dataCollected, dayNumber);
+      if (dayValidation.warnings.length > 0) {
+        logger.warn('⚠️ PostOp data warnings:', dayValidation.warnings);
+      }
+      if (!dayValidation.valid) {
+        logger.error('❌ PostOp data errors:', dayValidation.errors);
+      }
+    }
+
+    logger.debug('✅ Claude response validated:', {
+      completed: validatedResponse.completed,
+      needsImage: validatedResponse.needsImage,
+      phase: validatedResponse.conversationPhase,
+      dataCollected: validatedResponse.dataCollected,
     });
 
-    return aiResponse;
+    return validatedResponse;
   } catch (error) {
     logger.error('❌ Erro ao chamar Claude API:', error);
 
@@ -1573,9 +1607,13 @@ async function processQuestionnaireAnswer(
       orderBy: { createdAt: 'desc' },
     });
 
-    const questionnaireData = response?.questionnaireData
-      ? JSON.parse(response.questionnaireData)
-      : { conversation: [], extractedData: {}, completed: false };
+    // Validar dados do questionário do banco
+    const rawQuestionnaireData = parseJSONSafely(response?.questionnaireData, {
+      conversation: [],
+      extractedData: {},
+      completed: false,
+    });
+    const questionnaireData = validateQuestionnaireData(rawQuestionnaireData);
 
     const conversationHistory = questionnaireData.conversation || [];
 
@@ -1634,6 +1672,21 @@ async function processQuestionnaireAnswer(
       ...questionnaireData.extractedData,
       ...aiResponse.dataCollected,
     };
+
+    // Validar dados mesclados antes de salvar
+    const validatedMergedData = validatePostOpData(mergedData);
+    if (!validatedMergedData) {
+      logger.warn('⚠️ Merged data validation failed, using unvalidated data');
+    } else {
+      // Validar regras de negócio por dia
+      const dayValidation = validatePostOpDataByDay(validatedMergedData, followUp.dayNumber);
+      if (dayValidation.warnings.length > 0) {
+        logger.warn('⚠️ PostOp validation warnings:', dayValidation.warnings);
+      }
+      if (!dayValidation.valid) {
+        logger.error('❌ PostOp validation errors:', dayValidation.errors);
+      }
+    }
 
     // 6. Atualizar banco de dados
     const updatedQuestionnaireData = {

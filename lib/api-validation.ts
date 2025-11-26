@@ -322,3 +322,194 @@ export const phoneValidator = z.string().refine(
   },
   { message: 'Telefone inválido' }
 );
+
+// ============================================
+// POST-OPERATIVE DATA VALIDATION SCHEMAS
+// Para validação em tempo real dos dados coletados via WhatsApp
+// ============================================
+
+/**
+ * Schema para validar dados pós-operatórios coletados via questionário
+ */
+export const postOpDataSchema = z.object({
+  // DOR - separada em repouso e durante evacuação
+  painAtRest: z.number().min(0).max(10).optional().nullable(),
+  painDuringBowelMovement: z.number().min(0).max(10).optional().nullable(),
+  painLevel: z.number().min(0).max(10).optional().nullable(), // Legacy
+
+  // FEBRE
+  hasFever: z.boolean().optional().nullable(),
+  feverDetails: z.string().optional().nullable(),
+
+  // EVACUAÇÃO
+  hadBowelMovementSinceLastContact: z.boolean().optional().nullable(),
+  hadBowelMovement: z.boolean().optional().nullable(), // Legacy
+  bowelMovementTime: z.string().optional().nullable(),
+  bristolScale: z.number().min(1).max(7).optional().nullable(),
+  isFirstBowelMovement: z.boolean().optional().nullable(),
+
+  // SANGRAMENTO
+  bleeding: z.enum(['none', 'mild', 'moderate', 'severe']).optional().nullable(),
+  bleedingDetails: z.string().optional().nullable(),
+
+  // ANALGÉSICOS
+  takingPrescribedMeds: z.boolean().optional().nullable(),
+  prescribedMedsDetails: z.string().optional().nullable(),
+  takingExtraMeds: z.boolean().optional().nullable(),
+  extraMedsDetails: z.string().optional().nullable(),
+
+  // SECREÇÃO PURULENTA (apenas D+3 em diante)
+  hasPurulentDischarge: z.boolean().optional().nullable(),
+  purulentDischargeDetails: z.string().optional().nullable(),
+
+  // OUTROS
+  otherSymptoms: z.string().optional().nullable(),
+
+  // PESQUISA DE SATISFAÇÃO (apenas D+14)
+  painControlSatisfaction: z.number().min(0).max(10).optional().nullable(),
+  aiFollowUpSatisfaction: z.number().min(0).max(10).optional().nullable(),
+  npsScore: z.number().min(0).max(10).optional().nullable(),
+  feedback: z.string().optional().nullable(),
+
+  // Campos legados (manter para compatibilidade)
+  canEat: z.boolean().optional().nullable(),
+  dietDetails: z.string().optional().nullable(),
+  canUrinate: z.boolean().optional().nullable(),
+  urinationDetails: z.string().optional().nullable(),
+}).passthrough(); // Permite campos extras não definidos
+
+/**
+ * Schema para validar resposta da IA Claude
+ */
+export const claudeAIResponseSchema = z.object({
+  message: z.string().min(1, 'Mensagem da IA é obrigatória'),
+  needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable().optional(),
+  dataCollected: z.record(z.string(), z.any()).default({}),
+  completed: z.boolean().default(false),
+  needsClarification: z.boolean().optional().default(false),
+  conversationPhase: z.string().optional(),
+});
+
+/**
+ * Schema para validar dados do questionário armazenados no banco
+ */
+export const questionnaireDataSchema = z.object({
+  conversation: z.array(z.object({
+    role: z.enum(['user', 'assistant']),
+    content: z.string(),
+  })).default([]),
+  extractedData: z.record(z.string(), z.any()).default({}),
+  completed: z.boolean().default(false),
+  conversationPhase: z.string().optional(),
+  hadFirstBowelMovement: z.boolean().optional(),
+}).passthrough();
+
+/**
+ * Valida e sanitiza dados pós-operatórios
+ * Retorna dados válidos ou null se inválido
+ */
+export function validatePostOpData(data: unknown): z.infer<typeof postOpDataSchema> | null {
+  try {
+    return postOpDataSchema.parse(data);
+  } catch (error) {
+    console.error('❌ PostOpData validation failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Valida resposta da IA Claude de forma segura
+ * Retorna dados válidos ou null se inválido
+ */
+export function validateClaudeResponse(data: unknown): z.infer<typeof claudeAIResponseSchema> | null {
+  try {
+    return claudeAIResponseSchema.parse(data);
+  } catch (error) {
+    console.error('❌ Claude response validation failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Valida dados do questionário de forma segura
+ * Retorna dados válidos ou default se inválido
+ */
+export function validateQuestionnaireData(data: unknown): z.infer<typeof questionnaireDataSchema> {
+  try {
+    return questionnaireDataSchema.parse(data);
+  } catch (error) {
+    console.warn('⚠️ Questionnaire data validation failed, using defaults:', error);
+    return {
+      conversation: [],
+      extractedData: {},
+      completed: false,
+    };
+  }
+}
+
+/**
+ * Valida dados específicos por dia pós-operatório
+ * Aplica regras de negócio contextual
+ */
+export function validatePostOpDataByDay(
+  data: z.infer<typeof postOpDataSchema>,
+  dayNumber: number
+): { valid: boolean; warnings: string[]; errors: string[] } {
+  const warnings: string[] = [];
+  const errors: string[] = [];
+
+  // Bristol Scale só é válida em D+5 e D+10
+  if (data.bristolScale !== null && data.bristolScale !== undefined) {
+    if (dayNumber !== 5 && dayNumber !== 10) {
+      warnings.push(`Bristol Scale coletada em D+${dayNumber}, mas só é esperada em D+5 e D+10`);
+    }
+  }
+
+  // Pesquisa de satisfação só em D+14
+  if (dayNumber !== 14) {
+    if (data.painControlSatisfaction !== null && data.painControlSatisfaction !== undefined) {
+      warnings.push(`Satisfação com dor coletada em D+${dayNumber}, mas só é esperada em D+14`);
+    }
+    if (data.aiFollowUpSatisfaction !== null && data.aiFollowUpSatisfaction !== undefined) {
+      warnings.push(`Satisfação com IA coletada em D+${dayNumber}, mas só é esperada em D+14`);
+    }
+    if (data.npsScore !== null && data.npsScore !== undefined) {
+      warnings.push(`NPS coletado em D+${dayNumber}, mas só é esperado em D+14`);
+    }
+  }
+
+  // Secreção purulenta só a partir de D+3
+  if (dayNumber < 3) {
+    if (data.hasPurulentDischarge !== null && data.hasPurulentDischarge !== undefined) {
+      warnings.push(`Secreção purulenta coletada em D+${dayNumber}, mas só é esperada a partir de D+3`);
+    }
+  }
+
+  // Validações de consistência
+  if (data.hasFever === true && !data.feverDetails) {
+    warnings.push('Febre informada mas sem detalhes de temperatura');
+  }
+
+  if (data.hadBowelMovementSinceLastContact === false && data.painDuringBowelMovement !== null) {
+    errors.push('Dor durante evacuação informada mas paciente não evacuou');
+  }
+
+  if (data.hadBowelMovementSinceLastContact === false && data.bristolScale !== null) {
+    errors.push('Bristol Scale informada mas paciente não evacuou');
+  }
+
+  // Alerta para dor alta
+  if (data.painAtRest != null && data.painAtRest >= 8) {
+    warnings.push(`Dor em repouso alta (${data.painAtRest}/10) - verificar necessidade de intervenção`);
+  }
+
+  if (data.painDuringBowelMovement != null && data.painDuringBowelMovement >= 8) {
+    warnings.push(`Dor durante evacuação alta (${data.painDuringBowelMovement}/10) - verificar necessidade de intervenção`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    warnings,
+    errors,
+  };
+}
