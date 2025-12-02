@@ -653,9 +653,6 @@ export default function ComoFuncionaPage() {
               href="/cadastro-medico?plan=professional"
               className="inline-flex items-center gap-3 px-12 py-6 bg-telos-blue text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl hover:shadow-telos-blue/50 hover:bg-blue-900 transition-all duration-500 shadow-xl"
             >
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
               Começar Agora
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -667,7 +664,7 @@ export default function ComoFuncionaPage() {
       </section>
 
       {/* Footer */}
-      <footer className="telos-gradient text-white">
+      <footer className="bg-gradient-to-b from-[#061A33] to-[#040E1D] text-white">
         <div className="container mx-auto px-6">
           {/* Main Footer Content */}
           <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">

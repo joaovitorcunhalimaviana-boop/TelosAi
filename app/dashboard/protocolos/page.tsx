@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
+import { Plus, Edit2, Trash2, Save, X, ArrowLeft, FileText, Shield } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 
 interface Protocol {
@@ -51,6 +52,7 @@ const categories = [
 export default function ProtocolsPage() {
   const { data: session } = useSession()
   const { toast } = useToast()
+  const router = useRouter()
 
   const [protocols, setProtocols] = useState<Protocol[]>([])
   const [researches, setResearches] = useState<Research[]>([])
@@ -230,22 +232,62 @@ export default function ProtocolsPage() {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Protocolos Pós-Operatórios
-        </h1>
-        <p className="text-lg text-muted-foreground mt-3">
-          Configure uma vez os protocolos para cada tipo de cirurgia. A IA usará automaticamente para todos os pacientes.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <div className="p-8 max-w-7xl mx-auto">
+        {/* Header com botão voltar */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/dashboard')}
+            className="mb-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Dashboard
+          </Button>
 
-      <div className="flex justify-end mb-6">
-        <Button onClick={handleCreate} disabled={isCreating} size="lg" className="shadow-lg">
-          <Plus className="w-5 h-5 mr-2" />
-          Novo Protocolo
-        </Button>
-      </div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg">
+              <FileText className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#0A2647]">
+                Protocolos Pós-Operatórios
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Configure os protocolos para cada tipo de cirurgia. A IA usará automaticamente.
+              </p>
+            </div>
+          </div>
+
+          {/* Card informativo */}
+          <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm">
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-amber-800 font-medium">
+                    Importante: Os protocolos configurados aqui serão usados pela IA para orientar todos os pacientes.
+                  </p>
+                  <p className="text-xs text-amber-700 mt-1">
+                    Certifique-se de que as orientações estejam corretas e atualizadas.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end mb-6">
+          <Button
+            onClick={handleCreate}
+            disabled={isCreating}
+            size="lg"
+            className="shadow-lg bg-[#0A2647] hover:bg-[#0D3156] border-2 border-[#D4AF37]"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Novo Protocolo
+          </Button>
+        </div>
 
       {/* Formulário de criação/edição */}
       {(isCreating || editingId) && (
@@ -476,6 +518,7 @@ export default function ProtocolsPage() {
             </Card>
           ))
         )}
+      </div>
       </div>
     </div>
   )

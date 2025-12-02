@@ -71,6 +71,18 @@ export async function GET(
     // Add follow-up response details
     patient.followUps.forEach((followUp) => {
       followUp.responses.forEach((response) => {
+        // Parse questionnaireData if it exists
+        let questionnaireData = null;
+        if (response.questionnaireData) {
+          try {
+            questionnaireData = typeof response.questionnaireData === 'string'
+              ? JSON.parse(response.questionnaireData)
+              : response.questionnaireData;
+          } catch (e) {
+            console.error('Error parsing questionnaireData:', e);
+          }
+        }
+
         detailedEvents.push({
           id: response.id,
           type: 'followup',
@@ -82,6 +94,8 @@ export async function GET(
             riskLevel: response.riskLevel,
             redFlags: response.redFlags ? JSON.parse(response.redFlags) : [],
             doctorAlerted: response.doctorAlerted,
+            questionnaireData: questionnaireData,
+            aiAnalysis: response.aiAnalysis,
           },
         });
       });

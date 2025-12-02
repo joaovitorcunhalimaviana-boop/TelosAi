@@ -167,6 +167,11 @@ const config: Config = {
         'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card-hover': '0 10px 20px -5px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
       },
+      backgroundImage: {
+        'tech-grid': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230A2647' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
       keyframes: {
         // Fade animations
         'fade-in': {
@@ -236,9 +241,11 @@ const config: Config = {
         'pulse-slow': {
           '0%, 100%': {
             transform: 'scale(1)',
+            opacity: '1',
           },
           '50%': {
             transform: 'scale(1.05)',
+            opacity: '0.8',
           },
         },
         'float': {
@@ -252,10 +259,10 @@ const config: Config = {
         // Glow animation
         'glow': {
           '0%, 100%': {
-            boxShadow: '0 0 20px rgba(212, 175, 55, 0.3)',
+            boxShadow: '0 0 5px rgba(212, 175, 55, 0.2), 0 0 10px rgba(212, 175, 55, 0.1)',
           },
           '50%': {
-            boxShadow: '0 0 40px rgba(212, 175, 55, 0.6)',
+            boxShadow: '0 0 20px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.4)',
           },
         },
         // Shimmer animation
@@ -279,6 +286,19 @@ const config: Config = {
             backgroundPosition: '0% 50%',
           },
         },
+        // Tech Reveal
+        'tech-reveal': {
+          '0%': {
+            opacity: '0',
+            transform: 'scale(0.95) translateY(10px)',
+            filter: 'blur(10px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'scale(1) translateY(0)',
+            filter: 'blur(0)',
+          },
+        },
       },
       animation: {
         'fade-in': 'fade-in 0.6s ease-out',
@@ -288,11 +308,12 @@ const config: Config = {
         'fade-in-right': 'fade-in-right 0.8s ease-out',
         'scale-in': 'scale-in 0.5s ease-out',
         'bounce-slow': 'bounce-slow 3s ease-in-out infinite',
-        'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+        'pulse-slow': 'pulse-slow 4s ease-in-out infinite',
         'float': 'float 6s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
+        'glow': 'glow 3s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
         'gradient-shift': 'gradient-shift 15s ease infinite',
+        'tech-reveal': 'tech-reveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
       },
       transitionDuration: {
         '2000': '2000ms',

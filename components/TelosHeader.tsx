@@ -18,21 +18,10 @@ export function TelosHeader() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full header-glass">
       <div className="container mx-auto flex h-20 items-center px-6">
-        {/* Logo */}
-        <Link href="/" className="group flex-shrink-0">
-          <div className="relative w-14 h-14">
-            <Image
-              src="/icons/icon-192.png"
-              alt="Telos.AI Logo"
-              width={56}
-              height={56}
-              className="transition-transform group-hover:scale-110"
-              priority
-            />
-          </div>
-        </Link>
+        {/* Espaço vazio para manter o layout equilibrado */}
+        <div className="flex-shrink-0 w-[120px] hidden md:block"></div>
 
         {/* Navigation - Centralizado */}
         <nav className="hidden md:flex items-center gap-10 flex-1 justify-center">
@@ -44,10 +33,9 @@ export function TelosHeader() {
                 href={item.href}
                 className={`
                   text-base font-medium transition-all duration-200
-                  ${
-                    isActive
-                      ? "text-telos-blue font-semibold border-b-2 border-telos-gold pb-1"
-                      : "text-gray-600 hover:text-telos-blue"
+                  ${isActive
+                    ? "text-telos-blue font-semibold border-b-2 border-telos-gold pb-1"
+                    : "text-gray-600 hover:text-telos-blue"
                   }
                 `}
               >
@@ -67,7 +55,7 @@ export function TelosHeader() {
           </Link>
           <Link
             href="/cadastro-medico?plan=professional"
-            className="flex items-center gap-2 px-6 py-3 bg-telos-blue text-white rounded-lg font-medium hover:bg-opacity-90 transition-all duration-200 shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 px-6 py-3 bg-telos-blue text-white rounded-lg font-medium btn-glow-premium shadow-md"
           >
             <svg
               className="w-5 h-5"
@@ -130,10 +118,9 @@ export function TelosHeader() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`
                     block px-4 py-3 rounded-lg text-base font-medium transition-colors
-                    ${
-                      isActive
-                        ? "bg-blue-50 text-telos-blue font-semibold"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-telos-blue"
+                    ${isActive
+                      ? "bg-blue-50 text-telos-blue font-semibold"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-telos-blue"
                     }
                   `}
                 >

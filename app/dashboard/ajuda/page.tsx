@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,9 @@ import {
   Users,
   Home,
   MessageSquare,
+  ArrowLeft,
+  HelpCircle,
+  GraduationCap,
 } from 'lucide-react';
 import { useTutorial } from '@/components/tutorial/TutorialProvider';
 import { tutorialMetadata, TutorialMetadata, getTutorialSteps } from '@/lib/tutorial-steps';
@@ -26,6 +30,7 @@ export default function HelpCenterPage() {
   const { startTutorial, isTutorialCompleted, getCompletionRate } = useTutorial();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const router = useRouter();
 
   // Convert tutorialMetadata to array format
   const allTutorials = Object.values(tutorialMetadata).map((meta) => ({
@@ -143,15 +148,29 @@ export default function HelpCenterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-4">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Central de Ajuda</h1>
-            <p className="text-lg text-gray-600">
-              Aprenda a usar todas as funcionalidades do Telos.AI com nossos tutoriais interativos
-            </p>
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/dashboard')}
+            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Dashboard
+          </Button>
+
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg">
+              <GraduationCap className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#0A2647]">Central de Ajuda</h1>
+              <p className="text-gray-600">
+                Aprenda a usar todas as funcionalidades do Telos.AI com tutoriais interativos
+              </p>
+            </div>
           </div>
 
           {/* Progress Overview */}

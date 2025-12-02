@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
 import { FadeIn } from "@/components/animations/FadeIn"
+import { Pricing } from "@/components/ui/pricing"
 
 export default function PricingPage() {
   const [patients, setPatients] = useState(3)
@@ -29,7 +30,7 @@ export default function PricingPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="py-20 bg-white relative z-10">
+      <section className="pt-20 pb-8 bg-white relative z-10">
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -42,6 +43,112 @@ export default function PricingPage() {
               </p>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* Price Calculator & Plans */}
+      <section className="py-12 bg-gray-50 relative z-10">
+        <div className="container mx-auto px-6">
+          <FadeIn delay={0.15} direction="up">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 hover-lift-strong card-shine mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-telos-blue mb-2">
+                  Calculadora de Preços
+                </h2>
+                <p className="text-gray-600">
+                  Ajuste o número de pacientes para ver o custo estimado
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-lg font-semibold text-telos-blue mb-4">
+                    Quantos pacientes você acompanha por mês?
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="1"
+                      max="30"
+                      value={patients}
+                      onChange={(e) => setPatients(parseInt(e.target.value))}
+                      className="flex-1 h-3 bg-[#0A2647] rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <div className="flex items-center justify-center w-20 h-12 bg-telos-blue text-white rounded-lg font-bold text-xl">
+                      {patients}
+                    </div>
+                  </div>
+                  <div className="flex justify-between mt-2 text-sm text-gray-500">
+                    <span>1</span>
+                    <span>15</span>
+                    <span>30+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+
+          <Pricing
+            showMonthlyToggle={false}
+            title="Escolha seu Plano"
+            description="Planos flexíveis que crescem com sua prática."
+            plans={[
+              {
+                name: "Founding Member",
+                price: foundingPrice.toString(),
+                yearlyPrice: foundingPrice.toString(),
+                period: "mês",
+                features: [
+                  "🔒 PREÇO VITALÍCIO",
+                  `Base: R$ 400 (3 pacientes)`,
+                  `+ R$ 150/paciente adicional`,
+                  `Economia de R$ ${(professionalPrice - foundingPrice).toLocaleString('pt-BR')}/mês`,
+                  "Acesso antecipado",
+                  "Suporte via WhatsApp"
+                ],
+                description: "Para os primeiros visionários. Preço nunca aumenta.",
+                buttonText: "Garantir Vaga",
+                href: "/cadastro-medico?plan=founding",
+                isPopular: true,
+                spots: 5
+              },
+              {
+                name: "Early Adopter",
+                price: earlyAdopterPrice.toString(),
+                yearlyPrice: earlyAdopterPrice.toString(),
+                period: "mês",
+                features: [
+                  "Desconto significativo",
+                  `Base: R$ 500 (3 pacientes)`,
+                  `+ R$ 180/paciente adicional`,
+                  `Economia de R$ ${(professionalPrice - earlyAdopterPrice).toLocaleString('pt-BR')}/mês`,
+                  "Suporte prioritário via Email"
+                ],
+                description: "Para quem quer inovação com economia.",
+                buttonText: "Começar Agora",
+                href: "/cadastro-medico?plan=early",
+                isPopular: false,
+                spots: 12
+              },
+              {
+                name: "Profissional",
+                price: professionalPrice.toString(),
+                yearlyPrice: professionalPrice.toString(),
+                period: "mês",
+                features: [
+                  "Acesso total à plataforma",
+                  `Base: R$ 950 (3 pacientes)`,
+                  `+ R$ 350/paciente adicional`,
+                  "Suporte via Email",
+                  "Sem fidelidade"
+                ],
+                description: "Preço regular de mercado.",
+                buttonText: "Assinar",
+                href: "/cadastro-medico?plan=professional",
+                isPopular: false
+              }
+            ]}
+          />
         </div>
       </section>
 
@@ -114,205 +221,6 @@ export default function PricingPage() {
               </div>
             </FadeIn>
           </div>
-        </div>
-      </section>
-
-      {/* Price Calculator */}
-      <section className="py-16 bg-gray-50 relative z-10">
-        <div className="container mx-auto px-6">
-          <FadeIn delay={0.2} direction="up">
-            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 hover-lift-strong card-shine">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-telos-blue mb-2">
-                Calculadora de Preços
-              </h2>
-              <p className="text-gray-600">
-                Ajuste o número de pacientes para ver o custo estimado
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-lg font-semibold text-telos-blue mb-4">
-                  Quantos pacientes você acompanha por mês?
-                </label>
-                <div className="flex items-center gap-4">
-                  <input
-                    type="range"
-                    min="1"
-                    max="30"
-                    value={patients}
-                    onChange={(e) => setPatients(parseInt(e.target.value))}
-                    className="flex-1 h-3 bg-[#0A2647] rounded-lg appearance-none cursor-pointer slider"
-                  />
-                  <div className="flex items-center justify-center w-20 h-12 bg-telos-blue text-white rounded-lg font-bold text-xl">
-                    {patients}
-                  </div>
-                </div>
-                <div className="flex justify-between mt-2 text-sm text-gray-500">
-                  <span>1</span>
-                  <span>15</span>
-                  <span>30+</span>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6 mt-8">
-                {/* Founding Members */}
-                <div className="relative p-6 bg-gradient-to-br from-telos-gold/10 to-yellow-50 rounded-xl border-2 border-telos-gold hover-lift-strong card-shine animate-fade-in animation-delay-200 animate-glow-pulse-strong">
-                  {/* Badge PREÇO VITALÍCIO */}
-                  <div className="absolute -top-3 -right-3 bg-telos-gold text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg transform rotate-12 animate-pulse">
-                    🔒 PREÇO VITALÍCIO
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg className="w-6 h-6 text-telos-gold hover-tilt animate-scale-bounce neon-gold" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                      <h3 className="text-xl font-bold text-telos-blue">Founding Member</h3>
-                    </div>
-                    <p className="text-xs text-telos-gold font-bold mb-3">⚡ Vagas limitadas</p>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-700 mb-4">
-                    <p>Base: R$ 400 (3 pacientes)</p>
-                    <p className="font-semibold text-telos-gold">+ R$ 150/paciente adicional</p>
-                    {patients > 3 && (
-                      <p className="text-xs">({patients - 3} × R$ 150 = R$ {(patients - 3) * 150})</p>
-                    )}
-                  </div>
-                  <div className="text-3xl font-bold text-telos-gold">
-                    R$ {foundingPrice.toLocaleString('pt-BR')}
-                    <span className="text-sm text-gray-600 font-normal">/mês</span>
-                  </div>
-
-                  {/* Destaque de Economia */}
-                  <div className="mt-4 p-3 bg-green-50 border-2 border-green-300 rounded-lg">
-                    <p className="text-sm font-bold text-green-700 text-center">
-                      💰 Economize R$ {(professionalPrice - foundingPrice).toLocaleString('pt-BR')}/mês
-                    </p>
-                    <p className="text-xs text-green-600 text-center mt-1">
-                      PARA SEMPRE
-                    </p>
-                  </div>
-                </div>
-
-                {/* Early Adopter */}
-                <div className="p-6 bg-white rounded-xl border-2 border-telos-blue hover-lift-strong card-shine animate-fade-in animation-delay-300">
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg className="w-6 h-6 text-telos-blue hover-tilt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <h3 className="text-xl font-bold text-telos-blue">Early Adopter</h3>
-                    </div>
-                    <p className="text-xs text-telos-blue font-bold mb-3">⚡ Vagas limitadas</p>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-700 mb-4">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-gray-400 line-through">R$ 950</span>
-                      <span className="font-bold text-red-500">→ R$ 500</span>
-                    </div>
-                    <p>Base: R$ 500 (3 pacientes)</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-gray-400 line-through text-xs">R$ 350</span>
-                      <span className="font-semibold text-red-500">→ R$ 180/paciente adicional</span>
-                    </div>
-                    {patients > 3 && (
-                      <p className="text-xs">({patients - 3} × R$ 180 = R$ {(patients - 3) * 180})</p>
-                    )}
-                  </div>
-                  <div className="text-3xl font-bold text-telos-blue">
-                    R$ {earlyAdopterPrice.toLocaleString('pt-BR')}
-                    <span className="text-sm text-gray-600 font-normal">/mês</span>
-                  </div>
-                  <p className="text-xs text-green-600 font-semibold mt-2">
-                    💰 Economize NO MÍNIMO R$ {(professionalPrice - earlyAdopterPrice).toLocaleString('pt-BR')}/mês
-                  </p>
-                </div>
-
-                {/* Professional */}
-                <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-300 hover-lift-strong card-shine animate-fade-in animation-delay-400 opacity-80">
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <h3 className="text-xl font-bold text-gray-700">Profissional</h3>
-                    </div>
-                    <p className="text-xs text-gray-600 font-bold mb-3">Plano regular</p>
-                  </div>
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
-                    <p>Base: R$ 950 (3 pacientes)</p>
-                    <p className="font-semibold text-gray-700">+ R$ 350/paciente adicional</p>
-                    {patients > 3 && (
-                      <p className="text-xs">({patients - 3} × R$ 350 = R$ {(patients - 3) * 350})</p>
-                    )}
-                  </div>
-                  <div className="text-3xl font-bold text-gray-700">
-                    R$ {professionalPrice.toLocaleString('pt-BR')}
-                    <span className="text-sm text-gray-500 font-normal">/mês</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Preço regular
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 p-6 bg-gradient-to-r from-telos-gold/10 to-telos-blue/10 border-2 border-telos-gold/30 rounded-xl">
-                <div className="flex items-start gap-4">
-                  <svg className="w-8 h-8 text-telos-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h4 className="font-bold text-telos-blue mb-2">⚡ Oferta Limitada</h4>
-                    <p className="text-gray-700 text-sm leading-relaxed">
-                      Os planos <span className="font-semibold text-telos-gold">Founding Member e Early Adopter têm vagas limitadas</span>.
-                      Após o preenchimento, apenas o plano Profissional estará disponível: R$ 950/mês + R$ 350/paciente adicional.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* CTA PRINCIPAL */}
-              <div className="mt-12 text-center">
-                <Link
-                  href="/cadastro-medico?plan=founding"
-                  className="group inline-flex items-center gap-3 px-10 py-5 bg-telos-gold text-white rounded-2xl font-bold text-xl hover-lift-strong hover:shadow-2xl hover:shadow-telos-gold/50 hover:bg-yellow-600 transition-all duration-500 shadow-xl"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                  Garantir Minha Vaga de Founding Member
-                  <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-                <p className="mt-4 text-sm text-gray-600">
-                  <span className="font-semibold text-telos-blue">Vagas limitadas</span> • Preço vitalício garantido
-                </p>
-              </div>
-
-              {/* CTA SECUNDÁRIO */}
-              <div className="mt-6 text-center">
-                <Link
-                  href="/cadastro-medico?plan=early"
-                  className="group inline-flex items-center gap-2 px-8 py-4 bg-telos-blue text-white rounded-xl font-semibold text-lg hover-lift hover:shadow-xl hover:shadow-telos-blue/30 transition-all duration-300"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Quero ser Early Adopter
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-                <p className="mt-3 text-sm text-gray-600">
-                  Vagas limitadas • Economize NO MÍNIMO R$ 450/mês
-                </p>
-              </div>
-            </div>
-          </div>
-          </FadeIn>
         </div>
       </section>
 
@@ -468,102 +376,102 @@ export default function PricingPage() {
           <FadeIn delay={0.2} direction="up">
             <div className="max-w-5xl mx-auto overflow-x-auto">
               <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="py-4 px-6 text-left text-lg font-bold text-telos-blue">
-                    Recursos
-                  </th>
-                  <th className="py-4 px-6 text-center text-lg font-bold text-telos-gold">
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                      Founding
-                    </div>
-                  </th>
-                  <th className="py-4 px-6 text-center text-lg font-bold text-telos-blue">
-                    Early Adopter
-                  </th>
-                  <th className="py-4 px-6 text-center text-lg font-bold text-gray-600">
-                    Profissional
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { feature: "Preço mensal (3 pacientes)", founding: "R$ 400", earlyAdopter: "R$ 500", professional: "R$ 950" },
-                  { feature: "Paciente adicional", founding: "R$ 150", earlyAdopter: "R$ 180", professional: "R$ 350" },
-                  { feature: "Disponibilidade", founding: "Limitada", earlyAdopter: "Limitada", professional: "Aberta" },
-                  { feature: "Acompanhamento 24/7", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "WhatsApp + IA", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Detecção de red flags", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Alertas em tempo real", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Dashboard completo", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Modo Pesquisa (LGPD)", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Histórico completo", founding: true, earlyAdopter: true, professional: true },
-                  { feature: "Suporte prioritário", founding: "WhatsApp", earlyAdopter: "Email", professional: "Email" },
-                  { feature: "Acesso antecipado", founding: true, earlyAdopter: true, professional: false },
-                  { feature: "Preço vitalício", founding: true, earlyAdopter: false, professional: false },
-                  { feature: "Badge exclusivo", founding: true, earlyAdopter: false, professional: false },
-                ].map((row, idx) => (
-                  <tr key={idx} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
-                    <td className="py-4 px-6 text-gray-700">{row.feature}</td>
-
-                    {/* Founding */}
-                    <td className="py-4 px-6 text-center">
-                      {typeof row.founding === 'boolean' ? (
-                        row.founding ? (
-                          <svg className="w-6 h-6 text-telos-gold mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        )
-                      ) : (
-                        <span className="font-semibold text-telos-gold">{row.founding}</span>
-                      )}
-                    </td>
-
-                    {/* Early Adopter */}
-                    <td className="py-4 px-6 text-center">
-                      {typeof row.earlyAdopter === 'boolean' ? (
-                        row.earlyAdopter ? (
-                          <svg className="w-6 h-6 text-telos-blue mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        )
-                      ) : (
-                        <span className="font-semibold text-telos-blue">{row.earlyAdopter}</span>
-                      )}
-                    </td>
-
-                    {/* Professional */}
-                    <td className="py-4 px-6 text-center">
-                      {typeof row.professional === 'boolean' ? (
-                        row.professional ? (
-                          <svg className="w-6 h-6 text-gray-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        ) : (
-                          <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        )
-                      ) : (
-                        <span className="font-semibold text-gray-600">{row.professional}</span>
-                      )}
-                    </td>
+                <thead>
+                  <tr className="border-b-2 border-gray-200">
+                    <th className="py-4 px-6 text-left text-lg font-bold text-telos-blue">
+                      Recursos
+                    </th>
+                    <th className="py-4 px-6 text-center text-lg font-bold text-telos-gold">
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        Founding
+                      </div>
+                    </th>
+                    <th className="py-4 px-6 text-center text-lg font-bold text-telos-blue">
+                      Early Adopter
+                    </th>
+                    <th className="py-4 px-6 text-center text-lg font-bold text-gray-600">
+                      Profissional
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "Preço mensal (3 pacientes)", founding: "R$ 400", earlyAdopter: "R$ 500", professional: "R$ 950" },
+                    { feature: "Paciente adicional", founding: "R$ 150", earlyAdopter: "R$ 180", professional: "R$ 350" },
+                    { feature: "Disponibilidade", founding: "Limitada", earlyAdopter: "Limitada", professional: "Aberta" },
+                    { feature: "Acompanhamento 24/7", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "WhatsApp + IA", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Detecção de red flags", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Alertas em tempo real", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Dashboard completo", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Modo Pesquisa (LGPD)", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Histórico completo", founding: true, earlyAdopter: true, professional: true },
+                    { feature: "Suporte prioritário", founding: "WhatsApp", earlyAdopter: "Email", professional: "Email" },
+                    { feature: "Acesso antecipado", founding: true, earlyAdopter: true, professional: false },
+                    { feature: "Preço vitalício", founding: true, earlyAdopter: false, professional: false },
+                    { feature: "Badge exclusivo", founding: true, earlyAdopter: false, professional: false },
+                  ].map((row, idx) => (
+                    <tr key={idx} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
+                      <td className="py-4 px-6 text-gray-700">{row.feature}</td>
+
+                      {/* Founding */}
+                      <td className="py-4 px-6 text-center">
+                        {typeof row.founding === 'boolean' ? (
+                          row.founding ? (
+                            <svg className="w-6 h-6 text-telos-gold mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )
+                        ) : (
+                          <span className="font-semibold text-telos-gold">{row.founding}</span>
+                        )}
+                      </td>
+
+                      {/* Early Adopter */}
+                      <td className="py-4 px-6 text-center">
+                        {typeof row.earlyAdopter === 'boolean' ? (
+                          row.earlyAdopter ? (
+                            <svg className="w-6 h-6 text-telos-blue mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )
+                        ) : (
+                          <span className="font-semibold text-telos-blue">{row.earlyAdopter}</span>
+                        )}
+                      </td>
+
+                      {/* Professional */}
+                      <td className="py-4 px-6 text-center">
+                        {typeof row.professional === 'boolean' ? (
+                          row.professional ? (
+                            <svg className="w-6 h-6 text-gray-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-6 h-6 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )
+                        ) : (
+                          <span className="font-semibold text-gray-600">{row.professional}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </FadeIn>
         </div>
       </section>
@@ -606,20 +514,20 @@ export default function PricingPage() {
                   question: "Funciona para quais tipos de cirurgia?",
                   answer: "Atualmente especializado em cirurgias orificiais (doença hemorroidária, fístulas, fissuras, pilonidal). Em breve expandiremos para outras especialidades cirúrgicas."
                 }
-            ].map((faq, idx) => (
-              <details key={idx} className="group bg-white rounded-xl border-2 border-gray-100 hover:border-telos-blue transition-colors shadow-sm">
-                <summary className="p-6 cursor-pointer flex justify-between items-center">
-                  <span className="font-semibold text-telos-blue text-lg">{faq.question}</span>
-                  <svg className="w-6 h-6 text-telos-blue transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="px-6 pb-6 text-gray-700 text-justify">
-                  {faq.answer}
-                </div>
-              </details>
-            ))}
-          </div>
+              ].map((faq, idx) => (
+                <details key={idx} className="group bg-white rounded-xl border-2 border-gray-100 hover:border-telos-blue transition-colors shadow-sm">
+                  <summary className="p-6 cursor-pointer flex justify-between items-center">
+                    <span className="font-semibold text-telos-blue text-lg">{faq.question}</span>
+                    <svg className="w-6 h-6 text-telos-blue transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </summary>
+                  <div className="px-6 pb-6 text-gray-700 text-justify">
+                    {faq.answer}
+                  </div>
+                </details>
+              ))}
+            </div>
           </FadeIn>
         </div>
       </section>
@@ -638,10 +546,7 @@ export default function PricingPage() {
               href="/cadastro-medico?plan=founding"
               className="inline-flex items-center gap-3 px-12 py-6 bg-telos-gold text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl hover:shadow-telos-gold/50 hover:bg-yellow-600 transition-all duration-500 shadow-xl"
             >
-              <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-              Quero Fazer Parte Agora!
+              Quero Fazer Parte Agora
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -651,7 +556,7 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="telos-gradient text-white">
+      <footer className="bg-gradient-to-b from-[#061A33] to-[#040E1D] text-white">
         <div className="container mx-auto px-6">
           {/* Main Footer Content */}
           <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -670,7 +575,7 @@ export default function PricingPage() {
               <div className="flex gap-4">
                 <a href="#" className="w-14 h-14 bg-white/10 hover:bg-telos-gold rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
                 </a>
               </div>

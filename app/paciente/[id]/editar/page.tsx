@@ -25,6 +25,10 @@ import { AnestesiaSection } from "@/components/edit/AnestesiaSection"
 import { PrescricaoSection } from "@/components/edit/PrescricaoSection"
 import { DescricaoCompletaSection } from "@/components/edit/DescricaoCompletaSection"
 
+// New patient components
+import { ConversationTimeline } from "@/components/patient/ConversationTimeline"
+import { PainEvolutionChart } from "@/components/patient/PainEvolutionChart"
+
 interface PatientData {
   id: string
   name: string
@@ -322,6 +326,16 @@ export default function EditPatientPage() {
         ) : (
           <SurgeryRiskNotAvailable className="mb-6" />
         )}
+
+        {/* Pain Evolution Chart */}
+        <div className="mb-6">
+          <PainEvolutionChart patientId={patient.id} />
+        </div>
+
+        {/* WhatsApp Conversation Timeline */}
+        <div className="mb-6">
+          <ConversationTimeline patientId={patient.id} />
+        </div>
 
         {/* Main Form */}
         <Card>

@@ -14,7 +14,10 @@ export default async function DashboardPage() {
   return (
     <PrivateLayout>
       <ErrorBoundary>
-        <DashboardClient userRole={user.role} />
+        <DashboardClient
+          userRole={user.role}
+          userName={user.name || user.email?.split('@')[0] || 'Médico'}
+        />
       </ErrorBoundary>
     </PrivateLayout>
   );
