@@ -46,7 +46,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/cadastro-medico"
-                    className="group relative px-8 py-4 bg-[#0A2647] text-white rounded-xl font-bold text-lg shadow-lg overflow-hidden text-center transition-all duration-500 hover:shadow-[0_0_30px_rgba(10,38,71,0.5)] hover:-translate-y-2 hover:bg-[#081E39]"
+                    className="group relative w-full sm:w-auto px-6 sm:px-8 py-4 bg-[#0A2647] text-white rounded-xl font-bold text-lg shadow-lg overflow-hidden text-center transition-all duration-500 hover:shadow-[0_0_30px_rgba(10,38,71,0.5)] hover:-translate-y-2 hover:bg-[#081E39]"
                   >
                     {/* Shine effect */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -79,15 +79,16 @@ export default function Home() {
             {/* Right Side - Logo */}
             <div className="flex justify-center relative mt-12 lg:mt-0">
               <FadeIn delay={0.2} direction="left">
-                <div className="relative w-full max-w-[350px] lg:max-w-[500px] aspect-square animate-float">
+                <div className="relative w-[280px] sm:w-[350px] lg:w-[500px] aspect-square animate-float">
                   {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-telos-blue/20 blur-[100px] rounded-full"></div>
+                  <div className="absolute inset-0 bg-telos-blue/20 blur-[60px] lg:blur-[100px] rounded-full"></div>
                   <Image
                     src="/icons/icon-original.jpeg"
                     alt="Telos.AI Logo"
                     fill
                     className="object-contain drop-shadow-2xl relative z-10"
                     priority
+                    sizes="(max-width: 768px) 280px, (max-width: 1024px) 350px, 500px"
                   />
                 </div>
               </FadeIn>

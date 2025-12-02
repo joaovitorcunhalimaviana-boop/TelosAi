@@ -124,8 +124,13 @@ export function Pricing({
                             delay: 0.4,
                             opacity: { duration: 0.5 },
                         }}
+                        whileHover={{
+                            scale: 1.05,
+                            zIndex: 50,
+                            transition: { duration: 0.2 }
+                        }}
                         className={cn(
-                            `rounded-2xl border-[1px] p-6 bg-background text-center lg:flex lg:flex-col lg:justify-center relative`,
+                            `rounded-2xl border-[1px] p-6 bg-background text-center lg:flex lg:flex-col lg:justify-center relative transition-shadow duration-300 hover:shadow-2xl`,
                             plan.isPopular ? "border-primary border-2" : "border-border",
                             "flex flex-col",
                             !plan.isPopular && "mt-5",
@@ -137,10 +142,10 @@ export function Pricing({
                         )}
                     >
                         {plan.isPopular && (
-                            <div className="absolute top-0 right-0 bg-primary py-0.5 px-2 rounded-bl-xl rounded-tr-xl flex items-center">
+                            <div className="absolute top-0 right-0 bg-primary py-1 px-3 rounded-bl-xl rounded-tr-xl flex items-center shadow-md">
                                 <Star className="text-primary-foreground h-4 w-4 fill-current" />
-                                <span className="text-primary-foreground ml-1 font-sans font-semibold">
-                                    Popular
+                                <span className="text-primary-foreground ml-1 font-sans font-bold text-sm">
+                                    Melhor Custo/Benefício
                                 </span>
                             </div>
                         )}

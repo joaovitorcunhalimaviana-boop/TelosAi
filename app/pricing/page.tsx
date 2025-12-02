@@ -242,89 +242,84 @@ export default function PricingPage() {
             <div className="max-w-5xl mx-auto overflow-x-auto">
               <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-100 overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-telos-blue to-telos-blue/90">
-                    <tr>
-                      <th className="py-5 px-6 text-left text-lg font-bold text-white">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="py-6 px-6 text-left text-lg font-bold text-gray-800">
                         Item
                       </th>
-                      <th className="py-5 px-6 text-center text-lg font-bold text-telos-gold">
+                      <th className="py-6 px-6 text-center text-lg font-bold text-telos-gold bg-gray-50/50">
                         Founding Member
                       </th>
-                      <th className="py-5 px-6 text-center text-lg font-bold text-white">
+                      <th className="py-6 px-6 text-center text-lg font-bold text-gray-600">
                         Early Adopter
                       </th>
-                      <th className="py-5 px-6 text-center text-lg font-bold text-white/80">
+                      <th className="py-6 px-6 text-center text-lg font-bold text-gray-400">
                         Profissional
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
-                      <td className="py-5 px-6 font-semibold text-telos-blue">
+                  <tbody className="divide-y divide-gray-100">
+                    <tr className="group hover:bg-gray-50 transition-colors">
+                      <td className="py-5 px-6 font-medium text-gray-700">
                         Custo mensal (3 pacientes)
                       </td>
-                      <td className="py-5 px-6 text-center">
+                      <td className="py-5 px-6 text-center bg-gray-50/30 group-hover:bg-gray-50/80">
                         <span className="text-2xl font-bold text-telos-gold">R$ 400</span>
                       </td>
                       <td className="py-5 px-6 text-center">
                         <span className="text-2xl font-bold text-telos-blue">R$ 500</span>
                       </td>
                       <td className="py-5 px-6 text-center">
-                        <span className="text-2xl font-bold text-gray-600">R$ 950</span>
+                        <span className="text-2xl font-bold text-gray-400">R$ 950</span>
                       </td>
                     </tr>
 
-                    <tr className="border-b border-gray-100 bg-red-50/30">
-                      <td className="py-5 px-6 font-semibold text-red-700">
+                    <tr className="group hover:bg-gray-50 transition-colors">
+                      <td className="py-5 px-6 font-medium text-gray-700">
                         Custo de 1 complicação evitada
                       </td>
-                      <td colSpan={3} className="py-5 px-6 text-center">
-                        <span className="text-3xl font-bold text-red-600">Alto custo</span>
-                        <p className="text-sm text-gray-600 mt-1">(reinternação + reoperação)</p>
+                      <td colSpan={3} className="py-5 px-6 text-center relative">
+                        <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 h-px bg-red-100 -z-10"></div>
+                        <span className="inline-block px-4 py-1 rounded-full bg-red-50 text-red-600 font-bold border border-red-100">
+                          Alto custo (reinternação + reoperação)
+                        </span>
                       </td>
                     </tr>
 
-                    <tr className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
-                      <td className="py-5 px-6 font-semibold text-telos-blue">
+                    <tr className="group hover:bg-gray-50 transition-colors">
+                      <td className="py-5 px-6 font-medium text-gray-700">
                         Horas economizadas/semana
                       </td>
                       <td colSpan={3} className="py-5 px-6 text-center">
-                        <span className="text-2xl font-bold text-blue-600">~10 horas</span>
-                        <p className="text-sm text-gray-600 mt-1">em ligações e acompanhamento manual</p>
+                        <span className="text-xl font-bold text-telos-blue">~10 horas</span>
+                        <span className="text-sm text-gray-500 ml-2">em ligações e acompanhamento manual</span>
                       </td>
                     </tr>
 
-                    <tr className="border-b border-gray-100 bg-green-50/30">
-                      <td className="py-5 px-6 font-semibold text-green-700">
+                    <tr className="group hover:bg-gray-50 transition-colors">
+                      <td className="py-5 px-6 font-medium text-gray-700">
                         Valor do tempo economizado
                       </td>
                       <td colSpan={3} className="py-5 px-6 text-center">
-                        <span className="text-3xl font-bold text-green-600">R$ 8.000/mês</span>
-                        <p className="text-sm text-gray-600 mt-1">(10h/semana × R$ 200/h × 4 semanas)</p>
+                        <span className="text-xl font-bold text-green-600">R$ 8.000/mês</span>
+                        <span className="text-sm text-gray-500 ml-2">(10h/semana × R$ 200/h)</span>
                       </td>
                     </tr>
 
-                    <tr className="bg-gradient-to-r from-telos-gold/10 to-yellow-50">
-                      <td className="py-6 px-6 font-bold text-telos-blue text-lg">
+                    <tr className="bg-gray-50">
+                      <td className="py-6 px-6 font-bold text-gray-800 text-lg">
                         ROI (Retorno sobre Investimento)
                       </td>
-                      <td className="py-6 px-6 text-center">
-                        <div className="inline-block bg-telos-gold text-white px-6 py-3 rounded-xl">
-                          <span className="text-2xl font-bold">+1.900%</span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                      <td className="py-6 px-6 text-center bg-telos-gold/5 border-l border-r border-telos-gold/20 relative">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-telos-gold"></div>
+                        <span className="text-3xl font-black text-telos-gold block">+1.900%</span>
+                        <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Melhor Retorno</span>
                       </td>
                       <td className="py-6 px-6 text-center">
-                        <div className="inline-block bg-telos-blue text-white px-6 py-3 rounded-xl">
-                          <span className="text-2xl font-bold">+1.500%</span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                        <span className="text-2xl font-bold text-telos-blue block">+1.500%</span>
                       </td>
                       <td className="py-6 px-6 text-center">
-                        <div className="inline-block bg-gray-600 text-white px-6 py-3 rounded-xl">
-                          <span className="text-2xl font-bold">+740%</span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-2">com tempo economizado</p>
+                        <span className="text-2xl font-bold text-gray-400 block">+740%</span>
                       </td>
                     </tr>
                   </tbody>
