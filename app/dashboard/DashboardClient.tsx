@@ -159,20 +159,6 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
     loadResearches()
   }, [])
 
-  // Load research stats
-  useEffect(() => {
-    async function loadResearchStats() {
-      try {
-        const stats = await getResearchStats()
-        setResearchStats(stats)
-      } catch (error) {
-        console.error('Error loading research stats:', error)
-      }
-    }
-
-    loadResearchStats()
-  }, [filters.researchFilter]) // Reload when research filter changes
-
   const handleFilterChange = (key: keyof DashboardFilters, value: any) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
