@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 const CRON_SECRET = process.env.CRON_SECRET!;
 const APP_ID = process.env.WHATSAPP_APP_ID!;
@@ -56,12 +57,21 @@ export async function GET(request: NextRequest) {
 
     console.log(`✅ Token renewed successfully - Expires in ${expiresInDays} days`);
 
+    // SALVAR NO BANCO DE DADOS
+    await prisma.systemConfig.upsert({
+      where: { key: 'WHATSAPP_ACCESS_TOKEN' },
+      update: { value: data.access_token },
+      create: { key: 'WHATSAPP_ACCESS_TOKEN', value: data.access_token }
+    });
+
+    console.log('✅ Token saved to database');
+
     // Notificar sucesso ao administrador
     await notifyAdminSuccess(data.access_token, expiresInDays);
 
     return NextResponse.json({
       success: true,
-      message: 'Token renewed and admin notified',
+      message: 'Token renewed and saved to DB',
       expiresInDays,
       timestamp: new Date().toISOString(),
     });
@@ -99,14 +109,10 @@ async function notifyAdminSuccess(newToken: string, expiresInDays: number) {
     const message =
       `🔄 TOKEN WHATSAPP RENOVADO\n\n` +
       `✅ Renovação automática concluída com sucesso!\n\n` +
+      `💾 Token salvo no banco de dados automaticamente.\n` +
       `📅 Válido por: ${expiresInDays} dias\n` +
       `📆 Próxima renovação: ~${expiresInDays - 10} dias\n\n` +
-      `🔐 Novo Token (primeiros 20 caracteres):\n${newToken.substring(0, 20)}...\n\n` +
-      `⚠️ AÇÃO NECESSÁRIA:\n` +
-      `1. Acesse a Vercel\n` +
-      `2. Atualize WHATSAPP_ACCESS_TOKEN\n` +
-      `3. Faça redeploy\n\n` +
-      `🔗 Link: https://vercel.com/[seu-projeto]/settings/environment-variables`;
+      `🔐 Novo Token (início):\n${newToken.substring(0, 10)}...`;
 
     // Enviar via WhatsApp usando a própria API
     const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!;

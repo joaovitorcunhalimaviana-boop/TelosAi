@@ -112,6 +112,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Simple in-memory deduplication for the same serverless instance
+const processedMessageIds = new Set<string>();
+
 /**
  * Processa mensagens recebidas
  */
@@ -123,6 +126,41 @@ async function processMessages(value: any) {
     // Ignorar mensagens enviadas por nós (apenas processar recebidas)
     if (message.from === value.metadata?.phone_number_id) {
       continue;
+    }
+
+    // DEDUPLICAÇÃO ROBUSTA (Banco de Dados + Memória)
+    try {
+      // 1. Verificar memória (rápido)
+      if (processedMessageIds.has(message.id)) {
+        logger.debug(`Duplicate message ignored (memory): ${message.id}`);
+        continue;
+      }
+
+      // 2. Verificar banco de dados (persistente entre retries)
+      const existing = await prisma.processedMessage.findUnique({
+        where: { id: message.id }
+      });
+
+      if (existing) {
+        logger.debug(`Duplicate message ignored (db): ${message.id}`);
+        processedMessageIds.add(message.id); // Atualizar memória
+        continue;
+      }
+
+      // 3. Registrar processamento
+      await prisma.processedMessage.create({
+        data: { id: message.id }
+      });
+      processedMessageIds.add(message.id);
+
+      // Limpar IDs antigos da memória
+      if (processedMessageIds.size > 1000) {
+        const it = processedMessageIds.values();
+        processedMessageIds.delete(it.next().value);
+      }
+    } catch (error) {
+      logger.error('Error checking duplicate message:', error);
+      // Em caso de erro no banco, continuar processamento mas logar
     }
 
     // Marcar como lida
@@ -340,17 +378,14 @@ async function processTextMessage(message: any, contacts: any[]) {
       const hadFirstBowelMovement = pendingFollowUp.surgery.hadFirstBowelMovement || false;
 
       // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
+      // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
       const initialMessage = `Olá ${firstName}! 👋
 
-Espero que esteja se recuperando bem da sua ${pendingFollowUp.surgery.type}.
+Vamos atualizar como você está hoje, no seu *${daysPostOp}º dia* pós-cirurgia.
 
-Vamos conversar um pouquinho sobre como você está se sentindo hoje, no seu *${daysPostOp}º dia* após a cirurgia.
+Para começar: *quanto está doendo agora, quando você está parado(a)?*
 
-Para começar, gostaria de saber sobre sua *dor em repouso* (quando você está parado, sem evacuar):
-
-*Em uma escala de 0 a 10*, qual o nível de dor que você está sentindo agora?
-
-Leve em consideração a escala de dor abaixo:`;
+Me diga um número de 0 a 10, olhando a imagem abaixo:`;
 
       // 1. PRIMEIRO: Enviar mensagem de saudação + pergunta
       logger.debug('📝 Enviando saudação inicial...');
@@ -532,96 +567,59 @@ async function callClaudeAPI(
     const currentPhase = savedPhase || determineCurrentPhase(conversationHistory);
     logger.debug('🎯 Fase para IA:', currentPhase);
 
-    const SYSTEM_PROMPT = `Você é um assistente médico especializado em acompanhamento pós-operatório de cirurgia colorretal (hemorroidectomia, fístula, etc) via WhatsApp.
+    const SYSTEM_PROMPT = `Você é a Clara, assistente virtual do Dr. João Vitor, especializada em acompanhar pacientes após cirurgias (hemorroidas, fístulas, etc) pelo WhatsApp.
 
-OBJETIVO: Coletar informações sobre a recuperação do paciente de forma NATURAL e EMPÁTICA.
+OBJETIVO: Coletar informações sobre a recuperação do paciente de forma SIMPLES, DIRETA e EDUCADA.
 
-CONTEXTO DO PACIENTE:
-- Nome: ${patient.name}
+CONTEXTO:
+- Paciente: ${patient.name}
 - Cirurgia: ${surgeryType}
-- Dia pós-operatório: D+${dayNumber}
-- Fase atual da conversa: ${currentPhase}
+- Dia: D+${dayNumber}
+- Fase: ${currentPhase}
 
-=== FLUXO DE COLETA (ORDEM IMPORTANTE) ===
+=== TOM DE VOZ ===
+- Seja DIRETA e EFICIENTE. Sem "mimimi" ou excesso de sentimentalismo.
+- Use linguagem simples e clara (ex: "ir ao banheiro" em vez de evacuar, se necessário para entendimento).
+- Evite frases como "sinto muito", "lamento", "espero que melhore".
+- Use "Entendi", "Certo", "Ok" para confirmar as respostas.
+- Emojis: Use poucos e apenas para organizar (ex: 👋, ✅, ⚠️). Evite corações ou emojis emotivos.
+
+=== O QUE PRECISAMOS SABER (FLUXO SUGERIDO) ===
 
 1. **DOR EM REPOUSO** (0-10)
-   - Perguntar: "qual sua dor em repouso, quando está parado?"
-   - Campo: painAtRest
+   - "Quanto está sua dor agora, parado?"
 
-2. **FEBRE** (sim/não + temperatura)
-   - Campo: hasFever, feverDetails
+2. **FEBRE**
+   - "Teve febre?"
 
-3. **EVACUAÇÃO**
-   - SE dayNumber == 1 (primeira conversa): Perguntar "Você já evacuou após a cirurgia?"
-   - SE dayNumber >= 2 (conversas seguintes): Perguntar "Você evacuou desde a nossa última conversa?"
+3. **IDAS AO BANHEIRO (COCÔ)**
+   - "Já conseguiu ir ao banheiro (fazer cocô) desde que conversamos?"
    - Se SIM:
-     a) Perguntar HORA aproximada: "Mais ou menos que horas foi?"
-     b) Perguntar DOR DURANTE EVACUAÇÃO (0-10): "Qual foi sua dor durante a evacuação?"
-        -> ENVIAR IMAGEM DA ESCALA DE DOR (needsImage: "pain_scale")
-     c) Perguntar BRISTOL (1-7): "Como estava a consistência das fezes?"
-        -> ENVIAR IMAGEM DA ESCALA DE BRISTOL (needsImage: "bristol_scale")
-   - Campos: hadBowelMovementSinceLastContact, bowelMovementTime, painDuringBowelMovement, bristolScale
-   - BRISTOL apenas em D+5 e D+10 (não perguntar em outros dias)
+     - "Doeu muito? De 0 a 10, quanto?" (Mandar escala de dor)
+     - "Qual o número da consistência nessa imagem?" (Mandar escala Bristol - APENAS D+5 e D+10 ou se paciente reclamar)
 
-4. **SANGRAMENTO** (nenhum/leve/moderado/intenso)
-   - Campo: bleeding
+4. **SANGRAMENTO**
+   - "Teve sangramento? Foi no papel ou no vaso?"
 
-5. **ANALGÉSICOS** (uso de medicações para dor)
-   - Perguntar: "Você está tomando as medicações para dor que foram receitadas?"
-   - Se SIM: "Está tomando certinho nos horários?"
-   - Perguntar: "Precisou tomar alguma outra medicação para dor além das receitadas?"
-   - Se SIM: "Qual medicação tomou?"
-   - Campos: takingPrescribedMeds, prescribedMedsDetails, takingExtraMeds, extraMedsDetails
-   - NOTA: Não mencionar medicações específicas (cada médico tem seu protocolo)
+5. **REMÉDIOS**
+   - "Está tomando os remédios nos horários certos?"
+   - "Tomou algo a mais para dor?"
 
-6. **SECREÇÃO PURULENTA** (APENAS A PARTIR DE D+3)
-   - SE dayNumber >= 3:
-     - Perguntar: "Você notou saída de alguma secreção amarelada ou esverdeada com mau cheiro (pus) no local da cirurgia?"
-     - Explicar: Secreção aquosa/clara é normal na cicatrização, mas secreção purulenta (amarela/verde com cheiro) não é.
-   - Campo: hasPurulentDischarge, purulentDischargeDetails
+6. **SECREÇÃO (Só se D+3 em diante)**
+   - "Notou alguma secreção (pus) ou cheiro ruim?"
 
-7. **OUTRAS PREOCUPAÇÕES**
-   - Campo: otherSymptoms
+7. **ALGO MAIS?**
+   - "Tem mais alguma dúvida ou sintoma?"
 
-8. **PESQUISA DE SATISFAÇÃO** (APENAS NO D+14 - último dia)
-   - SE dayNumber == 14:
-     a) Satisfação com analgesia (0-10): "De 0 a 10, quão satisfeito você está com o controle da dor durante todo o período pós-operatório?"
-     b) Satisfação com acompanhamento IA (0-10): "De 0 a 10, como você avalia este acompanhamento pós-operatório por WhatsApp com inteligência artificial?"
-     c) NPS (0-10): "De 0 a 10, qual a probabilidade de você recomendar este acompanhamento por WhatsApp a um amigo ou familiar?"
-     d) Feedback aberto (opcional): "Gostaria de deixar algum comentário ou sugestão sobre o acompanhamento? (opcional)"
-   - Campos: painControlSatisfaction, aiFollowUpSatisfaction, npsScore, feedback
-
-NOTA: NÃO perguntar sobre alimentação - pacientes de cirurgia colorretal não têm problemas de alimentação.
-NOTA: NÃO perguntar sobre urina - foi removido do fluxo.
-
-=== REGRAS CRÍTICAS ===
-
-1. SEMPRE diferencie DOR EM REPOUSO vs DOR DURANTE EVACUAÇÃO
-   - painAtRest: dor quando está parado, sem evacuar
-   - painDuringBowelMovement: dor durante/após evacuar
-
-2. Quando perguntar sobre EVACUAÇÃO:
-   - SE dayNumber == 1: Use "Você já evacuou após a cirurgia?" (primeira conversa)
-   - SE dayNumber >= 2: Use "Você evacuou desde a nossa última conversa?"
-   - Se evacuou, pergunte a HORA ("mais ou menos que horas?")
-   - Se evacuou, pergunte a DOR DURANTE a evacuação E ENVIE A ESCALA DE DOR
-   - Se evacuou, pergunte BRISTOL E ENVIE A ESCALA DE BRISTOL
-
-3. SEMPRE envie imagem quando:
-   - Perguntar sobre dor: needsImage: "pain_scale"
-   - Perguntar sobre Bristol/fezes: needsImage: "bristol_scale"
-
-4. NUNCA REPITA pergunta já respondida
-
-5. LINGUAGEM - Use linguagem SIMPLES mas FORMAL:
-   - NÃO use gírias ou expressões informais (ex: "okay", "beleza", "show")
-   - Use "Ótimo", "Entendi", "Certo" ao invés de gírias
-   - Pacientes podem ser de diferentes perfis, inclusive do interior
-   - Seja cordial mas profissional
+=== REGRAS DE OURO ===
+1. **UMA COISA DE CADA VEZ**: Perguntas curtas e diretas.
+2. **NÃO SEJA REPETITIVA**: Se já respondeu, avance.
+3. **SEJA PRÁTICA**: Se a dor for alta, apenas registre e oriente (se houver instrução), não fique lamentando.
+4. **IMAGENS**: Sempre peça para enviar a imagem da escala quando perguntar de dor (needsImage: "pain_scale").
 
 === FORMATO DE RESPOSTA (JSON) ===
 {
-  "message": "sua resposta empática",
+  "message": "sua mensagem direta aqui",
   "needsImage": "pain_scale" | "bristol_scale" | null,
   "dataCollected": {
     "painAtRest": null,
@@ -643,30 +641,8 @@ NOTA: NÃO perguntar sobre urina - foi removido do fluxo.
   },
   "completed": false,
   "needsClarification": false,
-  "conversationPhase": "collecting_pain_at_rest"
-}
-
-FASES VÁLIDAS:
-- collecting_pain_at_rest (dor em repouso)
-- collecting_fever
-- collecting_bowel (se evacuou desde última conversa)
-- collecting_bowel_time (hora da evacuação)
-- collecting_pain_during_bm (dor durante evacuação)
-- collecting_bristol (APENAS D+5 e D+10)
-- collecting_bleeding
-- collecting_meds_prescribed (medicações prescritas)
-- collecting_meds_extra (medicações extras)
-- collecting_purulent_discharge (secreção purulenta - apenas D+3)
-- collecting_concerns
-- collecting_satisfaction_pain (satisfação analgesia - APENAS D+14)
-- collecting_satisfaction_ai (satisfação IA - APENAS D+14)
-- collecting_nps (NPS - APENAS D+14)
-- collecting_feedback (feedback aberto - APENAS D+14)
-- completed
-
-IMPORTANTE SOBRE BRISTOL:
-- APENAS perguntar Bristol em D+5 e D+10
-- Em outros dias, após dor durante evacuação, pular direto para sangramento`;
+  "conversationPhase": "fase_atual"
+}`;
 
     // Construir mensagens para Claude
     const messages = [
@@ -689,7 +665,7 @@ IMPORTANTE SOBRE BRISTOL:
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2000,
-      temperature: 0.5, // Mais consistente para seguir instruções
+      temperature: 0.3, // Temperatura mais baixa para ser mais objetivo
       system: SYSTEM_PROMPT,
       messages,
     });
@@ -714,7 +690,7 @@ IMPORTANTE SOBRE BRISTOL:
       logger.error('❌ Claude response validation failed, using parsed data with defaults');
       // Usar dados parseados com valores default se validação falhar
       const aiResponse: ClaudeAIResponse = {
-        message: parsedJson.message || 'Desculpe, tive um problema. Pode repetir?',
+        message: parsedJson.message || 'Não entendi. Pode repetir?',
         needsImage: parsedJson.needsImage || null,
         dataCollected: parsedJson.dataCollected || {},
         completed: parsedJson.completed || false,
@@ -763,7 +739,7 @@ IMPORTANTE SOBRE BRISTOL:
 
     // Último recurso: pedir para repetir (mas NÃO reiniciar questionário)
     return {
-      message: `Desculpe, não consegui processar sua resposta. Pode repetir de forma mais direta?\n\nPor exemplo, se for sobre dor, me diga apenas o número de 0 a 10.`,
+      message: `Não consegui entender. Pode responder apenas com o número ou sim/não?`,
       needsImage: null,
       dataCollected: {},
       completed: false,
@@ -947,9 +923,9 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
 
   // Detectar sim/não
   const isYes = /^(sim|s|yes|claro|ok|isso|positivo|afirmativo)$/i.test(msg.trim()) ||
-                /\b(sim|yes|claro)\b/i.test(msg);
+    /\b(sim|yes|claro)\b/i.test(msg);
   const isNo = /^(não|nao|n|no|nope|negativo)$/i.test(msg.trim()) ||
-               /\b(não|nao|nunca)\b/i.test(msg);
+    /\b(não|nao|nunca)\b/i.test(msg);
 
   // Tentar extrair hora (ex: "10h", "às 10", "10:30", "pela manhã")
   let timeExtracted: string | null = null;
@@ -981,8 +957,8 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
 
     if (msg.includes('média') || msg.includes('moderada') || msg.includes('razoável') ||
-        msg.includes('forte') || msg.includes('fraca') || msg.includes('leve') ||
-        msg.includes('muita') || msg.includes('pouca') || msg.includes('bastante')) {
+      msg.includes('forte') || msg.includes('fraca') || msg.includes('leve') ||
+      msg.includes('muita') || msg.includes('pouca') || msg.includes('bastante')) {
       return {
         message: `Entendo. Mas para eu registrar certinho, preciso de um número.\n\nOlhando a escala de dor, qual número de 0 a 10 representa sua dor em repouso agora?`,
         needsImage: 'pain_scale',
@@ -1096,7 +1072,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   if (currentPhase === 'collecting_bowel') {
     if (isYes) {
       return {
-        message: `Que bom que evacuou! Mais ou menos que horas foi?`,
+        message: `Certo. Mais ou menos que horas foi?`,
         needsImage: null,
         dataCollected: { hadBowelMovementSinceLastContact: true },
         completed: false,
@@ -1106,7 +1082,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (isNo || msg.includes('ainda não') || msg.includes('ainda nao')) {
       return {
-        message: `Tudo bem, é comum nos primeiros dias. Continue tomando bastante líquido e os laxantes prescritos. Você está tendo sangramento?`,
+        message: `Entendi. Continue com os líquidos e laxantes. Teve sangramento?`,
         needsImage: null,
         dataCollected: { hadBowelMovementSinceLastContact: false },
         completed: false,
@@ -1117,8 +1093,8 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
 
     // Clarificação também diferente para D+1 vs D+2+
     const clarification = dayNumber === 1
-      ? `Desculpe, não entendi. Você já evacuou após a cirurgia? Responda sim ou não.`
-      : `Desculpe, não entendi. Você evacuou desde a nossa última conversa? Responda sim ou não.`;
+      ? `Não entendi. Você já foi ao banheiro (fazer cocô)? Responda sim ou não.`
+      : `Não entendi. Você foi ao banheiro (fazer cocô) desde nossa última conversa? Responda sim ou não.`;
 
     return {
       message: clarification,
@@ -1137,7 +1113,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     // Aceita qualquer indicação de hora
     const bowelTime = timeExtracted || userMessage;
     return {
-      message: `Entendi, por volta das ${bowelTime}. Agora preciso saber: *qual foi sua dor DURANTE a evacuação?*\n\nMe diz um número de 0 a 10, olhando a escala abaixo:`,
+      message: `Ok, por volta das ${bowelTime}. E *doeu muito na hora?*\n\nMe diga um número de 0 a 10:`,
       needsImage: 'pain_scale',
       dataCollected: { bowelMovementTime: bowelTime },
       completed: false,
@@ -1156,7 +1132,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     if (number !== null && number >= 0 && number <= 10) {
       if (shouldAskBristol) {
         return {
-          message: `Entendi, dor ${number}/10 durante a evacuação. ${number >= 7 ? 'Sei que está sendo difícil. ' : ''}Agora me conta: como estava a consistência das fezes?\n\nOlhe a escala de Bristol abaixo e me diga qual número (1 a 7) mais se parece:`,
+          message: `Entendi, dor ${number}. Olhe a imagem abaixo: qual número (1 a 7) parece mais com o seu cocô?`,
           needsImage: 'bristol_scale',
           dataCollected: { painDuringBowelMovement: number },
           completed: false,
@@ -1166,7 +1142,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       } else {
         // Pular Bristol, ir direto para sangramento
         return {
-          message: `Entendi, dor ${number}/10 durante a evacuação. ${number >= 7 ? 'Sei que está sendo difícil. ' : ''}Você está tendo sangramento?`,
+          message: `Entendi, dor ${number}. Teve sangramento?`,
           needsImage: null,
           dataCollected: { painDuringBowelMovement: number },
           completed: false,
@@ -1176,7 +1152,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       }
     }
     return {
-      message: `Preciso que você me diga um número de 0 a 10 para a dor DURANTE a evacuação.\n\nOlhe a escala de dor:`,
+      message: `Por favor, me diga apenas o número de 0 a 10 para a dor na hora de ir ao banheiro.`,
       needsImage: 'pain_scale',
       dataCollected: {},
       completed: false,
@@ -1190,11 +1166,11 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // ========================================
   if (currentPhase === 'collecting_bristol') {
     if (number !== null && number >= 1 && number <= 7) {
-      const bristolComment = number <= 2 ? 'Fezes mais duras podem indicar constipação. Continue tomando bastante líquido.'
-        : number >= 6 ? 'Fezes mais líquidas. Fique atento se persistir.'
-        : 'Consistência adequada.';
+      const bristolComment = number <= 2 ? 'Fezes duras, beba mais água.'
+        : number >= 6 ? 'Fezes líquidas. Fique atento.'
+          : 'Consistência ok.';
       return {
-        message: `Entendi, tipo ${number} na escala de Bristol. ${bristolComment}\n\nVocê está tendo sangramento?`,
+        message: `Certo, tipo ${number}. ${bristolComment}\n\nTeve sangramento?`,
         needsImage: null,
         dataCollected: { bristolScale: number },
         completed: false,
@@ -1203,7 +1179,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
     return {
-      message: `Não entendi. Por favor, olhe a imagem da Escala de Bristol e me diga qual número de 1 a 7 mais se parece com suas fezes.`,
+      message: `Não entendi. Olhe a imagem e diga o número de 1 a 7.`,
       needsImage: 'bristol_scale',
       dataCollected: {},
       completed: false,
@@ -1218,7 +1194,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   if (currentPhase === 'collecting_bleeding') {
     if (isNo || msg.includes('nenhum') || msg.includes('zero')) {
       return {
-        message: `Ótimo, sem sangramento. Agora sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
+        message: `Ok, sem sangramento. Está tomando os remédios nos horários certos?`,
         needsImage: null,
         dataCollected: { bleeding: 'none' },
         completed: false,
@@ -1228,7 +1204,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('leve') || msg.includes('pouco') || msg.includes('papel') || msg.includes('gotas')) {
       return {
-        message: `Entendi, sangramento leve no papel é normal nos primeiros dias. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
+        message: `Certo, pouco sangue no papel é normal. Está tomando os remédios nos horários certos?`,
         needsImage: null,
         dataCollected: { bleeding: 'mild' },
         completed: false,
@@ -1238,7 +1214,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('moderado') || msg.includes('roupa') || msg.includes('médio')) {
       return {
-        message: `Entendi, sangramento moderado. Fique atento se aumentar. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
+        message: `Entendi, sangramento moderado. Fique atento. Está tomando os remédios nos horários certos?`,
         needsImage: null,
         dataCollected: { bleeding: 'moderate' },
         completed: false,
@@ -1248,7 +1224,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('intenso') || msg.includes('muito') || msg.includes('forte') || msg.includes('vaso')) {
       return {
-        message: `⚠️ Sangramento intenso requer atenção! Se continuar ou piorar, procure atendimento médico de urgência. Sobre suas medicações para dor: você está tomando as medicações que foram receitadas?`,
+        message: `⚠️ Sangramento intenso requer atenção. Se continuar, vá ao hospital. Está tomando os remédios nos horários certos?`,
         needsImage: null,
         dataCollected: { bleeding: 'severe' },
         completed: false,
@@ -1258,7 +1234,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (isYes) {
       return {
-        message: `Entendi que está tendo sangramento. Pode me dizer a intensidade?\n\n- *Leve*: só no papel higiênico\n- *Moderado*: mancha a roupa\n- *Intenso*: encheu o vaso`,
+        message: `Foi muito sangue?\n\n- *Leve*: só no papel\n- *Moderado*: manchou a roupa\n- *Intenso*: encheu o vaso`,
         needsImage: null,
         dataCollected: {},
         completed: false,
@@ -1267,7 +1243,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
     return {
-      message: `Desculpe, não entendi. Você está tendo sangramento? Responda sim ou não.`,
+      message: `Teve sangramento? Responda sim ou não.`,
       needsImage: null,
       dataCollected: {},
       completed: false,
@@ -1282,7 +1258,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   if (currentPhase === 'collecting_meds_prescribed') {
     if (isYes || msg.includes('tomando') || msg.includes('tomo') || msg.includes('certinho') || msg.includes('horários')) {
       return {
-        message: `Ótimo que está tomando as medicações certinho! E você precisou tomar alguma *outra* medicação para dor, além das que foram receitadas?`,
+        message: `Ótimo. Precisou tomar algum *outro* remédio para dor, além desses?`,
         needsImage: null,
         dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: msg.includes('certinho') ? 'tomando nos horários' : undefined },
         completed: false,
@@ -1292,7 +1268,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (isNo || msg.includes('não estou') || msg.includes('esqueci') || msg.includes('parei')) {
       return {
-        message: `Entendi. É importante tomar as medicações nos horários prescritos para controlar a dor. E você tomou alguma *outra* medicação para dor por conta própria?`,
+        message: `Entendi. Tente tomar nos horários certos. Tomou algum *outro* remédio por conta própria?`,
         needsImage: null,
         dataCollected: { takingPrescribedMeds: false, prescribedMedsDetails: userMessage },
         completed: false,
@@ -1302,7 +1278,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     }
     if (msg.includes('algumas') || msg.includes('às vezes') || msg.includes('as vezes')) {
       return {
-        message: `Entendi que está tomando algumas vezes. Tente manter os horários para um melhor controle da dor. Você precisou tomar alguma *outra* medicação além das receitadas?`,
+        message: `Entendi. Tente manter os horários. Precisou tomar algum *outro* remédio além desses?`,
         needsImage: null,
         dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: 'tomando irregularmente' },
         completed: false,
@@ -1311,7 +1287,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
     return {
-      message: `Desculpe, não entendi. Você está tomando as medicações para dor que foram receitadas? Responda sim ou não.`,
+      message: `Está tomando os remédios receitados direitinho? Responda sim ou não.`,
       needsImage: null,
       dataCollected: {},
       completed: false,
@@ -1329,7 +1305,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       // Como não temos acesso ao dayNumber aqui, vamos para concerns
       // A IA vai verificar se precisa perguntar sobre secreção
       return {
-        message: `Perfeito, só as medicações receitadas. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
+        message: `Ok. Tem mais alguma dúvida ou sintoma?`,
         needsImage: null,
         dataCollected: { takingExtraMeds: false },
         completed: false,
@@ -1347,7 +1323,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
 
       if (mentionedMeds.length > 0) {
         return {
-          message: `Entendi, está tomando ${mentionedMeds.join(', ')} além das medicações prescritas. Vou registrar isso. Última pergunta: tem alguma outra preocupação ou sintoma?`,
+          message: `Certo, anotado (${mentionedMeds.join(', ')}). Tem mais alguma dúvida?`,
           needsImage: null,
           dataCollected: { takingExtraMeds: true, extraMedsDetails: mentionedMeds.join(', ') },
           completed: false,
@@ -1357,7 +1333,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       }
 
       return {
-        message: `Entendi que precisou de algo a mais. Qual medicação você está tomando além das receitadas?`,
+        message: `Qual remédio você tomou a mais?`,
         needsImage: null,
         dataCollected: { takingExtraMeds: true },
         completed: false,
@@ -1366,7 +1342,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
       };
     }
     return {
-      message: `Desculpe, não entendi. Você precisou tomar alguma outra medicação para dor além das que foram receitadas? Responda sim ou não.`,
+      message: `Precisou tomar algum outro remédio além dos receitados? Responda sim ou não.`,
       needsImage: null,
       dataCollected: {},
       completed: false,
@@ -1724,7 +1700,7 @@ async function processQuestionnaireAnswer(
     logger.error('❌ Erro ao processar resposta com IA:', error);
     await sendEmpatheticResponse(
       phone,
-      'Desculpe, tive um problema ao processar sua resposta. Pode tentar novamente?'
+      'Tive um erro ao processar. Pode responder novamente?'
     );
   }
 }
@@ -1938,7 +1914,7 @@ async function finalizeQuestionnaireWithAI(
           });
 
           // Construir trajetória de dor
-          const painTrajectory: Array<{day: number; painAtRest: number | null; painDuringBowel: number | null}> = [];
+          const painTrajectory: Array<{ day: number; painAtRest: number | null; painDuringBowel: number | null }> = [];
           let maxPainAtRest = 0;
           let totalPainAtRest = 0;
           let countPainAtRest = 0;
@@ -2023,8 +1999,7 @@ async function finalizeQuestionnaireWithAI(
     logger.error('Error finalizing questionnaire with AI:', error);
     await sendEmpatheticResponse(
       phone,
-      'Obrigado por responder! Recebi suas informações e vou analisá-las com cuidado. ' +
-      'Em caso de qualquer sintoma que te preocupe, não hesite em entrar em contato.'
+      'Obrigado. Registrei suas informações. Se tiver alguma dúvida ou sintoma forte, entre em contato.'
     );
   }
 }

@@ -146,9 +146,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    console.log(`[GET Patient] Fetching patient with ID: ${id}`);
 
     // Validate ID format
     if (!isValidCuid(id)) {
+      console.log(`[GET Patient] Invalid CUID: ${id}`);
       return NextResponse.json(
         buildErrorResponse('Invalid patient ID format', 'ID must be a valid CUID'),
         { status: 400 }
@@ -156,6 +158,7 @@ export async function GET(
     }
 
     // Fetch patient with all relations
+    console.log(`[GET Patient] Executing Prisma query...`);
     const patient = await prisma.patient.findUnique({
       where: { id },
       include: {
@@ -197,11 +200,13 @@ export async function GET(
     });
 
     if (!patient) {
+      console.log(`[GET Patient] Patient not found in DB.`);
       return NextResponse.json(
         buildErrorResponse('Patient not found', `No patient found with ID: ${id}`),
         { status: 404 }
       );
     }
+    console.log(`[GET Patient] Patient found: ${patient.name}`);
 
     // Calculate completeness for the latest surgery
     let dataCompleteness = 20;
@@ -215,13 +220,17 @@ export async function GET(
     }
 
     // Audit log: visualização de dados do paciente
-    await AuditLogger.patientViewed({
-      userId: patient.userId,
-      patientId: patient.id,
-      patientName: patient.name,
-      ipAddress: getClientIP(request),
-      userAgent: request.headers.get('user-agent') || 'unknown',
-    });
+    try {
+      await AuditLogger.patientViewed({
+        userId: patient.userId,
+        patientId: patient.id,
+        patientName: patient.name,
+        ipAddress: getClientIP(request),
+        userAgent: request.headers.get('user-agent') || 'unknown',
+      });
+    } catch (auditError) {
+      console.error('[GET Patient] Audit log failed (non-fatal):', auditError);
+    }
 
     return NextResponse.json({
       success: true,
@@ -231,7 +240,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error fetching patient:', error);
+    console.error('[GET Patient] Critical error fetching patient:', error);
     return NextResponse.json(
       buildErrorResponse(
         'Failed to fetch patient',

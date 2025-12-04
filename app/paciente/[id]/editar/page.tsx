@@ -187,9 +187,10 @@ export default function EditPatientPage() {
       const completed = calculateCompletedSections(data)
       setCompletedSections(completed)
     } catch (error) {
+      console.error("Error loading patient:", error)
       toast({
         title: "Erro ao carregar dados",
-        description: "Não foi possível carregar os dados do paciente",
+        description: error instanceof Error ? error.message : "Não foi possível carregar os dados do paciente",
         variant: "destructive"
       })
     }
@@ -311,8 +312,8 @@ export default function EditPatientPage() {
 
         {/* ML Risk Prediction */}
         {patient?.surgery?.predictedRisk !== null &&
-         patient?.surgery?.predictedRisk !== undefined &&
-         patient?.surgery?.predictedRiskLevel ? (
+          patient?.surgery?.predictedRisk !== undefined &&
+          patient?.surgery?.predictedRiskLevel ? (
           <SurgeryRiskDisplay
             risk={patient.surgery.predictedRisk}
             level={patient.surgery.predictedRiskLevel}

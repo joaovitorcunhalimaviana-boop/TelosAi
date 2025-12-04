@@ -5,9 +5,31 @@
 
 import { Patient, Surgery, FollowUp } from '@prisma/client';
 
+import { prisma } from '@/lib/prisma';
+
 const WHATSAPP_API_URL = 'https://graph.facebook.com/v21.0';
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!;
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN!;
+
+/**
+ * Obtém o token do WhatsApp do banco de dados ou variável de ambiente
+ */
+async function getWhatsAppToken(): Promise<string> {
+  try {
+    // Tentar buscar do banco primeiro
+    const config = await prisma.systemConfig.findUnique({
+      where: { key: 'WHATSAPP_ACCESS_TOKEN' }
+    });
+
+    if (config?.value) {
+      return config.value;
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to fetch WhatsApp token from DB, falling back to env var:', error);
+  }
+
+  // Fallback para variável de ambiente
+  return process.env.WHATSAPP_ACCESS_TOKEN || '';
+}
 
 export interface WhatsAppMessage {
   to: string;
@@ -56,6 +78,7 @@ export async function sendImage(
 ): Promise<WhatsAppResponse> {
   try {
     const formattedPhone = formatPhoneNumber(to);
+    const token = await getWhatsAppToken();
 
     console.log('📸 Sending WhatsApp image:', {
       to: formattedPhone,
@@ -78,7 +101,7 @@ export async function sendImage(
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
@@ -110,13 +133,14 @@ export async function sendMessage(
   try {
     // Formatar número de telefone (remover caracteres especiais)
     const formattedPhone = formatPhoneNumber(to);
+    const token = await getWhatsAppToken();
 
     console.log('📱 Sending WhatsApp message:', {
       originalPhone: to,
       formattedPhone,
       messagePreview: message.substring(0, 100) + '...',
       apiUrl: `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
-      hasToken: !!ACCESS_TOKEN,
+      hasToken: !!token,
       hasPhoneId: !!PHONE_NUMBER_ID,
     });
 
@@ -133,7 +157,7 @@ export async function sendMessage(
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -173,6 +197,7 @@ export async function sendTemplate(
 ): Promise<WhatsAppResponse> {
   try {
     const formattedPhone = formatPhoneNumber(to);
+    const token = await getWhatsAppToken();
 
     // Template "day1" usa idioma "en" (erro na criação), outros usam "pt_BR"
     const language = languageCode || (templateName === 'day1' ? 'en' : 'pt_BR');
@@ -194,7 +219,7 @@ export async function sendTemplate(
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -230,6 +255,7 @@ export async function sendInteractiveMessage(
 ): Promise<WhatsAppResponse> {
   try {
     const formattedPhone = formatPhoneNumber(to);
+    const token = await getWhatsAppToken();
 
     const payload: WhatsAppMessage = {
       to: formattedPhone,
@@ -248,7 +274,7 @@ export async function sendInteractiveMessage(
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -439,12 +465,13 @@ function getGreeting(): string {
  */
 export async function markAsRead(messageId: string): Promise<void> {
   try {
+    const token = await getWhatsAppToken();
     await fetch(
       `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -463,8 +490,12 @@ export async function markAsRead(messageId: string): Promise<void> {
 /**
  * Verifica se o WhatsApp API está configurado corretamente
  */
+/**
+ * Verifica se o WhatsApp API está configurado corretamente
+ * Nota: Verifica apenas variáveis de ambiente, não o banco
+ */
 export function isWhatsAppConfigured(): boolean {
-  return !!(PHONE_NUMBER_ID && ACCESS_TOKEN);
+  return !!(PHONE_NUMBER_ID && process.env.WHATSAPP_ACCESS_TOKEN);
 }
 
 /**
@@ -472,12 +503,13 @@ export function isWhatsAppConfigured(): boolean {
  */
 export async function testWhatsAppConnection(): Promise<boolean> {
   try {
+    const token = await getWhatsAppToken();
     const response = await fetch(
       `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}`,
       {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
         },
       }
     );
@@ -648,7 +680,7 @@ export async function sendFinalReport(
     }
     if (satisfaction.npsScore !== undefined) {
       const npsCategory = satisfaction.npsScore >= 9 ? 'Promotor' :
-                          satisfaction.npsScore >= 7 ? 'Passivo' : 'Detrator';
+        satisfaction.npsScore >= 7 ? 'Passivo' : 'Detrator';
       message += `• NPS: ${satisfaction.npsScore}/10 (${npsCategory})\n`;
     }
     if (satisfaction.feedback) {
