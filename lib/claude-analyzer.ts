@@ -329,7 +329,7 @@ MENSAGEM DO PACIENTE:
       analysis.shouldNotifyDoctor = true;
       // Garantir que resposta crítica sempre orienta pronto-socorro
       if (!analysis.suggestedResponse.toLowerCase().includes('pronto-socorro') &&
-          !analysis.suggestedResponse.includes('192')) {
+        !analysis.suggestedResponse.includes('192')) {
         analysis.suggestedResponse =
           `🚨 ATENÇÃO - PROCURE O PRONTO-SOCORRO IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
           `${analysis.suggestedResponse}\n\n` +
@@ -346,7 +346,7 @@ MENSAGEM DO PACIENTE:
 
     return analysis;
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error analyzing message with Claude:', error);
 
     // Fallback inteligente: analisar palavras-chave para urgência
@@ -366,11 +366,11 @@ MENSAGEM DO PACIENTE:
       summary: message.substring(0, 100),
       suggestedResponse: urgency === 'CRITICAL'
         ? `🚨 ATENÇÃO - Sua mensagem indica sintomas graves. PROCURE O PRONTO-SOCORRO IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
-          `Dr. João Vitor foi notificado, mas não espere! Procure atendimento médico AGORA.`
+        `Dr. João Vitor foi notificado, mas não espere! Procure atendimento médico AGORA.`
         : `Recebemos sua mensagem e Dr. João Vitor foi notificado.\n\n` +
-          `Se você está com sintomas graves (sangramento volumoso, febre alta com dor, dor insuportável), ` +
-          `procure o pronto-socorro IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
-          `Caso contrário, aguarde o retorno do Dr. João.`,
+        `Se você está com sintomas graves (sangramento volumoso, febre alta com dor, dor insuportável), ` +
+        `procure o pronto-socorro IMEDIATAMENTE ou ligue 192 (SAMU).\n\n` +
+        `Caso contrário, aguarde o retorno do Dr. João.`,
       shouldNotifyDoctor: true,
       redFlags: isCritical ? ['erro_analise_claude'] : [],
     };
