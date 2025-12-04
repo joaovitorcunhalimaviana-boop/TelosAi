@@ -156,7 +156,10 @@ async function processMessages(value: any) {
       // Limpar IDs antigos da memória
       if (processedMessageIds.size > 1000) {
         const it = processedMessageIds.values();
-        processedMessageIds.delete(it.next().value);
+        const oldestId = it.next().value;
+        if (oldestId) {
+          processedMessageIds.delete(oldestId);
+        }
       }
     } catch (error) {
       logger.error('Error checking duplicate message:', error);
