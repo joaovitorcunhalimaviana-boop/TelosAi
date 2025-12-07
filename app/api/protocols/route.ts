@@ -5,7 +5,7 @@ import { AuditLogger } from '@/lib/audit/logger'
 import { getClientIP } from '@/lib/utils/ip'
 
 // GET - Lista todos os protocolos do médico
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
 

@@ -15,7 +15,7 @@ import {
 /**
  * GET - Test WhatsApp API connection
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check if configured
     const configured = isWhatsAppConfigured();

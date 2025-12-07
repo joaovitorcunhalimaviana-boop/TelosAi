@@ -32,7 +32,7 @@ export function AutoSaveIndicator({
   // Update time ago every second
   useEffect(() => {
     if (!lastSaved) {
-      setTimeAgo("")
+      setTimeout(() => setTimeAgo(""), 0)
       return
     }
 

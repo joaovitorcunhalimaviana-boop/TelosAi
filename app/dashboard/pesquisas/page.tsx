@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -420,7 +421,7 @@ export default function PesquisasPage() {
                   <div className="bg-white/80 rounded-lg p-6 text-center border-2 border-dashed border-amber-300">
                     <FileText className="h-12 w-12 mx-auto text-amber-400 mb-2" />
                     <p className="text-sm text-gray-600">
-                      Nenhum protocolo adicionado. Clique em "Adicionar Protocolo" para criar.
+                      Nenhum protocolo adicionado. Clique em &quot;Adicionar Protocolo&quot; para criar.
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
                       Protocolos de pesquisa garantem orientações uniformes para todos os pacientes do estudo

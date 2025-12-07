@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 /**
  * API de Exportação de Logs de Auditoria em CSV
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
     const isSensitive = searchParams.get('isSensitive');
 
     // Construir filtro where
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (userId) {
       where.userId = userId;

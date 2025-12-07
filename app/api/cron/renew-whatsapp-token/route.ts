@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Vercel Cron Job - Renew WhatsApp Token
  * Runs every 50 days to renew the WhatsApp access token before it expires

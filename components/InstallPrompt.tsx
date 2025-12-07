@@ -19,7 +19,7 @@ export function InstallPrompt() {
   useEffect(() => {
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
+      setTimeout(() => setIsInstalled(true), 0);
       return;
     }
 
@@ -53,6 +53,7 @@ export function InstallPrompt() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Show iOS prompt after 30 seconds if on iOS and not installed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (isIOSDevice && !(window.navigator as any).standalone) {
       setTimeout(() => {
         setShowIOSPrompt(true);
@@ -140,11 +141,11 @@ export function InstallPrompt() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-semibold text-blue-600">2.</span>
-                    <span>Role e toque em "Adicionar à Tela Inicial"</span>
+                    <span>Role e toque em &quot;Adicionar à Tela Inicial&quot;</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="font-semibold text-blue-600">3.</span>
-                    <span>Toque em "Adicionar"</span>
+                    <span>Toque em &quot;Adicionar&quot;</span>
                   </li>
                 </ol>
               </div>

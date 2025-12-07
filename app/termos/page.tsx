@@ -73,11 +73,10 @@ export default function TermosPage() {
         {Object.entries(categorizados).map(([categoria, termosCategoria]) => (
           <div key={categoria} className="mb-10">
             <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                categoria === 'Cirúrgico'
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${categoria === 'Cirúrgico'
                   ? 'bg-gradient-to-br from-blue-500 to-blue-600'
                   : 'bg-gradient-to-br from-green-500 to-emerald-600'
-              } shadow-md`}>
+                } shadow-md`}>
                 {categoria === 'Cirúrgico' ? (
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -179,15 +178,15 @@ export default function TermosPage() {
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#D4AF37] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</div>
-              <p className="text-sm text-gray-700">Clique em "Visualizar" para ver o termo completo antes de imprimir</p>
+              <p className="text-sm text-gray-700">Clique em &quot;Visualizar&quot; para ver o termo completo antes de imprimir</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#D4AF37] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</div>
-              <p className="text-sm text-gray-700">Use "Imprimir" para abrir diretamente a janela de impressão</p>
+              <p className="text-sm text-gray-700">Use &quot;Imprimir&quot; para abrir diretamente a janela de impressão</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#D4AF37] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">4</div>
-              <p className="text-sm text-gray-700">Selecione "Salvar como PDF" na impressora para arquivo digital</p>
+              <p className="text-sm text-gray-700">Selecione &quot;Salvar como PDF&quot; na impressora para arquivo digital</p>
             </div>
           </div>
         </div>

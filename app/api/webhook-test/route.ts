@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
@@ -67,8 +68,8 @@ export async function POST(request: NextRequest) {
       const patientPhoneNormalized = patient.phone.replace(/\D/g, '')
 
       if (patientPhoneNormalized.includes(last11) ||
-          patientPhoneNormalized.includes(last9) ||
-          patientPhoneNormalized.includes(last8)) {
+        patientPhoneNormalized.includes(last9) ||
+        patientPhoneNormalized.includes(last8)) {
         jsResult = patient
         console.log('✅ JAVASCRIPT ENCONTROU:', jsResult)
         break

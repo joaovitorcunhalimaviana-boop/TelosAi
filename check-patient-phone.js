@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Script para verificar telefone do paciente no banco
  * Execute: node check-patient-phone.js

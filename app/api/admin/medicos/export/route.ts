@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -98,11 +99,12 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ error: "Formato inválido" }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error exporting medicos:", error);
+    const message = error instanceof Error ? error.message : "Erro ao exportar médicos";
     return NextResponse.json(
-      { error: error.message || "Erro ao exportar médicos" },
-      { status: error.message === "Acesso negado. Apenas administradores." ? 403 : 500 }
+      { error: message },
+      { status: message === "Acesso negado. Apenas administradores." ? 403 : 500 }
     );
   }
 }

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { applyTemplateToSurgery, validateTemplate, TemplateData } from "@/lib/template-utils"
+import { validateTemplate, TemplateData } from "@/lib/template-utils"
 
 // ============================================
 // POST - Apply template to patient's surgery

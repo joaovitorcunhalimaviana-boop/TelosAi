@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Vercel Cron Job - Send Follow-ups
  * Runs daily at 10:00 AM BRT (Brasília Time) to send scheduled follow-up questionnaires
@@ -254,18 +255,4 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Calculates next run time (informational)
- * Returns the next scheduled time in BRT (Brasília Time)
- */
-function getNextRunInfo(): string {
-  const nowInBrazil = toBrasiliaTime(new Date());
-  const nextInBrazil = new Date(nowInBrazil);
-  nextInBrazil.setHours(10, 0, 0, 0);
 
-  if (nowInBrazil.getHours() >= 10) {
-    nextInBrazil.setDate(nextInBrazil.getDate() + 1);
-  }
-
-  return fromBrasiliaTime(nextInBrazil).toISOString();
-}

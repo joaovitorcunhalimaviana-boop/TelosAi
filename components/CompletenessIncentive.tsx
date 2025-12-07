@@ -53,27 +53,6 @@ export function CompletenessIncentive({
     .reverse()
     .find(([threshold]) => currentCompletion >= parseInt(threshold))?.[1] || motivationalMessages[0]
 
-  // Check for milestone reached
-  useEffect(() => {
-    const milestones = [40, 60, 80, 100]
-    const reachedMilestone = milestones.find(
-      m => currentCompletion >= m && previousCompletion < m
-    )
-
-    if (reachedMilestone) {
-      setShowMilestone(true)
-
-      // Trigger confetti for 100%
-      if (reachedMilestone === 100 && showConfetti) {
-        triggerConfetti()
-      }
-
-      setTimeout(() => setShowMilestone(false), 3000)
-    }
-
-    setPreviousCompletion(currentCompletion)
-  }, [currentCompletion, previousCompletion, showConfetti])
-
   const triggerConfetti = () => {
     const duration = 3000
     const end = Date.now() + duration
@@ -100,6 +79,27 @@ export function CompletenessIncentive({
     }
     frame()
   }
+
+  // Check for milestone reached
+  useEffect(() => {
+    const milestones = [40, 60, 80, 100]
+    const reachedMilestone = milestones.find(
+      m => currentCompletion >= m && previousCompletion < m
+    )
+
+    if (reachedMilestone) {
+      setTimeout(() => setShowMilestone(true), 0)
+
+      // Trigger confetti for 100%
+      if (reachedMilestone === 100 && showConfetti) {
+        triggerConfetti()
+      }
+
+      setTimeout(() => setShowMilestone(false), 3000)
+    }
+
+    setPreviousCompletion(currentCompletion)
+  }, [currentCompletion, previousCompletion, showConfetti])
 
   // Get unlocked and locked benefits
   const allBenefitLevels = [20, 40, 60, 80, 100]

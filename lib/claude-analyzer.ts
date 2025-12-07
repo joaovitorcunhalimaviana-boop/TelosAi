@@ -222,6 +222,7 @@ export async function analyzePatientMessage(
       };
 
       protocolsSection += `${categoryNames[category] || category.toUpperCase()}:\n`;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (protocols as any[]).forEach((p: any) => {
         protocolsSection += `• ${p.title}: ${p.content}\n`;
       });

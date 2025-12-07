@@ -20,6 +20,7 @@ export default function PatientRegistrationExample() {
   } | null>(null)
 
   // Example: After successful patient registration
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePatientRegistration = async (formData: any) => {
     try {
       // Your existing patient registration logic

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
@@ -243,20 +244,7 @@ export async function GET(
         ? allSurgeries.reduce((a, b) => a + b.dataCompleteness, 0) / allSurgeries.length
         : 0;
 
-    // Chi-square test for categorical variables
-    const chiSquareTest = (observed: number[][], expected: number[][]) => {
-      let chiSquare = 0;
-      for (let i = 0; i < observed.length; i++) {
-        for (let j = 0; j < observed[i].length; j++) {
-          const obs = observed[i][j];
-          const exp = expected[i][j];
-          if (exp > 0) {
-            chiSquare += Math.pow(obs - exp, 2) / exp;
-          }
-        }
-      }
-      return chiSquare;
-    };
+
 
     // T-test for continuous variables (simplified)
     const tTest = (group1: number[], group2: number[]) => {

@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Packer } from 'docx';
-import { generatePublicationDocument, generateAbstract, generateMethodsText, formatPValue, formatStatisticalText } from '@/lib/word-export';
+import { generatePublicationDocument, generateAbstract, generateMethodsText } from '@/lib/word-export';
 import { ResearchPDFGenerator } from '@/lib/pdf-export';
-import { getTemplateById } from '@/lib/export-templates';
 
 /**
  * POST /api/export-research/report
@@ -203,32 +202,32 @@ export async function POST(request: NextRequest) {
             ],
             rows: config.sections.demographics
               ? [
-                  [
-                    'Pain Day 1, M (SD)',
-                    ...groupsData.map((g) => `${g.outcomes.avgPainDay1.toFixed(1)} (1.8)`),
-                    '.234',
-                  ],
-                  [
-                    'Pain Day 7, M (SD)',
-                    ...groupsData.map((g) => `${g.outcomes.avgPainDay7.toFixed(1)} (1.5)`),
-                    '< .001***',
-                  ],
-                  [
-                    'Pain Day 30, M (SD)',
-                    ...groupsData.map((g) => `${g.outcomes.avgPainDay30.toFixed(1)} (1.2)`),
-                    '< .001***',
-                  ],
-                  [
-                    'Recovery time (days)',
-                    ...groupsData.map((g) => `${g.outcomes.avgRecoveryDays.toFixed(0)}`),
-                    '.002**',
-                  ],
-                  [
-                    'Satisfaction (0-10)',
-                    ...groupsData.map((g) => `${g.outcomes.satisfactionScore.toFixed(1)}`),
-                    '.015*',
-                  ],
-                ]
+                [
+                  'Pain Day 1, M (SD)',
+                  ...groupsData.map((g) => `${g.outcomes.avgPainDay1.toFixed(1)} (1.8)`),
+                  '.234',
+                ],
+                [
+                  'Pain Day 7, M (SD)',
+                  ...groupsData.map((g) => `${g.outcomes.avgPainDay7.toFixed(1)} (1.5)`),
+                  '< .001***',
+                ],
+                [
+                  'Pain Day 30, M (SD)',
+                  ...groupsData.map((g) => `${g.outcomes.avgPainDay30.toFixed(1)} (1.2)`),
+                  '< .001***',
+                ],
+                [
+                  'Recovery time (days)',
+                  ...groupsData.map((g) => `${g.outcomes.avgRecoveryDays.toFixed(0)}`),
+                  '.002**',
+                ],
+                [
+                  'Satisfaction (0-10)',
+                  ...groupsData.map((g) => `${g.outcomes.satisfactionScore.toFixed(1)}`),
+                  '.015*',
+                ],
+              ]
               : [],
             note: 'M = Mean; SD = Standard Deviation.',
             significanceNotes: true,

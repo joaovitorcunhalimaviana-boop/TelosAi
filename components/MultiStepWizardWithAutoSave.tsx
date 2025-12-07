@@ -83,7 +83,7 @@ export function MultiStepWizardWithAutoSave({
   )
 
   // Update form field
-  const updateField = (field: keyof WizardFormData, value: any) => {
+  const updateField = (field: keyof WizardFormData, value: string) => {
     setFormData({ ...formData, [field]: value })
   }
 

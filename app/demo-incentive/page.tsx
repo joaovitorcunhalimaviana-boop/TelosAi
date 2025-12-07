@@ -140,12 +140,12 @@ export default function IncentiveDemoPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Dynamic Levels</h3>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>• 0-20%: "Dados básicos" - Red</li>
-                <li>• 21-40%: "Informações essenciais" - Orange</li>
-                <li>• 41-60%: "Bom progresso" - Yellow</li>
-                <li>• 61-80%: "Quase completo" - Light green</li>
-                <li>• 81-99%: "Excelente!" - Green</li>
-                <li>• 100%: "Cadastro perfeito!" - Gold with confetti</li>
+                <li>• 0-20%: &quot;Dados básicos&quot; - Red</li>
+                <li>• 21-40%: &quot;Informações essenciais&quot; - Orange</li>
+                <li>• 41-60%: &quot;Bom progresso&quot; - Yellow</li>
+                <li>• 61-80%: &quot;Quase completo&quot; - Light green</li>
+                <li>• 81-99%: &quot;Excelente!&quot; - Green</li>
+                <li>• 100%: &quot;Cadastro perfeito!&quot; - Gold with confetti</li>
               </ul>
             </div>
 
@@ -177,7 +177,7 @@ export default function IncentiveDemoPage() {
           <h2 className="text-2xl font-semibold mb-4 text-gray-900">Integration Example</h2>
 
           <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`import { CompletenessIncentive } from '@/components/CompletenessIncentive'
+            {`import { CompletenessIncentive } from '@/components/CompletenessIncentive'
 import { MilestoneReward } from '@/components/MilestoneReward'
 import { useState } from 'react'
 

@@ -15,6 +15,7 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { motion } from "framer-motion"
 import { ScaleOnHover } from "@/components/animations"
+import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts"
 import type { PatientCard as PatientCardType, SurgeryType } from "@/app/dashboard/actions"
 
 interface PatientCardProps {
@@ -104,7 +105,7 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
     >
       <ScaleOnHover scale={1.02}>
         <Card
-          className={`border-2 hover:shadow-lg transition-all ${getRiskBorderClass(riskLevel)} relative ${isCritical ? 'bg-red-50 border-l-4 border-l-red-600' : ''}`}
+          className={`glass-card border-none hover-lift-tech transition-all ${getRiskBorderClass(riskLevel)} relative ${isCritical ? 'bg-red-50/90 border-l-4 border-l-red-600' : 'bg-white/80'}`}
           role="article"
           aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
           data-tutorial="patient-card"
@@ -249,6 +250,34 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
                         </ul>
                       )}
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sparkline de Dor */}
+              {patient.painHistory && patient.painHistory.length > 0 && (
+                <div className="mt-4 mb-2">
+                  <div className="flex justify-between items-center mb-1 px-1">
+                    <span className="text-xs font-medium text-gray-500">Dor Recente</span>
+                    <span className="text-xs font-bold text-[#0A2647] bg-gray-100 px-1.5 py-0.5 rounded">
+                      {patient.painHistory[patient.painHistory.length - 1]?.value ?? 0}/10
+                    </span>
+                  </div>
+                  <div className="h-12 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={patient.painHistory}>
+                        <YAxis domain={[0, 10]} hide />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#0A2647"
+                          strokeWidth={2}
+                          dot={{ r: 2, fill: "#D4AF37", strokeWidth: 0 }}
+                          activeDot={{ r: 4 }}
+                          isAnimationActive={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
               )}

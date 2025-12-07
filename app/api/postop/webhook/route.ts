@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * WhatsApp Webhook Handler
  * Recebe mensagens e eventos do WhatsApp Business API
@@ -327,7 +328,7 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
   const normalizedPhone = phone.replace(/\D/g, '');
 
   // Tentar encontrar por match exato
-  let patient = await prisma.patient.findFirst({
+  const patient = await prisma.patient.findFirst({
     where: {
       phone: {
         contains: normalizedPhone.slice(-9), // Últimos 9 dígitos
@@ -403,8 +404,8 @@ function parseResponseText(text: string): any {
   // Retenção urinária
   if (textLower.includes('urina') || textLower.includes('xixi')) {
     data.urinaryRetention = textLower.includes('não consigo') ||
-                            textLower.includes('dificuldade') ||
-                            textLower.includes('retenção');
+      textLower.includes('dificuldade') ||
+      textLower.includes('retenção');
 
     // Tentar extrair horas
     const hoursMatch = text.match(/(\d+)\s*h/i);
@@ -416,7 +417,7 @@ function parseResponseText(text: string): any {
   // Evacuação
   if (textLower.includes('evac') || textLower.includes('cocô')) {
     data.bowelMovement = !textLower.includes('não') &&
-                         !textLower.includes('ainda não');
+      !textLower.includes('ainda não');
   }
 
   // Náuseas/vômitos
@@ -444,16 +445,4 @@ function parseResponseText(text: string): any {
 /**
  * Valida assinatura do webhook (opcional - para segurança adicional)
  */
-function validateWebhookSignature(
-  payload: string,
-  signature: string
-): boolean {
-  // Implementar validação HMAC se necessário
-  // const crypto = require('crypto');
-  // const expectedSignature = crypto
-  //   .createHmac('sha256', process.env.WHATSAPP_APP_SECRET!)
-  //   .update(payload)
-  //   .digest('hex');
-  // return signature === expectedSignature;
-  return true;
-}
+

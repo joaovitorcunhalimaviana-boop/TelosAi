@@ -281,6 +281,7 @@ export function validateJSON(jsonString: string | null | undefined): boolean {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseJSONSafely<T = any>(
   jsonString: string | null | undefined,
   defaultValue: T = null as T

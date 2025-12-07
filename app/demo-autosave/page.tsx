@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -122,9 +123,9 @@ export default function AutoSaveDemoPage() {
                       <ol className="text-sm text-gray-700 space-y-2 list-decimal list-inside">
                         <li>Preencha alguns campos do formulário</li>
                         <li>
-                          Observe o indicador "Salvando..." aparecer no canto superior direito
+                          Observe o indicador &quot;Salvando...&quot; aparecer no canto superior direito
                         </li>
-                        <li>Após 2 segundos, verá "Salvo há X segundos"</li>
+                        <li>Após 2 segundos, verá &quot;Salvo há X segundos&quot;</li>
                         <li>
                           Recarregue a página (F5) - seus dados serão recuperados automaticamente
                         </li>
@@ -282,7 +283,7 @@ export default function AutoSaveDemoPage() {
                 Formato dos Dados Salvos
               </h4>
               <pre className="text-xs bg-white p-3 rounded border overflow-auto">
-{`{
+                {`{
   "version": "1.0.0",
   "timestamp": "2025-11-11T10:30:45.123Z",
   "data": {

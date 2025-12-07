@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -307,7 +308,7 @@ export async function PATCH(
       patientUpdateData.email = validatedData.email;
 
     // Start transaction
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       // Update patient
       const updatedPatient = await tx.patient.update({
         where: { id },

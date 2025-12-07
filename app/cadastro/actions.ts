@@ -1,79 +1,89 @@
 "use server"
 
-import { redirect } from "next/navigation"
+import { createFollowUpSchedule } from "@/lib/follow-up-scheduler"
 import { prisma } from '@/lib/prisma'
-import { fromBrasiliaTime } from '@/lib/date-utils'
-import { predictComplicationRisk } from '@/lib/ml-prediction'
-import { invalidateAllDashboardData } from '@/lib/cache-helpers'
+import { parseDateStringToBrasiliaTime } from '@/lib/date-utils'
+import { auth } from '@/lib/auth'
 
-interface QuickPatientData {
-  userId: string
+// Tipos para os dados dos pacientes
+interface SimplifiedPatientData {
   name: string
+  dateOfBirth?: string // Opcional
   phone: string
-  email?: string // Added: Optional email field
-  surgeryType: "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
+  email?: string
+  surgeryType: string // String simples
   surgeryDate: string
+  notes?: string
+  age?: number // Opcional
+  hospital?: string // Novo campo
 }
 
-export async function createQuickPatient(data: QuickPatientData) {
+interface CompletePatientData extends SimplifiedPatientData {
+  sex: "Masculino" | "Feminino" | "Outro"
+  cpf?: string
+  dateOfBirth: string // Obrigatório para completo
+  age: number // Obrigatório para completo
+}
+
+import { invalidateAllDashboardData } from '@/lib/cache-helpers'
+import { predictComplicationRisk } from '@/lib/ml-prediction'
+
+/**
+ * Cadastro Simplificado (Médicos comuns)
+ * Apenas dados básicos, sem campos de pesquisa
+ */
+export async function createSimplifiedPatient(data: SimplifiedPatientData) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Você precisa estar autenticado para cadastrar pacientes.",
+      };
+    }
+    const userId = session.user.id;
+
     // 1. Criar o paciente
     const patient = await prisma.patient.create({
       data: {
-        userId: data.userId,
+        userId,
         name: data.name,
         phone: data.phone,
-        email: data.email && data.email.trim() !== "" ? data.email : null, // Added: Save email if provided, null otherwise
-        // Dados opcionais ficam em branco por enquanto
+        email: data.email || null,
+        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+        age: data.age || null,
+        sex: null, // Não coletado no formulário simplificado
         cpf: null,
-        dateOfBirth: null,
-        age: null,
-        sex: null,
       },
     })
 
     // 2. Criar a cirurgia vinculada ao paciente
     // Converter a data do formulário (horário de Brasília) para UTC
-    const surgeryDate = fromBrasiliaTime(new Date(data.surgeryDate))
+    const surgeryDate = parseDateStringToBrasiliaTime(data.surgeryDate)
     const surgery = await prisma.surgery.create({
       data: {
-        userId: data.userId,
+        userId,
         patientId: patient.id,
         type: data.surgeryType,
         date: surgeryDate,
+        hospital: data.hospital || "Clínica", // Padrão "Clínica"
         dataCompleteness: 20, // 20% conforme especificado
         status: "active",
       },
     })
 
     // 3. Criar os 7 follow-ups agendados (D+1, D+2, D+3, D+5, D+7, D+10, D+14)
-    const followUpDays = [1, 2, 3, 5, 7, 10, 14]
-
-    const followUpsData = followUpDays.map((dayNumber) => {
-      const scheduledDate = new Date(surgeryDate)
-      scheduledDate.setDate(scheduledDate.getDate() + dayNumber)
-
-      return {
-        userId: data.userId,
-        surgeryId: surgery.id,
-        patientId: patient.id,
-        dayNumber,
-        scheduledDate,
-        status: "pending" as const,
-      }
-    })
-
-    // Criar todos os follow-ups de uma vez
-    await prisma.followUp.createMany({
-      data: followUpsData,
+    await createFollowUpSchedule({
+      patientId: patient.id,
+      surgeryId: surgery.id,
+      surgeryDate,
+      userId,
     })
 
     // 4. INTEGRAÇÃO ML: Predizer risco de complicações (não-bloqueante)
-    // Esta chamada é assíncrona e não afeta o sucesso do cadastro
     predictComplicationRisk(surgery, patient)
-      .then(async (prediction) => {
+      .then(async (prediction: any) => {
         if (prediction) {
-          // Salvar predição no banco de dados
           await prisma.surgery.update({
             where: { id: surgery.id },
             data: {
@@ -84,20 +94,13 @@ export async function createQuickPatient(data: QuickPatientData) {
               mlFeatures: JSON.stringify(prediction.features),
             },
           })
-
-          console.log('[ML] Predição salva com sucesso:', {
-            surgeryId: surgery.id,
-            risk: prediction.risk,
-            level: prediction.level,
-          })
         }
       })
-      .catch((error) => {
-        // Log de erro mas NÃO falha o cadastro
+      .catch((error: any) => {
         console.error('[ML] Erro ao salvar predição (não-crítico):', error)
       })
 
-    // Invalidate dashboard cache (novo paciente e cirurgia)
+    // 5. Invalidate dashboard cache
     invalidateAllDashboardData()
 
     return {
@@ -120,6 +123,137 @@ export async function createQuickPatient(data: QuickPatientData) {
     return {
       success: false,
       error: "Erro ao cadastrar paciente. Tente novamente.",
+    }
+  }
+}
+
+/**
+ * Cadastro Completo (Admin)
+ * Todos os campos incluindo dados para pesquisa científica
+ */
+export async function createCompletePatient(data: CompletePatientData) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Você precisa estar autenticado para cadastrar pacientes.",
+      };
+    }
+    const userId = session.user.id;
+
+    // 1. Criar o paciente com TODOS os dados
+    const patient = await prisma.patient.create({
+      data: {
+        userId,
+        name: data.name,
+        phone: data.phone,
+        email: data.email || null,
+        dateOfBirth: new Date(data.dateOfBirth),
+        age: data.age,
+        sex: data.sex,
+        cpf: data.cpf || null,
+      },
+    })
+
+    // 2. Criar a cirurgia vinculada ao paciente
+    // Converter a data do formulário (horário de Brasília) para UTC
+    const surgeryDate = parseDateStringToBrasiliaTime(data.surgeryDate)
+    const surgery = await prisma.surgery.create({
+      data: {
+        userId,
+        patientId: patient.id,
+        type: data.surgeryType,
+        date: surgeryDate,
+        hospital: data.hospital || null,
+        dataCompleteness: 40, // 40% porque tem mais dados preenchidos
+        status: "active",
+      },
+    })
+
+    // 3. Criar os 7 follow-ups agendados
+    await createFollowUpSchedule({
+      patientId: patient.id,
+      surgeryId: surgery.id,
+      surgeryDate,
+      userId,
+    })
+
+    // 4. Incrementar contador de pacientes do usuário
+    // TODO: Descomentar quando User estiver no banco
+    // await prisma.user.update({
+    //   where: { id: userId },
+    //   data: { currentPatients: { increment: 1 } }
+    // })
+
+    // 5. Se tiver observações, criar uma nota (implementar modelo Notes no futuro)
+    if (data.notes) {
+      // TODO: Implementar modelo Notes
+      console.log("Observações do paciente:", data.notes)
+    }
+
+    return {
+      success: true,
+      patientId: patient.id,
+      surgeryId: surgery.id,
+      message: "Paciente cadastrado com sucesso! Acompanhamento ativado. Dados para pesquisa incluídos.",
+      forResearch: true,
+    }
+  } catch (error) {
+    console.error("Erro ao criar paciente:", error)
+
+    // Verificar se é um erro de duplicação
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
+      if (error.message.includes("cpf")) {
+        return {
+          success: false,
+          error: "Já existe um paciente cadastrado com este CPF.",
+        }
+      }
+      return {
+        success: false,
+        error: "Já existe um paciente cadastrado com este WhatsApp.",
+      }
+    }
+
+    return {
+      success: false,
+      error: "Erro ao cadastrar paciente. Tente novamente.",
+    }
+  }
+}
+
+/**
+ * Verificar se o usuário atingiu o limite de pacientes
+ */
+export async function checkPatientLimit(userId: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        currentPatients: true,
+        maxPatients: true,
+      },
+    })
+
+    if (!user) {
+      return { success: false, error: "Usuário não encontrado" }
+    }
+
+    const hasReachedLimit = user.currentPatients >= user.maxPatients
+
+    return {
+      success: true,
+      currentPatients: user.currentPatients,
+      maxPatients: user.maxPatients,
+      hasReachedLimit,
+      canAddMore: !hasReachedLimit,
+    }
+  } catch (error) {
+    console.error("Erro ao verificar limite de pacientes:", error)
+    return {
+      success: false,
+      error: "Erro ao verificar limite de pacientes",
     }
   }
 }

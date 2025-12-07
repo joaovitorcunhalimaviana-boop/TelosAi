@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Verifica TODOS os dados relacionados ao follow-up atual
  */

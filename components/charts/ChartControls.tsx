@@ -63,7 +63,7 @@ export function ChartControls({
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setLocalSettings({ ...settings, ...parsed });
+        setTimeout(() => setLocalSettings({ ...settings, ...parsed }), 0);
         onSettingsChange({ ...settings, ...parsed });
       } catch (e) {
         console.error('Failed to parse saved chart settings', e);
@@ -176,6 +176,7 @@ export function ChartControls({
               </Label>
               <Select
                 value={localSettings.colorScheme}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onValueChange={(value: any) => updateSetting('colorScheme', value)}
               >
                 <SelectTrigger>
@@ -237,6 +238,7 @@ export function ChartControls({
                 </Label>
                 <Select
                   value={localSettings.axisScaleX}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onValueChange={(value: any) => updateSetting('axisScaleX', value)}
                 >
                   <SelectTrigger>
@@ -256,6 +258,7 @@ export function ChartControls({
                 </Label>
                 <Select
                   value={localSettings.axisScaleY}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onValueChange={(value: any) => updateSetting('axisScaleY', value)}
                 >
                   <SelectTrigger>

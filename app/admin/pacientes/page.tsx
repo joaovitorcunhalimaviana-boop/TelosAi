@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -47,11 +47,7 @@ export default function PacientesPage() {
   const [surgeryTypeFilter, setSurgeryTypeFilter] = useState("all");
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    loadPacientes();
-  }, [search, surgeryTypeFilter]);
-
-  const loadPacientes = async () => {
+  const loadPacientes = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -71,7 +67,11 @@ export default function PacientesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, surgeryTypeFilter]);
+
+  useEffect(() => {
+    loadPacientes();
+  }, [loadPacientes]);
 
   const handleExport = async (format: "csv" | "excel") => {
     setExporting(true);
@@ -81,9 +81,8 @@ export default function PacientesPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `pacientes-${new Date().toISOString().split("T")[0]}.${
-        format === "csv" ? "csv" : "xlsx"
-      }`;
+      a.download = `pacientes-${new Date().toISOString().split("T")[0]}.${format === "csv" ? "csv" : "xlsx"
+        }`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -178,13 +177,12 @@ export default function PacientesPage() {
               <div className="flex items-center gap-2">
                 <div className="w-16 bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${
-                      value.dataCompleteness >= 80
-                        ? "bg-green-500"
-                        : value.dataCompleteness >= 40
+                    className={`h-2 rounded-full ${value.dataCompleteness >= 80
+                      ? "bg-green-500"
+                      : value.dataCompleteness >= 40
                         ? "bg-yellow-500"
                         : "bg-red-500"
-                    }`}
+                      }`}
                     style={{ width: `${value.dataCompleteness}%` }}
                   />
                 </div>
@@ -329,14 +327,14 @@ export default function PacientesPage() {
               <div className="text-2xl font-bold text-yellow-600">
                 {pacientes.length > 0
                   ? Math.round(
-                      pacientes
-                        .filter((p) => p.lastSurgery !== null)
-                        .reduce(
-                          (sum, p) => sum + (p.lastSurgery?.dataCompleteness || 0),
-                          0
-                        ) /
-                        pacientes.filter((p) => p.lastSurgery !== null).length || 1
-                    )
+                    pacientes
+                      .filter((p) => p.lastSurgery !== null)
+                      .reduce(
+                        (sum, p) => sum + (p.lastSurgery?.dataCompleteness || 0),
+                        0
+                      ) /
+                    pacientes.filter((p) => p.lastSurgery !== null).length || 1
+                  )
                   : 0}
                 %
               </div>

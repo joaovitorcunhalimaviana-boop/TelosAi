@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { QuickPatientForm } from "@/components/QuickPatientForm"
-import { PostRegistrationModal } from "@/components/PostRegistrationModal"
-import { createQuickPatient } from "./actions"
-import { PrivateLayout } from "@/components/PrivateLayout"
+import { CadastroPacienteSimplificado } from "@/components/CadastroPacienteSimplificado"
+import { createSimplifiedPatient } from "./actions"
+import { TelosHeader } from "@/components/TelosHeader"
 import {
   Card,
   CardContent,
@@ -14,153 +11,130 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { toast } from "sonner"
+import { motion } from "framer-motion"
 
-// Types
-interface PatientData {
-  id: string
+// Tipo para os dados do formulário simplificado
+interface SimplifiedPatientData {
   name: string
+  dateOfBirth?: string
+  phone: string
+  email?: string
+  surgeryType: string
+  surgeryDate: string
+  notes?: string
+  age?: number
+  hospital?: string
 }
 
 export default function CadastroPage() {
   const router = useRouter()
-  const { data: session } = useSession()
 
-  // State for modal control
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [patientData, setPatientData] = useState<PatientData | null>(null)
+  const handleSimplifiedSubmit = async (data: SimplifiedPatientData) => {
+    try {
+      const result = await createSimplifiedPatient(data)
 
-  const handleSubmit = async (data: {
-    name: string
-    phone: string
-    surgeryType: "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
-    surgeryDate: string
-  }) => {
-    // Get userId from session
-    if (!session?.user?.id) {
-      alert('Erro: Usuário não autenticado')
-      return
-    }
+      if (result.success) {
+        toast.success("Paciente cadastrado com sucesso!", {
+          description: "Acompanhamento ativado."
+        })
 
-    // Call the Server Action
-    const result = await createQuickPatient({
-      ...data,
-      userId: session.user.id
-    })
-
-    if (result.success && result.patientId) {
-      // Store patient data and open modal
-      setPatientData({
-        id: result.patientId,
-        name: data.name,
+        // Redireciona para o dashboard com mensagem de sucesso
+        router.push(
+          `/dashboard?success=true&message=${encodeURIComponent(
+            result.message || 'Paciente cadastrado com sucesso'
+          )}`
+        )
+      } else {
+        toast.error("Erro ao cadastrar", {
+          description: result.error || 'Erro desconhecido'
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error("Erro inesperado", {
+        description: "Não foi possível completar o cadastro."
       })
-      setIsModalOpen(true)
-    } else {
-      // Show error
-      alert(result.error || 'Erro ao cadastrar paciente')
     }
-  }
-
-  const handleModalClose = () => {
-    setIsModalOpen(false)
-    // Redirect to dashboard after modal closes
-    router.push('/dashboard')
-  }
-
-  const handleAssignSuccess = () => {
-    // Optional callback when patient is assigned to research
-    // Can be used for additional tracking or analytics
-    console.log('Patient successfully assigned to research')
   }
 
   return (
-    <PrivateLayout>
-      <div className="w-full">
-        {/* Header */}
-        <div id="registration-header" className="text-center mb-12 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-4">
-            <svg
-              className="w-4 h-4 text-telos-gold"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="text-sm font-medium text-telos-blue">
-              Cadastro Express com IA
+    <div className="min-h-screen bg-gray-50/50">
+      <TelosHeader />
+
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Header Section with Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10 space-y-3"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#0A2647]/5 border border-[#0A2647]/10 rounded-full mb-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-telos-gold opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-telos-gold"></span>
+            </span>
+            <span className="text-xs font-semibold text-[#0A2647] tracking-wide uppercase">
+              Concierge Digital
             </span>
           </div>
 
-          <h1 className="text-4xl lg:text-5xl font-bold text-telos-blue mb-3">
-            Cadastro Express
+          <h1 className="text-3xl lg:text-4xl font-bold text-[#0A2647] tracking-tight">
+            Novo Paciente
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ative o acompanhamento pós-operatório em{" "}
-            <span className="text-telos-gold font-semibold">30 segundos</span>
+          <p className="text-lg text-gray-500 max-w-xl mx-auto font-light">
+            Inicie o acompanhamento automatizado em menos de 1 minuto.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Card principal centralizado */}
-        <div className="max-w-2xl mx-auto">
-          <Card className="shadow-2xl border-2 border-gray-100">
-            <CardHeader className="border-b bg-gradient-to-r from-[#F5F7FA] to-white">
-              <CardTitle className="text-2xl text-telos-blue">Dados do Paciente</CardTitle>
-              <CardDescription className="text-base text-gray-600">
-                Preencha os dados essenciais para iniciar o acompanhamento automatizado
+        {/* Main Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="max-w-3xl mx-auto"
+        >
+          <Card className="shadow-xl shadow-gray-200/50 border-0 overflow-hidden ring-1 ring-gray-100">
+            <CardHeader className="bg-white border-b border-gray-100 pb-6 pt-8 px-8">
+              <CardTitle className="text-xl text-[#0A2647] font-semibold flex items-center gap-2">
+                Dados Essenciais
+              </CardTitle>
+              <CardDescription className="text-gray-500 text-sm">
+                A IA cuidará do resto. Preencha apenas o básico agora.
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="pt-6">
-              <QuickPatientForm onSubmit={handleSubmit} />
+            <CardContent className="bg-white p-8">
+              <CadastroPacienteSimplificado onSubmit={handleSimplifiedSubmit} />
             </CardContent>
           </Card>
 
-          {/* Informações adicionais */}
-          <div className="mt-8 text-center space-y-4">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                O que acontece após o cadastro?
-              </h3>
-              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 text-left max-w-lg mx-auto">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-                  <span>Paciente é cadastrado no sistema com 20% de completude de dados</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-                  <span>7 follow-ups automáticos são agendados (D+1, D+2, D+3, D+5, D+7, D+10, D+14)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-                  <span>WhatsApp será usado para enviar questionários e receber respostas</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">✓</span>
-                  <span>IA analisa as respostas e alerta sobre red flags</span>
-                </li>
-              </ul>
+          {/* Additional Info Footer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center"
+          >
+            <div className="p-4 rounded-xl bg-white border border-gray-100 shadow-sm">
+              <div className="text-2xl mb-1">🤖</div>
+              <h3 className="font-semibold text-[#0A2647] text-sm">Cadastro Instantâneo</h3>
+              <p className="text-xs text-gray-500 mt-1">Dados básicos ativam o sistema imediatamente</p>
             </div>
-
-            <p className="text-sm text-muted-foreground">
-              Você poderá completar os dados restantes (80%) posteriormente no dashboard.
-            </p>
-          </div>
-        </div>
+            <div className="p-4 rounded-xl bg-white border border-gray-100 shadow-sm">
+              <div className="text-2xl mb-1">📅</div>
+              <h3 className="font-semibold text-[#0A2647] text-sm">Agenda Automática</h3>
+              <p className="text-xs text-gray-500 mt-1">7 follow-ups agendados automaticamente</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white border border-gray-100 shadow-sm">
+              <div className="text-2xl mb-1">🔍</div>
+              <h3 className="font-semibold text-[#0A2647] text-sm">Monitoramento 24/7</h3>
+              <p className="text-xs text-gray-500 mt-1">Red flags detectados pela IA em tempo real</p>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
-
-      {/* Post Registration Modal */}
-      {patientData && (
-        <PostRegistrationModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          patientId={patientData.id}
-          patientName={patientData.name}
-          onAssignSuccess={handleAssignSuccess}
-        />
-      )}
-    </PrivateLayout>
+    </div>
   )
 }

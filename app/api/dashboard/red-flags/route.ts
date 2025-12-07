@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
 
 // GET: Retorna red flags Critical ou High não visualizados ou visualizados há menos de 24h
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser()
 

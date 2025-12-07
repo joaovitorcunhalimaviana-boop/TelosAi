@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import {
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
     Object.assign(where, filters);
 
     // Apply completeness filter (requires a subquery approach)
-    let patientsQuery = prisma.patient.findMany({
+    const patientsQuery = prisma.patient.findMany({
       where,
       include: {
         comorbidities: {
@@ -143,13 +144,13 @@ export async function GET(request: NextRequest) {
         updatedAt: patient.updatedAt,
         surgery: latestSurgery
           ? {
-              id: latestSurgery.id,
-              type: latestSurgery.type,
-              date: latestSurgery.date,
-              hospital: latestSurgery.hospital,
-              status: latestSurgery.status,
-              dataCompleteness: latestSurgery.dataCompleteness,
-            }
+            id: latestSurgery.id,
+            type: latestSurgery.type,
+            date: latestSurgery.date,
+            hospital: latestSurgery.hospital,
+            status: latestSurgery.status,
+            dataCompleteness: latestSurgery.dataCompleteness,
+          }
           : null,
         comorbidityCount: patient.comorbidities.length,
         medicationCount: patient.medications.length,
@@ -215,6 +216,16 @@ export async function POST(request: NextRequest) {
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         age: body.age,
         sex: body.sex,
+        surgeries: body.surgeryType ? {
+          create: {
+            type: body.surgeryType,
+            date: body.surgeryDate ? new Date(body.surgeryDate) : new Date(),
+            hospital: body.hospital,
+            userId: userId, // Explicitly link surgery to the doctor
+            status: 'scheduled',
+            dataCompleteness: 0,
+          }
+        } : undefined,
       },
       include: {
         surgeries: true,

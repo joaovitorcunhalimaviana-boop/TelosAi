@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 
 import { unstable_cache } from "next/cache"
@@ -33,6 +34,7 @@ export interface PatientCard {
   researchGroup: string | null // Research group name
   researchDataComplete: boolean // Research fields validation
   researchMissingFieldsCount: number // Number of missing required fields
+  painHistory: { day: string; value: number }[]
   latestResponse?: {
     riskLevel: "low" | "medium" | "high" | "critical"
   } | null
@@ -230,7 +232,7 @@ const getCachedDashboardPatientsInternal = unstable_cache(
           orderBy: {
             dayNumber: "desc",
           },
-          take: 1,
+          take: 7,
           include: {
             responses: {
               orderBy: {
@@ -269,13 +271,35 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         }
       }
 
-      // Determinar o dia do follow-up
+      // Determinar o dia do follow-up e histórico de dor
       let followUpDay = "D+0"
       if (latestFollowUp) {
         followUpDay = `D+${latestFollowUp.dayNumber}`
       } else if (daysSinceSurgery > 0) {
         followUpDay = `D+${daysSinceSurgery}`
       }
+
+      // Extract pain history for sparkline
+      const painHistory = surgery.followUps
+        .filter(f => f.responses.length > 0)
+        .map(f => {
+          const response = f.responses[0];
+          let painValue = 0;
+          try {
+            const data = JSON.parse(response.questionnaireData);
+            // Tenta encontrar valor de dor em vários formatos possíveis
+            painValue = Number(data.pain || data.dor || data.nivel_dor || 0);
+          } catch (e) {
+            painValue = 0;
+          }
+          return {
+            day: `D+${f.dayNumber}`,
+            value: isNaN(painValue) ? 0 : painValue,
+            dayNumber: f.dayNumber // Auxiliar para ordenação
+          };
+        })
+        .sort((a, b) => a.dayNumber - b.dayNumber) // Ordenar cronologicamente
+        .map(({ day, value }) => ({ day, value }));
 
       // Validate research fields if participant
       let researchDataComplete = true
@@ -312,6 +336,7 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         researchGroup: surgery.patient.researchGroup,
         researchDataComplete,
         researchMissingFieldsCount,
+        painHistory, // Adicionado campo de histórico de dor
         latestResponse: latestResponse ? {
           riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical"
         } : null,
@@ -334,7 +359,7 @@ const getCachedDashboardPatientsInternal = unstable_cache(
   },
   ['dashboard-patients-list'],
   {
-    revalidate: 1, // Revalidate every second to ensure fresh data
+    revalidate: 1,
     tags: ['dashboard', 'dashboard-patients']
   }
 )
@@ -489,4 +514,54 @@ export async function getResearchStats(userId?: string): Promise<{
     nonParticipants,
     researches: researchStats,
   }
+}
+
+export interface RecentActivity {
+  id: string
+  patientId: string
+  patientName: string
+  surgeryType: string
+  dayNumber: number
+  riskLevel: 'low' | 'medium' | 'high' | 'critical'
+  summary: string
+  timestamp: Date
+  isRead: boolean
+}
+
+export async function getRecentPatientActivity(limit = 10): Promise<RecentActivity[]> {
+  const responses = await prisma.followUpResponse.findMany({
+    take: limit,
+    orderBy: {
+      createdAt: 'desc'
+    },
+    include: {
+      followUp: {
+        include: {
+          patient: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          surgery: {
+            select: {
+              type: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  return responses.map(r => ({
+    id: r.id,
+    patientId: r.followUp.patient.id,
+    patientName: r.followUp.patient.name,
+    surgeryType: r.followUp.surgery.type,
+    dayNumber: r.followUp.dayNumber,
+    riskLevel: r.riskLevel as 'low' | 'medium' | 'high' | 'critical',
+    summary: r.aiAnalysis || 'Resposta recebida',
+    timestamp: r.createdAt,
+    isRead: r.doctorAlerted
+  }))
 }

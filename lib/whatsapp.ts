@@ -199,8 +199,8 @@ export async function sendTemplate(
     const formattedPhone = formatPhoneNumber(to);
     const token = await getWhatsAppToken();
 
-    // Template "day1" usa idioma "en" (erro na criação), outros usam "pt_BR"
-    const language = languageCode || (templateName === 'day1' ? 'en' : 'pt_BR');
+    // Template uses "pt_BR" for all cases now
+    const language = languageCode || 'pt_BR';
 
     const payload: WhatsAppMessage = {
       to: formattedPhone,
@@ -344,8 +344,8 @@ export async function sendFollowUpQuestionnaire(
       ];
     }
 
-    // day1 usa 'en' (erro no template), otherdays usa 'pt_BR'
-    const language = templateName === 'day1' ? 'en' : 'pt_BR';
+    // All templates use 'pt_BR'
+    const language = 'pt_BR';
 
     console.log('📱 Sending template message:', {
       template: templateName,
@@ -445,20 +445,7 @@ export function isValidWhatsAppNumber(phone: string): boolean {
   return formatted.length >= 12 && formatted.length <= 13;
 }
 
-/**
- * Retorna saudação apropriada baseada no horário
- */
-function getGreeting(): string {
-  const hour = new Date().getHours();
 
-  if (hour >= 5 && hour < 12) {
-    return 'Bom dia';
-  } else if (hour >= 12 && hour < 18) {
-    return 'Boa tarde';
-  } else {
-    return 'Boa noite';
-  }
-}
 
 /**
  * Marca mensagem como lida

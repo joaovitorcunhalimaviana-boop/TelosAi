@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // API Route para exportação de dados científicos
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
@@ -32,11 +33,11 @@ export async function POST(request: NextRequest) {
           // Filtro de data
           ...(filters.startDate || filters.endDate
             ? {
-                date: {
-                  ...(filters.startDate ? { gte: new Date(filters.startDate) } : {}),
-                  ...(filters.endDate ? { lte: new Date(filters.endDate) } : {}),
-                },
-              }
+              date: {
+                ...(filters.startDate ? { gte: new Date(filters.startDate) } : {}),
+                ...(filters.endDate ? { lte: new Date(filters.endDate) } : {}),
+              },
+            }
             : {}),
 
           // Filtro de tipo de cirurgia
@@ -61,11 +62,11 @@ export async function POST(request: NextRequest) {
             // Filtros de cirurgia
             ...(filters.startDate || filters.endDate
               ? {
-                  date: {
-                    ...(filters.startDate ? { gte: new Date(filters.startDate) } : {}),
-                    ...(filters.endDate ? { lte: new Date(filters.endDate) } : {}),
-                  },
-                }
+                date: {
+                  ...(filters.startDate ? { gte: new Date(filters.startDate) } : {}),
+                  ...(filters.endDate ? { lte: new Date(filters.endDate) } : {}),
+                },
+              }
               : {}),
 
             ...(filters.surgeryTypes && filters.surgeryTypes.length > 0

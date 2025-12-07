@@ -252,7 +252,7 @@ export async function POST(
 
     // Perform regression
     let result: SimpleRegressionResult | MultipleRegressionResult;
-    let interpretations: string[] = [];
+    const interpretations: string[] = [];
     let modelInterpretation: string = '';
 
     if (modelType === 'simple' && predictors.length === 1) {

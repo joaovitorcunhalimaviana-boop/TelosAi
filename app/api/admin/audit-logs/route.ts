@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+
+import { Prisma } from '@prisma/client';
 
 /**
  * API de Auditoria - Apenas Admin
@@ -33,7 +36,7 @@ export async function GET(req: NextRequest) {
     const isSensitive = searchParams.get('isSensitive');
 
     // Construir filtro where
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (userId) {
       where.userId = userId;

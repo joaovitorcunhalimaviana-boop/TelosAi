@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,7 +14,7 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const order = searchParams.get("order") || "desc";
 
-    const where: any = {
+    const where: Prisma.UserWhereInput = {
       role: "medico",
     };
 
@@ -79,11 +81,12 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(medicosWithBilling);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching medicos:", error);
+    const message = error instanceof Error ? error.message : "Erro ao buscar médicos";
     return NextResponse.json(
-      { error: error.message || "Erro ao buscar médicos" },
-      { status: error.message === "Acesso negado. Apenas administradores." ? 403 : 500 }
+      { error: message },
+      { status: message === "Acesso negado. Apenas administradores." ? 403 : 500 }
     );
   }
 }

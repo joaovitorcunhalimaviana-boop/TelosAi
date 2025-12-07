@@ -62,6 +62,8 @@ const nextConfig: NextConfig = {
       },
     },
   }),
+
+
 };
 
 export default withSentryConfig(nextConfig, {

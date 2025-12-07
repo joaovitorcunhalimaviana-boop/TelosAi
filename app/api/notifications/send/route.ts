@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * API Endpoint: Send Push Notification
  * Envia notificações push para usuários específicos

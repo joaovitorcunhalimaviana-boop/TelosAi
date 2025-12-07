@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -164,11 +165,10 @@ export function ApplyTemplateDialog({
                     return (
                       <div
                         key={template.id}
-                        className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                          selectedTemplate === template.id
+                        className={`border rounded-lg p-4 cursor-pointer transition-colors ${selectedTemplate === template.id
                             ? "border-blue-600 bg-blue-50"
                             : "border-gray-200 hover:border-gray-300"
-                        }`}
+                          }`}
                         onClick={() => setSelectedTemplate(template.id)}
                       >
                         <div className="flex items-start gap-3">

@@ -738,7 +738,7 @@ export default function StyleGuidePage() {
         <div className="mt-16 pt-8 border-t border-gray-200">
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              Telos.AI Design System v1.0.0 " Last Updated: November 11, 2025
+              Telos.AI Design System v1.0.0 &quot; Last Updated: November 11, 2025
             </p>
             <div className="flex justify-center gap-6 text-sm">
               <a href="/dashboard" className="text-telos-blue-500 hover:underline">Dashboard</a>

@@ -139,9 +139,8 @@ export function FollowUpStatus({
                               disabled={resendingId === followUp.id || isLoading}
                             >
                               <RefreshCw
-                                className={`h-4 w-4 ${
-                                  resendingId === followUp.id ? 'animate-spin' : ''
-                                }`}
+                                className={`h-4 w-4 ${resendingId === followUp.id ? 'animate-spin' : ''
+                                  }`}
                               />
                               {followUp.status === 'pending' ? 'Enviar' : 'Reenviar'}
                             </Button>
@@ -247,7 +246,7 @@ function StatusIcon({
  * Status Badge Component
  */
 function StatusBadge({ status }: { status: string }) {
-  const variants: Record<string, { label: string; variant: any }> = {
+  const variants: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
     pending: { label: 'Pendente', variant: 'secondary' },
     sent: { label: 'Enviado', variant: 'default' },
     responded: { label: 'Respondido', variant: 'default' },

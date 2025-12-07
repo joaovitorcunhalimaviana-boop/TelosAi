@@ -28,6 +28,7 @@ import { DescricaoCompletaSection } from "@/components/edit/DescricaoCompletaSec
 // New patient components
 import { ConversationTimeline } from "@/components/patient/ConversationTimeline"
 import { PainEvolutionChart } from "@/components/patient/PainEvolutionChart"
+import { AIRecoveryInsights } from "@/components/patient/AIRecoveryInsights"
 
 interface PatientData {
   id: string
@@ -180,11 +181,31 @@ export default function EditPatientPage() {
       const response = await fetch(`/api/paciente/${params.id}`)
       if (!response.ok) throw new Error("Paciente não encontrado")
 
-      const data = await response.json()
-      setPatient(data)
+      const result = await response.json()
+
+      if (!result.success || !result.data) {
+        throw new Error("Formato de dados inválido")
+      }
+
+      const patientData = result.data
+
+      // Transform surgeries array to surgery object (take the latest one)
+      if (patientData.surgeries && patientData.surgeries.length > 0) {
+        patientData.surgery = patientData.surgeries[0]
+      } else {
+        // Fallback for patients with no surgery (avoids undefined crash)
+        patientData.surgery = {
+          id: "",
+          type: "não informado",
+          date: new Date(),
+          dataCompleteness: 0
+        }
+      }
+
+      setPatient(patientData)
 
       // Calculate completed sections
-      const completed = calculateCompletedSections(data)
+      const completed = calculateCompletedSections(patientData)
       setCompletedSections(completed)
     } catch (error) {
       console.error("Error loading patient:", error)
@@ -326,6 +347,13 @@ export default function EditPatientPage() {
           />
         ) : (
           <SurgeryRiskNotAvailable className="mb-6" />
+        )}
+
+        {/* AI Recovery Insights */}
+        {patient?.surgery?.id && (
+          <div className="mb-6">
+            <AIRecoveryInsights surgeryId={patient.surgery.id} />
+          </div>
         )}
 
         {/* Pain Evolution Chart */}

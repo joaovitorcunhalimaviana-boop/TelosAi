@@ -12,7 +12,7 @@ import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date
 /**
  * POST - Manually send today's follow-ups
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Verificar se usuário está autenticado
     const user = await getCurrentUser();

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * WEBHOOK BYPASS - EMERGÊNCIA
  * Este endpoint substitui temporariamente o webhook principal

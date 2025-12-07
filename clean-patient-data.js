@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Remove TODOS os dados do paciente João Vítor do banco de PRODUÇÃO
  */

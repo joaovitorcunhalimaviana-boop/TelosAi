@@ -21,7 +21,7 @@ export default function PrivacidadePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introdução</h2>
             <p className="text-gray-700 mb-4">
-              A Telos.AI ("nós", "nosso" ou "nossa") opera o sistema de acompanhamento
+              A Telos.AI (&quot;nós&quot;, &quot;nosso&quot; ou &quot;nossa&quot;) opera o sistema de acompanhamento
               pós-operatório que utiliza inteligência artificial para monitorar pacientes
               após procedimentos cirúrgicos.
             </p>
@@ -42,9 +42,9 @@ export default function PrivacidadePage() {
               <li><strong>Dados de Identificação:</strong> Nome completo, CPF, data de nascimento</li>
               <li><strong>Dados de Contato:</strong> Número de telefone, e-mail</li>
               <li><strong>Dados de Saúde:</strong> Tipo de cirurgia, data da cirurgia, sintomas relatados,
-                  respostas a questionários pós-operatórios, medicamentos utilizados</li>
+                respostas a questionários pós-operatórios, medicamentos utilizados</li>
               <li><strong>Dados de Comunicação:</strong> Mensagens trocadas via WhatsApp,
-                  registros de acompanhamento</li>
+                registros de acompanhamento</li>
             </ul>
           </section>
 
@@ -55,11 +55,11 @@ export default function PrivacidadePage() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li><strong>Tutela da saúde (Art. 11, II, LGPD):</strong> Procedimentos realizados
-                  por profissionais de saúde para proteção da vida</li>
+                por profissionais de saúde para proteção da vida</li>
               <li><strong>Consentimento (Art. 7, I, LGPD):</strong> Para comunicações e
-                  funcionalidades não essenciais</li>
+                funcionalidades não essenciais</li>
               <li><strong>Execução de contrato (Art. 7, V, LGPD):</strong> Prestação de serviços
-                  médicos contratados</li>
+                médicos contratados</li>
             </ul>
             <p className="text-gray-700 mt-4">
               <strong>Finalidades:</strong> Monitoramento pós-operatório, detecção precoce de
@@ -74,7 +74,7 @@ export default function PrivacidadePage() {
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li><strong>Equipe médica responsável:</strong> Cirurgiões e profissionais envolvidos
-                  no seu tratamento</li>
+                no seu tratamento</li>
               <li><strong>Prestadores de serviço essenciais:</strong>
                 <ul className="list-circle pl-6 mt-2 space-y-1">
                   <li>Meta Platforms (WhatsApp Business API) - apenas para transmissão de mensagens</li>
@@ -182,8 +182,8 @@ export default function PrivacidadePage() {
             <p className="text-gray-700 mt-4">
               Você também pode contatar a Autoridade Nacional de Proteção de Dados (ANPD) em
               caso de reclamações não resolvidas: <a href="https://www.gov.br/anpd"
-              className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
-              www.gov.br/anpd
+                className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                www.gov.br/anpd
               </a>
             </p>
           </section>

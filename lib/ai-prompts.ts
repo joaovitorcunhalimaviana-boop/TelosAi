@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * AI Prompts - Sistema de Prompts para Análise Claude AI
  * Prompts específicos para cada tipo de cirurgia e dia de pós-operatório

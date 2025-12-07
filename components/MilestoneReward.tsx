@@ -73,27 +73,6 @@ export function MilestoneReward({
   const data = milestoneData[milestone]
   const Icon = data.icon
 
-  useEffect(() => {
-    if (isVisible) {
-      setShow(true)
-
-      // Trigger confetti
-      if (milestone === 100) {
-        triggerBigConfetti()
-      } else {
-        triggerSmallConfetti()
-      }
-
-      // Auto close
-      if (autoClose) {
-        const timer = setTimeout(() => {
-          handleClose()
-        }, autoCloseDelay)
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [isVisible, milestone, autoClose, autoCloseDelay])
-
   const handleClose = () => {
     setShow(false)
     setTimeout(() => {
@@ -137,6 +116,27 @@ export function MilestoneReward({
     frame()
   }
 
+  useEffect(() => {
+    if (isVisible) {
+      setShow(true)
+
+      // Trigger confetti
+      if (milestone === 100) {
+        triggerBigConfetti()
+      } else {
+        triggerSmallConfetti()
+      }
+
+      // Auto close
+      if (autoClose) {
+        const timer = setTimeout(() => {
+          handleClose()
+        }, autoCloseDelay)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isVisible, milestone, autoClose, autoCloseDelay])
+
   return (
     <AnimatePresence>
       {show && (
@@ -172,24 +172,24 @@ export function MilestoneReward({
                   <motion.div
                     key={i}
                     initial={{
-                      x: Math.random() * 400 - 200,
+                      x: (i * 20) - 200, // Deterministic x
                       y: -20,
                       opacity: 0
                     }}
                     animate={{
                       y: 500,
                       opacity: [0, 1, 0],
-                      rotate: Math.random() * 360
+                      rotate: i * 18 // Deterministic rotation
                     }}
                     transition={{
-                      duration: Math.random() * 2 + 2,
+                      duration: 2 + (i % 3), // Deterministic duration
                       repeat: Infinity,
-                      delay: Math.random() * 2,
+                      delay: i * 0.1, // Deterministic delay
                       ease: "linear"
                     }}
                     className="absolute text-2xl"
                   >
-                    {milestone === 100 ? '🏆' : ['⭐', '✨', '🎉'][Math.floor(Math.random() * 3)]}
+                    {milestone === 100 ? '🏆' : ['⭐', '✨', '🎉'][i % 3]}
                   </motion.div>
                 ))}
               </div>

@@ -23,7 +23,6 @@ import { NextRequest, NextResponse } from 'next/server'
 const CRON_SECRET = process.env.CRON_SECRET!
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN
 const WHATSAPP_TOKEN_CREATED_AT = process.env.WHATSAPP_TOKEN_CREATED_AT // ISO date string
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'telos.ia@gmail.com'
 
 // WhatsApp tokens expiram em 60 dias (segundo a Meta)
 const TOKEN_EXPIRY_DAYS = 60

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { detectRedFlags, getRiskLevel, formatRedFlags } from '@/lib/red-flags';
+import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
 import { analyzeFollowUpResponse, type QuestionnaireData, type PatientData } from '@/lib/anthropic';
 
 export const runtime = 'nodejs';

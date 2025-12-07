@@ -21,13 +21,13 @@ export default function TermosPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Aceitação dos Termos</h2>
             <p className="text-gray-700 mb-4">
-              Ao utilizar o sistema Telos.AI de acompanhamento pós-operatório ("Serviço"),
-              você concorda com estes Termos de Serviço ("Termos"). Se você não concorda
+              Ao utilizar o sistema Telos.AI de acompanhamento pós-operatório (&quot;Serviço&quot;),
+              você concorda com estes Termos de Serviço (&quot;Termos&quot;). Se você não concorda
               com estes termos, não utilize o Serviço.
             </p>
             <p className="text-gray-700">
               Estes Termos constituem um contrato juridicamente vinculante entre você
-              ("Paciente" ou "Usuário") e os profissionais de saúde que utilizam o
+              (&quot;Paciente&quot; ou &quot;Usuário&quot;) e os profissionais de saúde que utilizam o
               sistema Telos.AI.
             </p>
           </section>
@@ -54,11 +54,11 @@ export default function TermosPage() {
               </p>
               <ul className="list-disc pl-6 text-gray-700 space-y-2">
                 <li>O sistema utiliza IA para triagem inicial, mas todas as decisões médicas
-                    são tomadas por profissionais de saúde qualificados</li>
+                  são tomadas por profissionais de saúde qualificados</li>
                 <li>Em caso de sintomas graves ou emergência, procure atendimento médico
-                    presencial imediatamente ou ligue para 192 (SAMU)</li>
+                  presencial imediatamente ou ligue para 192 (SAMU)</li>
                 <li>As respostas fornecidas pelo sistema são orientações gerais e não
-                    constituem diagnóstico ou prescrição médica</li>
+                  constituem diagnóstico ou prescrição médica</li>
               </ul>
             </div>
           </section>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -44,11 +44,7 @@ export default function MedicosPage() {
   const [planFilter, setPlanFilter] = useState("all");
   const [exporting, setExporting] = useState(false);
 
-  useEffect(() => {
-    loadMedicos();
-  }, [search, planFilter]);
-
-  const loadMedicos = async () => {
+  const loadMedicos = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -68,7 +64,11 @@ export default function MedicosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, planFilter]);
+
+  useEffect(() => {
+    loadMedicos();
+  }, [loadMedicos]);
 
   const handleExport = async (format: "csv" | "excel") => {
     setExporting(true);
@@ -78,9 +78,8 @@ export default function MedicosPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `medicos-${new Date().toISOString().split("T")[0]}.${
-        format === "csv" ? "csv" : "xlsx"
-      }`;
+      a.download = `medicos-${new Date().toISOString().split("T")[0]}.${format === "csv" ? "csv" : "xlsx"
+        }`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {

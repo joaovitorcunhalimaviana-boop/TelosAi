@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -39,7 +40,6 @@ export async function GET(
     // Get query parameters
     const { searchParams } = new URL(request.url);
     const outcome = searchParams.get('outcome') || 'complication'; // complication, pain_resolution, return_to_activities
-    const groups = searchParams.get('groups')?.split(',') || [];
 
     // Fetch research
     const research = await prisma.research.findUnique({

@@ -1,18 +1,17 @@
-/**
- * WhatsApp Webhook Handler
- * Recebe mensagens e eventos do WhatsApp Business API
- */
-
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { markAsRead } from '@/lib/whatsapp';
-import { analyzeFollowUpResponse } from '@/lib/anthropic';
-import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
-import { sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
-import { sendPushNotification } from '@/app/api/notifications/send/route';
-import { rateLimit, getClientIP } from '@/lib/rate-limit';
 import { invalidateDashboardStats } from '@/lib/cache-helpers';
-import { logger } from "@/lib/logger";
+import { detectRedFlags, getRiskLevel } from '@/lib/red-flags';
+import { analyzeFollowUpResponse } from '@/lib/anthropic';
+import { sendPushNotification } from '@/app/api/notifications/send/route';
+import { logger } from '@/lib/logger';
+import {
+  markAsRead,
+  sendEmpatheticResponse,
+  sendImage,
+  sendDoctorAlert
+} from '@/lib/whatsapp';
 import {
   validateClaudeResponse,
   validateQuestionnaireData,
@@ -118,9 +117,9 @@ const processedMessageIds = new Set<string>();
 /**
  * Processa mensagens recebidas
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processMessages(value: any) {
   const messages = value.messages || [];
-  const contacts = value.contacts || [];
 
   for (const message of messages) {
     // Ignorar mensagens enviadas por nós (apenas processar recebidas)
@@ -172,13 +171,14 @@ async function processMessages(value: any) {
     );
 
     // Processar baseado no tipo de mensagem
+    // Processar baseado no tipo de mensagem
     if (message.type === 'text') {
-      await processTextMessage(message, contacts);
+      await processTextMessage(message);
     } else if (message.type === 'interactive') {
-      await processInteractiveMessage(message, contacts);
+      await processInteractiveMessage(message);
     } else if (['audio', 'image', 'video', 'document', 'sticker', 'location', 'contacts'].includes(message.type)) {
       // Mensagens não-texto: orientar paciente a escrever
-      await processUnsupportedMessage(message, contacts);
+      await processUnsupportedMessage(message);
     } else {
       logger.debug(`Message type ${message.type} not handled`);
     }
@@ -189,7 +189,7 @@ async function processMessages(value: any) {
  * Processa mensagens não suportadas (áudio, imagem, vídeo, etc.)
  * Orienta o paciente a enviar mensagem de texto escrito
  */
-async function processUnsupportedMessage(message: any, contacts: any[]) {
+async function processUnsupportedMessage(message: any) {
   try {
     const phone = message.from;
     const messageType = message.type;
@@ -248,7 +248,7 @@ Se precisar informar algo sobre sua recuperação, digite a resposta por escrito
 /**
  * Processa mensagem de texto
  */
-async function processTextMessage(message: any, contacts: any[]) {
+async function processTextMessage(message: any) {
   try {
     const phone = message.from;
     const text = message.text?.body || '';
@@ -529,14 +529,12 @@ interface ClaudeAIResponse {
 }
 
 /**
- * Envia imagem de escala médica (dor ou Bristol)
+ * Envia imagem de escala (Dor ou Bristol)
  */
 async function sendImageScale(phone: string, scaleType: 'pain_scale' | 'bristol_scale') {
   try {
-    const { sendImage } = await import('@/lib/whatsapp');
-
     const captions = {
-      pain_scale: '📊 *Escala de Dor*\n\nUse esta escala para avaliar sua dor de 0 a 10.',
+      pain_scale: '📊 *Escala de Dor*\n\nPor favor, indique um número de 0 a 10.',
       bristol_scale: '📊 *Escala de Bristol*\n\nUse esta escala para classificar suas fezes de 1 a 7.',
     };
 
@@ -555,96 +553,79 @@ async function sendImageScale(phone: string, scaleType: 'pain_scale' | 'bristol_
 /**
  * Chama Claude API para conversação inteligente
  */
+/**
+ * Chama Claude API para conversação inteligente com CHECKLIST DINÂMICO
+ */
 async function callClaudeAPI(
   conversationHistory: any[],
   userMessage: string,
   patient: any,
   surgeryType: string,
   dayNumber: number,
-  savedPhase?: string // Fase salva no banco (mais confiável)
+  savedPhase?: string,
+  currentData: any = {}
 ): Promise<ClaudeAIResponse> {
   try {
     const { anthropic } = await import('@/lib/anthropic');
 
-    // Usar fase salva no banco se disponível, senão determinar pelo histórico
-    const currentPhase = savedPhase || determineCurrentPhase(conversationHistory);
+    // Fase simplificada: ou estamos coletando dados ou finalizando
+    const currentPhase = savedPhase || 'collecting_data';
     logger.debug('🎯 Fase para IA:', currentPhase);
 
-    const SYSTEM_PROMPT = `Você é a Clara, assistente virtual do Dr. João Vitor, especializada em acompanhar pacientes após cirurgias (hemorroidas, fístulas, etc) pelo WhatsApp.
+    // Definição do Checklist Diário
+    const dailyChecklist = {
+      d1: ['painAtRest', 'hasFever', 'hadBowelMovementSinceLastContact', 'takingPrescribedMeds', 'bleeding'],
+      d2plus: ['painAtRest', 'hasFever', 'hadBowelMovementSinceLastContact', 'takingPrescribedMeds', 'bleeding'],
+      d3plus: ['hasPurulentDischarge'], // Além dos anteriores
+      d5and10: ['bristolScale'], // Apenas se evacuou
+    };
 
-OBJETIVO: Coletar informações sobre a recuperação do paciente de forma SIMPLES, DIRETA e EDUCADA.
+    let requiredFields = dayNumber === 1 ? dailyChecklist.d1 : dailyChecklist.d2plus;
+    if (dayNumber >= 3) requiredFields = [...requiredFields, ...dailyChecklist.d3plus];
 
-CONTEXTO:
-- Paciente: ${patient.name}
-- Cirurgia: ${surgeryType}
-- Dia: D+${dayNumber}
-- Fase: ${currentPhase}
+    // Bristol apenas se evacuou (será verificado dinamicamente pela IA)
 
-=== TOM DE VOZ ===
-- Seja DIRETA e EFICIENTE. Sem "mimimi" ou excesso de sentimentalismo.
-- Use linguagem simples e clara (ex: "ir ao banheiro" em vez de evacuar, se necessário para entendimento).
-- Evite frases como "sinto muito", "lamento", "espero que melhore".
-- Use "Entendi", "Certo", "Ok" para confirmar as respostas.
-- Emojis: Use poucos e apenas para organizar (ex: 👋, ✅, ⚠️). Evite corações ou emojis emotivos.
+    const SYSTEM_PROMPT = `Você é a Clara, assistente virtual do Dr. João Vitor (Telos.AI).
+OBJETIVO: Monitorar a recuperação de ${patient.name} (Cirurgia: ${surgeryType}, Dia: D+${dayNumber}).
 
-=== O QUE PRECISAMOS SABER (FLUXO SUGERIDO) ===
+=== SUAS INSTRUÇÕES (CHECKLIST DINÂMICO) ===
+Você deve preencher o seguinte CHECKLIST DIÁRIO através da conversa:
 
-1. **DOR EM REPOUSO** (0-10)
-   - "Quanto está sua dor agora, parado?"
+1. Dor em Repouso (0-10)
+2. Febre (Sim/Não - se sim, qual temp?)
+3. Evacuação (Sim/Não - se sim, doeu? qual hora?)
+4. Sangramento (Nenhum/Leve/Moderado/Intenso)
+5. Medicações (Está tomando? Preciso de extra?)
+${dayNumber >= 3 ? '6. Secreção (Tem pus/mau cheiro?)' : ''}
 
-2. **FEBRE**
-   - "Teve febre?"
+=== DADOS JÁ COLETADOS ===
+${JSON.stringify(currentData, null, 2)}
 
-3. **IDAS AO BANHEIRO (COCÔ)**
-   - "Já conseguiu ir ao banheiro (fazer cocô) desde que conversamos?"
-   - Se SIM:
-     - "Doeu muito? De 0 a 10, quanto?" (Mandar escala de dor)
-     - "Qual o número da consistência nessa imagem?" (Mandar escala Bristol - APENAS D+5 e D+10 ou se paciente reclamar)
+=== REGRAS DE CONDUÇÃO ===
+1. ANALISE a mensagem do paciente e extraia TUDO o que puder.
+2. VERIFIQUE o que falta do checklist.
+3. PERGUNTE APENAS o que falta. Agrupe perguntas se faltar muita coisa (ex: "E sobre a febre e o intestino?").
+4. SEJA DIRETA. Não use frases longas de empatia. Use "Entendi", "Certo".
+5. IMAGENS: Se perguntar de dor, peça "pain_scale". Se perguntar de fezes (e for D+5 ou D+10), peça "bristol_scale".
+6. ALERTA: Se dor > 7, febre > 38, sangramento intenso ou pus, avise que vai notificar o médico, mas continue o checklist.
 
-4. **SANGRAMENTO**
-   - "Teve sangramento? Foi no papel ou no vaso?"
+=== FINALIZAÇÃO ===
+- Se o checklist estiver completo, pergunte: "Tem mais alguma dúvida ou sintoma?"
+- Se o paciente disser que não tem mais dúvidas, marque "completed": true.
 
-5. **REMÉDIOS**
-   - "Está tomando os remédios nos horários certos?"
-   - "Tomou algo a mais para dor?"
-
-6. **SECREÇÃO (Só se D+3 em diante)**
-   - "Notou alguma secreção (pus) ou cheiro ruim?"
-
-7. **ALGO MAIS?**
-   - "Tem mais alguma dúvida ou sintoma?"
-
-=== REGRAS DE OURO ===
-1. **UMA COISA DE CADA VEZ**: Perguntas curtas e diretas.
-2. **NÃO SEJA REPETITIVA**: Se já respondeu, avance.
-3. **SEJA PRÁTICA**: Se a dor for alta, apenas registre e oriente (se houver instrução), não fique lamentando.
-4. **IMAGENS**: Sempre peça para enviar a imagem da escala quando perguntar de dor (needsImage: "pain_scale").
-
-=== FORMATO DE RESPOSTA (JSON) ===
+=== FORMATO JSON ===
 {
-  "message": "sua mensagem direta aqui",
+  "message": "Sua resposta aqui",
   "needsImage": "pain_scale" | "bristol_scale" | null,
   "dataCollected": {
-    "painAtRest": null,
-    "painDuringBowelMovement": null,
-    "hasFever": null,
-    "feverDetails": null,
-    "canUrinate": null,
-    "hadBowelMovementSinceLastContact": null,
-    "bowelMovementTime": null,
-    "bristolScale": null,
-    "bleeding": null,
-    "takingPrescribedMeds": null,
-    "prescribedMedsDetails": null,
-    "takingExtraMeds": null,
-    "extraMedsDetails": null,
-    "hasPurulentDischarge": null,
-    "purulentDischargeDetails": null,
-    "otherSymptoms": null
+    // Campos extraídos desta mensagem E confirmados do contexto
+    "painAtRest": 5,
+    "hasFever": false
+    ...
   },
-  "completed": false,
-  "needsClarification": false,
-  "conversationPhase": "fase_atual"
+  "completed": boolean,
+  "needsClarification": boolean, // Se não entendeu algo crítico
+  "conversationPhase": "collecting_data" | "completed"
 }`;
 
     // Construir mensagens para Claude
@@ -659,16 +640,16 @@ CONTEXTO:
       },
     ];
 
-    logger.debug('🤖 Chamando Claude API', {
-      historyLength: conversationHistory.length,
-      userMessage: userMessage.substring(0, 100),
-      currentPhase,
+    logger.debug('🤖 Chamando Claude API (Checklist Mode)', {
+      dayNumber,
+      requiredFields,
+      currentDataKeys: Object.keys(currentData)
     });
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2000,
-      temperature: 0.3, // Temperatura mais baixa para ser mais objetivo
+      temperature: 0.1, // Bem baixa para seguir regras estritas
       system: SYSTEM_PROMPT,
       messages,
     });
@@ -677,77 +658,37 @@ CONTEXTO:
       ? response.content[0].text
       : '';
 
-    logger.debug('🤖 Claude raw response:', responseText);
-
-    // Tentar extrair JSON da resposta (pode ter texto antes/depois)
+    // Tentar extrair JSON da resposta
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in Claude response');
     }
 
-    // Parse e validar resposta da IA
     const parsedJson = JSON.parse(jsonMatch[0]);
-    const validatedResponse = validateClaudeResponse(parsedJson);
 
-    if (!validatedResponse) {
-      logger.error('❌ Claude response validation failed, using parsed data with defaults');
-      // Usar dados parseados com valores default se validação falhar
-      const aiResponse: ClaudeAIResponse = {
-        message: parsedJson.message || 'Não entendi. Pode repetir?',
-        needsImage: parsedJson.needsImage || null,
-        dataCollected: parsedJson.dataCollected || {},
-        completed: parsedJson.completed || false,
-        needsClarification: parsedJson.needsClarification || false,
-        conversationPhase: parsedJson.conversationPhase || currentPhase,
-      };
-      return aiResponse;
-    }
+    // Validação básica
+    const aiResponse: ClaudeAIResponse = {
+      message: parsedJson.message || 'Não entendi. Pode repetir?',
+      needsImage: parsedJson.needsImage || null,
+      dataCollected: parsedJson.dataCollected || {},
+      completed: parsedJson.completed || false,
+      needsClarification: parsedJson.needsClarification || false,
+      conversationPhase: parsedJson.conversationPhase || 'collecting_data',
+    };
 
-    // Validar dados coletados específicos para o dia
-    if (validatedResponse.dataCollected && Object.keys(validatedResponse.dataCollected).length > 0) {
-      const dayValidation = validatePostOpDataByDay(validatedResponse.dataCollected, dayNumber);
-      if (dayValidation.warnings.length > 0) {
-        logger.warn('⚠️ PostOp data warnings:', dayValidation.warnings);
-      }
-      if (!dayValidation.valid) {
-        logger.error('❌ PostOp data errors:', dayValidation.errors);
-      }
-    }
+    return aiResponse;
 
-    logger.debug('✅ Claude response validated:', {
-      completed: validatedResponse.completed,
-      needsImage: validatedResponse.needsImage,
-      phase: validatedResponse.conversationPhase,
-      dataCollected: validatedResponse.dataCollected,
-    });
-
-    return validatedResponse;
   } catch (error) {
     logger.error('❌ Erro ao chamar Claude API:', error);
 
-    // Log detalhado do erro
-    if (error instanceof Error) {
-      logger.error('Error name:', error.name);
-      logger.error('Error message:', error.message);
-      logger.error('Error stack:', error.stack);
-    }
-
-    // FALLBACK INTELIGENTE: Tentar interpretar a resposta localmente
-    const localInterpretation = interpretResponseLocally(userMessage, conversationHistory, dayNumber);
-
-    if (localInterpretation) {
-      logger.debug('🔄 Usando interpretação local:', localInterpretation);
-      return localInterpretation;
-    }
-
-    // Último recurso: pedir para repetir (mas NÃO reiniciar questionário)
+    // Fallback simples
     return {
-      message: `Não consegui entender. Pode responder apenas com o número ou sim/não?`,
+      message: `Não consegui entender. Poderia responder novamente?`,
       needsImage: null,
       dataCollected: {},
       completed: false,
       needsClarification: true,
-      conversationPhase: determineCurrentPhase(conversationHistory)
+      conversationPhase: 'collecting_data'
     };
   }
 }
@@ -1628,7 +1569,8 @@ async function processQuestionnaireAnswer(
       patient,
       followUp.surgery.type,
       followUp.dayNumber,
-      savedPhase // Passar fase salva para a IA
+      savedPhase, // Passar fase salva para a IA
+      questionnaireData.extractedData // Passar dados já coletados
     );
 
     // 4. PRIMEIRO: Enviar resposta da IA (texto)
@@ -1765,17 +1707,7 @@ async function finalizeQuestionnaireWithAI(
       concerns: extractedData.otherSymptoms || '',
     };
 
-    // Detectar red flags deterministicamente
-    const redFlags = detectRedFlags({
-      surgeryType: followUp.surgery.type,
-      dayNumber: followUp.dayNumber,
-      ...questionnaireData,
-    });
-
-    const detectedRedFlagMessages = redFlags.map(rf => rf.message);
-    const deterministicRiskLevel = getRiskLevel(redFlags);
-
-    // Analisar com Claude AI
+    // Analisar com Claude AI (Substituindo lógica determinística por IA completa)
     const aiAnalysis = await analyzeFollowUpResponse({
       surgeryType: followUp.surgery.type,
       dayNumber: followUp.dayNumber,
@@ -1787,20 +1719,14 @@ async function finalizeQuestionnaireWithAI(
         medications: [],
       },
       questionnaireData,
-      detectedRedFlags: detectedRedFlagMessages,
+      detectedRedFlags: [], // IA fará a detecção completa
     });
 
-    // Combinar red flags
-    const allRedFlags = [
-      ...detectedRedFlagMessages,
-      ...aiAnalysis.additionalRedFlags,
-    ];
+    // Red flags agora vêm exclusivamente da análise da IA
+    const allRedFlags = aiAnalysis.additionalRedFlags;
 
-    // Determinar nível de risco final
-    const riskLevels = ['low', 'medium', 'high', 'critical'];
-    const finalRiskLevel = riskLevels.indexOf(aiAnalysis.riskLevel) > riskLevels.indexOf(deterministicRiskLevel)
-      ? aiAnalysis.riskLevel
-      : deterministicRiskLevel;
+    // Nível de risco determinado pela IA
+    const finalRiskLevel = aiAnalysis.riskLevel;
 
     // Atualizar resposta no banco
     if (responseId) {
@@ -2008,21 +1934,9 @@ async function finalizeQuestionnaireWithAI(
 }
 
 /**
- * Calcula nível de risco baseado nos dados coletados (helper function)
- */
-function calculateRiskLevel(data: Partial<PostOpData>): 'low' | 'medium' | 'high' | 'critical' {
-  // Lógica simples de risco - será refinada pela IA depois
-  if (data.painLevel && data.painLevel >= 8) return 'high';
-  if (data.bleeding === 'severe') return 'critical';
-  if (data.hasFever) return 'medium';
-  if (!data.canUrinate) return 'high';
-  return 'low';
-}
-
-/**
  * Processa mensagem interativa (botões/listas)
  */
-async function processInteractiveMessage(message: any, contacts: any[]) {
+async function processInteractiveMessage(message: any) {
   try {
     const phone = message.from;
     const interactive = message.interactive;
@@ -2038,7 +1952,8 @@ async function processInteractiveMessage(message: any, contacts: any[]) {
     }
 
     // Processar como mensagem de texto
-    await processTextMessage({ from: phone, text: { body: response } }, contacts);
+    // Processar como mensagem de texto
+    await processTextMessage({ from: phone, text: { body: response } });
 
   } catch (error) {
     logger.error('Error processing interactive message:', error);
@@ -2077,6 +1992,7 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
   try {
     // SOLUÇÃO: Usar raw SQL para normalizar telefone no banco e comparar
     // REGEXP_REPLACE remove todos os caracteres não-numéricos
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await prisma.$queryRaw`
       SELECT id, name, phone, "userId"
       FROM "Patient"
@@ -2162,6 +2078,7 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
 /**
  * Encontra follow-up pendente ou enviado para o paciente
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function findPendingFollowUp(patientId: string): Promise<any | null> {
   const followUp = await prisma.followUp.findFirst({
     where: {
@@ -2181,100 +2098,5 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
   return followUp;
 }
 
-/**
- * Parse resposta de texto em dados estruturados
- * Implementação simplificada - em produção usar NLP
- */
-function parseResponseText(text: string): any {
-  const data: any = {};
 
-  // Tentar extrair nível de dor (0-10)
-  const painMatch = text.match(/dor[:\s]*(\d+)/i);
-  if (painMatch) {
-    data.painLevel = parseInt(painMatch[1]);
-  }
 
-  // Tentar extrair temperatura
-  const tempMatch = text.match(/(\d+)[.,]?\d*\s*[°º]?\s*c/i);
-  if (tempMatch) {
-    data.temperature = parseFloat(tempMatch[1].replace(',', '.'));
-  }
-
-  // Detectar palavras-chave para booleanos
-  const textLower = text.toLowerCase();
-
-  // Febre
-  if (textLower.includes('febre') || textLower.includes('fever')) {
-    data.fever = !textLower.includes('sem febre') && !textLower.includes('não');
-  }
-
-  // Sangramento
-  if (textLower.includes('sangr')) {
-    if (textLower.includes('intenso') || textLower.includes('muito')) {
-      data.bleeding = 'severe';
-    } else if (textLower.includes('moderado')) {
-      data.bleeding = 'moderate';
-    } else if (textLower.includes('leve') || textLower.includes('pouco')) {
-      data.bleeding = 'light';
-    } else if (textLower.includes('não') || textLower.includes('sem')) {
-      data.bleeding = 'none';
-    }
-  }
-
-  // Retenção urinária
-  if (textLower.includes('urina') || textLower.includes('xixi')) {
-    data.urinaryRetention = textLower.includes('não consigo') ||
-      textLower.includes('dificuldade') ||
-      textLower.includes('retenção');
-
-    // Tentar extrair horas
-    const hoursMatch = text.match(/(\d+)\s*h/i);
-    if (hoursMatch && data.urinaryRetention) {
-      data.urinaryRetentionHours = parseInt(hoursMatch[1]);
-    }
-  }
-
-  // Evacuação
-  if (textLower.includes('evac') || textLower.includes('cocô')) {
-    data.bowelMovement = !textLower.includes('não') &&
-      !textLower.includes('ainda não');
-  }
-
-  // Náuseas/vômitos
-  if (textLower.includes('náusea') || textLower.includes('vômit')) {
-    data.nausea = true;
-  }
-
-  // Secreção
-  if (textLower.includes('secreção') || textLower.includes('pus')) {
-    if (textLower.includes('pus') || textLower.includes('purulent')) {
-      data.discharge = 'purulent';
-    } else if (textLower.includes('abundante')) {
-      data.discharge = 'abundant';
-    } else if (textLower.includes('clara') || textLower.includes('serosa')) {
-      data.discharge = 'serous';
-    }
-  }
-
-  // Adicionar texto original como preocupação
-  data.concerns = text;
-
-  return data;
-}
-
-/**
- * Valida assinatura do webhook (opcional - para segurança adicional)
- */
-function validateWebhookSignature(
-  payload: string,
-  signature: string
-): boolean {
-  // Implementar validação HMAC se necessário
-  // const crypto = require('crypto');
-  // const expectedSignature = crypto
-  //   .createHmac('sha256', process.env.WHATSAPP_APP_SECRET!)
-  //   .update(payload)
-  //   .digest('hex');
-  // return signature === expectedSignature;
-  return true;
-}

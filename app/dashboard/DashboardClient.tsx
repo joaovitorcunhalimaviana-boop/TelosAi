@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   getDashboardStats,
   getDashboardPatients,
@@ -13,7 +12,7 @@ import {
   type SurgeryType,
   type ResearchStats,
 } from "./actions"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,35 +21,26 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import {
   AlertCircle,
-  FileText,
   Plus,
   Search,
   UserCheck,
   Users,
-  DollarSign,
-  Shield,
   FlaskConical,
-  MoreVertical,
-  Download,
-  HelpCircle,
-  BookOpen,
   Filter,
   X,
 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { FadeIn, SlideIn, StaggerChildren, StaggerItem } from "@/components/animations"
 import { AnimatePresence } from "framer-motion"
-// import { OnboardingChecklist } from "@/components/tutorial/OnboardingChecklist" // REMOVIDO: Checklist com bugs
-import { SimpleTour } from "@/components/tutorial/SimpleTour"
 import { useRedFlags } from "@/hooks/useRedFlags"
 import { RedFlagsCard } from "@/components/dashboard/RedFlagsCard"
 import { PatientCard, getSurgeryTypeLabel } from "@/components/dashboard/PatientCard"
 import { StatsCards } from "@/components/dashboard/StatsCards"
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
+import { SmartInbox } from "@/components/dashboard/SmartInbox"
 
 interface DashboardClientProps {
   userRole: string;
@@ -72,12 +62,11 @@ interface Research {
   groups: ResearchGroup[];
 }
 
-export default function DashboardClient({ userRole, userName }: DashboardClientProps) {
-  const router = useRouter()
+export default function DashboardClient({ userName }: DashboardClientProps) {
+
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [patients, setPatients] = useState<PatientCardData[]>([])
   const [loading, setLoading] = useState(true)
-  const [showTour, setShowTour] = useState(false)
 
   // Red Flags Hook
   const { redFlags, count: redFlagsCount, markAsViewed } = useRedFlags()
@@ -158,7 +147,21 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
     loadResearches()
   }, [])
 
-  const handleFilterChange = (key: keyof DashboardFilters, value: any) => {
+  // Load research stats
+  useEffect(() => {
+    async function loadResearchStats() {
+      try {
+        const stats = await getResearchStats()
+        setResearchStats(stats)
+      } catch (error: unknown) {
+        console.error('Error loading research stats:', error)
+      }
+    }
+
+    loadResearchStats()
+  }, [filters.researchFilter])
+
+  const handleFilterChange = (key: keyof DashboardFilters, value: DashboardFilters[keyof DashboardFilters]) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
@@ -239,86 +242,22 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
         <div id="dashboard-header" className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div className="flex items-center gap-3">
             <div>
-              <h1 className="text-4xl font-bold mb-2" style={{ color: '#0A2647' }}>
+              <h1 className="text-4xl font-bold mb-2 text-gradient-blue pb-1">
                 Dashboard Médico
               </h1>
               <p className="text-lg text-muted-foreground">
-                Acompanhamento Pós-Operatório - {userName}
+                Workstation Clínica - {userName}
               </p>
             </div>
-            <Button
-              onClick={() => {
-                console.log('🎯 Tour button clicked! Opening SimpleTour...');
-                setShowTour(true);
-              }}
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              aria-label="Iniciar tour guiado pelo dashboard"
-              aria-expanded={showTour}
-            >
-              <HelpCircle className="h-5 w-5" aria-hidden="true" />
-            </Button>
           </div>
 
           {/* Botões de Ação */}
           <div className="flex flex-wrap gap-3 items-center">
-            {/* Menu de Ferramentas */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="gap-2 hover:bg-gray-50 border-gray-200 text-gray-700"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                  <span className="hidden sm:inline">Ferramentas</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">AÇÕES RÁPIDAS</div>
-                <DropdownMenuItem asChild>
-                  <Link href="/cadastro" className="flex items-center cursor-pointer">
-                    <UserCheck className="mr-2 h-4 w-4" />
-                    Cadastro Express
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/exportar" className="flex items-center cursor-pointer">
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar Dados
-                  </Link>
-                </DropdownMenuItem>
-
-                <div className="my-1 h-px bg-gray-200" />
-
-                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">RECURSOS</div>
-                <DropdownMenuItem asChild>
-                  <Link href="/templates" className="flex items-center cursor-pointer">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Templates
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/termos" className="flex items-center cursor-pointer">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Central de Termos
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard/ajuda" className="flex items-center cursor-pointer">
-                    <HelpCircle className="mr-2 h-4 w-4" />
-                    Central de Ajuda
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             {/* Novo Paciente - Highlighted with Golden Color */}
             <Link href="/cadastro">
               <Button
                 size="lg"
-                className="shadow-md font-semibold hover:opacity-90 transition-all hover:scale-105 active:scale-95"
-                style={{ backgroundColor: '#D4AF37', color: '#0A2647' }}
+                className="shadow-lg shadow-yellow-500/20 font-semibold hover:opacity-90 transition-all hover:scale-105 active:scale-95 text-base px-8 h-12 hover-glow bg-telos-gold text-telos-blue"
                 data-tutorial="new-patient-btn"
               >
                 <Plus className="mr-2 h-5 w-5" />
@@ -342,6 +281,11 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
           count={redFlagsCount}
           onView={markAsViewed}
         />
+
+        {/* Smart Inbox Section */}
+        <div className="mb-6">
+          <SmartInbox />
+        </div>
 
         {/* Compact Filter Toolbar */}
         <SlideIn direction="down" delay={0.7}>
@@ -508,7 +452,7 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
 
                 {searchInput && (
                   <Badge variant="secondary" className="gap-1 bg-gray-100 text-gray-700">
-                    "{searchInput}"
+                    &quot;{searchInput}&quot;
                     <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchInput("")} />
                   </Badge>
                 )}
@@ -709,13 +653,6 @@ export default function DashboardClient({ userRole, userName }: DashboardClientP
           </DialogContent>
         </Dialog>
 
-        {/* SimpleTour - custom tour replacing driver.js */}
-        {showTour && (
-          <SimpleTour onClose={() => {
-            console.log('🎯 SimpleTour closed!');
-            setShowTour(false);
-          }} />
-        )}
       </div>
     </div >
   )

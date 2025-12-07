@@ -8,6 +8,7 @@ export interface Column<T> {
   key: string;
   label: string;
   sortable?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render?: (value: any, row: T) => React.ReactNode;
   width?: string;
 }
@@ -21,6 +22,7 @@ interface DataTableProps<T> {
 
 type SortDirection = "asc" | "desc" | null;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function DataTable<T extends Record<string, any>>({
   columns,
   data,
@@ -77,9 +79,8 @@ export function DataTable<T extends Record<string, any>>({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    column.width || ""
-                  }`}
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.width || ""
+                    }`}
                 >
                   {column.sortable ? (
                     <Button
@@ -112,9 +113,8 @@ export function DataTable<T extends Record<string, any>>({
                 <tr
                   key={String(row[keyField])}
                   onClick={() => onRowClick?.(row)}
-                  className={`${
-                    onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
-                  } transition-colors`}
+                  className={`${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
+                    } transition-colors`}
                 >
                   {columns.map((column) => (
                     <td key={column.key} className="px-6 py-4 whitespace-nowrap">

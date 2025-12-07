@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Utilitários para exportação de dados de pesquisa científica
 import * as XLSX from 'xlsx';
 
@@ -154,6 +155,7 @@ function calculateMedian(values: number[]): number {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseQuestionnaireData(jsonString: string): any {
   try {
     return JSON.parse(jsonString);
@@ -364,7 +366,7 @@ export function calculateFisherExact(observed: number[][]): FisherExactResult {
   // In production, use a proper statistical library
   const expected = (rowTotal1 * colTotal1) / n;
   const variance = (rowTotal1 * colTotal1 * (n - rowTotal1) * (n - colTotal1)) /
-                   (n * n * (n - 1));
+    (n * n * (n - 1));
   const z = Math.abs(a - expected) / Math.sqrt(variance);
   const pValue = 2 * (1 - normalCDF(z)); // Two-tailed
 
@@ -1351,7 +1353,7 @@ export function calculateTukeyHSD(
       // Standard error for the comparison
       const n1 = groupSizes[i];
       const n2 = groupSizes[j];
-      const standardError = Math.sqrt(msWithin * (1/n1 + 1/n2) / 2);
+      const standardError = Math.sqrt(msWithin * (1 / n1 + 1 / n2) / 2);
 
       // q-statistic (Studentized range statistic)
       const qStatistic = meanDifference / standardError;
@@ -1440,9 +1442,9 @@ function calculateFDistributionPValue(
 
   // Find closest critical value
   const dfWithinKey = dfWithin <= 10 ? 10 :
-                      dfWithin <= 20 ? 20 :
-                      dfWithin <= 30 ? 30 :
-                      dfWithin <= 60 ? 60 : 120;
+    dfWithin <= 20 ? 20 :
+      dfWithin <= 30 ? 30 :
+        dfWithin <= 60 ? 60 : 120;
 
   const key = `${Math.min(dfBetween, 5)}_${dfWithinKey}`;
   const critical05 = criticalValues[key] || 3.0;
@@ -1476,9 +1478,9 @@ function getTukeyQCritical(k: number, dfWithin: number, alpha: number = 0.05): n
   };
 
   const dfKey = dfWithin <= 10 ? 10 :
-                dfWithin <= 20 ? 20 :
-                dfWithin <= 30 ? 30 :
-                dfWithin <= 60 ? 60 : 120;
+    dfWithin <= 20 ? 20 :
+      dfWithin <= 30 ? 30 :
+        dfWithin <= 60 ? 60 : 120;
 
   const kClamped = Math.min(Math.max(k, 3), 6);
   const key = `${kClamped}_${dfKey}_${alpha}`;

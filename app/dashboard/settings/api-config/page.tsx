@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState } from 'react';
@@ -215,7 +216,7 @@ export default function ApiConfigPage() {
               <h4 className="font-semibold">Como configurar:</h4>
               <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
                 <li>Acesse <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">developers.facebook.com/apps</a></li>
-                <li>Crie um novo app e adicione o produto "WhatsApp Business API"</li>
+                <li>Crie um novo app e adicione o produto &quot;WhatsApp Business API&quot;</li>
                 <li>Configure um número de telefone de teste</li>
                 <li>Obtenha o Phone Number ID e Access Token</li>
                 <li>Adicione no arquivo .env:

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";

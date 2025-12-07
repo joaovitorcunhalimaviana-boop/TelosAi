@@ -135,7 +135,7 @@ export async function DELETE(request: NextRequest) {
 /**
  * GET - Listar subscriptions do usuário
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verificar autenticação
     const session = await auth();

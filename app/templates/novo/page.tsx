@@ -83,10 +83,10 @@ export default function NewTemplatePage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  Clique em "Salvar como Template"
+                  Clique em &quot;Salvar como Template&quot;
                 </h3>
                 <p className="text-gray-600 mb-3">
-                  Na página de edição do paciente, você verá um botão "Salvar como Template" ao lado dos botões de salvar.
+                  Na página de edição do paciente, você verá um botão &quot;Salvar como Template&quot; ao lado dos botões de salvar.
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <p className="text-sm text-blue-900">
@@ -106,7 +106,7 @@ export default function NewTemplatePage() {
                   Aplique em Novos Pacientes
                 </h3>
                 <p className="text-gray-600 mb-3">
-                  Ao editar outros pacientes do mesmo tipo de cirurgia, clique em "Aplicar Template" para preencher automaticamente com suas configurações padrão.
+                  Ao editar outros pacientes do mesmo tipo de cirurgia, clique em &quot;Aplicar Template&quot; para preencher automaticamente com suas configurações padrão.
                 </p>
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function NewTemplatePage() {
                   <li>Prescrição: Dipirona + Lactulose + Orientações padrão</li>
                 </ul>
                 <p className="pt-2">
-                  <strong>Solução:</strong> Ele preenche um paciente com todas essas configurações e salva como "Minha hemorroidectomia padrão do Dr. João". Agora, para cada novo paciente, basta clicar em "Aplicar Template" e tudo é preenchido automaticamente.
+                  <strong>Solução:</strong> Ele preenche um paciente com todas essas configurações e salva como &quot;Minha hemorroidectomia padrão do Dr. João&quot;. Agora, para cada novo paciente, basta clicar em &quot;Aplicar Template&quot; e tudo é preenchido automaticamente.
                 </p>
               </div>
             </div>

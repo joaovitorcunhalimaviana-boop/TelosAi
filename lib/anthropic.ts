@@ -99,7 +99,13 @@ ${detectedRedFlags.length > 0 ? detectedRedFlags.map(rf => `- ${rf}`).join('\n')
    - As comorbidades do paciente
    - Os red flags já detectados
 
-2. Identifique outros red flags não óbvios que possam ter sido perdidos pela análise determinística
+2. Identifique TODOS os sinais de alerta (Red Flags), como:
+   - Febre > 37.8°C
+   - Dor intensa (> 7) ou crescente
+   - Sangramento moderado-intenso
+   - Secreção purulenta
+   - Retenção urinária
+   - Vômitos ou outros sintomas graves
 
 3. Gere uma resposta empática e acolhedora para o paciente, que:
    - Reconheça seus sintomas

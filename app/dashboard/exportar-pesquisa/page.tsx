@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -408,11 +409,10 @@ export default function ExportarPesquisaPage() {
                   {selectedResearchData.groups.map((group) => (
                     <div
                       key={group.id}
-                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                        selectedGroups.includes(group.id)
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedGroups.includes(group.id)
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                        }`}
                       onClick={() => toggleGroup(group.id)}
                     >
                       <div className="flex items-start gap-3">

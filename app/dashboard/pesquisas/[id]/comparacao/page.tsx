@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -84,7 +85,7 @@ const calculateTTest = (group1: number[], group2: number[]): { t: number; p: num
   const n2 = group2.length;
 
   const pooledSD = Math.sqrt(((n1 - 1) * sd1 * sd1 + (n2 - 1) * sd2 * sd2) / (n1 + n2 - 2));
-  const t = (mean1 - mean2) / (pooledSD * Math.sqrt(1/n1 + 1/n2));
+  const t = (mean1 - mean2) / (pooledSD * Math.sqrt(1 / n1 + 1 / n2));
   const df = n1 + n2 - 2;
 
   // Simplified p-value calculation (approximation)
@@ -483,28 +484,28 @@ export default function ComparacaoPage() {
         {showAiInsights && aiInsights.length > 0 && (
           <SlideIn direction="down" duration={0.4}>
             <Card className="mb-6 border-purple-200 bg-purple-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-purple-900">
-              <Sparkles className="h-5 w-5" />
-              Insights Automatizados da IA
-            </CardTitle>
-            <CardDescription>
-              Padrões e observações detectados automaticamente nos dados
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StaggerChildren staggerDelay={0.1}>
-              {aiInsights.map((insight, index) => (
-                <StaggerItem key={index}>
-                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-purple-200 mb-3">
-                    <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">{insight}</p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerChildren>
-          </CardContent>
-        </Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-900">
+                  <Sparkles className="h-5 w-5" />
+                  Insights Automatizados da IA
+                </CardTitle>
+                <CardDescription>
+                  Padrões e observações detectados automaticamente nos dados
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StaggerChildren staggerDelay={0.1}>
+                  {aiInsights.map((insight, index) => (
+                    <StaggerItem key={index}>
+                      <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-purple-200 mb-3">
+                        <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm text-gray-700">{insight}</p>
+                      </div>
+                    </StaggerItem>
+                  ))}
+                </StaggerChildren>
+              </CardContent>
+            </Card>
           </SlideIn>
         )}
       </AnimatePresence>
@@ -788,15 +789,15 @@ export default function ComparacaoPage() {
                               {anovaResults.painANOVA.anova.pValue < 0.001
                                 ? '< 0.001'
                                 : prefersReducedMotion
-                                ? anovaResults.painANOVA.anova.pValue.toFixed(4)
-                                : (
-                                  <CountUp
-                                    value={anovaResults.painANOVA.anova.pValue}
-                                    decimals={4}
-                                    duration={1.5}
-                                    delay={0.15}
-                                  />
-                                )}
+                                  ? anovaResults.painANOVA.anova.pValue.toFixed(4)
+                                  : (
+                                    <CountUp
+                                      value={anovaResults.painANOVA.anova.pValue}
+                                      decimals={4}
+                                      duration={1.5}
+                                      delay={0.15}
+                                    />
+                                  )}
                             </p>
                             <motion.div
                               initial={{ scale: 0 }}
@@ -834,8 +835,8 @@ export default function ComparacaoPage() {
                               {anovaResults.painANOVA.anova.etaSquared >= 0.14
                                 ? 'Efeito Grande'
                                 : anovaResults.painANOVA.anova.etaSquared >= 0.06
-                                ? 'Efeito Médio'
-                                : 'Efeito Pequeno'}
+                                  ? 'Efeito Médio'
+                                  : 'Efeito Pequeno'}
                             </p>
                           </div>
                         </ScaleOnHover>
@@ -1077,8 +1078,8 @@ export default function ComparacaoPage() {
                           {anovaResults.ageANOVA.anova.etaSquared >= 0.14
                             ? 'Efeito Grande'
                             : anovaResults.ageANOVA.anova.etaSquared >= 0.06
-                            ? 'Efeito Médio'
-                            : 'Efeito Pequeno'}
+                              ? 'Efeito Médio'
+                              : 'Efeito Pequeno'}
                         </p>
                       </div>
                     </div>
@@ -1148,7 +1149,7 @@ export default function ComparacaoPage() {
                           </h4>
                           <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <p className="text-sm text-gray-600">Cohen's d</p>
+                              <p className="text-sm text-gray-600">Cohen&apos;s d</p>
                               <p className="text-2xl font-bold">
                                 {Math.abs(cohenD).toFixed(3)}
                               </p>
@@ -1157,15 +1158,15 @@ export default function ComparacaoPage() {
                                   Math.abs(cohenD) > 0.8
                                     ? 'default'
                                     : Math.abs(cohenD) > 0.5
-                                    ? 'secondary'
-                                    : 'outline'
+                                      ? 'secondary'
+                                      : 'outline'
                                 }
                               >
                                 {Math.abs(cohenD) > 0.8
                                   ? 'Grande'
                                   : Math.abs(cohenD) > 0.5
-                                  ? 'Médio'
-                                  : 'Pequeno'}
+                                    ? 'Médio'
+                                    : 'Pequeno'}
                               </Badge>
                             </div>
                             <div>
@@ -1376,8 +1377,8 @@ export default function ComparacaoPage() {
                           tIndex === 0
                             ? group.outcomes.avgPainDay1
                             : tIndex === 1
-                            ? group.outcomes.avgPainDay7
-                            : group.outcomes.avgPainDay30;
+                              ? group.outcomes.avgPainDay7
+                              : group.outcomes.avgPainDay30;
 
                         const height = (painValue / 10) * 100;
                         const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];

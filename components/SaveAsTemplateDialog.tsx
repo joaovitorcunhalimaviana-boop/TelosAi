@@ -20,6 +20,7 @@ import { extractTemplateFromSurgery, SURGERY_TYPE_LABELS } from "@/lib/template-
 interface SaveAsTemplateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   patientData: any
   onSuccess: () => void
 }
@@ -79,6 +80,7 @@ export function SaveAsTemplateDialog({
 
       onSuccess()
       onOpenChange(false)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast({
         title: "Erro ao salvar template",
@@ -131,7 +133,7 @@ export function SaveAsTemplateDialog({
               }}
             />
             <p className="text-xs text-gray-500">
-              Ex: "Minha hemorroidectomia padrão", "Fístula - protocolo Dr. João"
+              Ex: &quot;Minha hemorroidectomia padrão&quot;, &quot;Fístula - protocolo Dr. João&quot;
             </p>
           </div>
 

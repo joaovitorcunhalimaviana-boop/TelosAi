@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendPatientReminder, isWhatsAppConfigured } from '@/lib/whatsapp';
-import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
+import { toBrasiliaTime } from '@/lib/date-utils';
 
 const CRON_SECRET = process.env.CRON_SECRET!;
 

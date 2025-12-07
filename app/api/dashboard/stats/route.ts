@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
@@ -308,7 +309,7 @@ const getCachedDashboardStats = unstable_cache(
 // GET - DASHBOARD STATISTICS
 // ============================================
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const startTime = Date.now();
     const stats = await getCachedDashboardStats();

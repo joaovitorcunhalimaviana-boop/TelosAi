@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { termoTemplates, TermoData } from '@/lib/termo-templates';
 
@@ -21,7 +22,7 @@ function TermoPage() {
   useEffect(() => {
     // Auto-print se o parâmetro print=true estiver na URL
     if (searchParams.get('print') === 'true') {
-      setAutoPrint(true);
+      setTimeout(() => setAutoPrint(true), 0);
       setTimeout(() => {
         window.print();
       }, 500);
@@ -36,12 +37,12 @@ function TermoPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Termo não encontrado</h1>
           <p className="text-gray-600 mb-6">O tipo de termo solicitado não existe.</p>
-          <a
+          <Link
             href="/termos"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Voltar para Central de Termos
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -64,7 +65,7 @@ function TermoPage() {
           </svg>
           Imprimir
         </button>
-        <a
+        <Link
           href="/termos"
           className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 shadow-lg flex items-center gap-2"
         >
@@ -72,7 +73,7 @@ function TermoPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Voltar
-        </a>
+        </Link>
       </div>
 
       {/* Container A4 */}

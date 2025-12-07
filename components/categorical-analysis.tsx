@@ -126,7 +126,7 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
                 <Badge variant="outline">Não significativo</Badge>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Cramér's V</p>
+                <p className="text-sm text-gray-600">Cramér&apos;s V</p>
                 <p className="text-2xl font-bold text-blue-700">0.123</p>
                 <Badge variant="secondary">Efeito Pequeno</Badge>
               </div>
@@ -134,7 +134,7 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
 
             <p className="text-sm text-gray-600 mt-3">
               Interpretação: Não há diferença estatisticamente significativa na distribuição de
-              sexo entre os grupos (p = 0.143). O tamanho do efeito é pequeno (Cramér's V = 0.123).
+              sexo entre os grupos (p = 0.143). O tamanho do efeito é pequeno (Cramér&apos;s V = 0.123).
             </p>
           </div>
 
@@ -228,7 +228,7 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Cramér's V</p>
+                <p className="text-sm text-gray-600">Cramér&apos;s V</p>
                 <p className="text-2xl font-bold text-red-700">0.234</p>
                 <Badge variant="secondary">Efeito Médio</Badge>
               </div>
@@ -242,7 +242,7 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
                   <p className="text-sm text-yellow-800 mt-1">
                     Há diferença estatisticamente significativa na taxa de complicações entre os
                     grupos (p = 0.028). Recomenda-se investigar os fatores que podem estar
-                    contribuindo para essa diferença. Fisher's Exact Test recomendado para
+                    contribuindo para essa diferença. Fisher&apos;s Exact Test recomendado para
                     confirmar devido ao tamanho amostral pequeno em algumas células.
                   </p>
                 </div>
@@ -258,18 +258,18 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
             </h4>
 
             <div className="space-y-3">
-              {['Hipertensão', 'Diabetes', 'Obesidade'].map((comorbidity) => (
+              {['Hipertensão', 'Diabetes', 'Obesidade'].map((comorbidity, index) => (
                 <div key={comorbidity} className="p-3 bg-gray-50 rounded">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">{comorbidity}</span>
                     <span className="text-sm text-gray-600">
-                      χ² = {(Math.random() * 5).toFixed(2)}, p ={' '}
-                      {(Math.random() * 0.2).toFixed(3)}
+                      χ² = {(2.5 + index * 0.5).toFixed(2)}, p ={' '}
+                      {(0.05 + index * 0.02).toFixed(3)}
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    {groups.map((group) => {
-                      const prevalence = 20 + Math.random() * 40;
+                    {groups.map((group, gIndex) => {
+                      const prevalence = 20 + ((index + gIndex) * 10) % 40;
                       return (
                         <div key={group.id} className="flex-1">
                           <div className="h-8 bg-gray-200 rounded overflow-hidden">
@@ -307,7 +307,7 @@ export default function CategoricalAnalysis({ groups }: CategoricalAnalysisProps
                 • Teste Exato de Fisher recomendado quando células têm contagem esperada {'<'} 5
               </li>
               <li>
-                • Cramér's V mede o tamanho do efeito (0.1=pequeno, 0.3=médio, 0.5=grande para df=1)
+                • Cramér&apos;s V mede o tamanho do efeito (0.1=pequeno, 0.3=médio, 0.5=grande para df=1)
               </li>
               <li>• Resíduos padronizados {'>'} 2 indicam células que contribuem significativamente</li>
               <li>• Nível de significância: α = 0.05 (* p {'<'} 0.05, ** p {'<'} 0.01, *** p {'<'} 0.001)</li>

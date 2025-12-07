@@ -155,7 +155,7 @@ export function ConsentTermViewer({ data, patientId }: ConsentTermViewerProps) {
             <div>
               <p className="font-medium">Imprima o termo</p>
               <p className="text-sm text-muted-foreground">
-                Use o botão "Imprimir Termo" abaixo para gerar uma cópia física
+                Use o botão &quot;Imprimir Termo&quot; abaixo para gerar uma cópia física
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export function ConsentTermViewer({ data, patientId }: ConsentTermViewerProps) {
             <div>
               <p className="font-medium">Confirme no sistema</p>
               <p className="text-sm text-muted-foreground">
-                Marque a checkbox de confirmação e clique em "Confirmar Consentimento"
+                Marque a checkbox de confirmação e clique em &quot;Confirmar Consentimento&quot;
               </p>
             </div>
           </div>
