@@ -2,22 +2,38 @@
 import { prisma } from '@/lib/prisma';
 
 async function main() {
-    const patientId = 'cmirejvko0001l804ohgsf5i3';
+    const targetPhone = '(83) 99866-3089';
 
-    console.log(`Deleting patient with ID: ${patientId}...`);
+    console.log(`Searching for patient with phone: ${targetPhone}...`);
 
-    const deletedPatient = await prisma.patient.delete({
+    const patient = await prisma.patient.findFirst({
         where: {
-            id: patientId,
-        },
+            phone: {
+                contains: '99866-3089'
+            }
+        }
     });
 
-    console.log(`Successfully deleted patient: ${deletedPatient.name} (${deletedPatient.id})`);
+    if (!patient) {
+        console.log('Patient not found.');
+        return;
+    }
+
+    console.log(`Found patient: ${patient.name} (ID: ${patient.id})`);
+    console.log('Deleting...');
+
+    await prisma.patient.delete({
+        where: {
+            id: patient.id
+        }
+    });
+
+    console.log('Patient deleted successfully.');
 }
 
 main()
     .catch(e => {
-        console.error('Error deleting patient:', e);
+        console.error('Error:', e);
         process.exit(1);
     })
     .finally(async () => {

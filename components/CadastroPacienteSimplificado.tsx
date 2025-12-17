@@ -118,11 +118,17 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
       const validatedData = simplifiedPatientSchema.parse(formData)
 
       // Validar data da cirurgia (usar horário de Brasília)
-      const todayBrasilia = startOfDayBrasilia()
-      const surgery = new Date(validatedData.surgeryDate)
+      // Criar data de hoje no fuso de Brasília para comparação segura (YYYY-MM-DD)
+      const now = new Date()
+      // Ajustar para UTC (remover offset local) e depois aplicar -3h (Brasil)
+      // getTimezoneOffset retorna o offset em minutos PARA UTC (ex: Brasil é 180).
+      // Se estiver em UTC, offset é 0.
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000)
+      const brazilTime = new Date(utc - (3 * 60 * 60 * 1000))
+      const todayStr = brazilTime.toISOString().split('T')[0]
 
-      if (surgery > todayBrasilia) {
-        setErrors({ surgeryDate: "Data da cirurgia não pode ser futura" })
+      if (validatedData.surgeryDate > todayStr) {
+        setErrors({ surgeryDate: `Data da cirurgia não pode ser futura (Hoje é ${todayStr.split('-').reverse().join('/')})` })
         setIsSubmitting(false)
         return
       }

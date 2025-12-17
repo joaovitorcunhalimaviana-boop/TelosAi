@@ -12,20 +12,22 @@ interface QuickLinkProps {
 export function QuickLink({ href, title, description, icon }: QuickLinkProps) {
   return (
     <Link href={href} className="group">
-      <Card className="border-2 hover:shadow-lg hover:border-blue-600 transition-all cursor-pointer h-full">
+      <Card className="border-0 bg-white/70 backdrop-blur-md shadow-lg shadow-blue-900/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ring-1 ring-gray-100 h-full group">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {icon && <div className="text-blue-600">{icon}</div>}
-              <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
+            <div className="flex items-center gap-4">
+              {icon && <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#0A2647] to-[#144272] text-white shadow-md group-hover:scale-110 transition-transform">{icon}</div>}
+              <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-[#0A2647] transition-colors">
                 {title}
               </CardTitle>
             </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+            <div className="p-2 rounded-full bg-blue-50 text-[#0A2647] opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0">
+              <ArrowRight className="h-5 w-5" />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm font-medium text-gray-500 leading-relaxed">
             {description}
           </CardDescription>
         </CardContent>

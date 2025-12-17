@@ -47,6 +47,15 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
   const [sameDayDischarge, setSameDayDischarge] = useState(patient?.sameDayDischarge || false);
   const [hospitalizationDays, setHospitalizationDays] = useState(patient?.hospitalizationDays || '');
 
+  // Use refs to stabilize callbacks
+  const onUpdateRef = React.useRef(onUpdate);
+  const onCompleteRef = React.useRef(onComplete);
+
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+    onCompleteRef.current = onComplete;
+  });
+
   // Check completion
   useEffect(() => {
     let isComplete = false;
@@ -61,8 +70,8 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
       isComplete = !!pilonidalTechnique;
     }
 
-    onComplete(isComplete);
-  }, [surgeryType, techniques, energyType, mamillaeResected, fistulaType, fistulaTechnique, fissureType, fissureLocation, pilonidalTechnique, onComplete]);
+    onCompleteRef.current(isComplete);
+  }, [surgeryType, techniques, energyType, mamillaeResected, fistulaType, fistulaTechnique, fissureType, fissureLocation, pilonidalTechnique]);
 
   // Update parent
   useEffect(() => {
@@ -104,8 +113,8 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
       };
     }
 
-    onUpdate(data);
-  }, [surgeryType, techniques, energyType, mamillaeResected, mamillaePositions, hemorrhoidType, internalGrade, externalDetails, fistulaType, fistulaTechnique, fistulaTracts, setonUsed, setonMaterial, fissureType, fissureLocation, fissureTechniques, pilonidalTechnique, complications, recoveryMinutes, sameDayDischarge, hospitalizationDays, onUpdate]);
+    onUpdateRef.current(data);
+  }, [surgeryType, techniques, energyType, mamillaeResected, mamillaePositions, hemorrhoidType, internalGrade, externalDetails, fistulaType, fistulaTechnique, fistulaTracts, setonUsed, setonMaterial, fissureType, fissureLocation, fissureTechniques, pilonidalTechnique, complications, recoveryMinutes, sameDayDischarge, hospitalizationDays]);
 
   const handleTechniqueToggle = (technique: string) => {
     setTechniques(prev =>

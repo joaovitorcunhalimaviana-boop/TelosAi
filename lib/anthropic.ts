@@ -133,7 +133,7 @@ Retorne APENAS um objeto JSON válido no seguinte formato (sem markdown, sem exp
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2000,
       temperature: 0.3, // Baixa temperatura para maior consistência
       messages: [

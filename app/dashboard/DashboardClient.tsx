@@ -242,11 +242,11 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
         <div id="dashboard-header" className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div className="flex items-center gap-3">
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-gradient-blue pb-1">
+              <h1 className="text-4xl font-bold mb-2 text-[#0A2647] pb-1">
                 Dashboard Médico
               </h1>
               <p className="text-lg text-muted-foreground">
-                Workstation Clínica - {userName}
+                Área de Trabalho Médico - {userName}
               </p>
             </div>
           </div>

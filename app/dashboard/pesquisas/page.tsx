@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText, ArrowLeft } from 'lucide-react';
+import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText, ArrowLeft, Shield } from 'lucide-react';
 
 const surgeryTypes = [
   { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
@@ -247,37 +247,65 @@ export default function PesquisasPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2 flex items-center" style={{ color: '#0A2647' }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push('/dashboard')}
-              className="mr-4 hover:bg-gray-100"
-            >
-              <ArrowLeft className="h-8 w-8" />
-            </Button>
-            <FlaskConical className="inline-block mr-3 h-10 w-10" />
-            Minhas Pesquisas
-          </h1>
-          <p className="text-gray-600">
-            Gerencie seus estudos clínicos e grupos de pesquisa
-          </p>
+    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/dashboard')}
+            className="mb-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar ao Dashboard
+          </Button>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg shadow-blue-900/20">
+                <FlaskConical className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-[#0A2647]">
+                  Minhas Pesquisas
+                </h1>
+                <p className="text-gray-500 mt-2 text-lg">
+                  Gerencie seus estudos clínicos e monitore o progresso dos pacientes.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Card informativo - Igual a Protocolos */}
+        <Card className="mt-8 border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm">
+          <CardContent className="py-4">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-amber-800 font-medium">
+                  Importante: As pesquisas permitem agrupar pacientes e comparar resultados clínicos.
+                </p>
+                <p className="text-xs text-amber-700 mt-1">
+                  Crie grupos (ex: Controle vs Intervenção) para análise detalhada no dashboard.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Botão Nova Pesquisa - Alinhado à direita igual Protocolos */}
+        <div className="flex justify-end mb-6">
+          <Button
+            size="lg"
+            onClick={() => setIsDialogOpen(true)}
+            className="shadow-xl shadow-blue-900/10 bg-[#0A2647] hover:bg-[#08203d] text-white transition-all hover:scale-105 active:scale-95"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Nova Pesquisa
+          </Button>
+        </div>
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              size="lg"
-              className="shadow-lg"
-              style={{ backgroundColor: '#0A2647', color: 'white' }}
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              Nova Pesquisa
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Criar Nova Pesquisa</DialogTitle>
@@ -575,161 +603,160 @@ export default function PesquisasPage() {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
-      {/* Research List */}
-      {researches.length === 0 ? (
-        <Card className="border-2 border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <FlaskConical className="h-16 w-16 text-gray-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Nenhuma pesquisa criada
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Comece criando sua primeira pesquisa clínica
-            </p>
-            <Button
-              onClick={() => setIsDialogOpen(true)}
-              style={{ backgroundColor: '#0A2647', color: 'white' }}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Pesquisa
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {researches.map((research) => (
-            <Card
-              key={research.id}
-              className={`border-2 ${research.isActive ? 'border-green-200' : 'border-gray-200'
-                }`}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <CardTitle className="text-2xl">{research.title}</CardTitle>
-                      <Badge
-                        variant={research.isActive ? 'default' : 'secondary'}
-                        className={
-                          research.isActive
-                            ? 'bg-green-500 hover:bg-green-600'
-                            : 'bg-gray-400'
-                        }
-                      >
-                        {research.isActive ? 'Ativa' : 'Inativa'}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-base">
-                      {research.description}
-                    </CardDescription>
-                    {research.surgeryType && (
-                      <p className="text-sm text-gray-500 mt-2">
-                        Tipo de cirurgia: <strong>{research.surgeryType}</strong>
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => router.push(`/dashboard/pesquisas/${research.id}`)}
-                      style={{ backgroundColor: '#0A2647', color: 'white' }}
-                    >
-                      <BarChart3 className="h-4 w-4 mr-1" />
-                      Estatísticas
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleToggleStatus(research.id, research.isActive)}
-                    >
-                      {research.isActive ? (
-                        <>
-                          <Pause className="h-4 w-4 mr-1" />
-                          Pausar
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4 mr-1" />
-                          Ativar
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setExpandedResearch(
-                          expandedResearch === research.id ? null : research.id
-                        )
-                      }
-                    >
-                      {expandedResearch === research.id ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent>
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <Users className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                    <p className="text-2xl font-bold text-blue-700">
-                      {research.totalPatients}
-                    </p>
-                    <p className="text-sm text-gray-600">Total de Pacientes</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <BarChart3 className="h-6 w-6 mx-auto mb-2 text-purple-600" />
-                    <p className="text-2xl font-bold text-purple-700">
-                      {research.groups.length}
-                    </p>
-                    <p className="text-sm text-gray-600">Grupos</p>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <FlaskConical className="h-6 w-6 mx-auto mb-2 text-green-600" />
-                    <p className="text-2xl font-bold text-green-700">
-                      {new Date(research.startDate).toLocaleDateString('pt-BR')}
-                    </p>
-                    <p className="text-sm text-gray-600">Data de Início</p>
-                  </div>
-                </div>
-
-                {/* Groups Details */}
-                {expandedResearch === research.id && (
-                  <div className="space-y-3 mt-6 pt-6 border-t">
-                    <h4 className="font-semibold text-lg mb-4">Grupos da Pesquisa</h4>
-                    {research.groups.map((group) => (
-                      <Card key={group.id} className="border">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-base">
-                              Grupo {group.groupCode}: {group.groupName}
-                            </CardTitle>
-                            <Badge variant="outline">
-                              {group.patientCount} pacientes
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-600">{group.description}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+        {/* Research List */}
+        {
+          researches.length === 0 ? (
+            <Card className="border-2 border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <FlaskConical className="h-16 w-16 text-gray-400 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  Nenhuma pesquisa criada
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Comece criando sua primeira pesquisa clínica
+                </p>
+                <Button
+                  onClick={() => setIsDialogOpen(true)}
+                  style={{ backgroundColor: '#0A2647', color: 'white' }}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nova Pesquisa
+                </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              {researches.map((research) => (
+                <Card
+                  key={research.id}
+                  className={`transition-all duration-300 hover:shadow-xl border-0 bg-white/70 backdrop-blur-md shadow-sm ring-1 ring-gray-200/50 ${!research.isActive ? 'opacity-75 grayscale-[0.8]' : 'hover:-translate-y-1'}`}
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-3">
+                          <CardTitle className="text-2xl font-bold text-gray-900">
+                            {research.title}
+                          </CardTitle>
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${research.isActive ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+                            {research.isActive ? 'Ativa' : 'Pausada'}
+                          </span>
+                        </div>
+                        <CardDescription className="text-base text-gray-600 leading-relaxed max-w-2xl">
+                          {research.description}
+                        </CardDescription>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleStatus(research.id, research.isActive)}
+                          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                          title={research.isActive ? "Pausar" : "Ativar"}
+                        >
+                          {research.isActive ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setExpandedResearch(
+                              expandedResearch === research.id ? null : research.id
+                            )
+                          }
+                          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                        >
+                          {expandedResearch === research.id ? (
+                            <ChevronUp className="h-5 w-5" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {research.surgeryType && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                          🔪 {surgeryTypes.find(t => t.value === research.surgeryType)?.label || research.surgeryType}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                        📊 {research.groups.length} Grupos
+                      </span>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 mb-2">
+                      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 transition-colors group-hover:border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Pacientes</span>
+                          <Users className="h-5 w-5 text-blue-500 opacity-60" />
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{research.totalPatients}</p>
+                        <p className="text-xs text-gray-500 mt-1">Total recrutados</p>
+                      </div>
+
+                      <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100 transition-colors group-hover:border-amber-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Duração</span>
+                          <BarChart3 className="h-5 w-5 text-amber-500 opacity-60" />
+                        </div>
+                        <p className="text-xl font-bold text-gray-900 truncate">
+                          {new Date(research.startDate).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {research.endDate ? `Até ${new Date(research.endDate).toLocaleDateString('pt-BR')}` : 'Em andamento'}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-full h-full min-h-[100px] bg-white border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all flex flex-col gap-2 shadow-none"
+                          onClick={() => router.push(`/dashboard/pesquisas/${research.id}`)}
+                        >
+                          <BarChart3 className="h-8 w-8" />
+                          <span className="font-semibold text-sm">Ver Dados Completos</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Groups Details Expanded */}
+                    {expandedResearch === research.id && (
+                      <div className="mt-6 pt-6 border-t border-gray-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <Users className="w-4 h-4" /> Grupos do Estudo
+                        </h4>
+                        <div className="grid gap-3">
+                          {research.groups.map((group) => (
+                            <div key={group.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">
+                                    {group.groupCode}
+                                  </span>
+                                  <span className="font-semibold text-gray-900">{group.groupName}</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1 ml-10">{group.description}</p>
+                              </div>
+                              <Badge variant="secondary" className="bg-white border border-gray-200">
+                                {group.patientCount} participantes
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )
+        }
+      </div>
     </div>
   );
 }

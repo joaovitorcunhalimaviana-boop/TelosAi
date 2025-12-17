@@ -313,7 +313,14 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => router.push(`/paciente/${patient.patientId}/editar`)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Previne eventos de clique no card pai
+                      if (patient.patientId) {
+                        router.push(`/paciente/${patient.patientId}/editar`);
+                      } else {
+                        console.error('ID do paciente inválido', patient);
+                      }
+                    }}
                     aria-label={`Ver detalhes de ${patient.patientName}`}
                   >
                     Ver Detalhes

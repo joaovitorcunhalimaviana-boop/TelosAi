@@ -47,6 +47,15 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
     }
   }, [formData.dateOfBirth]);
 
+  // Use refs to stabilize callbacks and prevent infinite loops
+  const onUpdateRef = React.useRef(onUpdate);
+  const onCompleteRef = React.useRef(onComplete);
+
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+    onCompleteRef.current = onComplete;
+  });
+
   // Check if form is complete
   useEffect(() => {
     const isComplete = !!(
@@ -57,13 +66,13 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
       formData.phone &&
       formData.hospital
     );
-    onComplete(isComplete);
-  }, [formData, onComplete]);
+    onCompleteRef.current(isComplete);
+  }, [formData]);
 
   // Update parent on any change
   useEffect(() => {
-    onUpdate(formData);
-  }, [formData, onUpdate]);
+    onUpdateRef.current(formData);
+  }, [formData]);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

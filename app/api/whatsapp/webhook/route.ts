@@ -19,6 +19,7 @@ import {
   validatePostOpDataByDay,
   parseJSONSafely,
 } from '@/lib/api-validation';
+import { findApplicableProtocols, formatProtocolsForPrompt } from '@/lib/protocols';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -563,72 +564,93 @@ async function callClaudeAPI(
   surgeryType: string,
   dayNumber: number,
   savedPhase?: string,
-  currentData: any = {}
+  currentData: any = {},
+  protocolText: string = '',
+  doctorName: string = 'seu médico'
 ): Promise<ClaudeAIResponse> {
   try {
     const { anthropic } = await import('@/lib/anthropic');
 
-    // Fase simplificada: ou estamos coletando dados ou finalizando
-    const currentPhase = savedPhase || 'collecting_data';
-    logger.debug('🎯 Fase para IA:', currentPhase);
+    // =================================================================================
+    // NOVA LÓGICA: CHECKLIST DINÂMICO (Substitui Fases Rígidas)
+    // =================================================================================
 
-    // Definição do Checklist Diário
-    const dailyChecklist = {
-      d1: ['painAtRest', 'hasFever', 'hadBowelMovementSinceLastContact', 'takingPrescribedMeds', 'bleeding'],
-      d2plus: ['painAtRest', 'hasFever', 'hadBowelMovementSinceLastContact', 'takingPrescribedMeds', 'bleeding'],
-      d3plus: ['hasPurulentDischarge'], // Além dos anteriores
-      d5and10: ['bristolScale'], // Apenas se evacuou
-    };
+    // 1. Definir o que precisamos saber (O "Checklist")
+    const requiredFields = [
+      'painAtRest',                   // Dor em repouso (0-10)
+      'hadBowelMovementSinceLastContact', // Evacuou desde a última?
+      'takingPrescribedMeds',         // Está tomando remédios?
+      'bleeding'                      // Tem sangramento?
+    ];
 
-    let requiredFields = dayNumber === 1 ? dailyChecklist.d1 : dailyChecklist.d2plus;
-    if (dayNumber >= 3) requiredFields = [...requiredFields, ...dailyChecklist.d3plus];
+    // Regras Condicionais (Adicionadas dinamicamente)
+    // Se dor > 5, investigar febre e secreção
+    if (currentData.painAtRest !== undefined && Number(currentData.painAtRest) > 5) {
+      if (!currentData.hasFever) requiredFields.push('hasFever');
+      if (!currentData.hasPurulentDischarge) requiredFields.push('hasPurulentDischarge');
+    }
 
-    // Bristol apenas se evacuou (será verificado dinamicamente pela IA)
+    // Se tomou remédios extras, perguntar quais
+    if (currentData.takingExtraMeds === true) {
+      requiredFields.push('extraMedsDetails');
+    }
 
-    const SYSTEM_PROMPT = `Você é a Clara, assistente virtual do Dr. João Vitor (Telos.AI).
-OBJETIVO: Monitorar a recuperação de ${patient.name} (Cirurgia: ${surgeryType}, Dia: D+${dayNumber}).
+    // Se teve sangramento, perguntar detalhes (exceto se for "none")
+    if (currentData.bleeding && currentData.bleeding !== 'none') {
+      requiredFields.push('bleedingDetails');
+    }
 
-=== SUAS INSTRUÇÕES (CHECKLIST DINÂMICO) ===
-Você deve preencher o seguinte CHECKLIST DIÁRIO através da conversa:
+    // 2. Identificar o que falta (Missing Fields)
+    const missingFields = requiredFields.filter(field => {
+      // Verifica se o campo já existe em currentData e não é null/undefined
+      return currentData[field] === undefined || currentData[field] === null;
+    });
 
-1. Dor em Repouso (0-10)
-2. Febre (Sim/Não - se sim, qual temp?)
-3. Evacuação (Sim/Não - se sim, doeu? qual hora?)
-4. Sangramento (Nenhum/Leve/Moderado/Intenso)
-5. Medicações (Está tomando? Preciso de extra?)
-${dayNumber >= 3 ? '6. Secreção (Tem pus/mau cheiro?)' : ''}
+    const isComplete = missingFields.length === 0;
 
-=== DADOS JÁ COLETADOS ===
+    // 3. Montar o Prompt do Sistema (O "Cérebro")
+    const SYSTEM_PROMPT = `Você é a Clara, assistente de IA da clínica do ${doctorName} (Telos.AI). Especialista em pós-operatório de cirurgia colorretal.
+
+CONTEXTO ATUAL:
+- Paciente: ${patient.name}
+- Cirurgia: ${surgeryType}
+- Dia: D+${dayNumber}
+
+SEU OBJETIVO:
+Preencher o checklist de saúde do paciente de forma natural, simpática e eficiente. 
+
+CHECKLIST (O que precisamos saber):
+${JSON.stringify(requiredFields)}
+
+DADOS JÁ COLETADOS:
 ${JSON.stringify(currentData, null, 2)}
 
-=== REGRAS DE CONDUÇÃO ===
-1. ANALISE a mensagem do paciente e extraia TUDO o que puder.
-2. VERIFIQUE o que falta do checklist.
-3. PERGUNTE APENAS o que falta. Agrupe perguntas se faltar muita coisa (ex: "E sobre a febre e o intestino?").
-4. SEJA DIRETA. Não use frases longas de empatia. Use "Entendi", "Certo".
-5. IMAGENS: Se perguntar de dor, peça "pain_scale". Se perguntar de fezes (e for D+5 ou D+10), peça "bristol_scale".
-6. ALERTA: Se dor > 7, febre > 38, sangramento intenso ou pus, avise que vai notificar o médico, mas continue o checklist.
+O QUE FALTA COLETAR (Sua Prioridade):
+${JSON.stringify(missingFields)}
 
-=== FINALIZAÇÃO ===
-- Se o checklist estiver completo, pergunte: "Tem mais alguma dúvida ou sintoma?"
-- Se o paciente disser que não tem mais dúvidas, marque "completed": true.
+REGRAS DE COMPORTAMENTO:
+1. **Prioridade**: Se houver campos faltando, faça A PRÓXIMA pergunta para preenchê-los.
+2. **Uma coisa de cada vez**: Não faça todas as perguntas juntas. Pergunte uma ou duas coisas no máximo.
+3. **Escala Visual de Dor**: Se for perguntar sobre nível de dor (0-10), VOCÊ DEVE solicitar a imagem marcando "needsImage": "pain_scale" no JSON.
+4. **Naturalidade**: Fale como uma enfermeira humana. Use emojis moderados. Seja empática se o paciente relatar dor.
+5. **Acolhimento**: Se o paciente disser algo fora do script, responda educadamente antes de voltar ao checklist.
 
-=== FORMATO JSON ===
+INSTRUÇÕES DE EXTRAÇÃO (JSON):
+- Analise a mensagem do usuário e extraia qualquer dado relevante para o checklist.
+- Normalize: 'não', 'nunca' -> false/none. 'sim', 'muito' -> true/severe.
+- Se o usuário disser "Dói 5", extraia "painAtRest": 5.
+
+FORMATO DE RESPOSTA (Obrigatório JSON puro):
 {
-  "message": "Sua resposta aqui",
-  "needsImage": "pain_scale" | "bristol_scale" | null,
-  "dataCollected": {
-    // Campos extraídos desta mensagem E confirmados do contexto
-    "painAtRest": 5,
-    "hasFever": false
-    ...
-  },
-  "completed": boolean,
-  "needsClarification": boolean, // Se não entendeu algo crítico
-  "conversationPhase": "collecting_data" | "completed"
-}`;
+  "message": "Sua resposta textual para o paciente",
+  "needsImage": "pain_scale" | null, // Use "pain_scale" SEMPRE que perguntar nota de dor
+  "dataCollected": { "campo": valor }, // Dados extraídos desta interação
+  "completed": boolean, // true SE missingFields estiver vazio
+  "needsClarification": boolean // true se não entendeu nada
+}
+`;
 
-    // Construir mensagens para Claude
+    // Histórico de Conversa
     const messages = [
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,
@@ -640,50 +662,51 @@ ${JSON.stringify(currentData, null, 2)}
       },
     ];
 
-    logger.debug('🤖 Chamando Claude API (Checklist Mode)', {
-      dayNumber,
-      requiredFields,
-      currentDataKeys: Object.keys(currentData)
+    logger.debug('🤖 Chamando Claude 3.5 Sonnet (Dynamic Mode)', {
+      missingFields,
+      isComplete
     });
 
+    // CHAMADA API - USANDO MODELO OFICIAL E CORRETO
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 2000,
-      temperature: 0.1, // Bem baixa para seguir regras estritas
+      model: 'claude-3-5-sonnet-20241022', // O MELHOR MODELO (Supera GPT-4o em coding/reasoning)
+      max_tokens: 1000,
+      temperature: 0.2, // Baixa para garantir o JSON
       system: SYSTEM_PROMPT,
-      messages,
+      messages: messages,
     });
 
     const responseText = response.content[0].type === 'text'
       ? response.content[0].text
       : '';
 
-    // Tentar extrair JSON da resposta
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in Claude response');
+    // Extração de JSON Robustecida
+    const startIndex = responseText.indexOf('{');
+    const endIndex = responseText.lastIndexOf('}');
+
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error('JSON não encontrado na resposta da IA');
     }
 
-    const parsedJson = JSON.parse(jsonMatch[0]);
+    const jsonString = responseText.substring(startIndex, endIndex + 1);
+    const parsedJson = JSON.parse(jsonString);
 
-    // Validação básica
+    // Validação final de segurança
     const aiResponse: ClaudeAIResponse = {
-      message: parsedJson.message || 'Não entendi. Pode repetir?',
+      message: parsedJson.message || 'Desculpe, não entendi. Pode repetir?',
       needsImage: parsedJson.needsImage || null,
       dataCollected: parsedJson.dataCollected || {},
       completed: parsedJson.completed || false,
       needsClarification: parsedJson.needsClarification || false,
-      conversationPhase: parsedJson.conversationPhase || 'collecting_data',
+      conversationPhase: isComplete ? 'completed' : 'collecting_data'
     };
 
     return aiResponse;
 
   } catch (error) {
-    logger.error('❌ Erro ao chamar Claude API:', error);
-
-    // Fallback simples
+    logger.error('❌ Erro crítico no cérebro da IA:', error);
     return {
-      message: `Não consegui entender. Poderia responder novamente?`,
+      message: "Tive um pequeno lapso. Podemos continuar? Como você está se sentindo agora?",
       needsImage: null,
       dataCollected: {},
       completed: false,
@@ -890,13 +913,18 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
   // ========================================
   if (currentPhase === 'collecting_pain_at_rest' || currentPhase === 'collecting_pain' || currentPhase === 'greeting') {
     if (number !== null && number >= 0 && number <= 10) {
+      // A IA agora decide dinamicamente se precisa perguntar sobre febre ou não (baseado na dor).
+      // Se a IA decidir perguntar, ela gerenciará isso. 
+      // Aqui apenas garantimos que se a IA perguntou sobre febre, a resposta seja processada pela própria IA.
+      // Portanto, removemos o hardcoded state machine para febre e deixamos o fluxo seguir para a IA ou para o próximo passo lógico.
+
       return {
-        message: `Entendi, sua dor em repouso está em ${number}/10. ${number >= 7 ? 'Percebo que está com bastante desconforto. ' : ''}Agora me conta: você teve febre?`,
+        message: `Entendi. Vamos continuar.`,
         needsImage: null,
         dataCollected: { painAtRest: number },
         completed: false,
         needsClarification: false,
-        conversationPhase: 'collecting_fever'
+        conversationPhase: 'collecting_bowel' // Pula direto para evacuação
       };
     }
 
@@ -923,90 +951,7 @@ function interpretResponseLocally(userMessage: string, conversationHistory: any[
     };
   }
 
-  // ========================================
-  // FASE 2: FEBRE (sim/não)
-  // ========================================
-  if (currentPhase === 'collecting_fever') {
-    // Pergunta de evacuação diferente para D+1 vs D+2+
-    const bowelQuestion = dayNumber === 1
-      ? `Você já evacuou após a cirurgia?`
-      : `Você evacuou desde a nossa última conversa?`;
-
-    if (isNo) {
-      return {
-        message: `Ótimo, sem febre. ${bowelQuestion}`,
-        needsImage: null,
-        dataCollected: { hasFever: false },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bowel'
-      };
-    }
-    if (isYes) {
-      return {
-        message: `Você conseguiu medir a temperatura? Qual foi?`,
-        needsImage: null,
-        dataCollected: { hasFever: true },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_fever_temp'
-      };
-    }
-    return {
-      message: `Desculpe, não entendi. Você teve febre? Responda sim ou não.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_fever'
-    };
-  }
-
-  // ========================================
-  // FASE 3: TEMPERATURA DA FEBRE
-  // ========================================
-  if (currentPhase === 'collecting_fever_temp') {
-    // Pergunta de evacuação diferente para D+1 vs D+2+
-    const bowelQuestion = dayNumber === 1
-      ? `Você já evacuou após a cirurgia?`
-      : `Você evacuou desde a nossa última conversa?`;
-
-    const tempMatch = msg.match(/(\d+)[,.]?(\d*)/);
-    if (tempMatch) {
-      const temp = parseFloat(tempMatch[1] + (tempMatch[2] ? '.' + tempMatch[2] : ''));
-      if (temp >= 35 && temp <= 42) {
-        const isHighFever = temp >= 38;
-        return {
-          message: isHighFever
-            ? `${temp}°C é febre alta. ${temp >= 39 ? '⚠️ Por favor, procure atendimento médico se persistir.' : ''} ${bowelQuestion}`
-            : `Entendi, ${temp}°C. ${bowelQuestion}`,
-          needsImage: null,
-          dataCollected: { hasFever: true, feverDetails: `${temp}°C` },
-          completed: false,
-          needsClarification: false,
-          conversationPhase: 'collecting_bowel'
-        };
-      }
-    }
-    if (msg.includes('não medi') || msg.includes('nao medi') || msg.includes('não sei') || msg.includes('nao sei')) {
-      return {
-        message: `Tudo bem. Fique atento e meça se possível. ${bowelQuestion}`,
-        needsImage: null,
-        dataCollected: { hasFever: true, feverDetails: 'não mediu' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bowel'
-      };
-    }
-    return {
-      message: `Não entendi a temperatura. Por favor, me diga o valor em graus (ex: 37.5 ou 38).`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_fever_temp'
-    };
-  }
+  // FASE 2 & 3 (Febre) REMOVIDAS DA LÓGICA RÍGIDA - A IA GERENCIA DINAMICAMENTE
 
   // ========================================
   // FASE 3: EVACUAÇÃO (URINA FOI REMOVIDA DO FLUXO)
@@ -1548,68 +1493,52 @@ async function processQuestionnaireAnswer(
       return;
     }
 
-    // Detectar perguntas do paciente (linha ~500)
-    const looksLikeQuestion = message.includes('?') ||
-      message.toLowerCase().includes('o que') ||
-      message.toLowerCase().includes('como');
+    // 2. Obter fase atual salva no banco
+    const savedPhase = questionnaireData.conversationPhase || 'collecting_data';
 
-    if (looksLikeQuestion && conversationHistory.length < 2) {
-      // IA vai responder a dúvida
-      logger.debug('Pergunta detectada - IA vai responder');
-    }
+    // 3. Buscar protocolos aplicáveis
+    const protocols = await findApplicableProtocols(
+      patient.userId,
+      followUp.surgery.type,
+      followUp.dayNumber,
+      patient.researchId
+    );
 
-    // 2. Obter fase atual salva no banco (mais confiável)
-    const savedPhase = questionnaireData.conversationPhase || 'collecting_pain';
-    logger.debug('📍 Fase atual:', savedPhase);
+    const protocolText = formatProtocolsForPrompt(protocols);
 
-    // 3. Chamar Claude API com a fase atual
+    // 4. Chamar Claude API com a fase atual e protocolos
     const aiResponse = await callClaudeAPI(
       conversationHistory,
       message,
       patient,
       followUp.surgery.type,
       followUp.dayNumber,
-      savedPhase, // Passar fase salva para a IA
-      questionnaireData.extractedData // Passar dados já coletados
+      savedPhase,
+      questionnaireData.extractedData,
+      protocolText,
+      patient.doctorName || 'seu médico'
     );
 
-    // 4. PRIMEIRO: Enviar resposta da IA (texto)
+    // 5. Enviar resposta da IA
     await sendEmpatheticResponse(phone, aiResponse.message);
 
-    // 5. SEGUNDO: Se precisa enviar imagem, enviar DEPOIS do texto
     if (aiResponse.needsImage) {
       await new Promise(resolve => setTimeout(resolve, 500));
       await sendImageScale(phone, aiResponse.needsImage);
     }
 
-    // 5. Atualizar histórico de conversação
+    // 6. Atualizar histórico
     conversationHistory.push(
       { role: 'user', content: message },
       { role: 'assistant', content: aiResponse.message }
     );
 
-    // Merge dados extraídos (preservar dados anteriores)
     const mergedData = {
       ...questionnaireData.extractedData,
       ...aiResponse.dataCollected,
     };
 
-    // Validar dados mesclados antes de salvar
-    const validatedMergedData = validatePostOpData(mergedData);
-    if (!validatedMergedData) {
-      logger.warn('⚠️ Merged data validation failed, using unvalidated data');
-    } else {
-      // Validar regras de negócio por dia
-      const dayValidation = validatePostOpDataByDay(validatedMergedData, followUp.dayNumber);
-      if (dayValidation.warnings.length > 0) {
-        logger.warn('⚠️ PostOp validation warnings:', dayValidation.warnings);
-      }
-      if (!dayValidation.valid) {
-        logger.error('❌ PostOp validation errors:', dayValidation.errors);
-      }
-    }
-
-    // 6. Atualizar banco de dados
+    // 7. Atualizar banco
     const updatedQuestionnaireData = {
       conversation: conversationHistory,
       extractedData: mergedData,
@@ -1620,9 +1549,7 @@ async function processQuestionnaireAnswer(
     if (response) {
       await prisma.followUpResponse.update({
         where: { id: response.id },
-        data: {
-          questionnaireData: JSON.stringify(updatedQuestionnaireData),
-        },
+        data: { questionnaireData: JSON.stringify(updatedQuestionnaireData) },
       });
     } else {
       await prisma.followUpResponse.create({
@@ -1630,23 +1557,19 @@ async function processQuestionnaireAnswer(
           followUpId: followUp.id,
           userId: patient.userId,
           questionnaireData: JSON.stringify(updatedQuestionnaireData),
-          riskLevel: 'low', // Será atualizado na finalização
+          riskLevel: 'low',
         },
       });
     }
 
-    // 7. Se completou, finalizar follow-up
+    // 8. Se completou, finalizar
     if (aiResponse.completed) {
-      logger.debug('✅ Questionário completado via IA - finalizando...');
       await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData, response?.id || '');
     }
 
   } catch (error) {
     logger.error('❌ Erro ao processar resposta com IA:', error);
-    await sendEmpatheticResponse(
-      phone,
-      'Tive um erro ao processar. Pode responder novamente?'
-    );
+    await sendEmpatheticResponse(phone, 'Tive um erro ao processar. Pode responder novamente?');
   }
 }
 
@@ -1994,13 +1917,14 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
     // REGEXP_REPLACE remove todos os caracteres não-numéricos
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await prisma.$queryRaw`
-      SELECT id, name, phone, "userId"
-      FROM "Patient"
-      WHERE "isActive" = true
+      SELECT p.id, p.name, p.phone, p."userId", p."researchId", p."researchGroup", u."nomeCompleto" as "doctorName"
+      FROM "Patient" p
+      JOIN "User" u ON p."userId" = u.id
+      WHERE p."isActive" = true
       AND (
-        REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last11}%`}
-        OR REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last9}%`}
-        OR REGEXP_REPLACE(phone, '[^0-9]', '', 'g') LIKE ${`%${last8}%`}
+        REGEXP_REPLACE(p.phone, '[^0-9]', '', 'g') LIKE ${`%${last11}%`}
+        OR REGEXP_REPLACE(p.phone, '[^0-9]', '', 'g') LIKE ${`%${last9}%`}
+        OR REGEXP_REPLACE(p.phone, '[^0-9]', '', 'g') LIKE ${`%${last8}%`}
       )
       LIMIT 1
     ` as any[];
@@ -2011,7 +1935,9 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
         patientId: patient.id,
         patientName: patient.name,
         patientPhone: patient.phone,
-        userId: patient.userId
+        userId: patient.userId,
+        researchId: patient.researchId,
+        doctorName: patient.doctorName
       })
       return patient
     }
@@ -2028,7 +1954,17 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
   try {
     const allPatients = await prisma.patient.findMany({
       where: { isActive: true },
-      select: { id: true, name: true, phone: true, userId: true }
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        userId: true,
+        researchId: true,
+        researchGroup: true,
+        user: {
+          select: { nomeCompleto: true }
+        }
+      }
     })
 
     logger.debug(`📋 Buscando entre ${allPatients.length} pacientes ativos via fallback`)
@@ -2038,13 +1974,19 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
       if (patientPhoneNormalized.includes(last11) ||
         patientPhoneNormalized.includes(last9) ||
         patientPhoneNormalized.includes(last8)) {
+
         logger.debug('✅ Paciente encontrado via fallback JavaScript', {
           patientId: patient.id,
           patientName: patient.name,
           patientPhone: patient.phone,
-          userId: patient.userId
+          userId: patient.userId,
+          doctorName: patient.user?.nomeCompleto
         })
-        return patient
+
+        return {
+          ...patient,
+          doctorName: patient.user?.nomeCompleto
+        }
       }
     }
 

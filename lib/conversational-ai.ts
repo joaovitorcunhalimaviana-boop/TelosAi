@@ -212,7 +212,17 @@ CONTEXTO DO PACIENTE:
 5. ENCERRAMENTO:
    Só finalize quando tiver TODAS as informações.
 
-RESPONDA APENAS COM JSON:
+RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
+DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
+
+EXAMPLES OF PARSING:
+- User: "Não tive febre" -> "fever": false
+- User: "Sem febre" -> "fever": false
+- User: "Tive um pouco de febre, 37.5" -> "fever": true, "feverTemperature": 37.5
+- User: "Não estou com dor" -> "pain": 0
+- User: "Dor suportável" -> DO NOT GUESS NUMBER, ASK 0-10
+
+JSON STRUCTURE:
 {
   "response": "sua resposta natural para o paciente",
   "extractedInfo": {
@@ -223,6 +233,7 @@ RESPONDA APENAS COM JSON:
     "painComparison": "worse",  // "better"|"same"|"worse" (D+2+)
     "medications": true,
     "painControlledWithMeds": false,
+    "fever": false,
     // ... outros campos conforme coletados
   },
   "sendImages": {
@@ -261,7 +272,7 @@ RESPONDA APENAS COM JSON:
     const response = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
-      temperature: 0.7, // Mais criativa para conversação natural
+      temperature: 0.1, // Reduzido para garantir formato JSON estrito
       system: systemPrompt,
       messages: messages,
     });
@@ -271,13 +282,33 @@ RESPONDA APENAS COM JSON:
       throw new Error('Unexpected response type from Claude');
     }
 
-    // Extrair JSON da resposta
-    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    // Limpar markdown formatting se presente
+    let cleanText = content.text.trim();
+
+    // Remove markdown code blocks if explicitly wrapped
+    if (cleanText.includes('```')) {
+      cleanText = cleanText.replace(/```json/g, '').replace(/```/g, '');
+    }
+
+    // Encontrar o primeiro '{' e o último '}' para isolar o objeto JSON
+    const startIndex = cleanText.indexOf('{');
+    const endIndex = cleanText.lastIndexOf('}');
+
+    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+      console.error('Invalid AI response structure (brackets mismatch):', cleanText);
       throw new Error('No JSON found in Claude response');
     }
 
-    const result = JSON.parse(jsonMatch[0]);
+    const jsonString = cleanText.substring(startIndex, endIndex + 1);
+
+    let result;
+    try {
+      result = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      console.error('Failed JSON String:', jsonString);
+      throw new Error('Failed to parse JSON from AI response');
+    }
 
     // Atualizar dados coletados
     const updatedData = {
@@ -299,7 +330,7 @@ RESPONDA APENAS COM JSON:
 
     // Fallback: resposta genérica
     return {
-      aiResponse: 'Desculpe, tive um problema técnico. Pode repetir sua resposta, por favor?',
+      aiResponse: 'Desculpe, tive uma pequena falha de conexão. Poderia repetir sua última resposta, por favor?',
       updatedData: currentData,
       isComplete: false,
       needsDoctorAlert: false,

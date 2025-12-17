@@ -50,13 +50,13 @@ export default async function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-blue-900">
+              <h1 className="text-3xl font-bold text-[#0A2647]">
                 Admin Dashboard - Telos.AI
               </h1>
               <p className="text-sm text-gray-600 mt-1">
@@ -103,54 +103,60 @@ export default async function AdminDashboard() {
 
         {/* Detalhamento de Planos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-yellow-200">
+          <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg ring-1 ring-gold-200/50 p-6 border-l-4 border-l-[#D4AF37]">
             <div className="flex items-center gap-3 mb-4">
-              <Star className="h-6 w-6 text-yellow-600" />
+              <div className="p-2 bg-yellow-50 rounded-lg">
+                <Star className="h-6 w-6 text-[#D4AF37]" />
+              </div>
               <h2 className="text-xl font-bold text-gray-900">Founding Members</h2>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total de membros</span>
-                <span className="text-2xl font-bold text-yellow-600">{foundingMembers}</span>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-yellow-50/50 rounded-md">
+                <span className="text-gray-600 font-medium">Total de membros</span>
+                <span className="text-2xl font-bold text-[#D4AF37]">{foundingMembers}</span>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Plano base</span>
-                <span className="font-semibold">R$ 400/mês</span>
+              <div className="flex justify-between items-center text-sm px-2">
+                <span className="text-gray-500">Plano base</span>
+                <span className="font-bold text-gray-900">R$ 400/mês</span>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Paciente adicional</span>
-                <span className="font-semibold">R$ 150</span>
+              <div className="flex justify-between items-center text-sm px-2">
+                <span className="text-gray-500">Paciente adicional</span>
+                <span className="font-bold text-gray-900">R$ 150</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-blue-200">
+          <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg ring-1 ring-blue-100 p-6 border-l-4 border-l-[#0A2647]">
             <div className="flex items-center gap-3 mb-4">
-              <UserCheck className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <UserCheck className="h-6 w-6 text-[#0A2647]" />
+              </div>
               <h2 className="text-xl font-bold text-gray-900">Professional</h2>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total de membros</span>
-                <span className="text-2xl font-bold text-blue-600">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-blue-50/50 rounded-md">
+                <span className="text-gray-600 font-medium">Total de membros</span>
+                <span className="text-2xl font-bold text-[#0A2647]">
                   {totalMedicos - foundingMembers}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Plano base</span>
-                <span className="font-semibold">R$ 500/mês</span>
+              <div className="flex justify-between items-center text-sm px-2">
+                <span className="text-gray-500">Plano base</span>
+                <span className="font-bold text-gray-900">R$ 500/mês</span>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Paciente adicional</span>
-                <span className="font-semibold">R$ 180</span>
+              <div className="flex justify-between items-center text-sm px-2">
+                <span className="text-gray-500">Paciente adicional</span>
+                <span className="font-bold text-gray-900">R$ 180</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Links rápidos */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Ações Rápidas</h2>
+        <div className="mb-6 mt-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            🚀 Ações Rápidas
+          </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <QuickLink

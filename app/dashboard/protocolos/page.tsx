@@ -232,8 +232,8 @@ export default function ProtocolsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="p-8 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="p-8 max-w-7xl mx-auto space-y-8">
         {/* Header com botão voltar */}
         <div className="mb-8">
           <Button
@@ -246,15 +246,15 @@ export default function ProtocolsPage() {
           </Button>
 
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg">
-              <FileText className="w-7 h-7 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg shadow-blue-900/20">
+              <FileText className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-[#0A2647]">
+              <h1 className="text-4xl font-bold text-[#0A2647]">
                 Protocolos Pós-Operatórios
               </h1>
-              <p className="text-gray-600 mt-1">
-                Configure os protocolos para cada tipo de cirurgia. A IA usará automaticamente.
+              <p className="text-gray-500 mt-2 text-lg">
+                Configure as orientações que a IA usará para cuidar dos seus pacientes.
               </p>
             </div>
           </div>
@@ -282,7 +282,7 @@ export default function ProtocolsPage() {
             onClick={handleCreate}
             disabled={isCreating}
             size="lg"
-            className="shadow-lg bg-[#0A2647] hover:bg-[#0D3156] border-2 border-[#D4AF37]"
+            className="shadow-xl shadow-blue-900/10 bg-[#0A2647] hover:bg-[#08203d] text-white transition-all hover:scale-105 active:scale-95"
           >
             <Plus className="w-5 h-5 mr-2" />
             Novo Protocolo
@@ -435,7 +435,7 @@ export default function ProtocolsPage() {
                   <X className="w-4 h-4 mr-2" />
                   Cancelar
                 </Button>
-                <Button onClick={handleSave} size="lg" className="min-w-32 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Button onClick={handleSave} size="lg" className="min-w-32 bg-[#0A2647] hover:bg-[#061a33] text-white shadow-md transition-all hover:scale-105 active:scale-95">
                   <Save className="w-4 h-4 mr-2" />
                   Salvar Protocolo
                 </Button>
@@ -462,57 +462,65 @@ export default function ProtocolsPage() {
             protocols.map(protocol => (
               <Card
                 key={protocol.id}
-                className={`transition-all hover:shadow-lg ${!protocol.isActive ? 'opacity-50' : 'border-l-4 border-l-blue-500'}`}
+                className={`group transition-all duration-300 hover:shadow-xl border-0 bg-white/70 backdrop-blur-md shadow-sm ring-1 ring-gray-200/50 ${!protocol.isActive ? 'opacity-60 grayscale' : 'hover:-translate-y-1'}`}
               >
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
-                      <CardTitle className="text-xl font-bold text-blue-900">
-                        {protocol.title}
-                      </CardTitle>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {protocol.researchId && (
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md">
-                            🔬 PESQUISA: {protocol.research?.title || 'Pesquisa'}
+                      <div className="flex items-center gap-3 mb-2">
+                        <CardTitle className="text-xl font-bold text-gray-900">
+                          {protocol.title}
+                        </CardTitle>
+                        {!protocol.isActive && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 uppercase tracking-wide border border-gray-200">
+                            Inativo
                           </span>
                         )}
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {protocol.researchId && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                            🔬 {protocol.research?.title || 'Pesquisa'}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
                           🔪 {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label}
                         </span>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
                           📌 {categories.find(c => c.value === protocol.category)?.label}
                         </span>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
                           📅 {getDayRangeText(protocol.dayRangeStart, protocol.dayRangeEnd)}
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(protocol)}
-                        className="hover:bg-blue-50 hover:border-blue-300"
+                        className="hover:bg-blue-50 text-gray-500 hover:text-blue-600"
                       >
-                        <Edit2 className="w-4 h-4 mr-1" />
-                        Editar
+                        <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(protocol.id)}
-                        className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                        className="hover:bg-red-50 text-gray-500 hover:text-red-600"
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Excluir
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <p className="text-sm font-medium text-gray-700 mb-2">💬 Orientação que será enviada:</p>
-                    <p className="text-base whitespace-pre-wrap text-gray-900">{protocol.content}</p>
+                  <div className="bg-gray-50/80 rounded-lg p-5 border border-gray-100/50">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Orientação ao Paciente</p>
+                    <p className="text-base leading-relaxed text-gray-700 font-serif italic">
+                      &ldquo;{protocol.content}&rdquo;
+                    </p>
                   </div>
                 </CardContent>
               </Card>

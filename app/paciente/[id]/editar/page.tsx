@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -71,55 +71,115 @@ export default function EditPatientPage() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [researchValidation, setResearchValidation] = useState<ValidationResult | null>(null)
 
-  // Auto-save every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (patient) {
-        autoSave()
-      }
-    }, 30000) // 30 seconds
-
-    return () => clearInterval(interval)
-  }, [patient])
-
-  // Load patient data
-  useEffect(() => {
-    async function loadInitialData() {
-      setLoading(true)
-      await loadPatient()
-      setLoading(false)
-    }
-
-    loadInitialData()
-  }, [params.id])
-
-  // Validate research fields whenever patient data changes
-  useEffect(() => {
-    if (patient && patient.isResearchParticipant) {
-      const validation = validateResearchFields(patient)
-      setResearchValidation(validation)
-    } else {
-      setResearchValidation(null)
-    }
-  }, [patient])
-
   function calculateCompletedSections(data: PatientData): Set<string> {
     const completed = new Set<string>()
-
     // Dados básicos sempre completo (vem do express)
     completed.add("basicos")
-
     // Check other sections based on data presence
-    if (data.surgery.hospital || data.surgery.durationMinutes) {
+    if (data?.surgery && (data.surgery.hospital || data.surgery.durationMinutes)) {
       completed.add("detalhes")
     }
-
-    // Add more logic for other sections
-
     return completed
   }
 
-  async function autoSave() {
+  const loadPatient = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/paciente/${params.id}`)
+      if (!response.ok) throw new Error("Paciente não encontrado")
+
+      const result = await response.json()
+
+      if (!result.success || !result.data) {
+        throw new Error("Formato de dados inválido")
+      }
+
+      const patientData = result.data
+
+      // Transform surgeries array to surgery object (take the latest one)
+      if (patientData.surgeries && Array.isArray(patientData.surgeries) && patientData.surgeries.length > 0) {
+        patientData.surgery = patientData.surgeries[0] || {};
+      }
+
+      // If surgery is still undefined or null, set default
+      if (!patientData.surgery || Object.keys(patientData.surgery).length === 0) {
+        patientData.surgery = {
+          id: "temp-id-" + Date.now(),
+          type: "não informado",
+          date: new Date(),
+          dataCompleteness: 0,
+          hospital: "",
+          durationMinutes: 0
+        };
+      } else {
+        // Ensure type property exists
+        if (!patientData.surgery.type) {
+          patientData.surgery.type = "não informado";
+        }
+      }
+
+      // NORMALIZATION
+      const rawType = (patientData.surgery.type || "").toLowerCase().trim();
+      let normalizedType = rawType;
+
+      if (rawType.includes("hemorroid")) normalizedType = "hemorroidectomia";
+      else if (rawType.includes("fistula") || rawType.includes("fístula")) normalizedType = "fistula";
+      else if (rawType.includes("fissura")) normalizedType = "fissura";
+      else if (rawType.includes("pilonidal") || rawType.includes("cisto")) normalizedType = "cisto_pilonidal";
+
+      patientData.surgery.type = normalizedType;
+      patientData.surgeryType = normalizedType;
+
+      setPatient(patientData)
+
+      // Calculate completed sections
+      const completed = calculateCompletedSections(patientData)
+      setCompletedSections(completed)
+    } catch (error) {
+      console.error("Error loading patient:", error)
+      toast({
+        title: "Erro ao carregar dados",
+        description: error instanceof Error ? error.message : "Não foi possível carregar os dados do paciente",
+        variant: "destructive"
+      })
+    }
+  }, [params.id, toast])
+
+  const handleTemplateSaved = useCallback(() => {
+    toast({
+      title: "Template salvo",
+      description: "Você pode aplicá-lo a outros pacientes na página de Templates"
+    })
+  }, [toast])
+
+  const handleTemplateApplied = useCallback(() => {
+    loadPatient()
+  }, [loadPatient])
+
+  const handleSectionUpdate = useCallback((updates: any) => {
+    setPatient(prev => {
+      if (!prev) return null;
+      return { ...prev, ...updates };
+    });
+  }, [])
+
+  const handleSectionComplete = useCallback((sectionId: string, isComplete: boolean) => {
+    setCompletedSections(prev => {
+      const newSet = new Set(prev);
+      if (isComplete) {
+        newSet.add(sectionId);
+      } else {
+        newSet.delete(sectionId);
+      }
+      // Stable return to avoid re-renders if size didn't change (and content implies same state roughly for badgess)
+      // Actually simply comparing size isn't enough but effectively we just need to avoid update if 'has' didn't change.
+      if (prev.has(sectionId) === isComplete) {
+        return prev;
+      }
+      return newSet;
+    });
+  }, [])
+
+  const autoSave = useCallback(async () => {
     if (!patient) return
 
     try {
@@ -132,11 +192,12 @@ export default function EditPatientPage() {
     } catch (error) {
       console.error("Auto-save failed:", error)
     }
-  }
+  }, [patient, params.id])
 
   async function handleSave() {
     setSaving(true)
     try {
+      if (!patient) return;
       await fetch(`/api/paciente/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -160,62 +221,35 @@ export default function EditPatientPage() {
     }
   }
 
-  function markSectionComplete(sectionId: string) {
-    setCompletedSections(prev => new Set([...prev, sectionId]))
-  }
-
-  function handleTemplateApplied() {
-    // Reload patient data after template is applied
-    loadPatient()
-  }
-
-  function handleTemplateSaved() {
-    toast({
-      title: "Template salvo",
-      description: "Você pode aplicá-lo a outros pacientes na página de Templates"
-    })
-  }
-
-  async function loadPatient() {
-    try {
-      const response = await fetch(`/api/paciente/${params.id}`)
-      if (!response.ok) throw new Error("Paciente não encontrado")
-
-      const result = await response.json()
-
-      if (!result.success || !result.data) {
-        throw new Error("Formato de dados inválido")
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (patient) {
+        autoSave()
       }
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [patient, autoSave])
 
-      const patientData = result.data
-
-      // Transform surgeries array to surgery object (take the latest one)
-      if (patientData.surgeries && patientData.surgeries.length > 0) {
-        patientData.surgery = patientData.surgeries[0]
-      } else {
-        // Fallback for patients with no surgery (avoids undefined crash)
-        patientData.surgery = {
-          id: "",
-          type: "não informado",
-          date: new Date(),
-          dataCompleteness: 0
-        }
-      }
-
-      setPatient(patientData)
-
-      // Calculate completed sections
-      const completed = calculateCompletedSections(patientData)
-      setCompletedSections(completed)
-    } catch (error) {
-      console.error("Error loading patient:", error)
-      toast({
-        title: "Erro ao carregar dados",
-        description: error instanceof Error ? error.message : "Não foi possível carregar os dados do paciente",
-        variant: "destructive"
-      })
+  // Load patient data initial effect
+  useEffect(() => {
+    async function loadInitialData() {
+      setLoading(true)
+      await loadPatient()
+      setLoading(false)
     }
-  }
+    loadInitialData()
+  }, [loadPatient])
+
+  // Validate research fields whenever patient data changes
+  useEffect(() => {
+    if (patient && patient.isResearchParticipant) {
+      const validation = validateResearchFields(patient)
+      setResearchValidation(validation)
+    } else {
+      setResearchValidation(null)
+    }
+  }, [patient])
 
   const sections = [
     { id: "basicos", label: "Dados Básicos", component: DadosBasicosSection },
@@ -265,7 +299,6 @@ export default function EditPatientPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] to-[#E2E8F0] p-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -282,8 +315,8 @@ export default function EditPatientPage() {
                 <div>
                   <CardTitle className="text-2xl">{patient.name}</CardTitle>
                   <CardDescription className="mt-2">
-                    {patient.surgery.type.charAt(0).toUpperCase() + patient.surgery.type.slice(1)} - {" "}
-                    {new Date(patient.surgery.date).toLocaleDateString("pt-BR")}
+                    {(patient.surgery?.type || "não informado").charAt(0).toUpperCase() + (patient.surgery?.type || "não informado").slice(1)} - {" "}
+                    {patient.surgery?.date ? new Date(patient.surgery.date).toLocaleDateString("pt-BR") : "Data desconhecida"}
                   </CardDescription>
                 </div>
                 <div className="text-right">
@@ -313,15 +346,13 @@ export default function EditPatientPage() {
           </Card>
         </div>
 
-        {/* Research Completion Progress */}
-        {patient?.isResearchParticipant && researchValidation && (
+        {patient.isResearchParticipant && researchValidation && (
           <ResearchCompletionProgress
             validation={researchValidation}
             isResearchParticipant={true}
             className="mb-6"
             showDetails={true}
             onFieldClick={(fieldId) => {
-              // Auto-scroll to field
               const element = document.getElementById(fieldId)
               if (element) {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -331,10 +362,9 @@ export default function EditPatientPage() {
           />
         )}
 
-        {/* ML Risk Prediction */}
-        {patient?.surgery?.predictedRisk !== null &&
-          patient?.surgery?.predictedRisk !== undefined &&
-          patient?.surgery?.predictedRiskLevel ? (
+        {patient.surgery?.predictedRisk !== null &&
+          patient.surgery?.predictedRisk !== undefined &&
+          patient.surgery?.predictedRiskLevel ? (
           <SurgeryRiskDisplay
             risk={patient.surgery.predictedRisk}
             level={patient.surgery.predictedRiskLevel}
@@ -349,24 +379,20 @@ export default function EditPatientPage() {
           <SurgeryRiskNotAvailable className="mb-6" />
         )}
 
-        {/* AI Recovery Insights */}
-        {patient?.surgery?.id && (
+        {patient.surgery?.id && (
           <div className="mb-6">
             <AIRecoveryInsights surgeryId={patient.surgery.id} />
           </div>
         )}
 
-        {/* Pain Evolution Chart */}
         <div className="mb-6">
           <PainEvolutionChart patientId={patient.id} />
         </div>
 
-        {/* WhatsApp Conversation Timeline */}
         <div className="mb-6">
           <ConversationTimeline patientId={patient.id} />
         </div>
 
-        {/* Main Form */}
         <Card>
           <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -391,8 +417,8 @@ export default function EditPatientPage() {
                   <TabsContent key={section.id} value={section.id}>
                     <SectionComponent
                       patient={patient}
-                      onUpdate={setPatient}
-                      onComplete={() => markSectionComplete(section.id)}
+                      onUpdate={handleSectionUpdate}
+                      onComplete={(isComplete: boolean) => handleSectionComplete(section.id, isComplete)}
                       isResearchParticipant={patient?.isResearchParticipant || false}
                     />
                   </TabsContent>
@@ -400,7 +426,6 @@ export default function EditPatientPage() {
               })}
             </Tabs>
 
-            {/* Template Actions */}
             <div className="flex justify-center gap-3 mt-6 pt-6 border-t">
               <Button
                 variant="outline"
@@ -421,7 +446,6 @@ export default function EditPatientPage() {
               </Button>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-between mt-4 pt-4 border-t">
               <Button
                 variant="outline"
@@ -451,15 +475,14 @@ export default function EditPatientPage() {
           </CardContent>
         </Card>
 
-        {/* Template Dialogs */}
         {patient && (
           <>
             <ApplyTemplateDialog
               open={applyDialogOpen}
               onOpenChange={setApplyDialogOpen}
-              surgeryType={patient.surgery.type}
+              surgeryType={patient.surgery?.type || "não informado"}
               patientId={patient.id}
-              surgeryId={patient.surgery.id}
+              surgeryId={patient.surgery?.id || ""}
               onSuccess={handleTemplateApplied}
             />
 
