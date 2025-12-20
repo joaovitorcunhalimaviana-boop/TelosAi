@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
-import { sendDoctorAlert } from '@/lib/whatsapp';
+import { sendWhatsAppToDoctor } from '@/lib/whatsapp';
 
 /**
  * Verifica follow-ups que estão pendentes há muito tempo (6 horas)
@@ -24,7 +24,6 @@ export async function checkAndAlertDoctor() {
                 createdAt: {
                     lt: sixHoursAgo
                 },
-                // Apenas respostas que ainda não foram "concluídas" ou analisadas
                 followUp: {
                     status: {
                         in: ['sent', 'in_progress']
@@ -35,7 +34,11 @@ export async function checkAndAlertDoctor() {
                 followUp: {
                     include: {
                         patient: true,
-                        surgery: true
+                        surgery: {
+                            include: {
+                                user: true // Incluir dados do médico para pegar telefone
+                            }
+                        }
                     }
                 }
             }
@@ -50,23 +53,30 @@ export async function checkAndAlertDoctor() {
 
         for (const response of stalledFollowUps) {
             const patient = response.followUp.patient;
+            const doctor = response.followUp.surgery.user;
             const hoursDelayed = Math.floor((new Date().getTime() - response.createdAt.getTime()) / (1000 * 60 * 60));
 
             const message = `⚠️ *ALERTA DE FALTA DE RESPOSTA*\n\n` +
                 `O paciente *${patient.name}* (D+${response.followUp.dayNumber}) iniciou o questionário há ${hoursDelayed} horas mas não concluiu.\n\n` +
                 `Status: ${response.followUp.status}\n` +
-                `Última interação: ${response.updatedAt.toLocaleTimeString('pt-BR')}`;
+                `Última interação: ${response.createdAt.toLocaleTimeString('pt-BR')}`;
 
             // Enviar alerta para o médico
-            await sendDoctorAlert(message);
+            // Prioridade: Telefone no cadastro do médico > Env Var
+            const doctorPhone = doctor.whatsapp || doctor.whatsappNumber || process.env.DOCTOR_PHONE_NUMBER;
+
+            if (doctorPhone) {
+                await sendWhatsAppToDoctor(doctorPhone, message);
+                logger.info(`✅ Médico alertado sobre ${patient.name}`);
+            } else {
+                logger.warn(`⚠️ Não foi possível alertar médico sobre ${patient.name}: Telefone não encontrado.`);
+            }
 
             // Marcar como alertado para não spactar
             await prisma.followUpResponse.update({
                 where: { id: response.id },
                 data: { doctorAlerted: true }
             });
-
-            logger.info(`✅ Médico alertado sobre ${patient.name}`);
         }
 
     } catch (error) {
