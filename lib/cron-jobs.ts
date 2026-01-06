@@ -304,8 +304,12 @@ export async function checkStalledFollowUps() {
                     if (lastMessage.content.includes('esqueceu') || lastMessage.content.includes('ainda está aí')) {
                         // Se já passou 12 horas e médico não foi avisado -> AVISAR MÉDICO
                         if (followUp.updatedAt < twelveHoursAgo && !lastResponse.doctorAlerted) {
+                            // Enviar alerta formata para o médico
                             await sendDoctorAlert(
-                                `⚠️ *PACIENTE SEM RESPOSTA*\n\nO paciente ${followUp.patient.name} parou de responder o questionário há mais de 12 horas.\nÚltima interação: ${followUp.updatedAt.toLocaleString('pt-BR')}`
+                                followUp.patient.name,
+                                followUp.dayNumber,
+                                'high', // Risco alto pois paciente parou de responder
+                                ['Paciente parou de responder há mais de 12 horas'] // Motivo
                             );
 
                             // Marcar que médico foi avisado
