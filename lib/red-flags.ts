@@ -6,15 +6,15 @@
 export interface RedFlagInput {
   surgeryType: 'hemorroidectomia' | 'fistula' | 'fissura' | 'pilonidal';
   dayNumber: number;
-  painLevel?: number;
-  urinaryRetention?: boolean;
-  urinaryRetentionHours?: number;
-  bowelMovement?: boolean;
-  bleeding?: 'none' | 'light' | 'moderate' | 'severe';
-  fever?: boolean;
-  temperature?: number;
-  discharge?: 'none' | 'serous' | 'purulent' | 'abundant';
-  additionalSymptoms?: string[];
+  painLevel?: number | null;
+  urinaryRetention?: boolean | null;
+  urinaryRetentionHours?: number | null;
+  bowelMovement?: boolean | null;
+  bleeding?: 'none' | 'light' | 'moderate' | 'severe' | null;
+  fever?: boolean | null;
+  temperature?: number | null;
+  discharge?: 'none' | 'serous' | 'purulent' | 'abundant' | null;
+  additionalSymptoms?: string[] | null;
 }
 
 export interface RedFlag {
@@ -103,7 +103,7 @@ function detectUniversalRedFlags(input: RedFlagInput): RedFlag[] {
   }
 
   // Dor extrema (>9/10)
-  if (input.painLevel !== undefined && input.painLevel >= 9) {
+  if (input.painLevel != null && input.painLevel >= 9) {
     flags.push({
       id: 'pain_extreme',
       severity: 'critical',
@@ -151,7 +151,7 @@ function detectHemorroidectomyRedFlags(input: RedFlagInput): RedFlag[] {
   }
 
   // Dor muito intensa (>8/10)
-  if (input.painLevel !== undefined && input.painLevel > 8) {
+  if (input.painLevel != null && input.painLevel > 8) {
     flags.push({
       id: 'pain_very_intense_hemorrhoid',
       severity: 'high',
@@ -190,7 +190,7 @@ function detectFistulaRedFlags(input: RedFlagInput): RedFlag[] {
   }
 
   // Dor muito intensa (>8/10)
-  if (input.painLevel !== undefined && input.painLevel > 8) {
+  if (input.painLevel != null && input.painLevel > 8) {
     flags.push({
       id: 'pain_very_intense_fistula',
       severity: 'high',
@@ -223,7 +223,7 @@ function detectFissureRedFlags(input: RedFlagInput): RedFlag[] {
   const flags: RedFlag[] = [];
 
   // Dor persistente muito intensa (>9/10)
-  if (input.painLevel !== undefined && input.painLevel > 9) {
+  if (input.painLevel != null && input.painLevel > 9) {
     flags.push({
       id: 'pain_extreme_fissure',
       severity: 'high',
@@ -286,7 +286,7 @@ function detectPilonidalRedFlags(input: RedFlagInput): RedFlag[] {
   }
 
   // Dor muito intensa
-  if (input.painLevel !== undefined && input.painLevel > 8) {
+  if (input.painLevel != null && input.painLevel > 8) {
     flags.push({
       id: 'pain_very_intense_pilonidal',
       severity: 'high',
