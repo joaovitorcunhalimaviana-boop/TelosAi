@@ -5,15 +5,15 @@ import { z } from 'zod';
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
 
 // Schema for structured output validation
-const geminiResponseSchema = z.object({
+export const geminiResponseSchema = z.object({
     reasoning: z.string(),
     message: z.string(),
     needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
     dataCollected: z.object({
-        painAtRest: z.number().nullable().optional(),
-        painDuringBowelMovement: z.number().nullable().optional(),
-        bleeding: z.boolean().nullable().optional(),
-        hasFever: z.boolean().nullable().optional(),
+        painAtRest: z.union([z.number(), z.string()]).nullable().optional(),
+        painDuringBowelMovement: z.union([z.number(), z.string()]).nullable().optional(),
+        bleeding: z.union([z.boolean(), z.string()]).nullable().optional(),
+        hasFever: z.union([z.boolean(), z.string()]).nullable().optional(),
         worry: z.string().nullable().optional(),
         otherSymptoms: z.array(z.string()).optional()
     }),
@@ -67,7 +67,8 @@ DIRETRIZES DE PERSONALIDADE E FLUXO:
 3. **UMA COISA DE CADA VEZ**: Não faça várias perguntas na mesma mensagem.
 4. **MEMÓRIA**: Use o histórico. Se ele já falou que não tem febre, não pergunte de novo.
 5. **DOR (0-10)**: Sempre que pedir nota de dor, explique a escala (0=sem dor, 10=pior dor).
-6. **FINALIZAÇÃO**: Só marque "completed": true quando TODOS os itens do checklist estiverem preenchidos E o paciente não tiver mais dúvidas.
+6. **RESPOSTAS QUALITATIVAS**: Se o paciente disser "dor média", "muita dor", "um pouco", PEÇA UM NÚMERO. Não tente adivinhar. Explique: "Entendo. Para eu registrar certinho, de 0 a 10, quanto seria essa dor?"
+7. **FINALIZAÇÃO**: Só marque "completed": true quando TODOS os itens do checklist estiverem preenchidos E o paciente não tiver mais dúvidas.
 
 FORMATO DE RESPOSTA (JSON ONLY):
 Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
@@ -76,13 +77,13 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
   "message": "Sua resposta textual para o paciente.",
   "needsImage": "pain_scale" | "bristol_scale" | null, (Use null se não precisar enviar imagem AGORA)
   "dataCollected": {
-    "painAtRest": number (0-10),
-    "painDuringBowelMovement": number (0-10),
-    "hasFever": boolean,
-    "bleeding": boolean
+    "painAtRest": number (0-10) ou null (NÃO COLOCAR STRING),
+    "painDuringBowelMovement": number (0-10) ou null,
+    "hasFever": boolean ou null,
+    "bleeding": boolean ou null
   },
   "completed": boolean, (true se coletou tudo E tirou dúvidas)
-  "needsClarification": boolean (true se a resposta do usuário foi confusa)
+  "needsClarification": boolean (true se a resposta do usuário foi confusa ou qualitativa demais)
 }
 `;
 
@@ -120,7 +121,34 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
         try {
             const parsed = JSON.parse(responseText);
             const validated = geminiResponseSchema.parse(parsed);
-            return validated;
+
+            // Sanitização de dados (Converter strings para números/booleanos ou limpar)
+            if (validated.dataCollected) {
+                // Pain At Rest
+                if (typeof validated.dataCollected.painAtRest === 'string') {
+                    const num = parseInt(validated.dataCollected.painAtRest);
+                    if (!isNaN(num)) {
+                        validated.dataCollected.painAtRest = num;
+                    } else {
+                        // Se não for número, o AI se confundiu. Limpar e marcar para clarificação.
+                        validated.dataCollected.painAtRest = null;
+                        validated.needsClarification = true;
+                    }
+                }
+
+                // Pain During Bowel
+                if (typeof validated.dataCollected.painDuringBowelMovement === 'string') {
+                    const num = parseInt(validated.dataCollected.painDuringBowelMovement);
+                    if (!isNaN(num)) {
+                        validated.dataCollected.painDuringBowelMovement = num;
+                    } else {
+                        validated.dataCollected.painDuringBowelMovement = null;
+                        validated.needsClarification = true;
+                    }
+                }
+            }
+
+            return validated as GeminiResponse;
         } catch (parseError) {
             logger.error('Error parsing Gemini response:', parseError);
             // Fallback for malformed JSON
