@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { logger } from '@/lib/logger';
+// import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
@@ -10,10 +10,10 @@ export const geminiResponseSchema = z.object({
     message: z.string(),
     needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
     dataCollected: z.object({
-        painAtRest: z.number().nullable().optional(),
-        painDuringBowelMovement: z.number().nullable().optional(),
-        bleeding: z.boolean().nullable().optional(),
-        hasFever: z.boolean().nullable().optional(),
+        painAtRest: z.union([z.number(), z.string(), z.null()]).optional(),
+        painDuringBowelMovement: z.union([z.number(), z.string(), z.null()]).optional(),
+        bleeding: z.union([z.boolean(), z.string(), z.null()]).optional(),
+        hasFever: z.union([z.boolean(), z.string(), z.null()]).optional(),
         worry: z.string().nullable().optional(),
         otherSymptoms: z.array(z.string()).optional()
     }),
@@ -27,7 +27,7 @@ export type GeminiResponse = z.infer<typeof geminiResponseSchema>;
  * Creates a fallback response in case of API errors or critical issues.
  */
 function createFallbackResponse(errorMessage: string): GeminiResponse {
-    logger.error(`Creating fallback response: ${errorMessage}`);
+    console.error(`Creating fallback response: ${errorMessage}`);
     return {
         reasoning: `Fallback: ${errorMessage}`,
         message: "Desculpe, tive um problema técnico. Por favor, tente novamente mais tarde.",
@@ -59,7 +59,7 @@ export async function analyzePatientMessageWithGemini(
 ): Promise<GeminiResponse> {
     // 1. Verificação de Chave de API
     if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-        logger.error('CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is missing');
+        console.error('CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is missing');
         return createFallbackResponse("Erro de configuração interna (API Key).");
     }
 
@@ -143,7 +143,7 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
         try {
             responseText = result.response.text();
         } catch (textError) {
-            logger.warn('Gemini response blocked or empty:', textError);
+            console.warn('Gemini response blocked or empty:', textError);
             return {
                 reasoning: "Safety block triggered",
                 message: "Entendo. Por favor, poderia reformular sua resposta?",
@@ -154,7 +154,7 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
             };
         }
 
-        logger.debug('Gemini Raw Response:', responseText);
+        console.log('Gemini Raw Response:', responseText);
 
         try {
             const parsed = JSON.parse(responseText);
@@ -197,7 +197,7 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
 
             return validated as GeminiResponse;
         } catch (parseError) {
-            logger.error('Error parsing Gemini response:', parseError);
+            console.error('Error parsing Gemini response:', parseError);
             return {
                 reasoning: "Error parsing JSON",
                 message: "Desculpe, tive um pequeno erro técnico. Pode repetir, por favor?",
@@ -209,7 +209,7 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
         }
 
     } catch (error) {
-        logger.error('Gemini API Fatal Error:', error);
+        console.error('Gemini API Fatal Error:', error);
 
         // Tenta extrair número básico da mensagem do usuário como "backup de emergência"
         let fallbackMessage = "Estou com uma instabilidade técnica momentânea. Por favor, tente responder com palavras simples ou apenas números.";
