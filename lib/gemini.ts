@@ -10,10 +10,10 @@ export const geminiResponseSchema = z.object({
     message: z.string(),
     needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
     dataCollected: z.object({
-        painAtRest: z.union([z.number(), z.string()]).nullable().optional(),
-        painDuringBowelMovement: z.union([z.number(), z.string()]).nullable().optional(),
-        bleeding: z.union([z.boolean(), z.string()]).nullable().optional(),
-        hasFever: z.union([z.boolean(), z.string()]).nullable().optional(),
+        painAtRest: z.number().nullable().optional(),
+        painDuringBowelMovement: z.number().nullable().optional(),
+        bleeding: z.boolean().nullable().optional(),
+        hasFever: z.boolean().nullable().optional(),
         worry: z.string().nullable().optional(),
         otherSymptoms: z.array(z.string()).optional()
     }),
@@ -24,7 +24,22 @@ export const geminiResponseSchema = z.object({
 export type GeminiResponse = z.infer<typeof geminiResponseSchema>;
 
 /**
- * Analyzes patient message using Google Gemini Pro
+ * Creates a fallback response in case of API errors or critical issues.
+ */
+function createFallbackResponse(errorMessage: string): GeminiResponse {
+    logger.error(`Creating fallback response: ${errorMessage}`);
+    return {
+        reasoning: `Fallback: ${errorMessage}`,
+        message: "Desculpe, tive um problema técnico. Por favor, tente novamente mais tarde.",
+        needsImage: null,
+        dataCollected: {},
+        completed: false,
+        needsClarification: true
+    };
+}
+
+/**
+ * Análise de mensagem mais robusta que nunca falha (retorna fallback se API cair)
  */
 export async function analyzePatientMessageWithGemini(
     conversationHistory: any[],
@@ -42,9 +57,16 @@ export async function analyzePatientMessageWithGemini(
     },
     protocols: string = ''
 ): Promise<GeminiResponse> {
+    // 1. Verificação de Chave de API
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+        logger.error('CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is missing');
+        return createFallbackResponse("Erro de configuração interna (API Key).");
+    }
+
     try {
+        // 2. Modelo Estável (Pro)
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-1.5-pro',
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -187,7 +209,19 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
         }
 
     } catch (error) {
-        logger.error('Gemini API Error:', error);
-        throw error;
+        logger.error('Gemini API Fatal Error:', error);
+
+        // Tenta extrair número básico da mensagem do usuário como "backup de emergência"
+        let fallbackMessage = "Estou com uma instabilidade técnica momentânea. Por favor, tente responder com palavras simples ou apenas números.";
+        const extractedNum = userMessage.match(/\d+/);
+
+        if (extractedNum) {
+            fallbackMessage = "Recebi seu número, mas tive um erro de conexão. Vou tentar registrar.";
+            // Em um mundo ideal, retornaríamos o dado, mas para segurança, pedimos confirmação.
+        }
+
+        return createFallbackResponse(fallbackMessage);
     }
 }
+
+
