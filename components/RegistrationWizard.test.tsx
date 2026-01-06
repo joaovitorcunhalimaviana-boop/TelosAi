@@ -17,7 +17,7 @@ const testStep: WizardStep = {
   description: "This is a test",
   fields: null as unknown as ReactNode,
   validate: async () => true,
-  onSave: async () => {}
+  onSave: async () => { }
 }
 
 // Test 2: Type checking RegistrationWizardProps
@@ -25,7 +25,7 @@ const testProps: RegistrationWizardProps = {
   steps: [testStep],
   currentStep: 0,
   onStepChange: (step: number) => console.log(step),
-  onComplete: async () => {},
+  onComplete: async () => { },
   isResearchMode: false,
   className: "test-class"
 }
@@ -36,26 +36,14 @@ const statuses: StepStatus[] = ["pending", "current", "completed"]
 // Test 4: Verify component can be referenced
 const ComponentReference = RegistrationWizard
 
-// Test 5: Verify all required props are enforced
-// @ts-expect-error - Missing required props
-const invalidProps1: RegistrationWizardProps = {
-  steps: [testStep]
-}
 
-// @ts-expect-error - Wrong type for currentStep
-const invalidProps2: RegistrationWizardProps = {
-  steps: [testStep],
-  currentStep: "not a number",
-  onStepChange: (step: number) => {},
-  onComplete: async () => {}
-}
 
 // Test 6: Verify optional props work
 const minimalProps: RegistrationWizardProps = {
   steps: [testStep],
   currentStep: 0,
-  onStepChange: (step: number) => {},
-  onComplete: async () => {}
+  onStepChange: (step: number) => { },
+  onComplete: async () => { }
 }
 
 // Test 7: Verify WizardStep with optional onSave

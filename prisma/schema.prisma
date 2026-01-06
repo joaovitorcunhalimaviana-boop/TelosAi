@@ -358,6 +358,10 @@ model FollowUpResponse {
   doctorAlerted     Boolean       @default(false)
   alertSentAt       DateTime?
   userId            String
+  painAtRest        Int?
+  painDuringBowel   Int?
+  bleeding          Boolean?
+  fever             Boolean?
   followUp          FollowUp      @relation(fields: [followUpId], references: [id], onDelete: Cascade)
   user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   redFlagViews      RedFlagView[]

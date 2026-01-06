@@ -26,13 +26,13 @@ describe('logger', () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    (process.env as any).NODE_ENV = originalEnv || 'development';
   });
 
   describe('AuditLogger', () => {
     it('should log debug messages only in development', async () => {
       // Simular ambiente de desenvolvimento
-      process.env.NODE_ENV = 'development';
+      (process.env as any).NODE_ENV = 'development';
 
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
@@ -57,7 +57,7 @@ describe('logger', () => {
 
     it('should log errors in production', async () => {
       // Simular ambiente de produção
-      process.env.NODE_ENV = 'production';
+      (process.env as any).NODE_ENV = 'production';
 
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -82,7 +82,7 @@ describe('logger', () => {
     });
 
     it('should not log sensitive data in production', async () => {
-      process.env.NODE_ENV = 'production';
+      (process.env as any).NODE_ENV = 'production';
 
       mockPrisma.auditLog.create.mockResolvedValue({
         id: 'log-1',

@@ -286,15 +286,32 @@ const getCachedDashboardPatientsInternal = unstable_cache(
           const response = f.responses[0];
           let painValue = 0;
           let evacuationValue = 0;
-          try {
-            const data = JSON.parse(response.questionnaireData);
-            // Tenta encontrar valor de dor em vários formatos possíveis
-            painValue = Number(data.pain || data.dor || data.nivel_dor || 0);
-            evacuationValue = Number(data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
-          } catch (e) {
-            painValue = 0;
-            evacuationValue = 0;
+
+          // Priority 1: New typed columns
+          if (response.painAtRest !== null && response.painAtRest !== undefined) {
+            painValue = response.painAtRest;
+          } else {
+            // Priority 2: JSON Fallback (Legacy)
+            try {
+              const data = JSON.parse(response.questionnaireData);
+              painValue = Number(data.pain || data.dor || data.nivel_dor || 0);
+            } catch {
+              painValue = 0;
+            }
           }
+
+          if (response.painDuringBowel !== null && response.painDuringBowel !== undefined) {
+            evacuationValue = response.painDuringBowel;
+          } else {
+            // Priority 2: JSON Fallback (Legacy)
+            try {
+              const data = JSON.parse(response.questionnaireData);
+              evacuationValue = Number(data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
+            } catch {
+              evacuationValue = 0;
+            }
+          }
+
           return {
             day: `D+${f.dayNumber}`,
             value: isNaN(painValue) ? 0 : painValue,

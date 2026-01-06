@@ -14,8 +14,6 @@ import {
 } from '@/lib/whatsapp';
 import {
   validateQuestionnaireData,
-  validatePostOpData,
-  validatePostOpDataByDay,
   parseJSONSafely,
 } from '@/lib/api-validation';
 import { findApplicableProtocols, formatProtocolsForPrompt } from '@/lib/protocols';
@@ -474,49 +472,49 @@ const MEDICAL_IMAGES = {
  */
 interface PostOpData {
   // DOR - separada em repouso e durante evacuação
-  painAtRest?: number; // 0-10 - Dor em REPOUSO (antes de evacuar)
-  painDuringBowelMovement?: number; // 0-10 - Dor DURANTE a evacuação
+  painAtRest?: number | null; // 0-10 - Dor em REPOUSO (antes de evacuar)
+  painDuringBowelMovement?: number | null; // 0-10 - Dor DURANTE a evacuação
 
   // FEBRE
-  hasFever?: boolean;
-  feverDetails?: string;
+  hasFever?: boolean | null;
+  feverDetails?: string | null;
 
   // EVACUAÇÃO - dados detalhados
-  hadBowelMovementSinceLastContact?: boolean; // Evacuou desde última conversa?
-  bowelMovementTime?: string; // Hora aproximada da evacuação (para primeira evacuação)
-  bristolScale?: number; // 1-7 - Escala de Bristol (APENAS D+5 e D+10)
-  isFirstBowelMovement?: boolean; // Flag se é a primeira evacuação pós-op
+  hadBowelMovementSinceLastContact?: boolean | null; // Evacuou desde última conversa?
+  bowelMovementTime?: string | null; // Hora aproximada da evacuação (para primeira evacuação)
+  bristolScale?: number | null; // 1-7 - Escala de Bristol (APENAS D+5 e D+10)
+  isFirstBowelMovement?: boolean | null; // Flag se é a primeira evacuação pós-op
 
   // SANGRAMENTO
-  bleeding?: 'none' | 'mild' | 'moderate' | 'severe';
-  bleedingDetails?: string;
+  bleeding?: boolean | 'none' | 'mild' | 'moderate' | 'severe' | null;
+  bleedingDetails?: string | null;
 
   // ANALGÉSICOS - esquema de medicação para dor
-  takingPrescribedMeds?: boolean; // Está tomando as medicações prescritas?
-  prescribedMedsDetails?: string; // Detalhes sobre as medicações prescritas
-  takingExtraMeds?: boolean; // Precisou tomar algo ALÉM do prescrito?
-  extraMedsDetails?: string; // Quais medicações extras está tomando
+  takingPrescribedMeds?: boolean | null; // Está tomando as medicações prescritas?
+  prescribedMedsDetails?: string | null; // Detalhes sobre as medicações prescritas
+  takingExtraMeds?: boolean | null; // Precisou tomar algo ALÉM do prescrito?
+  extraMedsDetails?: string | null; // Quais medicações extras está tomando
 
   // SECREÇÃO PURULENTA (apenas D+3 em diante)
-  hasPurulentDischarge?: boolean; // Tem saída de secreção purulenta?
-  purulentDischargeDetails?: string;
+  hasPurulentDischarge?: boolean | null; // Tem saída de secreção purulenta?
+  purulentDischargeDetails?: string | null;
 
   // OUTROS
-  otherSymptoms?: string;
+  otherSymptoms?: string | null;
 
   // PESQUISA DE SATISFAÇÃO (apenas D+14)
-  painControlSatisfaction?: number; // 0-10 - Satisfação com controle da dor
-  aiFollowUpSatisfaction?: number; // 0-10 - Satisfação com acompanhamento IA
-  npsScore?: number; // 0-10 - Net Promoter Score (recomendaria?)
-  feedback?: string; // Feedback aberto opcional
+  painControlSatisfaction?: number | null; // 0-10 - Satisfação com controle da dor
+  aiFollowUpSatisfaction?: number | null; // 0-10 - Satisfação com acompanhamento IA
+  npsScore?: number | null; // 0-10 - Net Promoter Score (recomendaria?)
+  feedback?: string | null; // Feedback aberto opcional
 
   // Campos legados (manter para compatibilidade)
-  painLevel?: number; // Mapeado para painAtRest
-  hadBowelMovement?: boolean; // Mapeado para hadBowelMovementSinceLastContact
-  canEat?: boolean; // Legado - não usar mais
-  dietDetails?: string; // Legado - não usar mais
-  canUrinate?: boolean; // Legado - removido do fluxo
-  urinationDetails?: string; // Legado - removido do fluxo
+  painLevel?: number | null; // Mapeado para painAtRest
+  hadBowelMovement?: boolean | null; // Mapeado para hadBowelMovementSinceLastContact
+  canEat?: boolean | null; // Legado - não usar mais
+  dietDetails?: string | null; // Legado - não usar mais
+  canUrinate?: boolean | null; // Legado - removido do fluxo
+  urinationDetails?: string | null; // Legado - removido do fluxo
 }
 
 /**
@@ -704,7 +702,7 @@ async function processQuestionnaireAnswer(
 
     // 8. Se completou, finalizar
     if (aiResponse.completed) {
-      await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData, response?.id || '');
+      await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData as any, response?.id || '');
     }
 
   } catch (error) {
@@ -766,7 +764,9 @@ async function finalizeQuestionnaireWithAI(
       bowelMovement: extractedData.hadBowelMovementSinceLastContact || extractedData.hadBowelMovement,
       bowelMovementTime: extractedData.bowelMovementTime,
       bristolScale: extractedData.bristolScale,
-      bleeding: extractedData.bleeding ? bleedingMap[extractedData.bleeding] : 'none',
+      bleeding: typeof extractedData.bleeding === 'string'
+        ? bleedingMap[extractedData.bleeding]
+        : (extractedData.bleeding ? 'light' : 'none'),
       concerns: extractedData.otherSymptoms || '',
     };
 
@@ -800,6 +800,10 @@ async function finalizeQuestionnaireWithAI(
           aiResponse: aiAnalysis.empatheticResponse,
           riskLevel: finalRiskLevel,
           redFlags: JSON.stringify(allRedFlags),
+          painAtRest: extractedData.painAtRest,
+          painDuringBowel: extractedData.painDuringBowelMovement,
+          bleeding: extractedData.bleeding && extractedData.bleeding !== 'none' ? true : false,
+          fever: extractedData.hasFever,
         },
       });
     } else {
@@ -813,6 +817,10 @@ async function finalizeQuestionnaireWithAI(
           aiResponse: aiAnalysis.empatheticResponse,
           riskLevel: finalRiskLevel,
           redFlags: JSON.stringify(allRedFlags),
+          painAtRest: extractedData.painAtRest,
+          painDuringBowel: extractedData.painDuringBowelMovement,
+          bleeding: extractedData.bleeding && extractedData.bleeding !== 'none' ? true : false,
+          fever: extractedData.hasFever,
         },
       });
       responseId = newResponse.id;

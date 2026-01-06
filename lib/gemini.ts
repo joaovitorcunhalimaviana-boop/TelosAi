@@ -9,7 +9,14 @@ const geminiResponseSchema = z.object({
     reasoning: z.string(),
     message: z.string(),
     needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
-    dataCollected: z.record(z.string(), z.any()),
+    dataCollected: z.object({
+        painAtRest: z.number().nullable().optional(),
+        painDuringBowelMovement: z.number().nullable().optional(),
+        bleeding: z.boolean().nullable().optional(),
+        hasFever: z.boolean().nullable().optional(),
+        worry: z.string().nullable().optional(),
+        otherSymptoms: z.array(z.string()).optional()
+    }),
     completed: z.boolean(),
     needsClarification: z.boolean()
 });
@@ -68,14 +75,22 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
   "reasoning": "Seu pensamento interno sobre o estado atual e decisão do próximo passo.",
   "message": "Sua resposta textual para o paciente.",
   "needsImage": "pain_scale" | "bristol_scale" | null, (Use null se não precisar enviar imagem AGORA)
-  "dataCollected": { "campo": valor }, (Apenas dados NOVOS extraídos desta mensagem)
+  "dataCollected": {
+    "painAtRest": number (0-10),
+    "painDuringBowelMovement": number (0-10),
+    "hasFever": boolean,
+    "bleeding": boolean
+  },
   "completed": boolean, (true se coletou tudo E tirou dúvidas)
   "needsClarification": boolean (true se a resposta do usuário foi confusa)
 }
 `;
 
+        // Sliding Window: Keep only the last 20 messages to manage context window
+        const recentHistory = conversationHistory.slice(-20);
+
         // Convert conversation history to Gemini format
-        const history = conversationHistory.map(msg => ({
+        const history = recentHistory.map(msg => ({
             role: msg.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: msg.content }]
         }));

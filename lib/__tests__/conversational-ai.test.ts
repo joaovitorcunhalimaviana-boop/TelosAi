@@ -44,11 +44,11 @@ describe('conversational-ai', () => {
     mockAnthropicCreate = jest.fn();
     (Anthropic as jest.MockedClass<typeof Anthropic>).mockImplementation(
       () =>
-        ({
-          messages: {
-            create: mockAnthropicCreate,
-          },
-        } as any)
+      ({
+        messages: {
+          create: mockAnthropicCreate,
+        },
+      } as any)
     );
 
     // Mock de paciente
@@ -65,7 +65,7 @@ describe('conversational-ai', () => {
       consentGiven: true,
       consentDate: new Date(),
       dataSharingConsent: false,
-    } as Patient;
+    } as unknown as Patient;
 
     // Mock de cirurgia
     mockSurgery = {
@@ -82,7 +82,7 @@ describe('conversational-ai', () => {
       anesthesiaType: 'spinal',
       complications: null,
       duration: null,
-    } as Surgery;
+    } as unknown as Surgery;
   });
 
   describe('conductConversation', () => {

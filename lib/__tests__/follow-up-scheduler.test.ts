@@ -27,7 +27,7 @@ describe('follow-up-scheduler', () => {
 
   describe('createFollowUpSchedule', () => {
     it('should create follow-ups at correct BRT time (10:00)', async () => {
-      mockPrisma.followUp.createMany.mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
 
       const surgeryDate = new Date('2025-01-15T14:00:00Z'); // UTC
       const params = {
@@ -41,7 +41,7 @@ describe('follow-up-scheduler', () => {
 
       expect(mockPrisma.followUp.createMany).toHaveBeenCalledTimes(1);
 
-      const callArgs = mockPrisma.followUp.createMany.mock.calls[0][0];
+      const callArgs = (mockPrisma.followUp.createMany as jest.Mock).mock.calls[0][0];
       const followUpsData = callArgs.data;
 
       // Verificar que todos os follow-ups foram criados às 10:00 BRT
@@ -54,7 +54,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should respect protocol days (D+1, D+2, D+3, D+5, D+7, D+10, D+14)', async () => {
-      mockPrisma.followUp.createMany.mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
@@ -66,7 +66,7 @@ describe('follow-up-scheduler', () => {
 
       await createFollowUpSchedule(params);
 
-      const callArgs = mockPrisma.followUp.createMany.mock.calls[0][0];
+      const callArgs = (mockPrisma.followUp.createMany as jest.Mock).mock.calls[0][0];
       const followUpsData = callArgs.data;
 
       // Verificar dias corretos
@@ -79,7 +79,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should avoid weekends (Saturday and Sunday)', async () => {
-      mockPrisma.followUp.createMany.mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
 
       // Cirurgia numa sexta-feira
       const surgeryDate = new Date('2025-01-17T10:00:00-03:00'); // Sexta
@@ -93,7 +93,7 @@ describe('follow-up-scheduler', () => {
 
       await createFollowUpSchedule(params);
 
-      const callArgs = mockPrisma.followUp.createMany.mock.calls[0][0];
+      const callArgs = (mockPrisma.followUp.createMany as jest.Mock).mock.calls[0][0];
       const followUpsData = callArgs.data;
 
       // D+1 seria sábado (18/01), D+2 seria domingo (19/01)
@@ -112,7 +112,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should handle surgeries without protocol', async () => {
-      mockPrisma.followUp.createMany.mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
@@ -130,7 +130,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should calculate scheduledDate correctly', async () => {
-      mockPrisma.followUp.createMany.mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
@@ -142,7 +142,7 @@ describe('follow-up-scheduler', () => {
 
       await createFollowUpSchedule(params);
 
-      const callArgs = mockPrisma.followUp.createMany.mock.calls[0][0];
+      const callArgs = (mockPrisma.followUp.createMany as jest.Mock).mock.calls[0][0];
       const followUpsData = callArgs.data;
 
       // Verificar D+1 (16/01)
