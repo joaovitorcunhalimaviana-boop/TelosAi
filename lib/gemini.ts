@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
@@ -43,7 +43,15 @@ export async function analyzePatientMessageWithGemini(
     protocols: string = ''
 ): Promise<GeminiResponse> {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro-latest' });
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            safetySettings: [
+                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            ]
+        });
 
         const systemPrompt = `Você é a Clara, a assistente de IA da clínica do ${patientContext.doctorName || 'Dr. João'} (Telos.AI).
 Sua missão é acompanhar a recuperação de pacientes pós-cirúrgicos com INTELIGÊNCIA HUMANIZADA e EMPATIA.
@@ -108,13 +116,21 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
 
         const fullPrompt = `${systemPrompt}\n\nMENSAGEM DO PACIENTE: "${userMessage}"`;
 
-        // For single-turn or last-turn context injection, we send the prompt as the message
-        // In a real chat loop, system prompt is usually set on initialization, but here we inject context dynamically per turn.
-        // The history is used for continuity.
-        // NOTE: Gemini API handles system instructions differently in newer versions, but prepending context works reliably.
-
         const result = await chat.sendMessage(fullPrompt);
-        const responseText = result.response.text();
+        let responseText = '';
+        try {
+            responseText = result.response.text();
+        } catch (textError) {
+            logger.warn('Gemini response blocked or empty:', textError);
+            return {
+                reasoning: "Safety block triggered",
+                message: "Entendo. Por favor, poderia reformular sua resposta?",
+                needsImage: null,
+                dataCollected: {},
+                completed: false,
+                needsClarification: true
+            };
+        }
 
         logger.debug('Gemini Raw Response:', responseText);
 
@@ -122,36 +138,44 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
             const parsed = JSON.parse(responseText);
             const validated = geminiResponseSchema.parse(parsed);
 
-            // Sanitização de dados (Converter strings para números/booleanos ou limpar)
+            // Sanitização Completa de Dados
             if (validated.dataCollected) {
-                // Pain At Rest
+                // Pain At Rest (Number)
                 if (typeof validated.dataCollected.painAtRest === 'string') {
                     const num = parseInt(validated.dataCollected.painAtRest);
-                    if (!isNaN(num)) {
-                        validated.dataCollected.painAtRest = num;
-                    } else {
-                        // Se não for número, o AI se confundiu. Limpar e marcar para clarificação.
-                        validated.dataCollected.painAtRest = null;
+                    validated.dataCollected.painAtRest = !isNaN(num) ? num : null;
+                    if (isNaN(num)) validated.needsClarification = true;
+                }
+
+                // Pain During Bowel (Number)
+                if (typeof validated.dataCollected.painDuringBowelMovement === 'string') {
+                    const num = parseInt(validated.dataCollected.painDuringBowelMovement);
+                    validated.dataCollected.painDuringBowelMovement = !isNaN(num) ? num : null;
+                    if (isNaN(num)) validated.needsClarification = true;
+                }
+
+                // Fever (Boolean)
+                if (typeof validated.dataCollected.hasFever === 'string') {
+                    const val = (validated.dataCollected.hasFever as string).toLowerCase();
+                    if (['sim', 'yes', 'true'].includes(val)) validated.dataCollected.hasFever = true;
+                    else if (['não', 'nao', 'no', 'false'].includes(val)) validated.dataCollected.hasFever = false;
+                    else {
+                        validated.dataCollected.hasFever = null;
                         validated.needsClarification = true;
                     }
                 }
 
-                // Pain During Bowel
-                if (typeof validated.dataCollected.painDuringBowelMovement === 'string') {
-                    const num = parseInt(validated.dataCollected.painDuringBowelMovement);
-                    if (!isNaN(num)) {
-                        validated.dataCollected.painDuringBowelMovement = num;
-                    } else {
-                        validated.dataCollected.painDuringBowelMovement = null;
-                        validated.needsClarification = true;
-                    }
+                // Bleeding (Boolean/String)
+                if (typeof validated.dataCollected.bleeding === 'string') {
+                    const val = (validated.dataCollected.bleeding as string).toLowerCase();
+                    if (['sim', 'yes', 'true'].includes(val)) validated.dataCollected.bleeding = true;
+                    else if (['não', 'nao', 'no', 'false', 'none'].includes(val)) validated.dataCollected.bleeding = false;
                 }
             }
 
             return validated as GeminiResponse;
         } catch (parseError) {
             logger.error('Error parsing Gemini response:', parseError);
-            // Fallback for malformed JSON
             return {
                 reasoning: "Error parsing JSON",
                 message: "Desculpe, tive um pequeno erro técnico. Pode repetir, por favor?",
