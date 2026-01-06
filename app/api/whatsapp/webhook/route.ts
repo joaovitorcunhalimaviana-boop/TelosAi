@@ -665,10 +665,20 @@ async function processQuestionnaireAnswer(
       { role: 'assistant', content: aiResponse.message }
     );
 
-    const mergedData = {
-      ...currentData,
-      ...aiResponse.dataCollected,
-    };
+    // Merge inteligente: Só atualiza campos que a IA explicitamente coletou como NÃO nulos,
+    // ou se o campo ainda não existia.
+    const newData = aiResponse.dataCollected || {};
+    const mergedData = { ...currentData };
+
+    Object.keys(newData).forEach((key) => {
+      // @ts-ignore
+      const val = newData[key];
+      // Só sobrescreve se o valor novo não for nulo/undefined
+      if (val !== null && val !== undefined) {
+        // @ts-ignore
+        mergedData[key] = val;
+      }
+    });
 
     const updatedQuestionnaireData = {
       conversation: conversationHistory,
