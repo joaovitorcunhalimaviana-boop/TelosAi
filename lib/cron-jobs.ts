@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { sendFollowUpQuestionnaire, isWhatsAppConfigured, sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
 import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
 import { logger } from '@/lib/logger';
 
@@ -99,6 +99,9 @@ export async function sendScheduledFollowUps() {
 
         // Verificar follow-ups atrasados
         await checkOverdueFollowUps();
+
+        // Verificar follow-ups parados (Nudge)
+        await checkStalledFollowUps();
 
         return { success: true, results };
 
@@ -249,6 +252,114 @@ async function checkOverdueFollowUps() {
 
     } catch (error) {
         logger.error('Error checking overdue follow-ups:', error);
+    }
+}
+
+/**
+ * Verifica follow-ups parados (sem resposta há muito tempo)
+ * - > 3 horas: Envia lembrete (Nudge)
+ * - > 12 horas: Avisa o médico
+ */
+export async function checkStalledFollowUps() {
+    try {
+        const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
+        const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+        // Buscar follow-ups em progresso sem atividade recente
+        const stalledFollowUps = await prisma.followUp.findMany({
+            where: {
+                status: 'in_progress',
+                updatedAt: {
+                    lt: threeHoursAgo
+                }
+            },
+            include: {
+                patient: true,
+                surgery: true,
+                responses: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1
+                }
+            }
+        });
+
+        logger.info(`🔍 Found ${stalledFollowUps.length} stalled follow-ups`);
+
+        for (const followUp of stalledFollowUps) {
+            try {
+                const lastResponse = followUp.responses[0];
+                if (!lastResponse) continue;
+
+                // Parse da conversa para verificar última mensagem
+                const questionnaireData = JSON.parse(lastResponse.questionnaireData || '{}');
+                const conversation = questionnaireData.conversation || [];
+
+                if (conversation.length === 0) continue;
+
+                const lastMessage = conversation[conversation.length - 1];
+
+                // Se a última mensagem já foi do assistente (nós), verificar se foi um nudge
+                if (lastMessage.role === 'assistant') {
+                    // Se já mandamos nudge, não mandar de novo (evitar spam)
+                    if (lastMessage.content.includes('esqueceu') || lastMessage.content.includes('ainda está aí')) {
+                        // Se já passou 12 horas e médico não foi avisado -> AVISAR MÉDICO
+                        if (followUp.updatedAt < twelveHoursAgo && !lastResponse.doctorAlerted) {
+                            await sendDoctorAlert(
+                                `⚠️ *PACIENTE SEM RESPOSTA*\n\nO paciente ${followUp.patient.name} parou de responder o questionário há mais de 12 horas.\nÚltima interação: ${followUp.updatedAt.toLocaleString('pt-BR')}`
+                            );
+
+                            // Marcar que médico foi avisado
+                            await prisma.followUpResponse.update({
+                                where: { id: lastResponse.id },
+                                data: { doctorAlerted: true }
+                            });
+
+                            logger.info(`🚨 Doctor alerted for stalled patient ${followUp.patient.name}`);
+                        }
+                        continue;
+                    }
+                }
+
+                // Enviar Nudge (Lembrete)
+                const firstName = followUp.patient.name.split(' ')[0];
+                const nudgeMessage = `Olá ${firstName}, ainda está aí? 👀\n\nNotei que não terminamos o seu acompanhamento de hoje. É muito importante para o Dr. João saber como você está.\n\nPodemos continuar?`;
+
+                await sendEmpatheticResponse(followUp.patient.phone, nudgeMessage);
+
+                // Atualizar histórico da conversa no banco (sem mudar updatedAt do FollowUp para não resetar o timer de 12h? 
+                // NÃO, se mandamos nudge, "tocamos" no paciente. Mas se atualizarmos updatedAt, o timer de 12h reseta.
+                // Mas queremos alertar médico se continuar parado.
+                // Vamos atualizar updatedAt para refletir que o BOT falou. E o próximo check vai ver se o paciente respondeu.
+                // Se o paciente não responder, updatedAt fica estagnado nesse horário do nudge.
+                // Daqui a 12 horas a partir DO NUDGE, avisamos o médico. Aceitável.
+
+                conversation.push({ role: 'assistant', content: nudgeMessage });
+
+                await prisma.followUpResponse.update({
+                    where: { id: lastResponse.id },
+                    data: {
+                        questionnaireData: JSON.stringify({
+                            ...questionnaireData,
+                            conversation
+                        })
+                    }
+                });
+
+                // Forçar update do FollowUp para registrar atividade do bot
+                await prisma.followUp.update({
+                    where: { id: followUp.id },
+                    data: { updatedAt: new Date() }
+                });
+
+                logger.info(`👋 Nudge sent to ${followUp.patient.name}`);
+
+            } catch (innerError) {
+                logger.error(`Error processing stalled follow-up ${followUp.id}:`, innerError);
+            }
+        }
+
+    } catch (error) {
+        logger.error('Error checking stalled follow-ups:', error);
     }
 }
 

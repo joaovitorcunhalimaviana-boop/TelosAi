@@ -25,8 +25,8 @@ class Logger {
 
   constructor() {
     this.config = {
-      // In production, only show warnings and errors
-      level: process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
+      // In production, default to 'info' to ensure visibility of key events
+      level: (process.env.LOG_LEVEL as LogLevel) || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
       enableConsole: true,
       enableSentry: process.env.NODE_ENV === 'production',
     };

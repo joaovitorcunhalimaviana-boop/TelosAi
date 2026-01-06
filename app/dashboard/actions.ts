@@ -34,7 +34,7 @@ export interface PatientCard {
   researchGroup: string | null // Research group name
   researchDataComplete: boolean // Research fields validation
   researchMissingFieldsCount: number // Number of missing required fields
-  painHistory: { day: string; value: number }[]
+  painHistory: { day: string; value: number; evacuation: number }[]
   latestResponse?: {
     riskLevel: "low" | "medium" | "high" | "critical"
   } | null
@@ -285,21 +285,25 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         .map(f => {
           const response = f.responses[0];
           let painValue = 0;
+          let evacuationValue = 0;
           try {
             const data = JSON.parse(response.questionnaireData);
             // Tenta encontrar valor de dor em vários formatos possíveis
             painValue = Number(data.pain || data.dor || data.nivel_dor || 0);
+            evacuationValue = Number(data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
           } catch (e) {
             painValue = 0;
+            evacuationValue = 0;
           }
           return {
             day: `D+${f.dayNumber}`,
             value: isNaN(painValue) ? 0 : painValue,
+            evacuation: isNaN(evacuationValue) ? 0 : evacuationValue,
             dayNumber: f.dayNumber // Auxiliar para ordenação
           };
         })
         .sort((a, b) => a.dayNumber - b.dayNumber) // Ordenar cronologicamente
-        .map(({ day, value }) => ({ day, value }));
+        .map(({ day, value, evacuation }) => ({ day, value, evacuation }));
 
       // Validate research fields if participant
       let researchDataComplete = true

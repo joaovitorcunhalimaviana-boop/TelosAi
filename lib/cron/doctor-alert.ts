@@ -61,15 +61,21 @@ export async function checkAndAlertDoctor() {
                 `Status: ${response.followUp.status}\n` +
                 `Última interação: ${response.createdAt.toLocaleTimeString('pt-BR')}`;
 
-            // Enviar alerta para o médico
-            // Prioridade: Telefone no cadastro do médico > Env Var
-            const doctorPhone = doctor.whatsapp || doctor.whatsappNumber || process.env.DOCTOR_PHONE_NUMBER;
+            // Prioridade: Telefone do médico (whatsapp > whatsappNumber) > Env Var
+            const doctorPhoneCandidate = doctor.whatsapp || doctor.whatsappNumber || process.env.DOCTOR_PHONE_NUMBER;
+            const doctorPhone = doctorPhoneCandidate ? String(doctorPhoneCandidate).trim() : null;
 
             if (doctorPhone) {
-                await sendWhatsAppToDoctor(doctorPhone, message);
-                logger.info(`✅ Médico alertado sobre ${patient.name}`);
+                logger.info(`📱 Enviando alerta para médico via ${doctorPhone} sobre paciente ${patient.name}`);
+                const sent = await sendWhatsAppToDoctor(doctorPhone, message);
+
+                if (sent) {
+                    logger.info(`✅ Médico alertado com sucesso sobre ${patient.name}`);
+                } else {
+                    logger.error(`❌ Falha ao enviar WhatsApp de alerta para ${doctorPhone}`);
+                }
             } else {
-                logger.warn(`⚠️ Não foi possível alertar médico sobre ${patient.name}: Telefone não encontrado.`);
+                logger.error(`❌ CRÍTICO: Não foi possível alertar médico sobre ${patient.name}. Nenhum telefone encontrado (DB ou ENV).`);
             }
 
             // Marcar como alertado para não spactar

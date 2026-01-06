@@ -344,8 +344,9 @@ export async function sendFollowUpQuestionnaire(
       ];
     }
 
-    // All templates use 'pt_BR'
-    const language = 'pt_BR';
+    // day1 uses 'en' (legacy template issue), others use 'pt_BR'
+    // This fixes the encoding/question marks issue
+    const language = templateName === 'day1' ? 'en' : 'pt_BR';
 
     console.log('📱 Sending template message:', {
       template: templateName,

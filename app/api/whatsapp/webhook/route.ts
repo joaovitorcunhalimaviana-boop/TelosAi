@@ -13,13 +13,13 @@ import {
   sendDoctorAlert
 } from '@/lib/whatsapp';
 import {
-  validateClaudeResponse,
   validateQuestionnaireData,
   validatePostOpData,
   validatePostOpDataByDay,
   parseJSONSafely,
 } from '@/lib/api-validation';
 import { findApplicableProtocols, formatProtocolsForPrompt } from '@/lib/protocols';
+import { analyzePatientMessageWithGemini } from '@/lib/gemini';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -366,7 +366,7 @@ async function processTextMessage(message: any) {
       textLower.includes('iniciar') ||
       textLower.includes('começar');
 
-    if (isPositiveResponse && pendingFollowUp.status === 'sent') {
+    if (isPositiveResponse && (pendingFollowUp.status === 'sent' || pendingFollowUp.status === 'pending')) {
       logger.debug('✅ Iniciando questionário com IA conversacional...', {
         patientName: patient.name,
         followUpId: pendingFollowUp.id
@@ -384,12 +384,14 @@ async function processTextMessage(message: any) {
       // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
       // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
       const initialMessage = `Olá ${firstName}! 👋
-
+      
 Vamos atualizar como você está hoje, no seu *${daysPostOp}º dia* pós-cirurgia.
 
 Para começar: *quanto está doendo agora, quando você está parado(a)?*
 
-Me diga um número de 0 a 10, olhando a imagem abaixo:`;
+Por favor, me diga um número de 0 a 10, onde:
+0️⃣ = **Zero dor** (totalmente sem dor)
+🔟 = **Pior dor da vida** (insuportável)`;
 
       // 1. PRIMEIRO: Enviar mensagem de saudação + pergunta
       logger.debug('📝 Enviando saudação inicial...');
@@ -521,6 +523,7 @@ interface PostOpData {
  * Resposta da IA Claude
  */
 interface ClaudeAIResponse {
+  reasoning?: string; // NOVO: Raciocínio (Chain of Thought)
   message: string;
   needsImage?: 'pain_scale' | 'bristol_scale' | null;
   dataCollected: Partial<PostOpData>;
@@ -552,903 +555,11 @@ async function sendImageScale(phone: string, scaleType: 'pain_scale' | 'bristol_
 }
 
 /**
- * Chama Claude API para conversação inteligente
- */
-/**
  * Chama Claude API para conversação inteligente com CHECKLIST DINÂMICO
  */
-async function callClaudeAPI(
-  conversationHistory: any[],
-  userMessage: string,
-  patient: any,
-  surgeryType: string,
-  dayNumber: number,
-  savedPhase?: string,
-  currentData: any = {},
-  protocolText: string = '',
-  doctorName: string = 'seu médico'
-): Promise<ClaudeAIResponse> {
-  try {
-    const { anthropic } = await import('@/lib/anthropic');
+// Função legada callClaudeAPI removida.
 
-    // =================================================================================
-    // NOVA LÓGICA: CHECKLIST DINÂMICO (Substitui Fases Rígidas)
-    // =================================================================================
-
-    // 1. Definir o que precisamos saber (O "Checklist")
-    const requiredFields = [
-      'painAtRest',                   // Dor em repouso (0-10)
-      'hadBowelMovementSinceLastContact', // Evacuou desde a última?
-      'takingPrescribedMeds',         // Está tomando remédios?
-      'bleeding'                      // Tem sangramento?
-    ];
-
-    // Regras Condicionais (Adicionadas dinamicamente)
-    // Se dor > 5, investigar febre e secreção
-    if (currentData.painAtRest !== undefined && Number(currentData.painAtRest) > 5) {
-      if (!currentData.hasFever) requiredFields.push('hasFever');
-      if (!currentData.hasPurulentDischarge) requiredFields.push('hasPurulentDischarge');
-    }
-
-    // Se tomou remédios extras, perguntar quais
-    if (currentData.takingExtraMeds === true) {
-      requiredFields.push('extraMedsDetails');
-    }
-
-    // Se teve sangramento, perguntar detalhes (exceto se for "none")
-    if (currentData.bleeding && currentData.bleeding !== 'none') {
-      requiredFields.push('bleedingDetails');
-    }
-
-    // 2. Identificar o que falta (Missing Fields)
-    const missingFields = requiredFields.filter(field => {
-      // Verifica se o campo já existe em currentData e não é null/undefined
-      return currentData[field] === undefined || currentData[field] === null;
-    });
-
-    const isComplete = missingFields.length === 0;
-
-    // 3. Montar o Prompt do Sistema (O "Cérebro")
-    const SYSTEM_PROMPT = `Você é a Clara, assistente de IA da clínica do ${doctorName} (Telos.AI). Especialista em pós-operatório de cirurgia colorretal.
-
-CONTEXTO ATUAL:
-- Paciente: ${patient.name}
-- Cirurgia: ${surgeryType}
-- Dia: D+${dayNumber}
-
-SEU OBJETIVO:
-Preencher o checklist de saúde do paciente de forma natural, simpática e eficiente. 
-
-CHECKLIST (O que precisamos saber):
-${JSON.stringify(requiredFields)}
-
-DADOS JÁ COLETADOS:
-${JSON.stringify(currentData, null, 2)}
-
-O QUE FALTA COLETAR (Sua Prioridade):
-${JSON.stringify(missingFields)}
-
-REGRAS DE COMPORTAMENTO:
-1. **Prioridade**: Se houver campos faltando, faça A PRÓXIMA pergunta para preenchê-los.
-2. **Uma coisa de cada vez**: Não faça todas as perguntas juntas. Pergunte uma ou duas coisas no máximo.
-3. **Escala Visual de Dor**: Se for perguntar sobre nível de dor (0-10), VOCÊ DEVE solicitar a imagem marcando "needsImage": "pain_scale" no JSON.
-4. **Naturalidade**: Fale como uma enfermeira humana. Use emojis moderados. Seja empática se o paciente relatar dor.
-5. **Acolhimento**: Se o paciente disser algo fora do script, responda educadamente antes de voltar ao checklist.
-
-INSTRUÇÕES DE EXTRAÇÃO (JSON):
-- Analise a mensagem do usuário e extraia qualquer dado relevante para o checklist.
-- Normalize: 'não', 'nunca' -> false/none. 'sim', 'muito' -> true/severe.
-- Se o usuário disser "Dói 5", extraia "painAtRest": 5.
-
-FORMATO DE RESPOSTA (Obrigatório JSON puro):
-{
-  "message": "Sua resposta textual para o paciente",
-  "needsImage": "pain_scale" | null, // Use "pain_scale" SEMPRE que perguntar nota de dor
-  "dataCollected": { "campo": valor }, // Dados extraídos desta interação
-  "completed": boolean, // true SE missingFields estiver vazio
-  "needsClarification": boolean // true se não entendeu nada
-}
-`;
-
-    // Histórico de Conversa
-    const messages = [
-      ...conversationHistory.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      {
-        role: 'user',
-        content: userMessage,
-      },
-    ];
-
-    logger.debug('🤖 Chamando Claude 3.5 Sonnet (Dynamic Mode)', {
-      missingFields,
-      isComplete
-    });
-
-    // CHAMADA API - USANDO MODELO OFICIAL E CORRETO
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022', // O MELHOR MODELO (Supera GPT-4o em coding/reasoning)
-      max_tokens: 1000,
-      temperature: 0.2, // Baixa para garantir o JSON
-      system: SYSTEM_PROMPT,
-      messages: messages,
-    });
-
-    const responseText = response.content[0].type === 'text'
-      ? response.content[0].text
-      : '';
-
-    // Extração de JSON Robustecida
-    const startIndex = responseText.indexOf('{');
-    const endIndex = responseText.lastIndexOf('}');
-
-    if (startIndex === -1 || endIndex === -1) {
-      throw new Error('JSON não encontrado na resposta da IA');
-    }
-
-    const jsonString = responseText.substring(startIndex, endIndex + 1);
-    const parsedJson = JSON.parse(jsonString);
-
-    // Validação final de segurança
-    const aiResponse: ClaudeAIResponse = {
-      message: parsedJson.message || 'Desculpe, não entendi. Pode repetir?',
-      needsImage: parsedJson.needsImage || null,
-      dataCollected: parsedJson.dataCollected || {},
-      completed: parsedJson.completed || false,
-      needsClarification: parsedJson.needsClarification || false,
-      conversationPhase: isComplete ? 'completed' : 'collecting_data'
-    };
-
-    return aiResponse;
-
-  } catch (error) {
-    logger.error('❌ Erro crítico no cérebro da IA:', error);
-    return {
-      message: "Tive um pequeno lapso. Podemos continuar? Como você está se sentindo agora?",
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_data'
-    };
-  }
-}
-
-/**
- * Determina a fase atual da conversa baseado no histórico
- * FASES ATUALIZADAS (sem alimentação):
- * 1. collecting_pain_at_rest - Dor em repouso
- * 2. collecting_fever - Febre
- * 3. collecting_fever_temp - Temperatura da febre
- * 4. collecting_urination - Urina
- * 5. collecting_urination_details - Detalhes da urina
- * 6. collecting_bowel - Evacuação desde última conversa
- * 7. collecting_bowel_time - Hora da evacuação
- * 8. collecting_pain_during_bm - Dor DURANTE evacuação
- * 9. collecting_bristol - Escala Bristol
- * 10. collecting_bleeding - Sangramento
- * 11. collecting_meds_prescribed - Medicações prescritas (dipirona, anti-inflamatório)
- * 12. collecting_meds_extra - Medicações extras além das prescritas
- * 13. collecting_purulent_discharge - Secreção purulenta (apenas D+3)
- * 14. collecting_concerns - Preocupações
- */
-function determineCurrentPhase(conversationHistory: any[], dayNumber?: number): string {
-  // Se não há histórico ou só tem mensagem inicial, estamos coletando dor em repouso
-  if (conversationHistory.length === 0) return 'collecting_pain_at_rest';
-  if (conversationHistory.length <= 2) return 'collecting_pain_at_rest';
-
-  // Analisar as últimas mensagens do assistente para determinar fase
-  const assistantMessages = conversationHistory
-    .filter(m => m.role === 'assistant')
-    .map(m => m.content.toLowerCase());
-
-  if (assistantMessages.length === 0) return 'collecting_pain_at_rest';
-
-  const lastAssistantMsg = assistantMessages[assistantMessages.length - 1];
-
-  // Verificar qual foi a última pergunta feita pelo assistente
-  // Ordem de verificação importa - mais específico primeiro
-
-  // Preocupações finais
-  if (lastAssistantMsg.includes('preocupação') || lastAssistantMsg.includes('sintoma') || lastAssistantMsg.includes('última pergunta')) {
-    return 'collecting_concerns';
-  }
-
-  // Secreção purulenta (D+3)
-  if (lastAssistantMsg.includes('secreção') || lastAssistantMsg.includes('pus') || lastAssistantMsg.includes('purulenta')) {
-    return 'collecting_purulent_discharge';
-  }
-
-  // Medicações extras (além das prescritas)
-  if (lastAssistantMsg.includes('além') || lastAssistantMsg.includes('outra medicação') || lastAssistantMsg.includes('qual medicação tomou')) {
-    return 'collecting_meds_extra';
-  }
-
-  // Medicações prescritas
-  if (lastAssistantMsg.includes('medicações') && lastAssistantMsg.includes('receitadas') || lastAssistantMsg.includes('tomando') && lastAssistantMsg.includes('medicações')) {
-    return 'collecting_meds_prescribed';
-  }
-
-  // Sangramento
-  if (lastAssistantMsg.includes('sangr')) {
-    return 'collecting_bleeding';
-  }
-
-  // Bristol Scale (consistência das fezes)
-  if (lastAssistantMsg.includes('bristol') || lastAssistantMsg.includes('1 a 7') || lastAssistantMsg.includes('consistência')) {
-    return 'collecting_bristol';
-  }
-
-  // Dor DURANTE evacuação (diferente de dor em repouso)
-  if (lastAssistantMsg.includes('dor durante') || lastAssistantMsg.includes('durante a evacuação')) {
-    return 'collecting_pain_during_bm';
-  }
-
-  // Hora da evacuação
-  if (lastAssistantMsg.includes('que horas') || lastAssistantMsg.includes('horas foi')) {
-    return 'collecting_bowel_time';
-  }
-
-  // Evacuação (desde última conversa)
-  if (lastAssistantMsg.includes('evacuou') || lastAssistantMsg.includes('evacu') && lastAssistantMsg.includes('última')) {
-    return 'collecting_bowel';
-  }
-
-  // Detalhes da urina
-  if (lastAssistantMsg.includes('dificuldade para urinar') || lastAssistantMsg.includes('o que está acontecendo')) {
-    return 'collecting_urination_details';
-  }
-
-  // Urina
-  if (lastAssistantMsg.includes('urin') || lastAssistantMsg.includes('xixi')) {
-    return 'collecting_urination';
-  }
-
-  // Temperatura da febre
-  if ((lastAssistantMsg.includes('qual foi') || lastAssistantMsg.includes('medir')) && lastAssistantMsg.includes('temperatura')) {
-    return 'collecting_fever_temp';
-  }
-
-  // Febre
-  if (lastAssistantMsg.includes('febre')) {
-    return 'collecting_fever';
-  }
-
-  // Dor em repouso (fase inicial)
-  if (lastAssistantMsg.includes('dor em repouso') || lastAssistantMsg.includes('dor') && lastAssistantMsg.includes('0 a 10')) {
-    return 'collecting_pain_at_rest';
-  }
-
-  // Fallback: verificar progresso pelo número de trocas
-  const exchanges = Math.floor(conversationHistory.length / 2);
-  const phases = [
-    'collecting_pain_at_rest',
-    'collecting_fever',
-    'collecting_urination',
-    'collecting_bowel',
-    'collecting_bowel_time',
-    'collecting_pain_during_bm',
-    'collecting_bristol',
-    'collecting_bleeding',
-    'collecting_meds_prescribed',
-    'collecting_meds_extra',
-    'collecting_purulent_discharge', // Só D+3, mas está no fallback
-    'collecting_concerns'
-  ];
-
-  return phases[Math.min(exchanges, phases.length - 1)];
-}
-
-/**
- * Interpreta resposta localmente quando a API falha
- * IMPORTANTE: Esta função é CONSERVADORA - só avança quando TEM CERTEZA da resposta
- *
- * FLUXO COMPLETO (ATUALIZADO - sem alimentação):
- * 1. collecting_pain_at_rest - Dor em repouso (0-10)
- * 2. collecting_fever - Febre (sim/não)
- * 3. collecting_fever_temp - Temperatura (se teve febre)
- * 4. collecting_urination - Urina normal (sim/não)
- * 5. collecting_bowel - Evacuou (D+1: "após a cirurgia" / D+2+: "desde nossa última conversa")
- * 6. collecting_bowel_time - Hora da evacuação (se evacuou)
- * 7. collecting_pain_during_bm - Dor DURANTE evacuação (0-10) + IMAGEM
- * 8. collecting_bristol - Escala Bristol (1-7) + IMAGEM
- * 9. collecting_bleeding - Sangramento
- * 10. collecting_meds_prescribed - Medicações prescritas
- * 11. collecting_meds_extra - Medicações extras além das prescritas
- * 11b. collecting_meds_extra_details - Detalhes das medicações extras (qual medicação)
- * 12. collecting_purulent_discharge - Secreção purulenta (APENAS D+3 em diante)
- * 13. collecting_concerns - Preocupações finais
- */
-function interpretResponseLocally(userMessage: string, conversationHistory: any[], dayNumber: number = 1): ClaudeAIResponse | null {
-  const msg = userMessage.trim().toLowerCase();
-  const currentPhase = determineCurrentPhase(conversationHistory);
-
-  logger.debug('🔄 interpretResponseLocally:', { msg, currentPhase });
-
-  // Mapeamento de números por extenso
-  const numberWords: Record<string, number> = {
-    'zero': 0, 'um': 1, 'uma': 1, 'dois': 2, 'duas': 2, 'três': 3, 'tres': 3,
-    'quatro': 4, 'cinco': 5, 'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9, 'dez': 10
-  };
-
-  // Tentar extrair número
-  let number: number | null = null;
-  const numberMatch = msg.match(/\b(\d+)\b/);
-  if (numberMatch) {
-    number = parseInt(numberMatch[1]);
-  } else {
-    for (const [word, value] of Object.entries(numberWords)) {
-      const regex = new RegExp(`\\b${word}\\b`);
-      if (regex.test(msg)) {
-        number = value;
-        break;
-      }
-    }
-  }
-
-  // Detectar sim/não
-  const isYes = /^(sim|s|yes|claro|ok|isso|positivo|afirmativo)$/i.test(msg.trim()) ||
-    /\b(sim|yes|claro)\b/i.test(msg);
-  const isNo = /^(não|nao|n|no|nope|negativo)$/i.test(msg.trim()) ||
-    /\b(não|nao|nunca)\b/i.test(msg);
-
-  // Tentar extrair hora (ex: "10h", "às 10", "10:30", "pela manhã")
-  let timeExtracted: string | null = null;
-  const timeMatch = msg.match(/(\d{1,2})[h:]?(\d{0,2})?/);
-  if (timeMatch) {
-    const hour = parseInt(timeMatch[1]);
-    if (hour >= 0 && hour <= 23) {
-      timeExtracted = timeMatch[2] ? `${hour}:${timeMatch[2]}` : `${hour}h`;
-    }
-  }
-  if (msg.includes('manhã') || msg.includes('manha')) timeExtracted = 'pela manhã';
-  if (msg.includes('tarde')) timeExtracted = 'à tarde';
-  if (msg.includes('noite')) timeExtracted = 'à noite';
-  if (msg.includes('madrugada')) timeExtracted = 'de madrugada';
-
-  // ========================================
-  // FASE 1: DOR EM REPOUSO (0-10)
-  // ========================================
-  if (currentPhase === 'collecting_pain_at_rest' || currentPhase === 'collecting_pain' || currentPhase === 'greeting') {
-    if (number !== null && number >= 0 && number <= 10) {
-      // A IA agora decide dinamicamente se precisa perguntar sobre febre ou não (baseado na dor).
-      // Se a IA decidir perguntar, ela gerenciará isso. 
-      // Aqui apenas garantimos que se a IA perguntou sobre febre, a resposta seja processada pela própria IA.
-      // Portanto, removemos o hardcoded state machine para febre e deixamos o fluxo seguir para a IA ou para o próximo passo lógico.
-
-      return {
-        message: `Entendi. Vamos continuar.`,
-        needsImage: null,
-        dataCollected: { painAtRest: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bowel' // Pula direto para evacuação
-      };
-    }
-
-    if (msg.includes('média') || msg.includes('moderada') || msg.includes('razoável') ||
-      msg.includes('forte') || msg.includes('fraca') || msg.includes('leve') ||
-      msg.includes('muita') || msg.includes('pouca') || msg.includes('bastante')) {
-      return {
-        message: `Entendo. Mas para eu registrar certinho, preciso de um número.\n\nOlhando a escala de dor, qual número de 0 a 10 representa sua dor em repouso agora?`,
-        needsImage: 'pain_scale',
-        dataCollected: {},
-        completed: false,
-        needsClarification: true,
-        conversationPhase: 'collecting_pain_at_rest'
-      };
-    }
-
-    return {
-      message: `Desculpe, não entendi. Preciso que você me diga um número de 0 a 10 para sua dor em repouso (quando está parado).`,
-      needsImage: 'pain_scale',
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_pain_at_rest'
-    };
-  }
-
-  // FASE 2 & 3 (Febre) REMOVIDAS DA LÓGICA RÍGIDA - A IA GERENCIA DINAMICAMENTE
-
-  // ========================================
-  // FASE 3: EVACUAÇÃO (URINA FOI REMOVIDA DO FLUXO)
-  // D+1: "Você já evacuou após a cirurgia?"
-  // D+2+: "Você evacuou desde a nossa última conversa?"
-  // ========================================
-  if (currentPhase === 'collecting_bowel') {
-    if (isYes) {
-      return {
-        message: `Certo. Mais ou menos que horas foi?`,
-        needsImage: null,
-        dataCollected: { hadBowelMovementSinceLastContact: true },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bowel_time'
-      };
-    }
-    if (isNo || msg.includes('ainda não') || msg.includes('ainda nao')) {
-      return {
-        message: `Entendi. Continue com os líquidos e laxantes. Teve sangramento?`,
-        needsImage: null,
-        dataCollected: { hadBowelMovementSinceLastContact: false },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bleeding'
-      };
-    }
-
-    // Clarificação também diferente para D+1 vs D+2+
-    const clarification = dayNumber === 1
-      ? `Não entendi. Você já foi ao banheiro (fazer cocô)? Responda sim ou não.`
-      : `Não entendi. Você foi ao banheiro (fazer cocô) desde nossa última conversa? Responda sim ou não.`;
-
-    return {
-      message: clarification,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_bowel'
-    };
-  }
-
-  // ========================================
-  // FASE 6: HORA DA EVACUAÇÃO
-  // ========================================
-  if (currentPhase === 'collecting_bowel_time') {
-    // Aceita qualquer indicação de hora
-    const bowelTime = timeExtracted || userMessage;
-    return {
-      message: `Ok, por volta das ${bowelTime}. E *doeu muito na hora?*\n\nMe diga um número de 0 a 10:`,
-      needsImage: 'pain_scale',
-      dataCollected: { bowelMovementTime: bowelTime },
-      completed: false,
-      needsClarification: false,
-      conversationPhase: 'collecting_pain_during_bm'
-    };
-  }
-
-  // ========================================
-  // FASE 7: DOR DURANTE EVACUAÇÃO (0-10)
-  // ========================================
-  if (currentPhase === 'collecting_pain_during_bm') {
-    // Bristol APENAS em D+5 e D+10
-    const shouldAskBristol = dayNumber === 5 || dayNumber === 10;
-
-    if (number !== null && number >= 0 && number <= 10) {
-      if (shouldAskBristol) {
-        return {
-          message: `Entendi, dor ${number}. Olhe a imagem abaixo: qual número (1 a 7) parece mais com o seu cocô?`,
-          needsImage: 'bristol_scale',
-          dataCollected: { painDuringBowelMovement: number },
-          completed: false,
-          needsClarification: false,
-          conversationPhase: 'collecting_bristol'
-        };
-      } else {
-        // Pular Bristol, ir direto para sangramento
-        return {
-          message: `Entendi, dor ${number}. Teve sangramento?`,
-          needsImage: null,
-          dataCollected: { painDuringBowelMovement: number },
-          completed: false,
-          needsClarification: false,
-          conversationPhase: 'collecting_bleeding'
-        };
-      }
-    }
-    return {
-      message: `Por favor, me diga apenas o número de 0 a 10 para a dor na hora de ir ao banheiro.`,
-      needsImage: 'pain_scale',
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_pain_during_bm'
-    };
-  }
-
-  // ========================================
-  // FASE 8: BRISTOL (1-7)
-  // ========================================
-  if (currentPhase === 'collecting_bristol') {
-    if (number !== null && number >= 1 && number <= 7) {
-      const bristolComment = number <= 2 ? 'Fezes duras, beba mais água.'
-        : number >= 6 ? 'Fezes líquidas. Fique atento.'
-          : 'Consistência ok.';
-      return {
-        message: `Certo, tipo ${number}. ${bristolComment}\n\nTeve sangramento?`,
-        needsImage: null,
-        dataCollected: { bristolScale: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_bleeding'
-      };
-    }
-    return {
-      message: `Não entendi. Olhe a imagem e diga o número de 1 a 7.`,
-      needsImage: 'bristol_scale',
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_bristol'
-    };
-  }
-
-  // ========================================
-  // FASE 9: SANGRAMENTO
-  // ========================================
-  if (currentPhase === 'collecting_bleeding') {
-    if (isNo || msg.includes('nenhum') || msg.includes('zero')) {
-      return {
-        message: `Ok, sem sangramento. Está tomando os remédios nos horários certos?`,
-        needsImage: null,
-        dataCollected: { bleeding: 'none' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_prescribed'
-      };
-    }
-    if (msg.includes('leve') || msg.includes('pouco') || msg.includes('papel') || msg.includes('gotas')) {
-      return {
-        message: `Certo, pouco sangue no papel é normal. Está tomando os remédios nos horários certos?`,
-        needsImage: null,
-        dataCollected: { bleeding: 'mild' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_prescribed'
-      };
-    }
-    if (msg.includes('moderado') || msg.includes('roupa') || msg.includes('médio')) {
-      return {
-        message: `Entendi, sangramento moderado. Fique atento. Está tomando os remédios nos horários certos?`,
-        needsImage: null,
-        dataCollected: { bleeding: 'moderate' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_prescribed'
-      };
-    }
-    if (msg.includes('intenso') || msg.includes('muito') || msg.includes('forte') || msg.includes('vaso')) {
-      return {
-        message: `⚠️ Sangramento intenso requer atenção. Se continuar, vá ao hospital. Está tomando os remédios nos horários certos?`,
-        needsImage: null,
-        dataCollected: { bleeding: 'severe' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_prescribed'
-      };
-    }
-    if (isYes) {
-      return {
-        message: `Foi muito sangue?\n\n- *Leve*: só no papel\n- *Moderado*: manchou a roupa\n- *Intenso*: encheu o vaso`,
-        needsImage: null,
-        dataCollected: {},
-        completed: false,
-        needsClarification: true,
-        conversationPhase: 'collecting_bleeding'
-      };
-    }
-    return {
-      message: `Teve sangramento? Responda sim ou não.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_bleeding'
-    };
-  }
-
-  // ========================================
-  // FASE 10: MEDICAÇÕES PRESCRITAS
-  // ========================================
-  if (currentPhase === 'collecting_meds_prescribed') {
-    if (isYes || msg.includes('tomando') || msg.includes('tomo') || msg.includes('certinho') || msg.includes('horários')) {
-      return {
-        message: `Ótimo. Precisou tomar algum *outro* remédio para dor, além desses?`,
-        needsImage: null,
-        dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: msg.includes('certinho') ? 'tomando nos horários' : undefined },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_extra'
-      };
-    }
-    if (isNo || msg.includes('não estou') || msg.includes('esqueci') || msg.includes('parei')) {
-      return {
-        message: `Entendi. Tente tomar nos horários certos. Tomou algum *outro* remédio por conta própria?`,
-        needsImage: null,
-        dataCollected: { takingPrescribedMeds: false, prescribedMedsDetails: userMessage },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_extra'
-      };
-    }
-    if (msg.includes('algumas') || msg.includes('às vezes') || msg.includes('as vezes')) {
-      return {
-        message: `Entendi. Tente manter os horários. Precisou tomar algum *outro* remédio além desses?`,
-        needsImage: null,
-        dataCollected: { takingPrescribedMeds: true, prescribedMedsDetails: 'tomando irregularmente' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_meds_extra'
-      };
-    }
-    return {
-      message: `Está tomando os remédios receitados direitinho? Responda sim ou não.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_meds_prescribed'
-    };
-  }
-
-  // ========================================
-  // FASE 11: MEDICAÇÕES EXTRAS (além das prescritas)
-  // ========================================
-  if (currentPhase === 'collecting_meds_extra') {
-    if (isNo || msg.includes('não precisei') || msg.includes('só as receitadas') || msg.includes('apenas')) {
-      // Verificar se precisa perguntar sobre secreção purulenta (D+3)
-      // Como não temos acesso ao dayNumber aqui, vamos para concerns
-      // A IA vai verificar se precisa perguntar sobre secreção
-      return {
-        message: `Ok. Tem mais alguma dúvida ou sintoma?`,
-        needsImage: null,
-        dataCollected: { takingExtraMeds: false },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_concerns'
-      };
-    }
-    if (isYes || msg.includes('tomei') || msg.includes('comprei') || msg.includes('tramadol') || msg.includes('tylenol') || msg.includes('paracetamol') || msg.includes('morfina') || msg.includes('codeína')) {
-      // Se já mencionou qual medicação, registrar
-      const mentionedMeds = [];
-      if (msg.includes('tramadol')) mentionedMeds.push('tramadol');
-      if (msg.includes('tylenol') || msg.includes('paracetamol')) mentionedMeds.push('paracetamol');
-      if (msg.includes('morfina')) mentionedMeds.push('morfina');
-      if (msg.includes('codeína') || msg.includes('codeina')) mentionedMeds.push('codeína');
-
-      if (mentionedMeds.length > 0) {
-        return {
-          message: `Certo, anotado (${mentionedMeds.join(', ')}). Tem mais alguma dúvida?`,
-          needsImage: null,
-          dataCollected: { takingExtraMeds: true, extraMedsDetails: mentionedMeds.join(', ') },
-          completed: false,
-          needsClarification: false,
-          conversationPhase: 'collecting_concerns'
-        };
-      }
-
-      return {
-        message: `Qual remédio você tomou a mais?`,
-        needsImage: null,
-        dataCollected: { takingExtraMeds: true },
-        completed: false,
-        needsClarification: true,
-        conversationPhase: 'collecting_meds_extra_details'
-      };
-    }
-    return {
-      message: `Precisou tomar algum outro remédio além dos receitados? Responda sim ou não.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_meds_extra'
-    };
-  }
-
-  // ========================================
-  // FASE 11b: DETALHES DAS MEDICAÇÕES EXTRAS
-  // ========================================
-  if (currentPhase === 'collecting_meds_extra_details') {
-    return {
-      message: `Entendi, vou registrar: ${userMessage}. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
-      needsImage: null,
-      dataCollected: { takingExtraMeds: true, extraMedsDetails: userMessage },
-      completed: false,
-      needsClarification: false,
-      conversationPhase: 'collecting_concerns'
-    };
-  }
-
-  // ========================================
-  // FASE 12: SECREÇÃO PURULENTA (apenas D+3 em diante)
-  // NOTA: Esta fase só é ativada pela IA quando dayNumber >= 3
-  // ========================================
-  if (currentPhase === 'collecting_purulent_discharge') {
-    if (isNo || msg.includes('não') || msg.includes('nenhuma') || msg.includes('limpo') || msg.includes('normal')) {
-      return {
-        message: `Ótimo, sem sinais de secreção anormal. Última pergunta: tem alguma outra preocupação ou sintoma que gostaria de me contar?`,
-        needsImage: null,
-        dataCollected: { hasPurulentDischarge: false },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_concerns'
-      };
-    }
-    if (isYes || msg.includes('pus') || msg.includes('amarela') || msg.includes('verde') || msg.includes('cheiro') || msg.includes('fede')) {
-      return {
-        message: `⚠️ Secreção purulenta pode indicar infecção e precisa ser avaliada. Vou registrar isso e o Dr. João Vitor vai analisar. Tem alguma outra preocupação?`,
-        needsImage: null,
-        dataCollected: { hasPurulentDischarge: true, purulentDischargeDetails: userMessage },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_concerns'
-      };
-    }
-    if (msg.includes('clara') || msg.includes('aquosa') || msg.includes('serosa') || msg.includes('transparente')) {
-      return {
-        message: `Secreção clara/aquosa é normal na cicatrização, faz parte do processo. Última pergunta: tem alguma outra preocupação ou sintoma?`,
-        needsImage: null,
-        dataCollected: { hasPurulentDischarge: false, purulentDischargeDetails: 'secreção serosa (normal)' },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_concerns'
-      };
-    }
-    return {
-      message: `Desculpe, não entendi. Você notou saída de secreção amarelada/esverdeada com mau cheiro (pus) no local da cirurgia? Responda sim ou não.\n\n_Obs: Secreção clara/aquosa é normal._`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_purulent_discharge'
-    };
-  }
-
-  // ========================================
-  // FASE 13: PREOCUPAÇÕES
-  // ========================================
-  if (currentPhase === 'collecting_concerns') {
-    const hasConcerns = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
-
-    // Se é D+14, ir para pesquisa de satisfação
-    if (dayNumber === 14) {
-      return {
-        message: `Registrei suas informações. ${hasConcerns ? '' : ''}
-
-Agora, vamos fazer algumas perguntas finais sobre sua experiência durante o acompanhamento.
-
-*De 0 a 10, quão satisfeito você está com o controle da dor durante todo o período pós-operatório?*
-
-(0 = Muito insatisfeito, 10 = Muito satisfeito)`,
-        needsImage: null,
-        dataCollected: { otherSymptoms: hasConcerns ? userMessage : undefined },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_satisfaction_pain'
-      };
-    }
-
-    // Dias normais (não D+14): finalizar
-    return {
-      message: `Obrigado por compartilhar! Registrei todas as informações. Seu médico vai analisar e, se necessário, entrará em contato. Boa recuperação! 💙`,
-      needsImage: null,
-      dataCollected: { otherSymptoms: hasConcerns ? userMessage : undefined },
-      completed: true,
-      needsClarification: false,
-      conversationPhase: 'completed'
-    };
-  }
-
-  // ========================================
-  // FASE 14: SATISFAÇÃO COM ANALGESIA (APENAS D+14)
-  // ========================================
-  if (currentPhase === 'collecting_satisfaction_pain') {
-    if (number !== null && number >= 0 && number <= 10) {
-      return {
-        message: `Entendi, satisfação ${number}/10 com o controle da dor.
-
-*De 0 a 10, como você avalia este acompanhamento pós-operatório por WhatsApp com inteligência artificial?*
-
-(0 = Muito ruim, 10 = Excelente)`,
-        needsImage: null,
-        dataCollected: { painControlSatisfaction: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_satisfaction_ai'
-      };
-    }
-    return {
-      message: `Por favor, me diga um número de 0 a 10 para sua satisfação com o controle da dor.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_satisfaction_pain'
-    };
-  }
-
-  // ========================================
-  // FASE 15: SATISFAÇÃO COM ACOMPANHAMENTO IA (APENAS D+14)
-  // ========================================
-  if (currentPhase === 'collecting_satisfaction_ai') {
-    if (number !== null && number >= 0 && number <= 10) {
-      return {
-        message: `Avaliação ${number}/10 para o acompanhamento por IA.
-
-*De 0 a 10, qual a probabilidade de você recomendar este acompanhamento por WhatsApp a um amigo ou familiar que fosse fazer uma cirurgia similar?*
-
-(0 = Não recomendaria, 10 = Recomendaria com certeza)`,
-        needsImage: null,
-        dataCollected: { aiFollowUpSatisfaction: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_nps'
-      };
-    }
-    return {
-      message: `Por favor, me diga um número de 0 a 10 para avaliar o acompanhamento por IA.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_satisfaction_ai'
-    };
-  }
-
-  // ========================================
-  // FASE 16: NPS - NET PROMOTER SCORE (APENAS D+14)
-  // ========================================
-  if (currentPhase === 'collecting_nps') {
-    if (number !== null && number >= 0 && number <= 10) {
-      return {
-        message: `Probabilidade de recomendação: ${number}/10.
-
-Por último, *gostaria de deixar algum comentário ou sugestão sobre o acompanhamento?*
-
-(Pode escrever livremente ou responder "não" se preferir)`,
-        needsImage: null,
-        dataCollected: { npsScore: number },
-        completed: false,
-        needsClarification: false,
-        conversationPhase: 'collecting_feedback'
-      };
-    }
-    return {
-      message: `Por favor, me diga um número de 0 a 10 para a probabilidade de recomendação.`,
-      needsImage: null,
-      dataCollected: {},
-      completed: false,
-      needsClarification: true,
-      conversationPhase: 'collecting_nps'
-    };
-  }
-
-  // ========================================
-  // FASE 17: FEEDBACK ABERTO (APENAS D+14) - FINAL
-  // ========================================
-  if (currentPhase === 'collecting_feedback') {
-    const hasFeedback = !isNo && msg.length > 2 && msg !== 'nada' && msg !== 'não' && msg !== 'nao';
-    return {
-      message: `*Muito obrigado por participar do acompanhamento pós-operatório!* 🎉
-
-${hasFeedback ? 'Agradecemos seu feedback, ele é muito importante para melhorarmos o sistema.' : ''}
-
-Todas as informações foram registradas. Seu médico receberá um relatório completo do seu acompanhamento.
-
-Desejamos uma excelente recuperação! 💙`,
-      needsImage: null,
-      dataCollected: { feedback: hasFeedback ? userMessage : undefined },
-      completed: true,
-      needsClarification: false,
-      conversationPhase: 'completed'
-    };
-  }
-
-  // Fallback - não avança
-  return {
-    message: `Desculpe, não consegui entender sua resposta. Pode repetir de forma mais clara?`,
-    needsImage: null,
-    dataCollected: {},
-    completed: false,
-    needsClarification: true,
-    conversationPhase: currentPhase
-  };
-}
+// Funções legadas (determineCurrentPhase, interpretResponseLocally) removidas em favor da integração com Gemini 100%.
 
 /**
  * Processa resposta do questionário com IA conversacional
@@ -1460,7 +571,7 @@ async function processQuestionnaireAnswer(
   message: string
 ) {
   try {
-    logger.debug('🔄 Processando resposta com IA conversacional...', {
+    logger.debug('🔄 Processando resposta com IA Gemini...', {
       patientId: patient.id,
       followUpId: followUp.id,
       message: message.substring(0, 100),
@@ -1484,7 +595,6 @@ async function processQuestionnaireAnswer(
 
     // Se já completou, NÃO reiniciar questionário
     if (questionnaireData.completed) {
-      logger.debug('⚠️ Questionário já completado - respondendo contextualmente');
       await sendEmpatheticResponse(
         phone,
         `Olá ${patient.name.split(' ')[0]}! Você já completou o questionário de hoje. ` +
@@ -1493,8 +603,28 @@ async function processQuestionnaireAnswer(
       return;
     }
 
-    // 2. Obter fase atual salva no banco
-    const savedPhase = questionnaireData.conversationPhase || 'collecting_data';
+    // 2. Definir Checklist Dinâmico
+    const currentData = questionnaireData.extractedData || {};
+    const requiredFields = [
+      'painAtRest',
+      'hadBowelMovementSinceLastContact',
+      'takingPrescribedMeds',
+      'bleeding'
+    ];
+
+    // Regras condicionais para o checklist
+    if (currentData.painAtRest !== undefined && Number(currentData.painAtRest) > 5) {
+      if (currentData.hasFever === undefined) requiredFields.push('hasFever');
+    }
+    if (currentData.takingExtraMeds === true) {
+      if (!currentData.extraMedsDetails) requiredFields.push('extraMedsDetails');
+    }
+    if (currentData.bleeding && currentData.bleeding !== 'none') {
+      if (!currentData.bleedingDetails) requiredFields.push('bleedingDetails');
+    }
+
+    // Identificar campos faltantes
+    const missingFields = requiredFields.filter(f => currentData[f] === undefined || currentData[f] === null);
 
     // 3. Buscar protocolos aplicáveis
     const protocols = await findApplicableProtocols(
@@ -1503,20 +633,24 @@ async function processQuestionnaireAnswer(
       followUp.dayNumber,
       patient.researchId
     );
-
     const protocolText = formatProtocolsForPrompt(protocols);
 
-    // 4. Chamar Claude API com a fase atual e protocolos
-    const aiResponse = await callClaudeAPI(
+    // 4. CHAMAR GEMINI
+    const aiResponse = await analyzePatientMessageWithGemini(
       conversationHistory,
       message,
-      patient,
-      followUp.surgery.type,
-      followUp.dayNumber,
-      savedPhase,
-      questionnaireData.extractedData,
-      protocolText,
-      patient.doctorName || 'seu médico'
+      {
+        name: patient.name,
+        surgeryType: followUp.surgery.type,
+        dayNumber: followUp.dayNumber,
+        doctorName: patient.doctorName
+      },
+      {
+        required: requiredFields,
+        missing: missingFields,
+        collected: currentData
+      },
+      protocolText
     );
 
     // 5. Enviar resposta da IA
@@ -1527,29 +661,35 @@ async function processQuestionnaireAnswer(
       await sendImageScale(phone, aiResponse.needsImage);
     }
 
-    // 6. Atualizar histórico
+    // 6. Atualizar histórico e dados
     conversationHistory.push(
       { role: 'user', content: message },
       { role: 'assistant', content: aiResponse.message }
     );
 
     const mergedData = {
-      ...questionnaireData.extractedData,
+      ...currentData,
       ...aiResponse.dataCollected,
     };
 
-    // 7. Atualizar banco
     const updatedQuestionnaireData = {
       conversation: conversationHistory,
       extractedData: mergedData,
       completed: aiResponse.completed,
-      conversationPhase: aiResponse.conversationPhase,
+      conversationPhase: aiResponse.completed ? 'completed' : 'in_progress', // Simplificado
     };
 
+    // 7. Salvar no banco
     if (response) {
       await prisma.followUpResponse.update({
         where: { id: response.id },
         data: { questionnaireData: JSON.stringify(updatedQuestionnaireData) },
+      });
+
+      // Atualizar timestamp do FollowUp para indicar atividade (para o Nudge)
+      await prisma.followUp.update({
+        where: { id: followUp.id },
+        data: { updatedAt: new Date() }
       });
     } else {
       await prisma.followUpResponse.create({
@@ -1568,7 +708,7 @@ async function processQuestionnaireAnswer(
     }
 
   } catch (error) {
-    logger.error('❌ Erro ao processar resposta com IA:', error);
+    logger.error('❌ Erro ao processar resposta com Gemini:', error);
     await sendEmpatheticResponse(phone, 'Tive um erro ao processar. Pode responder novamente?');
   }
 }
@@ -2022,22 +1162,43 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function findPendingFollowUp(patientId: string): Promise<any | null> {
-  const followUp = await prisma.followUp.findFirst({
+  // 1. Prioridade: Buscar follow-up ATIVO (sent ou in_progress)
+  const activeFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
       status: {
-        in: ['sent', 'pending', 'in_progress'],  // CRITICAL FIX: incluir in_progress
+        in: ['sent', 'in_progress'],
       },
     },
     include: {
       surgery: true,
     },
     orderBy: {
-      scheduledDate: 'asc', // Priorizar o follow-up mais antigo (D1 antes de D2)
+      scheduledDate: 'desc', // Se houver múltiplos ativos (erro?), pega o mais recente
     },
   });
 
-  return followUp;
+  if (activeFollowUp) {
+    return activeFollowUp;
+  }
+
+  // 2. Fallback: Buscar follow-up PENDENTE (se houver, mas não deveria bloquear o fluxo)
+  // Se retornarmos um pending aqui, ele vai cair no "No pending follow-up found" lá em cima se não tratarmos?
+  // Na verdade, o código chamador verifica o status.
+  const pendingFollowUp = await prisma.followUp.findFirst({
+    where: {
+      patientId,
+      status: 'pending',
+    },
+    include: {
+      surgery: true,
+    },
+    orderBy: {
+      scheduledDate: 'asc', // Priorizar o mais antigo não respondido
+    },
+  });
+
+  return pendingFollowUp;
 }
 
 

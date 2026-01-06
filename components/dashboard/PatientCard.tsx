@@ -315,8 +315,8 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation(); // Previne eventos de clique no card pai
-                      if (patient.patientId) {
-                        router.push(`/paciente/${patient.patientId}/editar`);
+                      if (patient.id) {
+                        router.push(`/paciente/${patient.id}/detalhes`);
                       } else {
                         console.error('ID do paciente inválido', patient);
                       }
