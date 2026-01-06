@@ -14,16 +14,20 @@ export interface PatientData {
 }
 
 export interface QuestionnaireData {
-  painLevel?: number;
-  urinaryRetention?: boolean;
-  urinaryRetentionHours?: number;
-  bowelMovement?: boolean;
-  bleeding?: string; // none, light, moderate, severe
-  fever?: boolean;
-  temperature?: number;
-  discharge?: string; // none, serous, purulent, abundant
-  additionalSymptoms?: string[];
-  concerns?: string;
+  painLevel?: number | null;
+  painAtRest?: number | null;
+  painDuringBowelMovement?: number | null;
+  urinaryRetention?: boolean | null;
+  urinaryRetentionHours?: number | null;
+  bowelMovement?: boolean | null;
+  bowelMovementTime?: string | null;
+  bristolScale?: number | null;
+  bleeding?: string | null; // none, light, moderate, severe
+  fever?: boolean | null;
+  temperature?: number | null;
+  discharge?: string | null; // none, serous, purulent, abundant
+  additionalSymptoms?: string[] | null;
+  concerns?: string | null;
 }
 
 export interface AnalysisInput {
@@ -187,18 +191,21 @@ Retorne APENAS um objeto JSON válido no seguinte formato (sem markdown, sem exp
 function buildQuestionnaireDescription(data: QuestionnaireData): string {
   const parts: string[] = [];
 
-  // Dor
-  if (data.painLevel !== undefined) {
+  // Dor (Lógica combinada)
+  if (data.painAtRest != null || data.painDuringBowelMovement != null) {
+    if (data.painAtRest != null) parts.push(`- Dor em repouso: ${data.painAtRest}/10`);
+    if (data.painDuringBowelMovement != null) parts.push(`- Dor ao evacuar: ${data.painDuringBowelMovement}/10`);
+  } else if (data.painLevel != null) {
     const painIntensity =
       data.painLevel >= 8 ? 'muito intensa' :
         data.painLevel >= 6 ? 'intensa' :
           data.painLevel >= 4 ? 'moderada' :
             data.painLevel >= 2 ? 'leve' : 'mínima';
-    parts.push(`- Dor: ${data.painLevel}/10 (${painIntensity})`);
+    parts.push(`- Dor (geral): ${data.painLevel}/10 (${painIntensity})`);
   }
 
   // Retenção urinária
-  if (data.urinaryRetention !== undefined) {
+  if (data.urinaryRetention != null) {
     if (data.urinaryRetention) {
       const hours = data.urinaryRetentionHours || 'não especificado';
       parts.push(`- Retenção urinária: SIM (${hours}h)`);
@@ -208,8 +215,10 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
   }
 
   // Evacuação
-  if (data.bowelMovement !== undefined) {
-    parts.push(`- Evacuação: ${data.bowelMovement ? 'SIM' : 'NÃO'}`);
+  if (data.bowelMovement != null) {
+    const timeInfo = data.bowelMovementTime ? ` (Horário: ${data.bowelMovementTime})` : '';
+    const bristolInfo = data.bristolScale != null ? ` (Bristol: ${data.bristolScale})` : '';
+    parts.push(`- Evacuação: ${data.bowelMovement ? 'SIM' : 'NÃO'}${timeInfo}${bristolInfo}`);
   }
 
   // Sangramento
@@ -224,7 +233,7 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
   }
 
   // Febre
-  if (data.fever !== undefined) {
+  if (data.fever != null) {
     if (data.fever && data.temperature) {
       parts.push(`- Febre: SIM (${data.temperature}°C)`);
     } else if (data.fever) {
