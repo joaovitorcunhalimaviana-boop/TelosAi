@@ -598,10 +598,10 @@ export async function sendFinalReport(
     totalFollowUps: number;
     // Dados de satisfação D+14
     satisfaction?: {
-      painControlSatisfaction?: number;
-      aiFollowUpSatisfaction?: number;
-      npsScore?: number;
-      feedback?: string;
+      painControlSatisfaction?: number | null;
+      aiFollowUpSatisfaction?: number | null;
+      npsScore?: number | null;
+      feedback?: string | null;
     };
   }
 ): Promise<boolean> {
@@ -660,13 +660,13 @@ export async function sendFinalReport(
   // Adicionar dados de satisfação se disponíveis
   if (satisfaction) {
     message += `\n📝 *SATISFAÇÃO:*\n`;
-    if (satisfaction.painControlSatisfaction !== undefined) {
+    if (satisfaction.painControlSatisfaction != null) {
       message += `• Controle da dor: ${satisfaction.painControlSatisfaction}/10\n`;
     }
-    if (satisfaction.aiFollowUpSatisfaction !== undefined) {
+    if (satisfaction.aiFollowUpSatisfaction != null) {
       message += `• Acompanhamento IA: ${satisfaction.aiFollowUpSatisfaction}/10\n`;
     }
-    if (satisfaction.npsScore !== undefined) {
+    if (satisfaction.npsScore != null) {
       const npsCategory = satisfaction.npsScore >= 9 ? 'Promotor' :
         satisfaction.npsScore >= 7 ? 'Passivo' : 'Detrator';
       message += `• NPS: ${satisfaction.npsScore}/10 (${npsCategory})\n`;
