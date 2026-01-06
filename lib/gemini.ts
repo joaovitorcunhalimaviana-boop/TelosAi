@@ -9,7 +9,7 @@ const geminiResponseSchema = z.object({
     reasoning: z.string(),
     message: z.string(),
     needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
-    dataCollected: z.record(z.any()),
+    dataCollected: z.record(z.string(), z.any()),
     completed: z.boolean(),
     needsClarification: z.boolean()
 });
