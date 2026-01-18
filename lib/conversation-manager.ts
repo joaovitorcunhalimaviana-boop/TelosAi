@@ -26,11 +26,33 @@ export interface ConversationContext {
  */
 export async function getOrCreateConversation(phoneNumber: string, patientId?: string) {
   // Formatar número (remover caracteres não numéricos)
-  const formattedPhone = phoneNumber.replace(/\D/g, '');
+  let formattedPhone = phoneNumber.replace(/\D/g, '');
 
+  // Remover código do país (55) se presente para normalizar
+  if (formattedPhone.startsWith('55') && formattedPhone.length > 11) {
+    formattedPhone = formattedPhone.substring(2);
+  }
+
+  // Tentar encontrar conversa existente
   let conversation = await prisma.conversation.findUnique({
     where: { phoneNumber: formattedPhone }
   });
+
+  // Se não encontrou, tentar com variações do número
+  if (!conversation) {
+    // Tentar com 55 na frente
+    conversation = await prisma.conversation.findUnique({
+      where: { phoneNumber: '55' + formattedPhone }
+    });
+  }
+
+  if (!conversation) {
+    // Tentar pelos últimos 9 dígitos (mais confiável)
+    const last9 = formattedPhone.slice(-9);
+    conversation = await prisma.conversation.findFirst({
+      where: { phoneNumber: { endsWith: last9 } }
+    });
+  }
 
   if (!conversation) {
     conversation = await prisma.conversation.create({
@@ -41,12 +63,14 @@ export async function getOrCreateConversation(phoneNumber: string, patientId?: s
         context: {}
       }
     });
+    console.log('📞 Nova conversa criada:', formattedPhone, 'patientId:', patientId);
   } else if (patientId && !conversation.patientId) {
     // Associar paciente se ainda não estava associado
     conversation = await prisma.conversation.update({
       where: { id: conversation.id },
       data: { patientId }
     });
+    console.log('📞 PatientId associado à conversa existente:', conversation.phoneNumber);
   }
 
   return conversation;

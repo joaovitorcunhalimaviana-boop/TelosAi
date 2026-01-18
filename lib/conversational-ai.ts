@@ -291,6 +291,14 @@ JSON STRUCTURE:
 - Use sendImages.bristolScale: true ANTES de perguntar sobre consistência das fezes`;
 
   try {
+    console.log('🧠 conductConversation - Starting...');
+    console.log('🧠 User message:', userMessage);
+    console.log('🧠 Patient:', patient.name);
+    console.log('🧠 Surgery:', surgery.type);
+    console.log('🧠 Days post-op:', daysPostOp);
+    console.log('🧠 Conversation history length:', conversationHistory.length);
+    console.log('🧠 Current data:', JSON.stringify(currentData));
+
     // Construir mensagens para Claude
     const messages: any[] = [];
 
@@ -308,6 +316,9 @@ JSON STRUCTURE:
       content: userMessage
     });
 
+    console.log('🧠 Messages array length:', messages.length);
+    console.log('🧠 Calling Anthropic API...');
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 1024,
@@ -316,10 +327,16 @@ JSON STRUCTURE:
       messages: messages,
     });
 
+    console.log('🧠 Anthropic API response received!');
+    console.log('🧠 Response content length:', response.content.length);
+
     const content = response.content[0];
     if (content.type !== 'text') {
+      console.error('🧠 ERROR: Unexpected response type:', content.type);
       throw new Error('Unexpected response type from Claude');
     }
+
+    console.log('🧠 Raw response text (first 500 chars):', content.text.substring(0, 500));
 
     // Limpar markdown formatting se presente
     let cleanText = content.text.trim();
@@ -364,9 +381,11 @@ JSON STRUCTURE:
       sendImages: result.sendImages
     };
 
-  } catch (error) {
-    console.error('Error in conversational AI:', error);
-    console.error('User message was:', userMessage);
+  } catch (error: any) {
+    console.error('🧠 ERROR in conversational AI:', error);
+    console.error('🧠 Error message:', error?.message);
+    console.error('🧠 Error stack:', error?.stack);
+    console.error('🧠 User message was:', userMessage);
 
     // Fallback inteligente: tentar entender a mensagem mesmo sem IA
     const userMessageLower = userMessage.toLowerCase().trim();
