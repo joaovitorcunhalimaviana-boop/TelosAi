@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * WEBHOOK COM MEMÓRIA DE CONVERSA
- * Mantém histórico para a IA saber o que já foi perguntado
+ * WEBHOOK COM MEMÓRIA, PROTOCOLO MÉDICO E SALVAMENTO DE RESPOSTAS
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import Anthropic from '@anthropic-ai/sdk';
+import { getProtocolForSurgery } from '@/lib/protocols/hemorroidectomia-protocol';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_secreto_123';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -94,7 +94,16 @@ async function processMessage(phone: string, text: string) {
 
     const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
-    // 3. Buscar ou criar conversa com histórico
+    // 3. Buscar follow-up pendente
+    const followUp = await prisma.followUp.findFirst({
+      where: {
+        patientId: patient.id,
+        status: { in: ['sent', 'pending'] }
+      },
+      orderBy: { scheduledDate: 'desc' }
+    });
+
+    // 4. Buscar ou criar conversa com histórico
     let conversation = await prisma.conversation.findFirst({
       where: { patientId: patient.id }
     });
@@ -111,10 +120,10 @@ async function processMessage(phone: string, text: string) {
       });
     }
 
-    // 4. Obter histórico de mensagens
+    // 5. Obter histórico de mensagens
     const history = (conversation.messageHistory as any[]) || [];
 
-    // 5. Se "SIM" e conversa nova/idle, iniciar questionário
+    // 6. Se "SIM" e conversa nova/idle, iniciar questionário
     const textLower = text.toLowerCase().trim();
     if ((textLower === 'sim' || textLower === 's') && (conversation.state === 'idle' || conversation.state === 'awaiting_consent')) {
       const greeting = getGreeting();
@@ -136,7 +145,12 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
         data: {
           state: 'collecting_answers',
           messageHistory: newHistory,
-          context: { startedAt: new Date().toISOString(), daysPostOp }
+          context: {
+            startedAt: new Date().toISOString(),
+            daysPostOp,
+            followUpId: followUp?.id,
+            collectedData: {}
+          }
         }
       });
 
@@ -144,30 +158,41 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
       return;
     }
 
-    // 6. Adicionar mensagem do usuário ao histórico
+    // 7. Adicionar mensagem do usuário ao histórico
     history.push({ role: 'user', content: text, timestamp: new Date().toISOString() });
 
-    // 7. Chamar IA com histórico completo
+    // 8. Chamar IA com histórico completo e protocolo médico
     console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens');
-    const aiResponse = await callAIWithHistory(history, patient.name, surgery.type, daysPostOp);
+    const { response: aiResponse, extractedData, isComplete } = await callAIWithHistory(
+      history,
+      patient.name,
+      surgery.type,
+      daysPostOp
+    );
 
-    // 8. Adicionar resposta da IA ao histórico
+    // 9. Adicionar resposta da IA ao histórico
     history.push({ role: 'assistant', content: aiResponse, timestamp: new Date().toISOString() });
 
-    // 9. Verificar se questionário está completo (IA disse "obrigado" ou similar)
-    const isComplete = aiResponse.toLowerCase().includes('obrigad') &&
-                       aiResponse.toLowerCase().includes('dr.') ||
-                       aiResponse.toLowerCase().includes('boa recuperação');
+    // 10. Atualizar dados coletados no contexto
+    const currentContext = (conversation.context as any) || {};
+    const collectedData = { ...(currentContext.collectedData || {}), ...extractedData };
 
-    // 10. Atualizar conversa no banco
+    // 11. Atualizar conversa no banco
     await prisma.conversation.update({
       where: { id: conversation.id },
       data: {
         messageHistory: history,
         state: isComplete ? 'completed' : 'collecting_answers',
+        context: { ...currentContext, collectedData },
         updatedAt: new Date()
       }
     });
+
+    // 12. Se questionário completo, salvar respostas
+    if (isComplete && followUp) {
+      await saveQuestionnaireResponse(followUp.id, collectedData, patient.userId, history);
+      console.log('✅ Respostas salvas no banco!');
+    }
 
     await sendWhatsApp(phone, aiResponse);
 
@@ -177,21 +202,74 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
   }
 }
 
-// Chamar IA COM HISTÓRICO
+// Salvar respostas do questionário
+async function saveQuestionnaireResponse(
+  followUpId: string,
+  data: any,
+  userId: string,
+  conversationHistory: any[]
+) {
+  try {
+    // Determinar nível de risco
+    let riskLevel = 'low';
+    if (data.pain >= 8 || data.bleeding === 'intenso' || data.fever === true) {
+      riskLevel = 'high';
+    } else if (data.pain >= 6 || data.bleeding === 'moderado') {
+      riskLevel = 'medium';
+    }
+
+    // Criar resposta no banco
+    await prisma.followUpResponse.create({
+      data: {
+        followUpId,
+        userId,
+        questionnaireData: JSON.stringify(data),
+        riskLevel,
+        painAtRest: data.pain || null,
+        painDuringBowel: data.painDuringBowel || null,
+        bleeding: data.bleeding || null,
+        fever: data.fever || false,
+        aiResponse: conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n\n')
+      }
+    });
+
+    // Atualizar status do follow-up
+    await prisma.followUp.update({
+      where: { id: followUpId },
+      data: {
+        status: 'responded',
+        respondedAt: new Date()
+      }
+    });
+
+    console.log('✅ FollowUpResponse criado com riskLevel:', riskLevel);
+  } catch (error: any) {
+    console.error('❌ Erro ao salvar resposta:', error?.message);
+  }
+}
+
+// Chamar IA COM HISTÓRICO E PROTOCOLO
 async function callAIWithHistory(
   history: any[],
   patientName: string,
   surgeryType: string,
   daysPostOp: number
-): Promise<string> {
+): Promise<{ response: string; extractedData: any; isComplete: boolean }> {
   const firstName = patientName.split(' ')[0];
 
-  const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios.
+  // Obter protocolo médico
+  const protocol = getProtocolForSurgery(surgeryType);
+
+  const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios do Dr. João Vitor.
 
 CONTEXTO:
 - Paciente: ${firstName}
 - Cirurgia: ${surgeryType}
 - Dia pós-operatório: D+${daysPostOp}
+
+=== PROTOCOLO MÉDICO OFICIAL (SIGA ESTAS ORIENTAÇÕES) ===
+${protocol}
+=== FIM DO PROTOCOLO ===
 
 PERGUNTAS A COLETAR (na ordem):
 1. Dor em repouso (0-10) ✓ já perguntei na primeira mensagem
@@ -209,18 +287,32 @@ REGRAS IMPORTANTES:
 5. Se dor >= 8, sangramento intenso ou febre >= 38°C: alerte para procurar emergência
 6. Quando tiver TODAS as informações, agradeça e diga que vai passar para o Dr. João Vitor
 7. Seja empática e use português brasileiro informal
+8. SE o paciente perguntar sobre cuidados (banho de assento, alimentação, etc.), USE O PROTOCOLO para responder corretamente
 
-FLUXO:
-- Se já tem dor → pergunte sobre evacuação
-- Se já tem evacuação → pergunte sobre sangramento (ou dor na evacuação se evacuou)
-- Se já tem sangramento → pergunte sobre febre
-- Se já tem febre → pergunte sobre medicações
-- Se tem tudo → agradeça e finalize
+ORIENTAÇÕES ESPECÍFICAS DO PROTOCOLO:
+- Banho de assento: APENAS ÁGUA LIMPA, sem nenhum produto (nem sal, nem nada)
+- Crioterapia (gelo): apenas D0 a D2
+- Banho de assento morno: a partir de D3
 
-Responda APENAS com o texto da mensagem. Sem JSON, sem formatação especial.`;
+Responda em formato JSON:
+{
+  "response": "sua resposta para o paciente",
+  "extractedData": {
+    "pain": 5,
+    "evacuated": true,
+    "painDuringBowel": 6,
+    "bleeding": "leve",
+    "fever": false,
+    "medications": true
+  },
+  "isComplete": false
+}
+
+IMPORTANTE:
+- Só inclua em extractedData os dados que o paciente CONFIRMOU nesta mensagem
+- isComplete = true APENAS quando tiver TODAS as informações`;
 
   try {
-    // Converter histórico para formato Anthropic
     const messages = history.map(msg => ({
       role: msg.role === 'assistant' ? 'assistant' : 'user',
       content: msg.content
@@ -228,41 +320,69 @@ Responda APENAS com o texto da mensagem. Sem JSON, sem formatação especial.`;
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 500,
-      temperature: 0.7,
+      max_tokens: 800,
+      temperature: 0.5,
       system: systemPrompt,
       messages: messages as any
     });
 
     const content = response.content[0];
     if (content.type === 'text') {
-      return content.text;
+      // Tentar parsear JSON
+      try {
+        const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return {
+            response: parsed.response || content.text,
+            extractedData: parsed.extractedData || {},
+            isComplete: parsed.isComplete || false
+          };
+        }
+      } catch (e) {
+        // Se não for JSON, retornar texto direto
+      }
+
+      // Verificar se está completo pelo texto
+      const isComplete = content.text.toLowerCase().includes('obrigad') &&
+                        (content.text.toLowerCase().includes('dr.') ||
+                         content.text.toLowerCase().includes('boa recuperação'));
+
+      return {
+        response: content.text,
+        extractedData: {},
+        isComplete
+      };
     }
 
     throw new Error('Resposta inesperada');
   } catch (error: any) {
     console.error('❌ Erro na IA:', error?.message);
 
-    // Fallback: analisar histórico manualmente
+    // Fallback inteligente
     const lastAssistantMsg = [...history].reverse().find(m => m.role === 'assistant')?.content || '';
 
     if (lastAssistantMsg.includes('dor') && lastAssistantMsg.includes('0 a 10')) {
-      return `Entendi! Agora me conta: você conseguiu evacuar desde ontem?`;
+      return { response: `Entendi! Agora me conta: você conseguiu evacuar desde ontem?`, extractedData: {}, isComplete: false };
     }
     if (lastAssistantMsg.includes('evacu')) {
-      return `Ok! E sobre sangramento: está tendo algum? (nenhum, leve no papel, moderado, ou intenso)`;
+      return { response: `Ok! E sobre sangramento: está tendo algum? (nenhum, leve no papel, moderado, ou intenso)`, extractedData: {}, isComplete: false };
     }
     if (lastAssistantMsg.includes('sangramento')) {
-      return `Certo! Teve febre? Se sim, qual foi a temperatura?`;
+      return { response: `Certo! Teve febre? Se sim, qual foi a temperatura?`, extractedData: {}, isComplete: false };
     }
     if (lastAssistantMsg.includes('febre')) {
-      return `E as medicações: está tomando conforme o prescrito?`;
+      return { response: `E as medicações: está tomando conforme o prescrito?`, extractedData: {}, isComplete: false };
     }
     if (lastAssistantMsg.includes('medicaç')) {
-      return `Perfeito, ${firstName}! Muito obrigada pelas informações. Vou passar tudo para o Dr. João Vitor. Boa recuperação! 💙`;
+      return {
+        response: `Perfeito, ${firstName}! Muito obrigada pelas informações. Vou passar tudo para o Dr. João Vitor. Boa recuperação! 💙`,
+        extractedData: {},
+        isComplete: true
+      };
     }
 
-    return `Recebi! Me conta: você conseguiu evacuar?`;
+    return { response: `Recebi! Me conta: você conseguiu evacuar?`, extractedData: {}, isComplete: false };
   }
 }
 
