@@ -161,10 +161,16 @@ export function CadastroPacienteCompleto({ onSubmit }: CadastroPacienteCompletoP
     const selectedDate = e.target.value
     setFormData({ ...formData, surgeryDate: selectedDate })
 
-    const todayBrasilia = startOfDayBrasilia()
-    const surgery = new Date(selectedDate)
+    // Comparar strings de data diretamente (YYYY-MM-DD)
+    const brazilFormatter = new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+    const todayStr = brazilFormatter.format(new Date())
 
-    if (surgery > todayBrasilia) {
+    if (selectedDate > todayStr) {
       setErrors({ ...errors, surgeryDate: "Data da cirurgia não pode ser futura" })
     } else {
       setErrors({ ...errors, surgeryDate: "" })
@@ -180,11 +186,16 @@ export function CadastroPacienteCompleto({ onSubmit }: CadastroPacienteCompletoP
       // Validação completa
       const validatedData = completePatientSchema.parse(formData)
 
-      // Validar data da cirurgia (usar horário de Brasília)
-      const todayBrasilia = startOfDayBrasilia()
-      const surgery = new Date(validatedData.surgeryDate)
+      // Validar data da cirurgia (comparar strings YYYY-MM-DD)
+      const brazilFormatter = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Sao_Paulo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
+      const todayStr = brazilFormatter.format(new Date())
 
-      if (surgery > todayBrasilia) {
+      if (validatedData.surgeryDate > todayStr) {
         setErrors({ surgeryDate: "Data da cirurgia não pode ser futura" })
         setIsSubmitting(false)
         return
