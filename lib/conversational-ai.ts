@@ -59,6 +59,11 @@ export interface QuestionnaireData {
   // Preocupações gerais
   concerns?: string;
 
+  // Pesquisa de Satisfação (D+14)
+  satisfactionRating?: number; // 0-10 (NPS style)
+  wouldRecommend?: boolean; // Recomendaria o acompanhamento?
+  satisfactionComments?: string; // Comentários livres
+
   [key: string]: any;
 }
 
@@ -273,6 +278,10 @@ JSON STRUCTURE:
     "medications": true,
     "painControlledWithMeds": false,
     "fever": false,
+    // Campos de satisfação (APENAS D+14):
+    "satisfactionRating": 9,  // 0-10, nota de satisfação com acompanhamento
+    "wouldRecommend": true,  // true/false, recomendaria para outros
+    "satisfactionComments": "Muito bom o acompanhamento"  // comentário opcional
     // ... outros campos conforme coletados
   },
   "sendImages": {
@@ -283,6 +292,13 @@ JSON STRUCTURE:
   "urgency": "low|medium|high|critical",
   "needsDoctorAlert": false
 }
+
+PESQUISA DE SATISFAÇÃO (APENAS D+14):
+- Coletar após todas as perguntas clínicas
+- "satisfactionRating": nota de 0 a 10 (NPS)
+- "wouldRecommend": sim/não (true/false)
+- "satisfactionComments": comentário livre (opcional)
+- Ao finalizar D+14: agradecer, desejar boa recuperação
 
 ⚠️ IMPORTANTE:
 - Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
@@ -524,6 +540,17 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
   // 7. MEDICAÇÕES
   if (data.medications === undefined) {
     missing.push('Se está tomando as medicações conforme prescrito');
+  }
+
+  // 8. PESQUISA DE SATISFAÇÃO (apenas D+14)
+  if (daysPostOp >= 14) {
+    if (data.satisfactionRating === undefined || data.satisfactionRating === null) {
+      missing.push('Nota de satisfação com o acompanhamento (0-10)');
+    }
+    if (data.wouldRecommend === undefined) {
+      missing.push('Se recomendaria o acompanhamento para outros pacientes');
+    }
+    // satisfactionComments é opcional
   }
 
   // Concerns é sempre opcional

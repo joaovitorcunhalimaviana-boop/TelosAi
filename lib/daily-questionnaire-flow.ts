@@ -255,6 +255,33 @@ function getDaySpecificQuestions(
     });
   }
 
+  // D+14: Adicionar pesquisa de satisfação
+  if (dayNumber === 14) {
+    questions.push(
+      {
+        id: 'satisfaction_rating',
+        category: 'general',
+        required: true,
+        text: 'Como última pergunta: de 0 a 10, qual nota você daria para o acompanhamento que recebeu durante sua recuperação?',
+        contextNote: 'Pesquisa de satisfação NPS - nota de 0 a 10. 0=muito insatisfeito, 10=muito satisfeito.'
+      },
+      {
+        id: 'would_recommend',
+        category: 'general',
+        required: true,
+        text: 'Você recomendaria este tipo de acompanhamento pós-operatório para outros pacientes?',
+        followUpLogic: 'Sim ou Não. Se quiser, o paciente pode elaborar.'
+      },
+      {
+        id: 'satisfaction_comments',
+        category: 'general',
+        required: false,
+        text: 'Gostaria de deixar algum comentário ou sugestão sobre o acompanhamento?',
+        contextNote: 'Campo livre e opcional para feedback do paciente'
+      }
+    );
+  }
+
   return questions;
 }
 
@@ -341,6 +368,35 @@ Esperado:
 - Ainda não evacuou (≥4 dias sem evacuar)
 - Secreção purulenta abundante
 - Febre persistente
+`;
+  } else if (dayNumber === 14) {
+    context += `
+📅 D+14 - ÚLTIMO DIA DE ACOMPANHAMENTO + PESQUISA DE SATISFAÇÃO
+
+Esperado:
+- Dor mínima (0-2/10) ou ausente
+- Evacuações normalizadas
+- Retorno às atividades normais
+
+IMPORTANTE - PESQUISA DE SATISFAÇÃO:
+Após coletar os dados clínicos habituais, fazer as perguntas de satisfação:
+
+1. NOTA DE SATISFAÇÃO (0-10):
+   "De 0 a 10, qual nota você daria para o acompanhamento que recebeu?"
+   - Coletar número de 0 a 10
+   - Não influenciar a resposta
+
+2. RECOMENDARIA? (Sim/Não):
+   "Você recomendaria este tipo de acompanhamento para outros pacientes?"
+
+3. COMENTÁRIOS (Opcional):
+   "Gostaria de deixar alguma sugestão ou comentário?"
+
+📝 FINALIZAÇÃO:
+Após coletar a pesquisa de satisfação:
+- Agradecer pelo feedback
+- Desejar boa recuperação final
+- Informar que pode entrar em contato se precisar de algo
 `;
   } else if (dayNumber >= 8) {
     context += `
@@ -467,7 +523,7 @@ export function getIntroductionMessage(dayNumber: number): string {
     5: 'Já fazem 5 dias da cirurgia. Vamos ver como está sua evolução.',
     7: 'Uma semana completa! Como você está se sentindo?',
     10: '10 dias de recuperação. Como está se sentindo?',
-    14: 'Duas semanas! Estamos quase finalizando o acompanhamento. Como está?'
+    14: 'Duas semanas! Hoje é nosso último dia de acompanhamento. Além das perguntas habituais, vou fazer uma breve pesquisa de satisfação. Como está?'
   };
 
   return (
