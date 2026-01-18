@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * WEBHOOK SIMPLIFICADO - VERSÃO ULTRA SIMPLES
- * Remove toda complexidade e chama IA diretamente
+ * WEBHOOK COM MEMÓRIA DE CONVERSA
+ * Mantém histórico para a IA saber o que já foi perguntado
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,7 +12,6 @@ const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_sec
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '866244236573219';
 
-// Cliente Anthropic
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
@@ -24,21 +23,11 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  console.log('🔍 Webhook verification attempt:');
-  console.log('   Mode:', mode);
-  console.log('   Token received:', token);
-  console.log('   Expected token:', VERIFY_TOKEN);
-  console.log('   Challenge:', challenge);
-
-  // Aceitar qualquer um dos tokens possíveis
   const validTokens = ['meu_token_secreto_123', VERIFY_TOKEN];
 
   if (mode === 'subscribe' && token && validTokens.includes(token)) {
-    console.log('✅ Verification SUCCESS');
     return new NextResponse(challenge, { status: 200 });
   }
-
-  console.log('❌ Verification FAILED');
   return NextResponse.json({ error: 'Verification failed' }, { status: 403 });
 }
 
@@ -46,7 +35,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log('📨 WEBHOOK SIMPLES - Recebido');
+    console.log('📨 WEBHOOK - Recebido');
 
     if (body.object !== 'whatsapp_business_account') {
       return NextResponse.json({ status: 'ok' });
@@ -64,11 +53,8 @@ export async function POST(request: NextRequest) {
 
               console.log(`📱 Mensagem de ${phone}: "${text}"`);
 
-              // Marcar como lida
               await markAsRead(message.id);
-
-              // Processar mensagem de forma SIMPLES
-              await processMessageSimple(phone, text);
+              await processMessage(phone, text);
             }
           }
         }
@@ -82,75 +68,122 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Função principal simplificada
-async function processMessageSimple(phone: string, text: string) {
+// Processar mensagem COM MEMÓRIA
+async function processMessage(phone: string, text: string) {
   try {
-    console.log('🔍 Buscando paciente...');
-
     // 1. Buscar paciente
     const patient = await findPatient(phone);
 
     if (!patient) {
-      console.log('❌ Paciente não encontrado');
-      await sendWhatsApp(phone, 'Olá! Não encontrei seu cadastro em nosso sistema. Por favor, entre em contato com o consultório.');
+      await sendWhatsApp(phone, 'Olá! Não encontrei seu cadastro. Entre em contato com o consultório.');
       return;
     }
 
     console.log(`✅ Paciente: ${patient.name}`);
 
-    // 2. Buscar cirurgia mais recente
+    // 2. Buscar cirurgia
     const surgery = await prisma.surgery.findFirst({
       where: { patientId: patient.id },
       orderBy: { date: 'desc' }
     });
 
     if (!surgery) {
-      await sendWhatsApp(phone, `Olá ${patient.name.split(' ')[0]}! Não encontrei registro de cirurgia. Entre em contato com o consultório.`);
+      await sendWhatsApp(phone, `Olá ${patient.name.split(' ')[0]}! Não encontrei cirurgia. Entre em contato com o consultório.`);
       return;
     }
 
-    console.log(`✅ Cirurgia: ${surgery.type}`);
-
-    // 3. Calcular dias pós-op
     const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
-    console.log(`📅 Dias pós-op: D+${daysPostOp}`);
 
-    // 4. Verificar se é resposta "SIM" para iniciar questionário
+    // 3. Buscar ou criar conversa com histórico
+    let conversation = await prisma.conversation.findFirst({
+      where: { patientId: patient.id }
+    });
+
+    if (!conversation) {
+      conversation = await prisma.conversation.create({
+        data: {
+          phoneNumber: phone.replace(/\D/g, ''),
+          patientId: patient.id,
+          state: 'idle',
+          context: {},
+          messageHistory: []
+        }
+      });
+    }
+
+    // 4. Obter histórico de mensagens
+    const history = (conversation.messageHistory as any[]) || [];
+
+    // 5. Se "SIM" e conversa nova/idle, iniciar questionário
     const textLower = text.toLowerCase().trim();
-    if (textLower === 'sim' || textLower === 's') {
+    if ((textLower === 'sim' || textLower === 's') && (conversation.state === 'idle' || conversation.state === 'awaiting_consent')) {
       const greeting = getGreeting();
       const firstName = patient.name.split(' ')[0];
 
       const welcomeMsg = `${greeting}, ${firstName}! 👋
 
-Aqui é a assistente de acompanhamento pós-operatório do Dr. João Vitor.
-
-Você está no D+${daysPostOp} após a cirurgia. Vou te fazer algumas perguntas rápidas sobre como você está.
+Você está no D+${daysPostOp} após a cirurgia. Vou fazer algumas perguntas rápidas.
 
 Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua vida.`;
+
+      // Salvar no histórico
+      const newHistory = [
+        { role: 'assistant', content: welcomeMsg, timestamp: new Date().toISOString() }
+      ];
+
+      await prisma.conversation.update({
+        where: { id: conversation.id },
+        data: {
+          state: 'collecting_answers',
+          messageHistory: newHistory,
+          context: { startedAt: new Date().toISOString(), daysPostOp }
+        }
+      });
 
       await sendWhatsApp(phone, welcomeMsg);
       return;
     }
 
-    // 5. Para qualquer outra resposta, usar IA
-    console.log('🤖 Chamando IA...');
-    const aiResponse = await callAI(text, patient.name, surgery.type, daysPostOp);
-    console.log(`🤖 Resposta da IA: ${aiResponse.substring(0, 100)}...`);
+    // 6. Adicionar mensagem do usuário ao histórico
+    history.push({ role: 'user', content: text, timestamp: new Date().toISOString() });
+
+    // 7. Chamar IA com histórico completo
+    console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens');
+    const aiResponse = await callAIWithHistory(history, patient.name, surgery.type, daysPostOp);
+
+    // 8. Adicionar resposta da IA ao histórico
+    history.push({ role: 'assistant', content: aiResponse, timestamp: new Date().toISOString() });
+
+    // 9. Verificar se questionário está completo (IA disse "obrigado" ou similar)
+    const isComplete = aiResponse.toLowerCase().includes('obrigad') &&
+                       aiResponse.toLowerCase().includes('dr.') ||
+                       aiResponse.toLowerCase().includes('boa recuperação');
+
+    // 10. Atualizar conversa no banco
+    await prisma.conversation.update({
+      where: { id: conversation.id },
+      data: {
+        messageHistory: history,
+        state: isComplete ? 'completed' : 'collecting_answers',
+        updatedAt: new Date()
+      }
+    });
 
     await sendWhatsApp(phone, aiResponse);
 
   } catch (error: any) {
-    console.error('❌ Erro processando mensagem:', error?.message);
-    console.error('Stack:', error?.stack);
-
-    // Mensagem de fallback amigável
-    await sendWhatsApp(phone, 'Recebi sua mensagem! 😊 Como está sua dor agora? Me diz um número de 0 a 10.');
+    console.error('❌ Erro:', error?.message);
+    await sendWhatsApp(phone, 'Recebi sua mensagem! Como está sua dor? Me diz de 0 a 10.');
   }
 }
 
-// Chamar IA de forma SIMPLES
-async function callAI(userMessage: string, patientName: string, surgeryType: string, daysPostOp: number): Promise<string> {
+// Chamar IA COM HISTÓRICO
+async function callAIWithHistory(
+  history: any[],
+  patientName: string,
+  surgeryType: string,
+  daysPostOp: number
+): Promise<string> {
   const firstName = patientName.split(' ')[0];
 
   const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios.
@@ -160,25 +193,45 @@ CONTEXTO:
 - Cirurgia: ${surgeryType}
 - Dia pós-operatório: D+${daysPostOp}
 
-REGRAS SIMPLES:
-1. Seja empática e acolhedora
-2. Faça UMA pergunta por vez
-3. Colete: dor (0-10), se evacuou, sangramento, febre
-4. Se dor >= 8, sangramento intenso ou febre alta: orientar buscar emergência
-5. Responda em português brasileiro informal
+PERGUNTAS A COLETAR (na ordem):
+1. Dor em repouso (0-10) ✓ já perguntei na primeira mensagem
+2. Se evacuou desde a última conversa
+3. Se evacuou: dor durante evacuação (0-10)
+4. Sangramento (nenhum/leve/moderado/intenso)
+5. Febre (sim/não, se sim qual temperatura)
+6. Está tomando medicações conforme prescrito
 
-Se o paciente disser "dor média", "dor leve", etc., peça um número de 0 a 10.
-Se disser um número, agradeça e pergunte sobre evacuação.
+REGRAS IMPORTANTES:
+1. NUNCA repita uma pergunta que já foi respondida
+2. Olhe o histórico para ver o que já foi perguntado e respondido
+3. Faça UMA pergunta por vez
+4. Se o paciente der resposta vaga, peça esclarecimento específico
+5. Se dor >= 8, sangramento intenso ou febre >= 38°C: alerte para procurar emergência
+6. Quando tiver TODAS as informações, agradeça e diga que vai passar para o Dr. João Vitor
+7. Seja empática e use português brasileiro informal
 
-Responda APENAS com o texto da mensagem para o paciente. Sem JSON, sem formatação especial.`;
+FLUXO:
+- Se já tem dor → pergunte sobre evacuação
+- Se já tem evacuação → pergunte sobre sangramento (ou dor na evacuação se evacuou)
+- Se já tem sangramento → pergunte sobre febre
+- Se já tem febre → pergunte sobre medicações
+- Se tem tudo → agradeça e finalize
+
+Responda APENAS com o texto da mensagem. Sem JSON, sem formatação especial.`;
 
   try {
+    // Converter histórico para formato Anthropic
+    const messages = history.map(msg => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content
+    }));
+
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 500,
       temperature: 0.7,
       system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }]
+      messages: messages as any
     });
 
     const content = response.content[0];
@@ -186,49 +239,38 @@ Responda APENAS com o texto da mensagem para o paciente. Sem JSON, sem formataç
       return content.text;
     }
 
-    throw new Error('Resposta inesperada da IA');
+    throw new Error('Resposta inesperada');
   } catch (error: any) {
     console.error('❌ Erro na IA:', error?.message);
 
-    // Fallback inteligente baseado na mensagem
-    const msgLower = userMessage.toLowerCase();
+    // Fallback: analisar histórico manualmente
+    const lastAssistantMsg = [...history].reverse().find(m => m.role === 'assistant')?.content || '';
 
-    if (msgLower.includes('dor')) {
-      if (msgLower.includes('sem') || msgLower.includes('não')) {
-        return `Que bom que está sem dor, ${firstName}! 😊 Você conseguiu evacuar hoje?`;
-      }
-      if (msgLower.includes('leve') || msgLower.includes('pouca')) {
-        return `Entendi, dor leve. Na escala de 0 a 10, seria algo como 2 ou 3? Me confirma o número.`;
-      }
-      if (msgLower.includes('média') || msgLower.includes('moderada')) {
-        return `Entendi, dor média. Na escala de 0 a 10, seria entre 4 e 6. Qual número você diria?`;
-      }
-      if (msgLower.includes('forte') || msgLower.includes('muita')) {
-        return `Sinto muito pela dor forte. Na escala de 0 a 10, seria 7, 8 ou 9? Me diz o número.`;
-      }
+    if (lastAssistantMsg.includes('dor') && lastAssistantMsg.includes('0 a 10')) {
+      return `Entendi! Agora me conta: você conseguiu evacuar desde ontem?`;
+    }
+    if (lastAssistantMsg.includes('evacu')) {
+      return `Ok! E sobre sangramento: está tendo algum? (nenhum, leve no papel, moderado, ou intenso)`;
+    }
+    if (lastAssistantMsg.includes('sangramento')) {
+      return `Certo! Teve febre? Se sim, qual foi a temperatura?`;
+    }
+    if (lastAssistantMsg.includes('febre')) {
+      return `E as medicações: está tomando conforme o prescrito?`;
+    }
+    if (lastAssistantMsg.includes('medicaç')) {
+      return `Perfeito, ${firstName}! Muito obrigada pelas informações. Vou passar tudo para o Dr. João Vitor. Boa recuperação! 💙`;
     }
 
-    // Tentar extrair número
-    const numMatch = msgLower.match(/\b([0-9]|10)\b/);
-    if (numMatch) {
-      const num = parseInt(numMatch[1]);
-      if (num >= 8) {
-        return `Anotei dor ${num}/10. Isso é bastante! Se a dor não melhorar com a medicação, procure o pronto-socorro. Você conseguiu evacuar hoje?`;
-      }
-      return `Anotei dor ${num}/10. Você conseguiu evacuar hoje?`;
-    }
-
-    return `Recebi sua mensagem! Como está sua dor agora? Me diz um número de 0 a 10.`;
+    return `Recebi! Me conta: você conseguiu evacuar?`;
   }
 }
 
-// Buscar paciente (simplificado)
+// Buscar paciente
 async function findPatient(phone: string) {
   const digits = phone.replace(/\D/g, '');
   const last8 = digits.slice(-8);
   const last9 = digits.slice(-9);
-
-  console.log(`🔍 Buscando: last8=${last8}, last9=${last9}`);
 
   const patients = await prisma.patient.findMany({
     where: { isActive: true }
@@ -236,19 +278,14 @@ async function findPatient(phone: string) {
 
   for (const p of patients) {
     const pDigits = p.phone.replace(/\D/g, '');
-    const pLast8 = pDigits.slice(-8);
-    const pLast9 = pDigits.slice(-9);
-
-    if (pLast8 === last8 || pLast9 === last9) {
-      console.log(`✅ Match: ${p.name}`);
+    if (pDigits.slice(-8) === last8 || pDigits.slice(-9) === last9) {
       return p;
     }
   }
-
   return null;
 }
 
-// Enviar mensagem WhatsApp
+// Enviar WhatsApp
 async function sendWhatsApp(to: string, message: string) {
   try {
     const response = await fetch(
@@ -267,13 +304,11 @@ async function sendWhatsApp(to: string, message: string) {
         }),
       }
     );
-
     const result = await response.json();
-    console.log('📤 WhatsApp enviado:', result.messages?.[0]?.id || 'erro');
+    console.log('📤 Enviado:', result.messages?.[0]?.id || 'erro');
     return result;
   } catch (error: any) {
-    console.error('❌ Erro enviando WhatsApp:', error?.message);
-    throw error;
+    console.error('❌ Erro WhatsApp:', error?.message);
   }
 }
 
@@ -295,12 +330,10 @@ async function markAsRead(messageId: string) {
         }),
       }
     );
-  } catch (error) {
-    // Ignorar erro de marcar como lida
-  }
+  } catch (error) {}
 }
 
-// Saudação por horário
+// Saudação
 function getGreeting(): string {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return 'Bom dia';
