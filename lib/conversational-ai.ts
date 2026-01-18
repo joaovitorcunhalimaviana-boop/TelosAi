@@ -1,11 +1,13 @@
 /**
  * IA Conversacional para Questionários Pós-Operatórios
  * Usa Claude para conversar naturalmente com pacientes
+ * Integrado com protocolo médico oficial
  */
 
 import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
+import { getProtocolForSurgery } from './protocols/hemorroidectomia-protocol';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -90,6 +92,9 @@ export async function conductConversation(
   // Definir o que ainda precisa ser coletado
   const missingInfo = getMissingInformation(currentData, daysPostOp);
 
+  // Obter protocolo médico oficial para o tipo de cirurgia
+  const medicalProtocol = getProtocolForSurgery(surgery.type);
+
   // Construir prompt para Claude
   const systemPrompt = `Você é uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
 
@@ -99,6 +104,10 @@ CONTEXTO DO PACIENTE:
 - Nome: ${patient.name}
 - Cirurgia: ${surgery.type}
 - Dia pós-operatório: D+${daysPostOp}
+
+=== PROTOCOLO MÉDICO OFICIAL (USE COMO REFERÊNCIA PARA TODAS AS ORIENTAÇÕES) ===
+${medicalProtocol}
+=== FIM DO PROTOCOLO ===
 
 ⚠️ REGRAS CRÍTICAS - NUNCA VIOLE ESTAS REGRAS:
 
