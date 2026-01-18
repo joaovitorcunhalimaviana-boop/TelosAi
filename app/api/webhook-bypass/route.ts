@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * WEBHOOK BYPASS - EMERGÊNCIA
- * Este endpoint substitui temporariamente o webhook principal
+ * WEBHOOK BYPASS - COM IA CONVERSACIONAL
+ * Usa a arquitetura completa: conversational-ai + conversation-manager
  * Use este URL no Meta: /api/webhook-bypass
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { markAsRead, sendEmpatheticResponse } from '@/lib/whatsapp';
+import {
+  processQuestionnaireAnswer,
+  startQuestionnaireCollection,
+  getOrCreateConversation,
+  isAwaitingQuestionnaire
+} from '@/lib/conversation-manager';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -98,54 +104,74 @@ async function processMessagesBypass(value: any) {
 
       console.log('✅ Follow-up encontrado:', followUp.id, '- Status:', followUp.status);
 
-      // LÓGICA CORRETA: Detectar "sim" e enviar perguntas
+      // LÓGICA COM IA CONVERSACIONAL
       const textLower = text.toLowerCase().trim();
 
-      if (textLower === 'sim' || textLower === 's') {
-        console.log('🎯 DETECTADO "SIM" - Enviando perguntas do questionário...');
+      // Verificar estado atual da conversa
+      const conversation = await getOrCreateConversation(phone, patient.id);
+      const conversationState = conversation.state;
 
-        const firstName = patient.name.split(' ')[0];
-        const questions = `Olá ${firstName}! 👋
+      console.log('🤖 Estado da conversa:', conversationState);
 
-Vou fazer algumas perguntas sobre sua recuperação após ${followUp.surgery.type}.
+      // Se paciente respondeu "sim" e está aguardando consentimento, iniciar questionário com IA
+      if ((textLower === 'sim' || textLower === 's') &&
+          (conversationState === 'awaiting_consent' || conversationState === 'idle')) {
+        console.log('🎯 DETECTADO "SIM" - Iniciando questionário com IA conversacional...');
 
-Por favor, responda TODAS em UMA ÚNICA mensagem:
-
-1️⃣ Como está sua DOR? (0 a 10)
-2️⃣ Teve FEBRE? (Sim/Não)
-3️⃣ Teve SANGRAMENTO? (Nenhum/Leve/Moderado/Intenso)
-4️⃣ Conseguiu URINAR? (Sim/Não)
-5️⃣ Conseguiu EVACUAR? (Sim/Não)
-6️⃣ Náuseas ou VÔMITOS? (Sim/Não)
-7️⃣ SECREÇÃO na ferida? (Nenhuma/Clara/Purulenta)
-8️⃣ Outras preocupações ou dúvidas?
-
-Exemplo de resposta:
-"Dor 3, sem febre, sangramento leve, urinou sim, não evacuou, sem náuseas, sem secreção, nenhuma preocupação"`;
-
-        await sendEmpatheticResponse(phone, questions);
-
-        console.log('✅ Perguntas enviadas com sucesso!');
+        try {
+          // Usar a IA conversacional para iniciar o questionário
+          await startQuestionnaireCollection(phone, patient, followUp.surgery);
+          console.log('✅ Questionário iniciado com IA conversacional!');
+        } catch (error) {
+          console.error('❌ Erro ao iniciar questionário com IA:', error);
+          // Fallback: enviar mensagem simples
+          const firstName = patient.name.split(' ')[0];
+          await sendEmpatheticResponse(
+            phone,
+            `Olá ${firstName}! 👋 Vou fazer algumas perguntas sobre sua recuperação. Como você está se sentindo hoje? Tem alguma dor?`
+          );
+        }
         return;
       }
 
-      // Se não é "sim", processar como resposta ao questionário
-      console.log('📝 Processando resposta ao questionário...');
-      await sendEmpatheticResponse(
-        phone,
-        `Recebi suas respostas! Obrigado por compartilhar essas informações. O Dr. ${patient.name.split(' ')[0]} foi notificado e entrará em contato se necessário. Continue seguindo as orientações pós-operatórias. 🏥`
-      );
+      // Para QUALQUER OUTRA resposta, usar a IA conversacional para processar
+      console.log('📝 Processando resposta com IA conversacional...');
 
-      // Atualizar status
-      await prisma.followUp.update({
-        where: { id: followUp.id },
-        data: {
-          status: 'responded',
-          respondedAt: new Date(),
-        },
-      });
+      try {
+        const result = await processQuestionnaireAnswer(phone, text);
 
-      console.log('✅ Follow-up marcado como respondido');
+        console.log('🤖 Resultado da IA:', {
+          completed: result.completed,
+          needsDoctorAlert: result.needsDoctorAlert
+        });
+
+        // Se precisa alertar médico (red flag detectada)
+        if (result.needsDoctorAlert) {
+          console.log('🚨 RED FLAG DETECTADA - Médico será alertado!');
+          // TODO: Implementar notificação push/email para o médico
+        }
+
+        if (result.completed) {
+          console.log('✅ Questionário completado via IA!');
+
+          // Atualizar status do follow-up
+          await prisma.followUp.update({
+            where: { id: followUp.id },
+            data: {
+              status: 'responded',
+              respondedAt: new Date(),
+            },
+          });
+        }
+      } catch (error) {
+        console.error('❌ Erro ao processar com IA:', error);
+
+        // Fallback em caso de erro na IA
+        await sendEmpatheticResponse(
+          phone,
+          `Recebi sua mensagem! Se você está tendo algum sintoma preocupante, por favor entre em contato diretamente com o consultório. Estamos aqui para ajudar! 🏥`
+        );
+      }
     }
   }
 }
