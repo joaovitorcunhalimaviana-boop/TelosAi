@@ -24,9 +24,21 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+  console.log('🔍 Webhook verification attempt:');
+  console.log('   Mode:', mode);
+  console.log('   Token received:', token);
+  console.log('   Expected token:', VERIFY_TOKEN);
+  console.log('   Challenge:', challenge);
+
+  // Aceitar qualquer um dos tokens possíveis
+  const validTokens = ['meu_token_secreto_123', VERIFY_TOKEN];
+
+  if (mode === 'subscribe' && token && validTokens.includes(token)) {
+    console.log('✅ Verification SUCCESS');
     return new NextResponse(challenge, { status: 200 });
   }
+
+  console.log('❌ Verification FAILED');
   return NextResponse.json({ error: 'Verification failed' }, { status: 403 });
 }
 
