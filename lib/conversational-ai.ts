@@ -129,19 +129,35 @@ ${medicalProtocol}
       ❌ PROIBIDO: "Então posso anotar como 7?"
       ✅ CORRETO: "Entendi. Me diz um número de 0 a 10 para eu anotar?"
 
-   c) ESCALA DE DOR (MUITO IMPORTANTE):
-      - SEMPRE pergunte a dor usando escala 0-10
-      - Se paciente responder vago ("muita dor", "doendo bastante"):
-        * NÃO aceite como resposta final
-        * EXPLIQUE a escala novamente
-        * INSISTA gentilmente: "Preciso que você me diga um número de 0 a 10 para eu registrar certinho"
+   c) ESCALA DE DOR - INTERPRETAÇÃO INTELIGENTE:
+      - SEMPRE colete dor usando escala 0-10
+      - PORÉM, seja INTELIGENTE para interpretar respostas descritivas:
 
-      ✅ Exemplo correto:
-      Paciente: "Estou com muita dor"
-      Você: "Entendo que está com bastante dor. Para eu poder registrar direitinho, preciso que você me diga um número. Se 0 é sem dor nenhuma e 10 é a pior dor que você já sentiu na vida, qual número você diria que está agora?"
+      ✅ SE o paciente der uma resposta DESCRITIVA sobre dor, você DEVE:
+         1. PRIMEIRO: Reconhecer e validar o que ele disse
+         2. SEGUNDO: Interpretar e sugerir um número aproximado
+         3. TERCEIRO: Pedir confirmação ou ajuste
 
-      Paciente: "Muito forte mesmo"
-      Você: "Sim, percebo que está bem forte. Me ajuda com um número de 0 a 10? Isso é importante para o Dr. João acompanhar sua recuperação."
+      ✅ MAPEAMENTO SUGERIDO (use como guia):
+         - "sem dor", "nenhuma dor", "zero dor" → sugerir 0-1
+         - "dor leve", "pouca dor", "quase nada" → sugerir 1-3
+         - "dor média", "moderada", "suportável", "mais ou menos" → sugerir 4-6
+         - "dor forte", "muita dor", "doendo bastante" → sugerir 6-8
+         - "dor muito forte", "insuportável", "horrível" → sugerir 8-10
+
+      ✅ EXEMPLOS DE RESPOSTAS CORRETAS:
+
+      Paciente: "Estou com uma dor média"
+      Você: "Entendi, uma dor média. Pensando na escala de 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua vida, uma dor média seria algo entre 4 e 6. Você diria que está mais perto de qual número?"
+
+      Paciente: "Está doendo bastante"
+      Você: "Percebo que está doendo bastante, sinto muito. Na escala de 0 a 10, isso seria algo como 6, 7 ou 8? Qual número você acha que representa melhor sua dor agora?"
+
+      Paciente: "Tá bem leve"
+      Você: "Que bom que está leve! Seria algo como 2 ou 3 na escala? Qual número você diria?"
+
+      ⚠️ IMPORTANTE: NUNCA diga "não entendi" ou "tive um problema técnico" para respostas descritivas!
+      Se o paciente descrever a dor de QUALQUER forma, você DEVE interpretar e pedir confirmação.
 
    d) OUTRAS INFORMAÇÕES:
 
@@ -224,12 +240,26 @@ ${medicalProtocol}
 RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
 DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
 
-EXAMPLES OF PARSING:
-- User: "Não tive febre" -> "fever": false
-- User: "Sem febre" -> "fever": false
-- User: "Tive um pouco de febre, 37.5" -> "fever": true, "feverTemperature": 37.5
-- User: "Não estou com dor" -> "pain": 0
-- User: "Dor suportável" -> DO NOT GUESS NUMBER, ASK 0-10
+EXAMPLES OF PARSING (MUITO IMPORTANTE - SIGA ESTES EXEMPLOS):
+
+FEBRE:
+- "Não tive febre" → "fever": false
+- "Sem febre" → "fever": false
+- "Tive um pouco de febre, 37.5" → "fever": true, "feverTemperature": 37.5
+
+DOR - INTERPRETAÇÃO INTELIGENTE:
+- "Não estou com dor" → "pain": 0
+- "Sem dor" → "pain": 0
+- "Dor leve" → NÃO registre ainda, pergunte: "Dor leve seria algo como 2 ou 3? Qual número?"
+- "Dor média" → NÃO registre ainda, pergunte: "Dor média seria entre 4 e 6. Qual número você diria?"
+- "Dor forte" ou "muita dor" → NÃO registre ainda, pergunte: "Dor forte seria 6, 7 ou 8? Qual número?"
+- "5" ou qualquer número → "pain": 5 (registre o número dado)
+- "uns 6 ou 7" → pergunte qual dos dois para confirmar
+
+⚠️ REGRA DE OURO PARA DOR:
+- Se paciente der NÚMERO → registre imediatamente
+- Se paciente der DESCRIÇÃO → interprete, sugira faixa de números, peça confirmação
+- NUNCA diga "não entendi" ou "erro técnico" para descrições de dor!
 
 JSON STRUCTURE:
 {
@@ -336,10 +366,73 @@ JSON STRUCTURE:
 
   } catch (error) {
     console.error('Error in conversational AI:', error);
+    console.error('User message was:', userMessage);
 
-    // Fallback: resposta genérica
+    // Fallback inteligente: tentar entender a mensagem mesmo sem IA
+    const userMessageLower = userMessage.toLowerCase().trim();
+
+    // Tentar detectar dor descritiva
+    if (userMessageLower.includes('dor') || userMessageLower.includes('doendo') || userMessageLower.includes('doer')) {
+      if (userMessageLower.includes('sem') || userMessageLower.includes('nenhuma') || userMessageLower.includes('não') || userMessageLower.includes('zero')) {
+        return {
+          aiResponse: 'Entendi, você está sem dor! Que ótimo! 😊 Agora me conta: você conseguiu evacuar desde a última vez que conversamos?',
+          updatedData: { ...currentData, pain: 0 },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+
+      if (userMessageLower.includes('leve') || userMessageLower.includes('pouca') || userMessageLower.includes('fraca')) {
+        return {
+          aiResponse: 'Entendi que a dor está leve, que bom! 😊 Na escala de 0 a 10, uma dor leve seria algo como 2 ou 3. Qual número você diria que representa melhor?',
+          updatedData: currentData,
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+
+      if (userMessageLower.includes('média') || userMessageLower.includes('moderada') || userMessageLower.includes('suportável') || userMessageLower.includes('mais ou menos')) {
+        return {
+          aiResponse: 'Entendi, uma dor média/moderada. Na escala de 0 a 10 (onde 0 é sem dor e 10 é a pior dor da sua vida), uma dor média seria entre 4 e 6. Qual número você acha que representa melhor sua dor agora?',
+          updatedData: currentData,
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+
+      if (userMessageLower.includes('forte') || userMessageLower.includes('muita') || userMessageLower.includes('bastante') || userMessageLower.includes('intensa')) {
+        return {
+          aiResponse: 'Sinto muito que esteja com dor forte. 😔 Para eu registrar direitinho, preciso de um número de 0 a 10. Uma dor forte geralmente fica entre 6 e 8. Qual número você diria?',
+          updatedData: currentData,
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'medium'
+        };
+      }
+    }
+
+    // Tentar detectar números na mensagem
+    const numberMatch = userMessageLower.match(/\b([0-9]|10)\b/);
+    if (numberMatch) {
+      const painNumber = parseInt(numberMatch[1]);
+      const urgency = painNumber >= 8 ? 'high' : painNumber >= 6 ? 'medium' : 'low';
+      const needsAlert = painNumber >= 8;
+
+      return {
+        aiResponse: `Anotei, dor ${painNumber}/10. ${painNumber >= 7 ? 'Sinto muito que esteja doendo tanto. ' : ''}Agora me conta: você conseguiu evacuar desde a última vez que conversamos?`,
+        updatedData: { ...currentData, pain: painNumber },
+        isComplete: false,
+        needsDoctorAlert: needsAlert,
+        urgencyLevel: urgency
+      };
+    }
+
+    // Fallback final: resposta genérica mais amigável
     return {
-      aiResponse: 'Desculpe, tive uma pequena falha de conexão. Poderia repetir sua última resposta, por favor?',
+      aiResponse: 'Recebi sua mensagem! 😊 Para eu entender melhor, você poderia me dizer: como está sua dor agora? Se 0 é sem dor e 10 é a pior dor da sua vida, qual número você daria?',
       updatedData: currentData,
       isComplete: false,
       needsDoctorAlert: false,
