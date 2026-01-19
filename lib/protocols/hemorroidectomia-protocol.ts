@@ -209,17 +209,37 @@ export const PROTOCOL_FAQ = {
   dirigir: `Pode dirigir quando não estiver mais usando medicamentos que causem sonolência e quando conseguir sentar e movimentar as pernas sem dor significativa. Geralmente após 7-10 dias, mas varia de pessoa para pessoa.`,
 };
 
+// Importar outros protocolos
+import { FISSURECTOMIA_PROTOCOL } from './fissurectomia-protocol';
+import { FISTULA_ANAL_PROTOCOL } from './fistula-anal-protocol';
+import { DOENCA_PILONIDAL_PROTOCOL } from './doenca-pilonidal-protocol';
+
 /**
  * Retorna o protocolo para um tipo de cirurgia
  */
 export function getProtocolForSurgery(surgeryType: string): string {
-  switch (surgeryType.toLowerCase()) {
-    case 'hemorroidectomia':
-    case 'hemorroida':
-    case 'hemorroidas':
-      return HEMORROIDECTOMIA_PROTOCOL;
-    // Adicionar outros protocolos quando disponíveis
-    default:
-      return HEMORROIDECTOMIA_PROTOCOL; // Default
+  const type = surgeryType.toLowerCase();
+
+  // Hemorroidectomia
+  if (type.includes('hemorroid') || type.includes('hemorroida')) {
+    return HEMORROIDECTOMIA_PROTOCOL;
   }
+
+  // Fissurectomia
+  if (type.includes('fissur') || type.includes('fissura')) {
+    return FISSURECTOMIA_PROTOCOL;
+  }
+
+  // Tratamento Cirúrgico de Fístula Anal
+  if (type.includes('fistul') || type.includes('fístula') || type.includes('lift') || type.includes('seton')) {
+    return FISTULA_ANAL_PROTOCOL;
+  }
+
+  // Tratamento Cirúrgico de Doença Pilonidal
+  if (type.includes('pilonidal') || type.includes('cisto pilonidal') || type.includes('sacrococ')) {
+    return DOENCA_PILONIDAL_PROTOCOL;
+  }
+
+  // Default: Hemorroidectomia (mais comum)
+  return HEMORROIDECTOMIA_PROTOCOL;
 }
