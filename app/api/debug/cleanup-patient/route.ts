@@ -6,11 +6,13 @@ import { prisma } from '@/lib/prisma';
  * Útil para testes - reseta conversas, follow-ups, respostas
  *
  * GET /api/debug/cleanup-patient?phone=5583991664904
+ * GET /api/debug/cleanup-patient?phone=5583991664904&delete=true (deleta completamente)
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
+    const deleteCompletely = searchParams.get('delete') === 'true';
 
     if (!phone) {
       return NextResponse.json(
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🧹 Starting cleanup for phone:', phone);
+    console.log('🧹 Starting cleanup for phone:', phone, deleteCompletely ? '(FULL DELETE)' : '(reset only)');
 
     // Buscar paciente
     const patient = await prisma.patient.findFirst({
@@ -54,10 +56,13 @@ export async function GET(request: NextRequest) {
     const stats = {
       patient: patient.name,
       phone: patient.phone,
+      mode: deleteCompletely ? 'FULL DELETE' : 'RESET',
       deleted: {
         conversations: 0,
         followUpResponses: 0,
-        followUps: 0
+        followUps: 0,
+        surgeries: 0,
+        patient: 0
       },
       reset: {
         followUps: 0
@@ -82,27 +87,60 @@ export async function GET(request: NextRequest) {
     }
     console.log('✅ Deleted follow-up responses:', stats.deleted.followUpResponses);
 
-    // 3. Resetar follow-ups para pending
-    for (const surgery of patient.surgeries) {
-      for (const followUp of surgery.followUps) {
-        await prisma.followUp.update({
-          where: { id: followUp.id },
-          data: {
-            status: 'pending',
-            sentAt: null,
-            respondedAt: null
-          }
-        });
-        stats.reset.followUps++;
-      }
-    }
-    console.log('✅ Reset follow-ups:', stats.reset.followUps);
+    if (deleteCompletely) {
+      // MODO DELETE COMPLETO: Deletar tudo
 
-    return NextResponse.json({
-      success: true,
-      message: `Patient ${patient.name} cleaned up successfully`,
-      stats
-    });
+      // 3. Deletar follow-ups
+      for (const surgery of patient.surgeries) {
+        const deletedFollowUps = await prisma.followUp.deleteMany({
+          where: { surgeryId: surgery.id }
+        });
+        stats.deleted.followUps += deletedFollowUps.count;
+      }
+      console.log('✅ Deleted follow-ups:', stats.deleted.followUps);
+
+      // 4. Deletar cirurgias
+      const deletedSurgeries = await prisma.surgery.deleteMany({
+        where: { patientId: patient.id }
+      });
+      stats.deleted.surgeries = deletedSurgeries.count;
+      console.log('✅ Deleted surgeries:', deletedSurgeries.count);
+
+      // 5. Deletar paciente
+      await prisma.patient.delete({
+        where: { id: patient.id }
+      });
+      stats.deleted.patient = 1;
+      console.log('✅ Deleted patient:', patient.name);
+
+      return NextResponse.json({
+        success: true,
+        message: `Patient ${patient.name} COMPLETELY DELETED`,
+        stats
+      });
+    } else {
+      // MODO RESET: Apenas resetar follow-ups
+      for (const surgery of patient.surgeries) {
+        for (const followUp of surgery.followUps) {
+          await prisma.followUp.update({
+            where: { id: followUp.id },
+            data: {
+              status: 'pending',
+              sentAt: null,
+              respondedAt: null
+            }
+          });
+          stats.reset.followUps++;
+        }
+      }
+      console.log('✅ Reset follow-ups:', stats.reset.followUps);
+
+      return NextResponse.json({
+        success: true,
+        message: `Patient ${patient.name} cleaned up successfully`,
+        stats
+      });
+    }
 
   } catch (error) {
     console.error('❌ Error cleaning up patient:', error);
