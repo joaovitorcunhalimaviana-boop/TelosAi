@@ -23,11 +23,17 @@ export async function GET(request: NextRequest) {
 
     console.log('🧹 Starting cleanup for phone:', phone, deleteCompletely ? '(FULL DELETE)' : '(reset only)');
 
-    // Buscar paciente
-    const patient = await prisma.patient.findFirst({
+    // Extrair apenas dígitos do telefone buscado
+    const phoneDigits = phone.replace(/\D/g, '');
+    const last9Digits = phoneDigits.slice(-9);
+
+    console.log('🔍 Searching with digits:', phoneDigits, 'last9:', last9Digits);
+
+    // Buscar paciente - tenta várias estratégias
+    let patient = await prisma.patient.findFirst({
       where: {
         phone: {
-          contains: phone.replace(/\D/g, '').slice(-11)
+          contains: last9Digits
         }
       },
       include: {
@@ -43,6 +49,29 @@ export async function GET(request: NextRequest) {
         conversations: true
       }
     });
+
+    // Se não encontrou, tentar busca exata
+    if (!patient) {
+      patient = await prisma.patient.findFirst({
+        where: {
+          phone: {
+            contains: phoneDigits
+          }
+        },
+        include: {
+          surgeries: {
+            include: {
+              followUps: {
+                include: {
+                  responses: true
+                }
+              }
+            }
+          },
+          conversations: true
+        }
+      });
+    }
 
     if (!patient) {
       return NextResponse.json(
