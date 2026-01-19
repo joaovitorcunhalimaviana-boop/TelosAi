@@ -161,13 +161,17 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
     // 7. Adicionar mensagem do usuário ao histórico
     history.push({ role: 'user', content: text, timestamp: new Date().toISOString() });
 
+    // 7.5. Buscar dor do dia anterior para mensagens de incentivo
+    const previousPain = await getPreviousDayPain(patient.id, surgery.id);
+
     // 8. Chamar IA com histórico completo e protocolo médico
-    console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens');
+    console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens, dor anterior:', previousPain);
     const { response: aiResponse, extractedData, isComplete } = await callAIWithHistory(
       history,
       patient.name,
       surgery.type,
-      daysPostOp
+      daysPostOp,
+      previousPain
     );
 
     // 9. Adicionar resposta da IA ao histórico
@@ -248,24 +252,63 @@ async function saveQuestionnaireResponse(
   }
 }
 
+// Buscar dor do dia anterior
+async function getPreviousDayPain(patientId: string, surgeryId: string): Promise<number | null> {
+  try {
+    // Buscar o follow-up respondido mais recente (que não seja de hoje)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const previousResponse = await prisma.followUpResponse.findFirst({
+      where: {
+        followUp: {
+          patientId,
+          surgeryId,
+          status: 'responded'
+        },
+        createdAt: {
+          lt: today // Antes de hoje
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        painAtRest: true
+      }
+    });
+
+    return previousResponse?.painAtRest ?? null;
+  } catch (error) {
+    console.error('❌ Erro ao buscar dor anterior:', error);
+    return null;
+  }
+}
+
 // Chamar IA COM HISTÓRICO E PROTOCOLO
 async function callAIWithHistory(
   history: any[],
   patientName: string,
   surgeryType: string,
-  daysPostOp: number
+  daysPostOp: number,
+  previousPain: number | null = null
 ): Promise<{ response: string; extractedData: any; isComplete: boolean }> {
   const firstName = patientName.split(' ')[0];
 
   // Obter protocolo médico
   const protocol = getProtocolForSurgery(surgeryType);
 
+  // Informação sobre dor anterior para mensagens de incentivo
+  const painComparisonInfo = previousPain !== null
+    ? `\n- Dor do dia anterior: ${previousPain}/10 (use para comparar e dar mensagens de incentivo se melhorou)`
+    : '';
+
   const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios do Dr. João Vitor.
 
 CONTEXTO:
 - Paciente: ${firstName}
 - Cirurgia: ${surgeryType}
-- Dia pós-operatório: D+${daysPostOp}
+- Dia pós-operatório: D+${daysPostOp}${painComparisonInfo}
 
 === PROTOCOLO MÉDICO OFICIAL (SIGA ESTAS ORIENTAÇÕES) ===
 ${protocol}
@@ -288,6 +331,12 @@ REGRAS IMPORTANTES:
 6. Quando tiver TODAS as informações, agradeça e diga que vai passar para o Dr. João Vitor
 7. Seja empática e use português brasileiro informal
 8. SE o paciente perguntar sobre cuidados (banho de assento, alimentação, etc.), USE O PROTOCOLO para responder corretamente
+
+MENSAGENS DE INCENTIVO (IMPORTANTE):
+- Se a dor atual for MENOR que a dor do dia anterior, elogie o paciente de forma empática!
+- Exemplos: "Que bom que a dor diminuiu! Sua recuperação está indo muito bem! 🎉"
+- Exemplos: "Excelente! Você está melhorando! Continue assim! 💪"
+- Isso ajuda a motivar o paciente durante a recuperação
 
 ORIENTAÇÕES ESPECÍFICAS DO PROTOCOLO:
 - Banho de assento: APENAS ÁGUA LIMPA, sem nenhum produto (nem sal, nem nada)
