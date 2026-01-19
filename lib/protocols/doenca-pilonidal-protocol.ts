@@ -144,11 +144,15 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 - ORIENTAR: suspender nimesulida, dipirona SN
 
 ### D14 - Décimo Quarto Dia:
-1. Dor após 2 semanas - Deve estar bem melhor
+1. Dor em repouso (0-10) após 2 semanas - Deve estar bem melhor
 2. Ferida: Cicatrização completa? Alguma área aberta?
 3. Alguma secreção ainda?
 4. Retomou atividades normais?
 5. Retorno agendado?
+6. **PESQUISA DE SATISFAÇÃO:**
+   - Satisfação com o resultado da cirurgia
+   - Satisfação com o acompanhamento por inteligência artificial
+   - Recomendaria este acompanhamento para outras pessoas?
 - ORIENTAR: evitar atrito na região, manter higiene
 
 ---

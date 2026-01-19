@@ -128,11 +128,16 @@ EVITAR (por 30 dias):
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D14 - Décimo Quarto Dia:
-1. Dor após 2 semanas - Interfere nas atividades?
-2. Evacuações normais?
-3. Sangramento?
-4. Cicatrização - Alterações preocupantes?
-5. Retorno agendado?
+1. Dor em repouso (0-10) após 2 semanas - Interfere nas atividades?
+2. Dor ao evacuar (0-10)
+3. Evacuações normais?
+4. Sangramento?
+5. Cicatrização - Alterações preocupantes?
+6. Retorno agendado?
+7. **PESQUISA DE SATISFAÇÃO:**
+   - Satisfação com o resultado da cirurgia
+   - Satisfação com o acompanhamento por inteligência artificial
+   - Recomendaria este acompanhamento para outras pessoas?
 - ORIENTAR: cicatrização completa leva 40-60 dias
 
 ---

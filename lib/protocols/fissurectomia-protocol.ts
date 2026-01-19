@@ -122,18 +122,29 @@ EVITAR (por 30 dias):
 5. Medicação sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
-1. Dor em repouso após 1 semana
-2. Dor ao evacuar - Melhora significativa?
+1. Dor em repouso (0-10) após 1 semana
+2. Dor ao evacuar (0-10) - Melhora significativa?
 3. Evacuações regulares?
 4. Sangramento - Pequenas manchas são esperadas
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
+### D10 - Décimo Dia:
+1. Dor em repouso (0-10)
+2. Dor ao evacuar (0-10)
+3. Evacuações normais?
+4. Espasmo anal ainda presente?
+5. Sangramento?
+
 ### D14 - Décimo Quarto Dia:
-1. Dor em repouso após 2 semanas
-2. Dor ao evacuar - Deve estar bem melhor
+1. Dor em repouso (0-10) após 2 semanas
+2. Dor ao evacuar (0-10) - Deve estar bem melhor
 3. Evacuações normais? Constipação resolvida?
 4. Sangramento?
 5. Retorno agendado?
+6. **PESQUISA DE SATISFAÇÃO:**
+   - Satisfação com o resultado da cirurgia
+   - Satisfação com o acompanhamento por inteligência artificial
+   - Recomendaria este acompanhamento para outras pessoas?
 - ORIENTAR: continuar banhos de assento, cicatrização leva 40-60 dias
 
 ---

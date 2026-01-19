@@ -465,8 +465,21 @@ const questionnaireD14: Questionnaire = {
       required: true,
     },
     {
+      id: 'ai_satisfaction',
+      question: 'Você ficou satisfeito com o acompanhamento por inteligência artificial?',
+      type: 'choice',
+      options: ['Muito satisfeito', 'Satisfeito', 'Neutro', 'Insatisfeito'],
+      required: true,
+    },
+    {
+      id: 'would_recommend',
+      question: 'Você recomendaria este acompanhamento por WhatsApp para outras pessoas?',
+      type: 'boolean',
+      required: true,
+    },
+    {
       id: 'additional_feedback',
-      question: 'Gostaria de dar algum feedback sobre o acompanhamento via WhatsApp?',
+      question: 'Gostaria de dar algum feedback ou sugestão sobre o acompanhamento?',
       type: 'text',
       required: false,
     },

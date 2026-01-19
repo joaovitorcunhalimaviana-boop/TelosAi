@@ -74,12 +74,6 @@ EVITAR (por 30 dias):
 - Cicatrização pode ser mais lenta que outras cirurgias anais
 - Cicatrização completa: 4-6 semanas (varia conforme técnica)
 
-### Cuidados com Seton (se aplicável):
-- NÃO puxar ou manipular o seton
-- Manter higiene rigorosa ao redor
-- É normal ter secreção ao redor do seton
-- Retornos programados para avaliação/ajuste
-
 ---
 
 ## SINAIS DE ALARME - QUANDO PROCURAR ATENDIMENTO
@@ -108,64 +102,70 @@ EVITAR (por 30 dias):
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
-**NOTA SOBRE SETON:** Se o paciente tem seton (verificar no cadastro da cirurgia),
-incluir perguntas específicas sobre o seton. Se não tem seton, NÃO perguntar sobre seton.
-
 **NOTA SOBRE INCONTINÊNCIA:** NÃO perguntar sobre incontinência nos primeiros dias (D1-D5).
 Nos primeiros dias há muita secreção e não é possível avaliar corretamente.
-Só perguntar sobre incontinência a partir do D7 ou D14.
+Só perguntar sobre incontinência a partir do D7, D10 ou D14.
+
+**IMPORTANTE:** Perguntar DOR EM REPOUSO e DOR AO EVACUAR em TODOS os dias!
 
 ### D1 - Primeiro Dia:
-1. Dor geral (0-10) - Se ≥7: verificar medicação
+1. Dor em repouso (0-10) - Se ≥7: verificar medicação
 2. Diurese - Urinou normalmente?
-3. Evacuação - Normal não ter evacuado ainda
+3. Evacuação - Normal não ter evacuado ainda. Se evacuou: dor ao evacuar (0-10)?
 4. Secreção da ferida? - Esperado ter alguma
 5. Sinais de alarme: febre, secreção purulenta, vermelhidão intensa
-6. **SE TEM SETON:** O seton está no lugar? Algum desconforto intenso?
 - ORIENTAR: importância dos banhos de assento desde já
-- **SE TEM SETON:** Orientar a não puxar ou manipular o seton
 
 ### D2 - Segundo Dia:
-1. Dor geral (0-10)
-2. Evacuação - Se não desde cirurgia: reforçar laxante
+1. Dor em repouso (0-10)
+2. Evacuação - Se não desde cirurgia: reforçar laxante. Se evacuou: dor ao evacuar (0-10)?
 3. Secreção - Tipo? (clara/serosa/amarelada = normal, purulenta = ALERTA)
 4. Vermelhidão ou inchaço ao redor da ferida?
-5. **SE TEM SETON:** Seton está bem posicionado? Secreção ao redor?
-6. Sinais de alarme
+5. Sinais de alarme
 
 ### D3 - Terceiro Dia:
-1. Dor comparada aos dias anteriores
-2. Evacuação e dor ao evacuar
+1. Dor em repouso (0-10) - Comparada aos dias anteriores
+2. Dor ao evacuar (0-10)
 3. Secreção - Quantidade e aspecto
 4. Sinais de infecção: vermelhidão, inchaço, calor, odor fétido
-5. **SE TEM SETON:** Alguma alteração no seton?
-6. Sinais de alarme
+5. Sinais de alarme
 
 ### D5 - Quinto Dia:
-1. Dor (0-10) - Está diminuindo?
-2. Evacuação regular?
-3. Secreção - Diminuindo?
-4. Algum sinal de infecção?
-5. Medicação sendo tomada corretamente?
-6. **SE TEM SETON:** Seton continua bem?
+1. Dor em repouso (0-10) - Está diminuindo?
+2. Dor ao evacuar (0-10)
+3. Evacuação regular?
+4. Secreção - Diminuindo?
+5. Algum sinal de infecção?
+6. Medicação sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
-1. Dor após 1 semana - Melhora significativa?
-2. Evacuações regulares?
-3. Secreção - Aspecto e quantidade
-4. **AGORA SIM PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
-5. Ferida - Como está a cicatrização?
-6. **SE TEM SETON:** Como está o seton? Alguma alteração?
+1. Dor em repouso (0-10) - Melhora significativa?
+2. Dor ao evacuar (0-10)
+3. Evacuações regulares?
+4. Secreção - Aspecto e quantidade
+5. **AGORA SIM PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
+6. Ferida - Como está a cicatrização?
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
+### D10 - Décimo Dia:
+1. Dor em repouso (0-10)
+2. Dor ao evacuar (0-10)
+3. Evacuações normais?
+4. Secreção ainda presente?
+5. Tem perdido fezes ou gases involuntariamente?
+
 ### D14 - Décimo Quarto Dia:
-1. Dor após 2 semanas
-2. Evacuações normais?
-3. Secreção ainda presente? (pode ser normal)
-4. **PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
-5. Ferida cicatrizando bem?
-6. **SE TEM SETON:** Status do seton (será avaliado no retorno)
+1. Dor em repouso (0-10) - Deve estar bem controlada
+2. Dor ao evacuar (0-10)
+3. Evacuações normais?
+4. Secreção ainda presente? (pode ser normal)
+5. Tem perdido fezes ou gases involuntariamente?
+6. Ferida cicatrizando bem?
 7. Retorno agendado?
+8. **PESQUISA DE SATISFAÇÃO:**
+   - Satisfação com o resultado da cirurgia
+   - Satisfação com o acompanhamento por inteligência artificial
+   - Recomendaria este acompanhamento para outras pessoas?
 - ORIENTAR: cicatrização da fístula leva 4-6 semanas
 
 ---
@@ -190,18 +190,6 @@ Só perguntar sobre incontinência a partir do D7 ou D14.
 → Geralmente melhora com o tempo
 → Se notar incontinência para fezes líquidas ou sólidas: contato imediato
 
-### "O seton está incomodando"
-→ Desconforto é esperado
-→ NÃO puxar ou manipular
-→ Manter higiene rigorosa
-→ Secreção ao redor é normal
-→ Será avaliado/ajustado no retorno
-
-### "Posso fazer banho de assento mesmo com seton?"
-→ SIM, é ainda mais importante
-→ Ajuda na higiene ao redor do seton
-→ Secar bem após o banho
-
 ---
 
 ## INFORMAÇÕES DO MÉDICO
@@ -217,7 +205,7 @@ export const FISTULA_ANAL_FAQ = {
 
   incontinencia: `Uma pequena incontinência para gases pode ocorrer temporariamente após a cirurgia de fístula e geralmente melhora com o tempo. Se você notar incontinência para fezes líquidas ou sólidas, entre em contato imediatamente com o Dr. João Vítor.`,
 
-  seton: `Se você tem um seton, é normal sentir algum desconforto. Nunca puxe ou manipule o seton. Mantenha higiene rigorosa com banhos de assento. É normal ter secreção ao redor do seton. Ele será avaliado e ajustado nos retornos programados.`,
-
   banho_assento: `Sim, os banhos de assento são fundamentais no tratamento da fístula anal e devem ser feitos DESDE O PRIMEIRO DIA (diferente de outras cirurgias). Faça 3-5 vezes por dia, especialmente após evacuações. Use apenas água morna, sem produtos.`,
+
+  seton: `Se você tem um seton, é normal sentir algum desconforto. Nunca puxe ou manipule o seton. Mantenha higiene rigorosa com banhos de assento. É normal ter secreção ao redor do seton. Ele será avaliado e ajustado nos retornos programados.`,
 };
