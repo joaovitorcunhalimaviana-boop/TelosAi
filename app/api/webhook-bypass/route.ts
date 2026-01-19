@@ -223,12 +223,24 @@ async function saveQuestionnaireResponse(
       riskLevel = 'medium';
     }
 
+    // Formatar conversa para incluir no questionnaireData
+    const formattedConversation = conversationHistory.map(msg => ({
+      role: msg.role === 'system' ? 'assistant' : msg.role,
+      content: msg.content
+    }));
+
+    // Incluir conversa no questionnaireData para exibição no dashboard
+    const dataWithConversation = {
+      ...data,
+      conversation: formattedConversation
+    };
+
     // Criar resposta no banco
     const response = await prisma.followUpResponse.create({
       data: {
         followUpId,
         userId,
-        questionnaireData: JSON.stringify(data),
+        questionnaireData: JSON.stringify(dataWithConversation),
         riskLevel,
         painAtRest: data.pain || null,
         painDuringBowel: data.painDuringBowel || null,
