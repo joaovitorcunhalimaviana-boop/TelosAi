@@ -108,27 +108,38 @@ EVITAR (por 30 dias):
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
+**NOTA SOBRE SETON:** Se o paciente tem seton (verificar no cadastro da cirurgia),
+incluir perguntas específicas sobre o seton. Se não tem seton, NÃO perguntar sobre seton.
+
+**NOTA SOBRE INCONTINÊNCIA:** NÃO perguntar sobre incontinência nos primeiros dias (D1-D5).
+Nos primeiros dias há muita secreção e não é possível avaliar corretamente.
+Só perguntar sobre incontinência a partir do D7 ou D14.
+
 ### D1 - Primeiro Dia:
 1. Dor geral (0-10) - Se ≥7: verificar medicação
 2. Diurese - Urinou normalmente?
 3. Evacuação - Normal não ter evacuado ainda
 4. Secreção da ferida? - Esperado ter alguma
 5. Sinais de alarme: febre, secreção purulenta, vermelhidão intensa
+6. **SE TEM SETON:** O seton está no lugar? Algum desconforto intenso?
 - ORIENTAR: importância dos banhos de assento desde já
+- **SE TEM SETON:** Orientar a não puxar ou manipular o seton
 
 ### D2 - Segundo Dia:
 1. Dor geral (0-10)
 2. Evacuação - Se não desde cirurgia: reforçar laxante
 3. Secreção - Tipo? (clara/serosa/amarelada = normal, purulenta = ALERTA)
 4. Vermelhidão ou inchaço ao redor da ferida?
-5. Sinais de alarme
+5. **SE TEM SETON:** Seton está bem posicionado? Secreção ao redor?
+6. Sinais de alarme
 
 ### D3 - Terceiro Dia:
 1. Dor comparada aos dias anteriores
 2. Evacuação e dor ao evacuar
 3. Secreção - Quantidade e aspecto
 4. Sinais de infecção: vermelhidão, inchaço, calor, odor fétido
-5. Sinais de alarme
+5. **SE TEM SETON:** Alguma alteração no seton?
+6. Sinais de alarme
 
 ### D5 - Quinto Dia:
 1. Dor (0-10) - Está diminuindo?
@@ -136,22 +147,25 @@ EVITAR (por 30 dias):
 3. Secreção - Diminuindo?
 4. Algum sinal de infecção?
 5. Medicação sendo tomada corretamente?
+6. **SE TEM SETON:** Seton continua bem?
 
 ### D7 - Sétimo Dia:
 1. Dor após 1 semana - Melhora significativa?
 2. Evacuações regulares?
 3. Secreção - Aspecto e quantidade
-4. Incontinência? (gases, líquido, sólido) - IMPORTANTE avaliar
+4. **AGORA SIM PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
 5. Ferida - Como está a cicatrização?
+6. **SE TEM SETON:** Como está o seton? Alguma alteração?
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D14 - Décimo Quarto Dia:
 1. Dor após 2 semanas
 2. Evacuações normais?
 3. Secreção ainda presente? (pode ser normal)
-4. Incontinência?
+4. **PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
 5. Ferida cicatrizando bem?
-6. Retorno agendado?
+6. **SE TEM SETON:** Status do seton (será avaliado no retorno)
+7. Retorno agendado?
 - ORIENTAR: cicatrização da fístula leva 4-6 semanas
 
 ---

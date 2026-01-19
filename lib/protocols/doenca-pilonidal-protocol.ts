@@ -37,10 +37,12 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 
 ## ORIENTAÇÕES GERAIS
 
-### Crioterapia (D0 a D2):
+### Crioterapia (Gelo):
 - Compressas geladas 5x/dia por 10 minutos
 - Usar pano entre gelo e pele
 - Objetivo: reduzir edema e dor
+- Recomendado especialmente nos primeiros 2-3 dias (D0-D2)
+- **PODE CONTINUAR após D2 se o paciente sentir que ajuda** (melhora dor e inflamação)
 
 ### Banhos de Assento:
 - NÃO FAZER banhos de assento
@@ -116,7 +118,7 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 3. Consegue sentar? (esperado desconforto)
 4. Inchaço na região?
 5. Febre?
-- ORIENTAR: último dia de gelo recomendado
+- ORIENTAR: gelo é mais importante nos primeiros dias, mas pode continuar se sentir que ajuda
 
 ### D3 - Terceiro Dia:
 1. Dor comparada aos dias anteriores - Diminuindo?
@@ -172,7 +174,7 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 
 ### "Está muito inchado"
 → Inchaço leve é normal nos primeiros dias
-→ Gelo ajuda a reduzir (primeiros 2-3 dias)
+→ Gelo ajuda a reduzir - pode usar enquanto sentir benefício
 → Se inchaço intenso + vermelhidão + calor + febre = ALERTA
 
 ### "Está vermelho ao redor"
