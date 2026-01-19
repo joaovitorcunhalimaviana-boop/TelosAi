@@ -224,20 +224,28 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Tipo de Cirurgia (Texto Livre) */}
+          {/* Tipo de Cirurgia (Select com opções fixas) */}
           <div className="space-y-2">
             <Label htmlFor="surgeryType" className="text-base">
               Tipo de Cirurgia *
             </Label>
-            <Input
-              id="surgeryType"
-              type="text"
+            <Select
               value={formData.surgeryType}
-              onChange={(e) => setFormData({ ...formData, surgeryType: e.target.value })}
-              placeholder="Ex: Hemorroidectomia, Fístula..."
-              className="h-12 text-base"
-              aria-invalid={!!errors.surgeryType}
-            />
+              onValueChange={(value) => {
+                setFormData({ ...formData, surgeryType: value })
+                if (value) setErrors(prev => ({ ...prev, surgeryType: "" }))
+              }}
+            >
+              <SelectTrigger id="surgeryType" className="h-12 text-base" aria-invalid={!!errors.surgeryType}>
+                <SelectValue placeholder="Selecione o tipo de cirurgia" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
+                <SelectItem value="fistula">Tratamento Cirúrgico de Fístula Anal</SelectItem>
+                <SelectItem value="fissura">Fissurectomia</SelectItem>
+                <SelectItem value="pilonidal">Tratamento Cirúrgico de Doença Pilonidal</SelectItem>
+              </SelectContent>
+            </Select>
             {errors.surgeryType && (
               <p className="text-sm text-destructive">{errors.surgeryType}</p>
             )}
