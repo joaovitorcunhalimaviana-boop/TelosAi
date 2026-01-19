@@ -17,8 +17,11 @@ interface ConversationMessage {
 
 interface QuestionnaireData {
     pain?: string | number;
+    painAtRest?: string | number;
     dor?: string | number;
     nivel_dor?: string | number;
+    painDuringBowelMovement?: string | number;
+    painDuringEvacuation?: string | number;
     evacuationPain?: string | number;
     dor_evacuar?: string | number;
     conversation?: ConversationMessage[];
@@ -78,8 +81,10 @@ export default function PatientDetailsPage() {
                             const qData = JSON.parse(resp.questionnaireData || '{}') as QuestionnaireData;
                             return {
                                 day: `D+${f.dayNumber}`,
-                                repouso: Number(qData.pain || qData.dor || qData.nivel_dor || 0),
-                                evacuar: Number(qData.evacuationPain || qData.dor_evacuar || 0),
+                                // Compatibilidade: IA salva como 'pain', interface usa vários nomes
+                                repouso: Number(qData.painAtRest || qData.pain || qData.dor || qData.nivel_dor || 0),
+                                // Compatibilidade: IA salva como 'painDuringBowelMovement'
+                                evacuar: Number(qData.painDuringBowelMovement || qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar || 0),
                                 fullData: f
                             };
                         });

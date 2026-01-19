@@ -399,11 +399,24 @@ export async function processQuestionnaireAnswer(
   if (result.isComplete) {
     // Salvar respostas no FollowUp
     if (context.followUpId) {
+      // Buscar conversa atualizada para salvar o histórico completo
+      const updatedConversation = await prisma.conversation.findUnique({
+        where: { id: conversation.id }
+      });
+      const fullMessageHistory = (updatedConversation?.messageHistory as any[]) || [];
+
+      // Formatar conversa para exibição
+      const conversationForSave = fullMessageHistory.map(msg => ({
+        role: msg.role === 'system' ? 'assistant' : msg.role,
+        content: msg.content
+      }));
+
       await saveQuestionnaireResponse(
         context.followUpId,
         result.updatedData,
         patient.userId,
-        result.urgencyLevel
+        result.urgencyLevel,
+        conversationForSave
       );
     }
 
@@ -446,7 +459,8 @@ async function saveQuestionnaireResponse(
   followUpId: string,
   answers: Record<string, any>,
   userId: string,
-  urgencyLevel: string = 'low'
+  urgencyLevel: string = 'low',
+  conversation: Array<{ role: string; content: string }> = []
 ) {
   // Buscar follow-up para obter surgeryId e dayNumber
   const followUp = await prisma.followUp.findUnique({
@@ -496,13 +510,23 @@ async function saveQuestionnaireResponse(
 
   const riskLevel = riskLevelMap[urgencyLevel] || 'low';
 
-  // Criar resposta de follow-up
+  // Criar resposta de follow-up com conversa incluída
+  const dataToSave = {
+    ...answers,
+    conversation: conversation
+  };
+
   await prisma.followUpResponse.create({
     data: {
       userId,
       followUpId,
-      questionnaireData: JSON.stringify(answers),
-      riskLevel
+      questionnaireData: JSON.stringify(dataToSave),
+      riskLevel,
+      // Salvar campos de dor diretamente para consultas
+      painAtRest: answers.pain ?? null,
+      painDuringBowel: answers.painDuringBowelMovement ?? null,
+      bleeding: answers.bleeding === 'severe' || answers.bleeding === 'moderate' ? true : false,
+      fever: answers.fever ?? false
     }
   });
 

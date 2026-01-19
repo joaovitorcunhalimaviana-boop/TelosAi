@@ -100,8 +100,10 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                 painDataMap.set(day, {
                   day,
                   date: new Date(event.date).toLocaleDateString('pt-BR'),
-                  painAtRest: questionnaireData?.painAtRest ?? null,
-                  painDuringEvacuation: questionnaireData?.painDuringEvacuation ?? null,
+                  // Compatibilidade: IA salva como 'pain', gráfico usa 'painAtRest'
+                  painAtRest: questionnaireData?.painAtRest ?? questionnaireData?.pain ?? null,
+                  // Compatibilidade: IA salva como 'painDuringBowelMovement', gráfico usa 'painDuringEvacuation'
+                  painDuringEvacuation: questionnaireData?.painDuringEvacuation ?? questionnaireData?.painDuringBowelMovement ?? null,
                   hasRedFlag: hasRedFlags || event.metadata?.riskLevel === 'critical' || event.metadata?.riskLevel === 'high',
                 })
               }
