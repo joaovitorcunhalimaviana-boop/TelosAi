@@ -136,12 +136,18 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 6. Medicação sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
-1. Dor após 1 semana - Melhora significativa?
+1. Dor em repouso (0-10) após 1 semana - Melhora significativa?
 2. Ferida: Como está a cicatrização?
 3. Houve abertura (deiscência)?
 4. Secreção? Odor?
 5. Consegue sentar confortavelmente?
 - ORIENTAR: suspender nimesulida, dipirona SN
+
+### D10 - Décimo Dia:
+1. Dor em repouso (0-10)
+2. Ferida: Cicatrizando bem?
+3. Alguma secreção ainda?
+4. Consegue sentar normalmente?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) após 2 semanas - Deve estar bem melhor
