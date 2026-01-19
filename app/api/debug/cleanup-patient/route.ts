@@ -29,13 +29,8 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Searching with digits:', phoneDigits, 'last9:', last9Digits);
 
-    // Buscar paciente - tenta várias estratégias
-    let patient = await prisma.patient.findFirst({
-      where: {
-        phone: {
-          contains: last9Digits
-        }
-      },
+    // Buscar todos os pacientes e filtrar por telefone normalizado
+    const allPatients = await prisma.patient.findMany({
       include: {
         surgeries: {
           include: {
@@ -50,28 +45,13 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Se não encontrou, tentar busca exata
-    if (!patient) {
-      patient = await prisma.patient.findFirst({
-        where: {
-          phone: {
-            contains: phoneDigits
-          }
-        },
-        include: {
-          surgeries: {
-            include: {
-              followUps: {
-                include: {
-                  responses: true
-                }
-              }
-            }
-          },
-          conversations: true
-        }
-      });
-    }
+    // Filtrar paciente pelo telefone (normalizar ambos para comparação)
+    const patient = allPatients.find(p => {
+      const patientPhoneDigits = (p.phone || '').replace(/\D/g, '');
+      const patientLast9 = patientPhoneDigits.slice(-9);
+      console.log('📱 Comparing:', patientLast9, 'with:', last9Digits);
+      return patientLast9 === last9Digits || patientPhoneDigits.includes(phoneDigits);
+    });
 
     if (!patient) {
       return NextResponse.json(
