@@ -125,7 +125,7 @@ EVITAR (por 30 dias):
 2. Dor ao evacuar (0-10)
 3. Evacuações regulares?
 4. Sangramento - Pequenas manchas são esperadas
-5. Alterações: inchaço, nódulos - Plicomas são comuns
+5. Febre? Secreção purulenta? Odor fétido?
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D10 - Décimo Dia:
@@ -133,7 +133,7 @@ EVITAR (por 30 dias):
 2. Dor ao evacuar (0-10)
 3. Evacuações normais?
 4. Sangramento?
-5. Plicomas diminuindo?
+5. Febre? Secreção purulenta?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) após 2 semanas - Interfere nas atividades?
