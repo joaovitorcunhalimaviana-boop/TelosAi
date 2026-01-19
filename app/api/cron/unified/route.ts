@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendMessage, sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
+import { sendDailySummaryToAllDoctors } from '@/lib/daily-summary';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -235,50 +236,20 @@ async function taskNotifyDoctorAndMarkOverdue() {
     });
   }
 
-  // Notificar médico sobre não respondidos de hoje
-  const nowBrasilia = toBrasiliaTime(new Date());
-  nowBrasilia.setHours(0, 0, 0, 0);
-  const todayStart = fromBrasiliaTime(nowBrasilia);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
+  // Enviar resumo diário consolidado para todos os médicos
+  console.log('📊 Enviando resumo diário para médicos...');
+  let summaryResults = { total: 0, sent: 0, failed: 0 };
 
-  const unansweredToday = await prisma.followUp.findMany({
-    where: {
-      status: 'sent',
-      scheduledDate: { gte: todayStart, lt: todayEnd },
-    },
-    include: { patient: true, user: true },
-  });
-
-  // Agrupar por médico
-  const byDoctor: Record<string, typeof unansweredToday> = {};
-  for (const f of unansweredToday) {
-    if (!byDoctor[f.userId]) byDoctor[f.userId] = [];
-    byDoctor[f.userId].push(f);
-  }
-
-  // Notificar cada médico
-  for (const [userId, followUps] of Object.entries(byDoctor)) {
-    const user = followUps[0]?.user;
-    if (!user?.whatsapp) continue;
-
-    const patientNames = followUps.map(f => f.patient.name).join(', ');
-    const message = `⚠️ *PACIENTES NÃO RESPONDERAM HOJE*\n\n` +
-      `${followUps.length} paciente(s) não responderam:\n${patientNames}\n\n` +
-      `Considere entrar em contato para verificar.`;
-
-    try {
-      await sendMessage(user.whatsapp, message);
-    } catch (error) {
-      console.error('Erro ao notificar médico:', error);
-    }
+  try {
+    summaryResults = await sendDailySummaryToAllDoctors();
+  } catch (error) {
+    console.error('❌ Erro ao enviar resumos diários:', error);
   }
 
   return {
     success: true,
     overdueMarked: overdueFollowUps.length,
-    doctorsNotified: Object.keys(byDoctor).length,
-    unansweredToday: unansweredToday.length,
+    dailySummary: summaryResults,
   };
 }
 

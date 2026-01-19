@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import Anthropic from '@anthropic-ai/sdk';
 import { getProtocolForSurgery } from '@/lib/protocols/hemorroidectomia-protocol';
+import { sendCriticalRedFlagAlert } from '@/lib/red-flag-alerts';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_secreto_123';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -223,7 +224,7 @@ async function saveQuestionnaireResponse(
     }
 
     // Criar resposta no banco
-    await prisma.followUpResponse.create({
+    const response = await prisma.followUpResponse.create({
       data: {
         followUpId,
         userId,
@@ -247,6 +248,24 @@ async function saveQuestionnaireResponse(
     });
 
     console.log('✅ FollowUpResponse criado com riskLevel:', riskLevel);
+
+    // Se risco alto, enviar alerta crítico ao médico
+    if (riskLevel === 'high') {
+      console.log('🚨 Risco alto detectado! Enviando alerta ao médico...');
+      const alertSent = await sendCriticalRedFlagAlert(followUpId, data);
+
+      if (alertSent) {
+        // Marcar que o alerta foi enviado
+        await prisma.followUpResponse.update({
+          where: { id: response.id },
+          data: {
+            doctorAlerted: true,
+            alertSentAt: new Date()
+          }
+        });
+        console.log('✅ Médico alertado com sucesso!');
+      }
+    }
   } catch (error: any) {
     console.error('❌ Erro ao salvar resposta:', error?.message);
   }

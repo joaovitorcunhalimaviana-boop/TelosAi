@@ -5,33 +5,69 @@
  * 1. Defina as variáveis de ambiente:
  *    - CRONJOB_ORG_API_KEY: Sua API key do cron-job.org
  *    - CRON_SECRET: O secret usado para autenticar os cron jobs
- *    - VERCEL_URL: URL base do seu app (ex: https://seu-app.vercel.app)
+ *    - VERCEL_URL: URL base do seu app (ex: https://sistema-pos-operatorio.vercel.app)
  *
  * 2. Execute: node scripts/setup-cronjob-org.js
  */
 
 const CRONJOB_ORG_API_URL = 'https://api.cron-job.org';
 
-// Configuração dos cron jobs
+// Configuração dos cron jobs - ATUALIZADO com novos lembretes
 const cronJobs = [
   {
-    title: 'Patient Reminder (4h sem resposta)',
-    url: '/api/cron/send-patient-reminder',
+    title: 'Follow-ups 10h BRT',
+    url: '/api/cron/unified',
     schedule: {
-      // 17:00 UTC = 14:00 BRT (4h após follow-up das 10:00)
-      hours: [17],
-      mdays: [-1], // Todos os dias
+      // 13:00 UTC = 10:00 BRT
+      hours: [13],
+      mdays: [-1],
       minutes: [0],
-      months: [-1], // Todos os meses
-      wdays: [-1], // Todos os dias da semana
+      months: [-1],
+      wdays: [-1],
     },
   },
   {
-    title: 'Notify Doctor Unanswered (6h sem resposta)',
-    url: '/api/cron/notify-doctor-unanswered',
+    title: 'Lembrete 14h BRT',
+    url: '/api/cron/unified',
     schedule: {
-      // 19:00 UTC = 16:00 BRT (6h após follow-up das 10:00)
-      hours: [19],
+      // 17:00 UTC = 14:00 BRT
+      hours: [17],
+      mdays: [-1],
+      minutes: [0],
+      months: [-1],
+      wdays: [-1],
+    },
+  },
+  {
+    title: 'Lembrete 18h BRT',
+    url: '/api/cron/unified',
+    schedule: {
+      // 21:00 UTC = 18:00 BRT
+      hours: [21],
+      mdays: [-1],
+      minutes: [0],
+      months: [-1],
+      wdays: [-1],
+    },
+  },
+  {
+    title: 'Notificar Medico 19h BRT',
+    url: '/api/cron/unified',
+    schedule: {
+      // 22:00 UTC = 19:00 BRT
+      hours: [22],
+      mdays: [-1],
+      minutes: [0],
+      months: [-1],
+      wdays: [-1],
+    },
+  },
+  {
+    title: 'Manutencao 0h BRT',
+    url: '/api/cron/daily-tasks',
+    schedule: {
+      // 03:00 UTC = 00:00 BRT
+      hours: [3],
       mdays: [-1],
       minutes: [0],
       months: [-1],
@@ -106,18 +142,38 @@ async function listCronJobs(apiKey) {
   }
 }
 
+async function deleteCronJob(apiKey, jobId) {
+  try {
+    const response = await fetch(`${CRONJOB_ORG_API_URL}/jobs/${jobId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete job: ${response.status}`);
+    }
+
+    console.log(`🗑️  Deleted job ID: ${jobId}`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Failed to delete job ${jobId}:`, error.message);
+    return false;
+  }
+}
+
 async function main() {
   const apiKey = process.env.CRONJOB_ORG_API_KEY;
   const cronSecret = process.env.CRON_SECRET;
-  const baseUrl = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL;
+  const baseUrl = process.env.VERCEL_URL || 'https://sistema-pos-operatorio.vercel.app';
 
   if (!apiKey) {
     console.error('❌ CRONJOB_ORG_API_KEY não definida');
     console.log('\nPara obter sua API key:');
-    console.log('1. Acesse https://cron-job.org');
-    console.log('2. Faça login');
-    console.log('3. Vá em Settings > API');
-    console.log('4. Copie sua API key');
+    console.log('1. Acesse https://console.cron-job.org/settings');
+    console.log('2. Vá em API');
+    console.log('3. Copie sua API key');
     console.log('\nDefina: set CRONJOB_ORG_API_KEY=sua_api_key');
     process.exit(1);
   }
@@ -128,15 +184,9 @@ async function main() {
     process.exit(1);
   }
 
-  if (!baseUrl) {
-    console.error('❌ VERCEL_URL não definida');
-    console.log('Defina: set VERCEL_URL=https://seu-app.vercel.app');
-    process.exit(1);
-  }
-
   console.log('🔧 Configurando cron jobs no cron-job.org...\n');
   console.log(`Base URL: ${baseUrl}`);
-  console.log(`CRON_SECRET: ${cronSecret.substring(0, 4)}...`);
+  console.log(`CRON_SECRET: ${cronSecret.substring(0, 8)}...`);
   console.log('');
 
   // Listar jobs existentes
@@ -151,24 +201,41 @@ async function main() {
     console.log('');
   }
 
+  // Perguntar se deve deletar jobs antigos
+  const deleteOld = process.argv.includes('--clean');
+  if (deleteOld && existingJobs.length > 0) {
+    console.log('🗑️  Deletando jobs antigos...\n');
+    for (const job of existingJobs) {
+      await deleteCronJob(apiKey, job.jobId);
+    }
+    console.log('');
+  }
+
   // Criar novos jobs
   console.log('🚀 Criando novos cron jobs...\n');
 
   for (const jobConfig of cronJobs) {
-    // Verificar se já existe
+    // Verificar se já existe (pelo título)
     const existing = existingJobs.find(j => j.title === jobConfig.title);
-    if (existing) {
+    if (existing && !deleteOld) {
       console.log(`⏭️  Pulando ${jobConfig.title} (já existe - ID: ${existing.jobId})`);
       continue;
     }
 
-    await createCronJob(apiKey, baseUrl, cronSecret, jobConfig);
+    try {
+      await createCronJob(apiKey, baseUrl, cronSecret, jobConfig);
+    } catch (e) {
+      // Continuar mesmo se um falhar
+    }
   }
 
   console.log('\n✅ Configuração concluída!');
-  console.log('\nAgenda dos cron jobs:');
-  console.log('- Patient Reminder: 14:00 BRT (17:00 UTC)');
-  console.log('- Notify Doctor: 16:00 BRT (19:00 UTC)');
+  console.log('\nAgenda dos cron jobs (horário de Brasília):');
+  console.log('- Follow-ups: 10:00');
+  console.log('- Lembrete 1: 14:00');
+  console.log('- Lembrete 2: 18:00');
+  console.log('- Notificar médico: 19:00');
+  console.log('- Manutenção: 00:00');
 }
 
 main().catch(console.error);
