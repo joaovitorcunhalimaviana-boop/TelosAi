@@ -174,9 +174,10 @@ export async function recordSystemMessage(
  */
 export async function markTemplateSent(
   phoneNumber: string,
-  followUpId: string
+  followUpId: string,
+  patientId?: string
 ) {
-  const conversation = await getOrCreateConversation(phoneNumber);
+  const conversation = await getOrCreateConversation(phoneNumber, patientId);
 
   return await updateConversationState(
     conversation.id,

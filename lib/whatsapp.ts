@@ -360,9 +360,9 @@ export async function sendFollowUpQuestionnaire(
 
     // Marcar que o template foi enviado (para gestão de conversa)
     const { markTemplateSent } = await import('./conversation-manager');
-    await markTemplateSent(patient.phone, followUp.id);
+    await markTemplateSent(patient.phone, followUp.id, patient.id);
 
-    console.log('✅ Template marked as sent in conversation manager');
+    console.log('✅ Template marked as sent in conversation manager with patientId:', patient.id);
 
     return response;
   } catch (error) {
