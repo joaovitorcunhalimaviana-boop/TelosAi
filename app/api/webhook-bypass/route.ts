@@ -165,22 +165,27 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
     // 7.5. Buscar dor do dia anterior para mensagens de incentivo
     const previousPain = await getPreviousDayPain(patient.id, surgery.id);
 
+    // 7.6. Obter dados já coletados do contexto
+    const currentContext = (conversation.context as any) || {};
+    const currentCollectedData = currentContext.collectedData || {};
+
     // 8. Chamar IA com histórico completo e protocolo médico
-    console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens, dor anterior:', previousPain);
+    console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens, dor anterior:', previousPain, 'dados coletados:', currentCollectedData);
     const { response: aiResponse, extractedData, isComplete } = await callAIWithHistory(
       history,
       patient.name,
       surgery.type,
       daysPostOp,
-      previousPain
+      previousPain,
+      currentCollectedData
     );
 
     // 9. Adicionar resposta da IA ao histórico
     history.push({ role: 'assistant', content: aiResponse, timestamp: new Date().toISOString() });
 
-    // 10. Atualizar dados coletados no contexto
-    const currentContext = (conversation.context as any) || {};
-    const collectedData = { ...(currentContext.collectedData || {}), ...extractedData };
+    // 10. Atualizar dados coletados no contexto (acumular com dados anteriores)
+    const collectedData = { ...currentCollectedData, ...extractedData };
+    console.log('📊 Dados coletados atualizados:', collectedData);
 
     // 11. Atualizar conversa no banco
     await prisma.conversation.update({
@@ -188,7 +193,11 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
       data: {
         messageHistory: history,
         state: isComplete ? 'completed' : 'collecting_answers',
-        context: { ...currentContext, collectedData },
+        context: {
+          ...currentContext,
+          collectedData,
+          lastUpdated: new Date().toISOString()
+        },
         updatedAt: new Date()
       }
     });
@@ -322,7 +331,8 @@ async function callAIWithHistory(
   patientName: string,
   surgeryType: string,
   daysPostOp: number,
-  previousPain: number | null = null
+  previousPain: number | null = null,
+  currentCollectedData: any = {}
 ): Promise<{ response: string; extractedData: any; isComplete: boolean }> {
   const firstName = patientName.split(' ')[0];
 
@@ -334,63 +344,55 @@ async function callAIWithHistory(
     ? `\n- Dor do dia anterior: ${previousPain}/10 (use para comparar e dar mensagens de incentivo se melhorou)`
     : '';
 
+  // Informar o que já foi coletado
+  const collectedInfo = Object.keys(currentCollectedData).length > 0
+    ? `\n\nDADOS JÁ COLETADOS NESTA CONVERSA:\n${JSON.stringify(currentCollectedData, null, 2)}\nNÃO pergunte novamente sobre esses dados!`
+    : '';
+
   const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios do Dr. João Vitor.
 
 CONTEXTO:
 - Paciente: ${firstName}
 - Cirurgia: ${surgeryType}
-- Dia pós-operatório: D+${daysPostOp}${painComparisonInfo}
+- Dia pós-operatório: D+${daysPostOp}${painComparisonInfo}${collectedInfo}
 
 === PROTOCOLO MÉDICO OFICIAL (SIGA ESTAS ORIENTAÇÕES) ===
 ${protocol}
 === FIM DO PROTOCOLO ===
 
 PERGUNTAS A COLETAR (na ordem):
-1. Dor em repouso (0-10) ✓ já perguntei na primeira mensagem
-2. Se evacuou desde a última conversa
-3. Se evacuou: dor durante evacuação (0-10)
-4. Sangramento (nenhum/leve/moderado/intenso)
-5. Febre (sim/não, se sim qual temperatura)
-6. Está tomando medicações conforme prescrito
+1. Dor em repouso (0-10) - campo: pain
+2. Se evacuou desde a última conversa - campo: evacuated (true/false)
+3. Se evacuou: dor durante evacuação (0-10) - campo: painDuringBowel
+4. Sangramento (nenhum/leve/moderado/intenso) - campo: bleeding
+5. Febre (sim/não, se sim qual temperatura) - campo: fever (true/false)
+6. Está tomando medicações conforme prescrito - campo: medications (true/false)
 
-REGRAS IMPORTANTES:
-1. NUNCA repita uma pergunta que já foi respondida
-2. Olhe o histórico para ver o que já foi perguntado e respondido
+REGRAS CRÍTICAS:
+1. NUNCA repita uma pergunta sobre dado que já está em "DADOS JÁ COLETADOS"
+2. Olhe o histórico E os dados coletados antes de perguntar
 3. Faça UMA pergunta por vez
 4. Se o paciente der resposta vaga, peça esclarecimento específico
 5. Se dor >= 8, sangramento intenso ou febre >= 38°C: alerte para procurar emergência
-6. Quando tiver TODAS as informações, agradeça e diga que vai passar para o Dr. João Vitor
+6. Quando tiver TODAS as 6 informações, agradeça e diga que vai passar para o Dr. João Vitor
 7. Seja empática e use português brasileiro informal
-8. SE o paciente perguntar sobre cuidados (banho de assento, alimentação, etc.), USE O PROTOCOLO para responder corretamente
+8. SE o paciente perguntar sobre cuidados, USE O PROTOCOLO para responder
 
 MENSAGENS DE INCENTIVO (IMPORTANTE):
-- Se a dor atual for MENOR que a dor do dia anterior, elogie o paciente de forma empática!
-- Exemplos: "Que bom que a dor diminuiu! Sua recuperação está indo muito bem! 🎉"
-- Exemplos: "Excelente! Você está melhorando! Continue assim! 💪"
-- Isso ajuda a motivar o paciente durante a recuperação
+- Se a dor atual for MENOR que a dor do dia anterior, elogie: "Que bom que melhorou! 🎉"
 
-ORIENTAÇÕES ESPECÍFICAS DO PROTOCOLO:
-- Banho de assento: APENAS ÁGUA LIMPA, sem nenhum produto (nem sal, nem nada)
+ORIENTAÇÕES DO PROTOCOLO:
+- Banho de assento: APENAS ÁGUA LIMPA, sem nenhum produto
 - Crioterapia (gelo): apenas D0 a D2
 - Banho de assento morno: a partir de D3
 
-Responda em formato JSON:
-{
-  "response": "sua resposta para o paciente",
-  "extractedData": {
-    "pain": 5,
-    "evacuated": true,
-    "painDuringBowel": 6,
-    "bleeding": "leve",
-    "fever": false,
-    "medications": true
-  },
-  "isComplete": false
-}
+RESPONDA SEMPRE em formato JSON puro (sem markdown):
+{"response":"sua resposta para o paciente","extractedData":{"pain":5},"isComplete":false}
 
-IMPORTANTE:
-- Só inclua em extractedData os dados que o paciente CONFIRMOU nesta mensagem
-- isComplete = true APENAS quando tiver TODAS as informações`;
+REGRAS DO JSON:
+- extractedData deve conter APENAS dados NOVOS confirmados pelo paciente NESTA mensagem
+- Não repita dados que já estão em "DADOS JÁ COLETADOS"
+- isComplete = true SOMENTE quando tiver TODOS os 6 campos coletados`;
 
   try {
     const messages = history.map(msg => ({
