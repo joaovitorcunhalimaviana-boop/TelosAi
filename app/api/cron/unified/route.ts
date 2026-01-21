@@ -18,13 +18,13 @@ import { sendMessage, sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/
 import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
 import { sendDailySummaryToAllDoctors } from '@/lib/daily-summary';
 
-const CRON_SECRET = process.env.CRON_SECRET;
+const CRON_SECRET = process.env.CRON_SECRET?.trim();
 
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
     const authHeader = request.headers.get('authorization');
-    const providedSecret = authHeader?.replace('Bearer ', '');
+    const providedSecret = authHeader?.replace('Bearer ', '').trim();
 
     if (CRON_SECRET && providedSecret !== CRON_SECRET) {
       console.error('❌ Unauthorized cron job access attempt');
