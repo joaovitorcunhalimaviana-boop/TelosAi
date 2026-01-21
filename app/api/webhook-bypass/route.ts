@@ -96,33 +96,47 @@ async function processMessage(phone: string, text: string) {
 
     const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
-    // 3. Buscar follow-up enviado mais recente (priorizar status 'sent')
-    // Primeiro tentar com status 'sent' (foi enviado e aguarda resposta)
-    let followUp = await prisma.followUp.findFirst({
-      where: {
-        patientId: patient.id,
-        status: 'sent'
-      },
-      orderBy: { sentAt: 'desc' }
-    });
-
-    // Se não encontrar 'sent', buscar 'pending' mais próximo
-    if (!followUp) {
-      followUp = await prisma.followUp.findFirst({
-        where: {
-          patientId: patient.id,
-          status: 'pending'
-        },
-        orderBy: { dayNumber: 'asc' }
-      });
-    }
-
-    console.log('📋 Follow-up encontrado:', followUp?.id, 'D+' + followUp?.dayNumber, 'status:', followUp?.status);
-
-    // 4. Buscar ou criar conversa com histórico
+    // 4. Buscar ou criar conversa com histórico (ANTES de buscar follow-up!)
     let conversation = await prisma.conversation.findFirst({
       where: { patientId: patient.id }
     });
+
+    // 3. Buscar follow-up - USAR O DO CONTEXTO SE JÁ EXISTE!
+    let followUp = null;
+    const existingContext = (conversation?.context as any) || {};
+
+    // Se a conversa está em andamento e tem um followUpId, usar esse!
+    if (conversation?.state === 'collecting_answers' && existingContext.followUpId) {
+      followUp = await prisma.followUp.findUnique({
+        where: { id: existingContext.followUpId }
+      });
+      console.log('📋 Usando follow-up do contexto:', followUp?.id, 'D+' + followUp?.dayNumber);
+    }
+
+    // Se não tem no contexto, buscar normalmente
+    if (!followUp) {
+      // Primeiro tentar com status 'sent' (foi enviado e aguarda resposta)
+      followUp = await prisma.followUp.findFirst({
+        where: {
+          patientId: patient.id,
+          status: 'sent'
+        },
+        orderBy: { sentAt: 'desc' }
+      });
+
+      // Se não encontrar 'sent', buscar 'pending' mais próximo
+      if (!followUp) {
+        followUp = await prisma.followUp.findFirst({
+          where: {
+            patientId: patient.id,
+            status: 'pending'
+          },
+          orderBy: { dayNumber: 'asc' }
+        });
+      }
+
+      console.log('📋 Follow-up buscado:', followUp?.id, 'D+' + followUp?.dayNumber, 'status:', followUp?.status);
+    }
 
     if (!conversation) {
       conversation = await prisma.conversation.create({
