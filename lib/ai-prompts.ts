@@ -384,7 +384,11 @@ Retorne APENAS um JSON válido no seguinte formato (sem markdown):
 
 1. **Seja conservador:** Em caso de dúvida, sempre classifique como nível de atenção maior
 2. **Red flags são prioridade:** Um único red flag importante justifica status URGENTE
-3. **Contextualize a dor:** Dor 8/10 em D+1 é diferente de dor 8/10 em D+10
+3. **Contextualize a dor COM MEDICAÇÃO:**
+   - Dor 8/10 em D+1 é diferente de dor 8/10 em D+10
+   - **MUITO IMPORTANTE:** Dor 5/10 COM Tramadol/opioides é PIOR que dor 5/10 SEM opioides
+   - Se paciente usou medicação extra (Tramadol, Codeína, etc), a dor real pode ser MAIOR
+   - Sempre perguntar se usou medicação além da prescrita e registrar detalhes
 4. **Febre é sempre alerta:** Febre ≥ 38°C exige atenção médica
 5. **Sangramento intenso é urgência:** Sangramento que encharque absorvente é emergência
 6. **Retenção urinária > 6h é urgência:** Requer intervenção rápida
@@ -392,6 +396,7 @@ Retorne APENAS um JSON válido no seguinte formato (sem markdown):
 8. **Incontinência fecal total:** Sempre classificar como URGENTE
 9. **Deterioração clínica:** Se quadro está PIORANDO, aumentar nível de alerta
 10. **Resposta empática:** Seja acolhedor, claro e tranquilizador (quando apropriado)
+11. **Medicação extra:** Registrar SEMPRE qual medicação, dose e horário - importante para pesquisa científica
 
 # EXEMPLOS DE CLASSIFICAÇÃO
 

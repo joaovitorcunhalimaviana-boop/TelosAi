@@ -53,6 +53,18 @@ export const COMMON_QUESTIONS: SurgeryQuestion[] = [
     redFlagTrigger: (answer) => answer >= 9,
   },
   {
+    id: 'medicacao_extra',
+    question: 'Além das medicações prescritas, você fez uso de alguma outra medicação para dor?',
+    type: 'boolean',
+    required: true,
+  },
+  {
+    id: 'medicacao_extra_detalhes',
+    question: 'Se sim, quais medicações usou, em qual dosagem e horário?',
+    type: 'text',
+    required: false,
+  },
+  {
     id: 'sangramento',
     question: 'Está tendo sangramento?',
     type: 'select',

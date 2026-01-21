@@ -93,56 +93,68 @@ EVITAR (por 30 dias):
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
+**IMPORTANTE - PERGUNTAR TODOS OS DIAS:**
+- Além das medicações prescritas, usou alguma outra medicação para dor? (Ex: Tramadol, Codeína)
+- Se sim: qual medicação, dosagem e horário?
+- CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação DIFERENTE de paciente com dor 5/10 sem opioides
+
 ### D1 - Primeiro Dia:
 1. Dor geral (0-10) - Se ≥7: verificar medicação
-2. Diurese - Urinou normalmente? - Se não há 8-12h: ALERTA
-3. Evacuação - Normal não ter evacuado ainda
-4. Sinais de alarme: sangramento, febre, secreção, calafrios
+2. **Medicação extra?** (Tramadol, Codeína, etc) - Se sim, anotar qual, dose e horário
+3. Diurese - Urinou normalmente? - Se não há 8-12h: ALERTA
+4. Evacuação - Normal não ter evacuado ainda
+5. Sinais de alarme: sangramento, febre, secreção, calafrios
 
 ### D2 - Segundo Dia:
 1. Dor geral (0-10)
-2. Evacuação - Se não desde cirurgia: reforçar laxante
-3. Sangramento - Manchas na gaze = normal, Em jato = ALERTA
-4. Sinais de alarme
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação - Se não desde cirurgia: reforçar laxante
+4. Sangramento - Manchas na gaze = normal, Em jato = ALERTA
+5. Sinais de alarme
 - ORIENTAR: último dia de gelo, amanhã inicia banho de assento
 
 ### D3 - Terceiro Dia:
 1. Dor comparada aos dias anteriores
-2. Evacuação e dor ao evacuar (0-10)
-3. Sangramento comparado aos dias anteriores
-4. Sinais de alarme
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação e dor ao evacuar (0-10)
+4. Sangramento comparado aos dias anteriores
+5. Sinais de alarme
 - ORIENTAR: como fazer banho de assento
 
 ### D5 - Quinto Dia:
 1. Dor (0-10) - Está diminuindo?
-2. Evacuação regular?
-3. Sangramento diminuindo?
-4. Medicação sendo tomada corretamente?
-5. Sinais de alarme
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação regular?
+4. Sangramento diminuindo?
+5. Medicação prescrita sendo tomada corretamente?
+6. Sinais de alarme
 
 ### D7 - Sétimo Dia:
 1. Dor em repouso (0-10) após 1 semana - Melhora significativa?
-2. Dor ao evacuar (0-10)
-3. Evacuações regulares?
-4. Sangramento - Pequenas manchas são esperadas
-5. Febre? Secreção purulenta? Odor fétido?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações regulares?
+5. Sangramento - Pequenas manchas são esperadas
+6. Febre? Secreção purulenta? Odor fétido?
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D10 - Décimo Dia:
 1. Dor em repouso (0-10)
-2. Dor ao evacuar (0-10)
-3. Evacuações normais?
-4. Sangramento?
-5. Febre? Secreção purulenta?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações normais?
+5. Sangramento?
+6. Febre? Secreção purulenta?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) após 2 semanas - Interfere nas atividades?
-2. Dor ao evacuar (0-10)
-3. Evacuações normais?
-4. Sangramento?
-5. Cicatrização - Alterações preocupantes?
-6. Retorno agendado?
-7. **PESQUISA DE SATISFAÇÃO:**
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações normais?
+5. Sangramento?
+6. Cicatrização - Alterações preocupantes?
+7. Retorno agendado?
+8. **PESQUISA DE SATISFAÇÃO:**
    - Satisfação com o resultado da cirurgia
    - Satisfação com o acompanhamento por inteligência artificial
    - Recomendaria este acompanhamento para outras pessoas?
