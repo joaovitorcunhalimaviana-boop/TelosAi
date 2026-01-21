@@ -53,6 +53,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: `Follow-up D+${dayNumber} not found` }, { status: 404 });
     }
 
+    // Se resetando para pending, deletar respostas inválidas também
+    let deletedResponses = 0;
+    if (newStatus === 'pending') {
+      const deleteResult = await prisma.followUpResponse.deleteMany({
+        where: { followUpId: followUp.id }
+      });
+      deletedResponses = deleteResult.count;
+    }
+
     // Atualizar status
     const updated = await prisma.followUp.update({
       where: { id: followUp.id },
@@ -71,7 +80,8 @@ export async function GET(request: NextRequest) {
         dayNumber: updated.dayNumber,
         status: updated.status,
         sentAt: updated.sentAt
-      }
+      },
+      deletedResponses
     });
 
   } catch (error) {
