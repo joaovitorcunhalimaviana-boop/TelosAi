@@ -71,6 +71,13 @@ export async function GET(request: NextRequest) {
 
     const surgery = patient.surgeries[0];
 
+    // DEBUG: Logar a ordem dos follow-ups
+    console.log('📋 Follow-ups order:', surgery.followUps.map(f => ({
+      dayNumber: f.dayNumber,
+      status: f.status,
+      scheduledDate: f.scheduledDate
+    })));
+
     // Encontrar follow-up específico ou o primeiro pendente
     let followUp;
     if (dayParam) {

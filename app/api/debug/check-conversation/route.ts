@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
           followUps: s.followUps.map(f => ({
             dayNumber: f.dayNumber,
             status: f.status,
+            scheduledDate: f.scheduledDate,
             sentAt: f.sentAt,
             respondedAt: f.respondedAt,
             responsesCount: f.responses.length
