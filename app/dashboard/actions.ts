@@ -306,7 +306,8 @@ const getCachedDashboardPatientsInternal = unstable_cache(
             // Priority 2: JSON Fallback (Legacy)
             try {
               const data = JSON.parse(response.questionnaireData);
-              evacuationValue = Number(data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
+              // IA salva como painDuringBowel
+              evacuationValue = Number(data.painDuringBowel || data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
             } catch {
               evacuationValue = 0;
             }

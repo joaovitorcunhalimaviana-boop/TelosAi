@@ -20,10 +20,18 @@ interface QuestionnaireData {
     painAtRest?: string | number;
     dor?: string | number;
     nivel_dor?: string | number;
+    painDuringBowel?: string | number;
     painDuringBowelMovement?: string | number;
     painDuringEvacuation?: string | number;
     evacuationPain?: string | number;
     dor_evacuar?: string | number;
+    evacuated?: boolean;
+    bowelMovement?: boolean;
+    fever?: boolean;
+    temperature?: number | string;
+    bleeding?: string | boolean;
+    medications?: boolean;
+    urinated?: boolean;
     conversation?: ConversationMessage[];
 }
 
@@ -83,8 +91,8 @@ export default function PatientDetailsPage() {
                                 day: `D+${f.dayNumber}`,
                                 // Compatibilidade: IA salva como 'pain', interface usa vários nomes
                                 repouso: Number(qData.painAtRest || qData.pain || qData.dor || qData.nivel_dor || 0),
-                                // Compatibilidade: IA salva como 'painDuringBowelMovement'
-                                evacuar: Number(qData.painDuringBowelMovement || qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar || 0),
+                                // Compatibilidade: IA salva como 'painDuringBowel'
+                                evacuar: Number(qData.painDuringBowel || qData.painDuringBowelMovement || qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar || 0),
                                 fullData: f
                             };
                         });

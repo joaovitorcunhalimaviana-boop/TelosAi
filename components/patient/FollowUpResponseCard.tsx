@@ -19,18 +19,26 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface QuestionnaireData {
+  // Formato padrão do dashboard
   painAtRest?: number
   painDuringEvacuation?: number
   hadBowelMovement?: boolean
   bowelMovementTime?: string
   bristolScale?: number
-  bleeding?: string
+  bleeding?: string | boolean
   hasFever?: boolean
   temperature?: number
   usedPrescribedMeds?: boolean
   usedExtraMeds?: boolean
   extraMedsDetails?: string
   hasPurulentDischarge?: boolean
+  // Formato da IA (compatibilidade)
+  pain?: number
+  painDuringBowel?: number
+  evacuated?: boolean
+  fever?: boolean
+  medications?: boolean
+  urinated?: boolean
   [key: string]: any
 }
 
@@ -52,7 +60,26 @@ interface FollowUpResponseCardProps {
 
 export function FollowUpResponseCard({ response, isLatest = false }: FollowUpResponseCardProps) {
   const [expanded, setExpanded] = useState(isLatest)
-  const data = response.questionnaireData || {}
+  const rawData = response.questionnaireData || {}
+
+  // Normalizar dados - aceitar ambos os formatos (IA e formulário)
+  const data = {
+    ...rawData,
+    // Dor em repouso: aceitar painAtRest ou pain
+    painAtRest: rawData.painAtRest ?? rawData.pain,
+    // Dor durante evacuação: aceitar painDuringEvacuation ou painDuringBowel
+    painDuringEvacuation: rawData.painDuringEvacuation ?? rawData.painDuringBowel,
+    // Evacuação: aceitar hadBowelMovement ou evacuated
+    hadBowelMovement: rawData.hadBowelMovement ?? rawData.evacuated,
+    // Febre: aceitar hasFever ou fever
+    hasFever: rawData.hasFever ?? rawData.fever,
+    // Medicações: aceitar usedPrescribedMeds ou medications
+    usedPrescribedMeds: rawData.usedPrescribedMeds ?? rawData.medications,
+    // Sangramento: converter boolean para string se necessário
+    bleeding: typeof rawData.bleeding === 'boolean'
+      ? (rawData.bleeding ? 'leve' : 'none')
+      : (rawData.bleeding || 'none'),
+  }
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -87,14 +114,20 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
   }
 
   const getBleedingLabel = (bleeding?: string) => {
-    if (!bleeding) return null
+    if (!bleeding || bleeding === 'none' || bleeding === 'nenhum') return { text: "Sem sangramento", color: "text-green-600" }
     const labels: Record<string, { text: string; color: string }> = {
+      // Formato do formulário
       none: { text: "Sem sangramento", color: "text-green-600" },
       paper: { text: "Só no papel", color: "text-yellow-600" },
       bowl: { text: "No vaso", color: "text-orange-600" },
       clots: { text: "Com coágulos", color: "text-red-600" },
+      // Formato da IA
+      nenhum: { text: "Sem sangramento", color: "text-green-600" },
+      leve: { text: "Sangramento leve", color: "text-yellow-600" },
+      moderado: { text: "Sangramento moderado", color: "text-orange-600" },
+      intenso: { text: "Sangramento intenso", color: "text-red-600" },
     }
-    return labels[bleeding]
+    return labels[bleeding] || { text: bleeding, color: "text-gray-600" }
   }
 
   const getRedFlagLabel = (flag: string): string => {

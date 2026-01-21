@@ -95,14 +95,28 @@ async function processMessage(phone: string, text: string) {
 
     const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
 
-    // 3. Buscar follow-up pendente
-    const followUp = await prisma.followUp.findFirst({
+    // 3. Buscar follow-up enviado mais recente (priorizar status 'sent')
+    // Primeiro tentar com status 'sent' (foi enviado e aguarda resposta)
+    let followUp = await prisma.followUp.findFirst({
       where: {
         patientId: patient.id,
-        status: { in: ['sent', 'pending'] }
+        status: 'sent'
       },
-      orderBy: { scheduledDate: 'desc' }
+      orderBy: { sentAt: 'desc' }
     });
+
+    // Se não encontrar 'sent', buscar 'pending' mais próximo
+    if (!followUp) {
+      followUp = await prisma.followUp.findFirst({
+        where: {
+          patientId: patient.id,
+          status: 'pending'
+        },
+        orderBy: { dayNumber: 'asc' }
+      });
+    }
+
+    console.log('📋 Follow-up encontrado:', followUp?.id, 'D+' + followUp?.dayNumber, 'status:', followUp?.status);
 
     // 4. Buscar ou criar conversa com histórico
     let conversation = await prisma.conversation.findFirst({
@@ -245,6 +259,9 @@ async function saveQuestionnaireResponse(
     };
 
     // Criar resposta no banco
+    // bleeding no banco é Boolean (tem ou não tem sangramento)
+    const hasBleeding = data.bleeding && data.bleeding !== 'nenhum' && data.bleeding !== 'none';
+
     const response = await prisma.followUpResponse.create({
       data: {
         followUpId,
@@ -253,7 +270,7 @@ async function saveQuestionnaireResponse(
         riskLevel,
         painAtRest: data.pain || null,
         painDuringBowel: data.painDuringBowel || null,
-        bleeding: data.bleeding || null,
+        bleeding: hasBleeding,
         fever: data.fever || false,
         aiResponse: conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n\n')
       }
@@ -381,10 +398,18 @@ REGRAS CRÍTICAS:
 MENSAGENS DE INCENTIVO (IMPORTANTE):
 - Se a dor atual for MENOR que a dor do dia anterior, elogie: "Que bom que melhorou! 🎉"
 
-ORIENTAÇÕES DO PROTOCOLO:
+ORIENTAÇÕES DO PROTOCOLO POR DIA:
+- D+0, D+1, D+2: Crioterapia (compressa GELADA/GELO) 5x ao dia
+- D+3 em diante: Banho de assento com água MORNA (não usar mais gelo)
 - Banho de assento: APENAS ÁGUA LIMPA, sem nenhum produto
-- Crioterapia (gelo): apenas D0 a D2
-- Banho de assento morno: a partir de D3
+
+REGRA CRÍTICA SOBRE GELO:
+- D+0: Diga "continue com compressa gelada"
+- D+1: Diga "continue com compressa gelada, ainda faltam 2 dias de gelo (hoje e amanhã)"
+- D+2: Diga "HOJE É O ÚLTIMO DIA de compressa gelada! A partir de amanhã (D+3), troque para banho de assento com água morna"
+- D+3 em diante: NÃO mencione gelo! Apenas banho de assento morno
+
+NUNCA diga "último dia de gelo" se estiver no D+0 ou D+1!
 
 RESPONDA SEMPRE em formato JSON puro (sem markdown):
 {"response":"sua resposta para o paciente","extractedData":{"pain":5},"isComplete":false}
