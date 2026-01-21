@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getPatientSummary } from "@/app/dashboard/actions";
+import { getPatientSummary, getPatientConversationHistory } from "@/app/dashboard/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, History } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 // Interfaces para tipagem
 interface ConversationMessage {
-    role: 'user' | 'assistant';
+    role: 'user' | 'assistant' | 'system';
     content: string;
+    timestamp?: string | null;
 }
 
 interface QuestionnaireData {
@@ -49,8 +50,10 @@ interface FollowUp {
 
 interface PatientSummary {
     patient: {
+        id: string;
         name: string;
     };
+    patientId: string;
     type: string;
     date: Date;
     followUps: FollowUp[];
@@ -70,6 +73,8 @@ export default function PatientDetailsPage() {
     const [patientData, setPatientData] = useState<PatientSummary | null>(null);
     const [graphData, setGraphData] = useState<GraphData[]>([]);
     const [selectedFollowUp, setSelectedFollowUp] = useState<FollowUp | null>(null);
+    const [fullConversation, setFullConversation] = useState<ConversationMessage[]>([]);
+    const [showFullHistory, setShowFullHistory] = useState(true); // Por padrão mostra histórico completo
 
     useEffect(() => {
         async function loadData() {
@@ -101,6 +106,13 @@ export default function PatientDetailsPage() {
                     // Selecionar o último follow-up por padrão
                     if (typedData.followUps.length > 0) {
                         setSelectedFollowUp(typedData.followUps[typedData.followUps.length - 1]);
+                    }
+
+                    // Carregar histórico completo de conversas
+                    const patientId = typedData.patientId || typedData.patient?.id;
+                    if (patientId) {
+                        const conversationHistory = await getPatientConversationHistory(patientId);
+                        setFullConversation(conversationHistory as ConversationMessage[]);
                     }
                 }
             } catch (error) {
@@ -187,38 +199,80 @@ export default function PatientDetailsPage() {
                     <div className="lg:col-span-1">
                         <Card className="h-[600px] flex flex-col">
                             <CardHeader className="border-b bg-gray-50">
-                                <CardTitle className="flex items-center gap-2">
-                                    <MessageCircle className="h-5 w-5" />
-                                    Chat com IA
-                                    {selectedFollowUp && <Badge variant="outline">Dia {selectedFollowUp.dayNumber}</Badge>}
-                                </CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="flex items-center gap-2">
+                                        {showFullHistory ? <History className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
+                                        {showFullHistory ? 'Histórico Completo' : 'Chat com IA'}
+                                        {!showFullHistory && selectedFollowUp && <Badge variant="outline">Dia {selectedFollowUp.dayNumber}</Badge>}
+                                    </CardTitle>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowFullHistory(!showFullHistory)}
+                                        className="text-xs"
+                                    >
+                                        {showFullHistory ? 'Ver por dia' : 'Ver tudo'}
+                                    </Button>
+                                </div>
+                                {showFullHistory && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {fullConversation.length} mensagens no total
+                                    </p>
+                                )}
                             </CardHeader>
                             <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-                                {selectedFollowUp && selectedFollowUp.responses[0] ? (
-                                    (() => {
-                                        const qData = JSON.parse(selectedFollowUp.responses[0].questionnaireData || '{}') as QuestionnaireData;
-                                        const conversation = qData.conversation || [];
-
-                                        if (conversation.length === 0) {
-                                            return <div className="text-center text-gray-400 mt-10">Nenhuma conversa registrada.</div>;
-                                        }
-
-                                        return conversation.map((msg, idx) => (
+                                {showFullHistory ? (
+                                    // Mostrar histórico completo de todas as conversas
+                                    fullConversation.length > 0 ? (
+                                        fullConversation.map((msg, idx) => (
                                             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                                <div className={`max-w-[85%] rounded-lg p-3 text-sm 
-                          ${msg.role === 'user'
+                                                <div className={`max-w-[85%] rounded-lg p-3 text-sm
+                                                    ${msg.role === 'user'
                                                         ? 'bg-blue-600 text-white rounded-tr-none'
                                                         : 'bg-gray-100 text-gray-800 rounded-tl-none border'
                                                     }`}>
                                                     {msg.content}
+                                                    {msg.timestamp && (
+                                                        <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-blue-200' : 'text-gray-400'}`}>
+                                                            {new Date(msg.timestamp).toLocaleString('pt-BR')}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                        ));
-                                    })()
+                                        ))
+                                    ) : (
+                                        <div className="text-center text-gray-400 mt-10">
+                                            Nenhuma conversa registrada ainda.
+                                        </div>
+                                    )
                                 ) : (
-                                    <div className="text-center text-gray-400 mt-10">
-                                        Selecione um dia respondido para ver a conversa.
-                                    </div>
+                                    // Mostrar conversa do dia selecionado (comportamento antigo)
+                                    selectedFollowUp && selectedFollowUp.responses[0] ? (
+                                        (() => {
+                                            const qData = JSON.parse(selectedFollowUp.responses[0].questionnaireData || '{}') as QuestionnaireData;
+                                            const conversation = qData.conversation || [];
+
+                                            if (conversation.length === 0) {
+                                                return <div className="text-center text-gray-400 mt-10">Nenhuma conversa registrada para este dia.</div>;
+                                            }
+
+                                            return conversation.map((msg, idx) => (
+                                                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                    <div className={`max-w-[85%] rounded-lg p-3 text-sm
+                                                        ${msg.role === 'user'
+                                                            ? 'bg-blue-600 text-white rounded-tr-none'
+                                                            : 'bg-gray-100 text-gray-800 rounded-tl-none border'
+                                                        }`}>
+                                                        {msg.content}
+                                                    </div>
+                                                </div>
+                                            ));
+                                        })()
+                                    ) : (
+                                        <div className="text-center text-gray-400 mt-10">
+                                            Selecione um dia respondido para ver a conversa.
+                                        </div>
+                                    )
                                 )}
                             </CardContent>
                         </Card>

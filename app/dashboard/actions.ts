@@ -550,6 +550,29 @@ export interface RecentActivity {
   isRead: boolean
 }
 
+/**
+ * Busca o histórico completo de conversas de um paciente
+ */
+export async function getPatientConversationHistory(patientId: string) {
+  // Buscar a conversa do paciente
+  const conversation = await prisma.conversation.findFirst({
+    where: { patientId }
+  });
+
+  if (!conversation || !conversation.messageHistory) {
+    return [];
+  }
+
+  // Formatar mensagens para exibição
+  const messageHistory = (conversation.messageHistory as any[]) || [];
+
+  return messageHistory.map((msg: any) => ({
+    role: msg.role === 'system' ? 'assistant' : msg.role,
+    content: msg.content,
+    timestamp: msg.timestamp || null
+  }));
+}
+
 export async function getRecentPatientActivity(limit = 10): Promise<RecentActivity[]> {
   const responses = await prisma.followUpResponse.findMany({
     take: limit,
