@@ -317,32 +317,19 @@ export async function sendFollowUpQuestionnaire(
     // Componentes usando formato NAMED
     let components: any[] = [];
 
-    if (templateName === 'day1') {
-      components = [
-        {
-          type: 'body',
-          parameters: [
-            {
-              type: 'text',
-              parameter_name: 'customer_name',
-              text: patientFirstName
-            }
-          ]
-        }
-      ];
-    } else {
-      components = [
-        {
-          type: 'body',
-          parameters: [
-            {
-              type: 'text',
-              text: patientFirstName
-            }
-          ]
-        }
-      ];
-    }
+    // Ambos os templates (day1 e otherdays) usam formato NAMED com {{customer_name}}
+    components = [
+      {
+        type: 'body',
+        parameters: [
+          {
+            type: 'text',
+            parameter_name: 'customer_name',
+            text: patientFirstName
+          }
+        ]
+      }
+    ];
 
     // day1 uses 'en' (legacy template issue), others use 'pt_BR'
     // This fixes the encoding/question marks issue
