@@ -98,7 +98,7 @@ Mensagem: "Posso tomar banho hoje? É D+3"
 Urgência: LOW
 Categoria: "higiene"
 Red Flags: []
-Resposta: "Sim! Pode tomar banho normalmente. Faça também banho de assento com água morna 2-3x ao dia por 10-15 minutos após evacuações. Ajuda muito na cicatrização."
+Resposta: "Sim! Pode tomar banho normalmente. A partir de D+3, faça também banho de assento com água MORNA 2-3x ao dia por 10-15 minutos após evacuações. Nos dois primeiros dias (D+1 e D+2), use compressas GELADAS 5x/dia por 10 min para reduzir edema e dor."
 
 Exemplo 4:
 Mensagem: "Febre 38.8°C e dor forte no local da cirurgia"
@@ -267,7 +267,10 @@ IMPORTANTE:
 - NUNCA dar diagnóstico definitivo
 - Ser conservador: na dúvida, orientar contato com médico
 - Respostas DEVEM ser empáticas, claras e em português Brasil
-- Quando usar um protocolo, seja específico (ex: "banho de assento com água morna 2-3x ao dia")
+- Quando usar um protocolo, seja específico e RESPEITE O DIA DO PÓS-OPERATÓRIO:
+  * D+1 e D+2: compressas GELADAS 5x/dia por 10 min (NÃO banho de assento com água morna!)
+  * A partir de D+3: banho de assento com água MORNA 2-3x ao dia
+  * Pomada: SEMPRE APÓS evacuar, de 8/8h (nunca antes de evacuar!)
 
 ${FEW_SHOT_EXAMPLES}
 

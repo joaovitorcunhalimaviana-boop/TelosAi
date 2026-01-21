@@ -154,7 +154,9 @@ EVITAR (por 30 dias):
 
 ### "A dor é muito forte, remédios não fazem efeito"
 → Verificar se está tomando nos horários corretos (não apenas quando dói)
-→ Banhos de assento/compressas ajudam muito
+→ D0 a D2: compressas GELADAS 5x/dia por 10 min (reduz edema e dor)
+→ A partir de D3: banhos de assento com água MORNA
+→ Pomada de 8/8h APÓS evacuar
 → Se ≥8/10 e impede dormir/comer: contato com médico
 
 ### "Estou sangrando, é normal?"
@@ -169,8 +171,9 @@ EVITAR (por 30 dias):
 
 ### "Dói muito para evacuar"
 → Esperado nas primeiras semanas
-→ Usar pomada antes de evacuar
-→ Banho de assento após evacuação
+→ Usar pomada APÓS evacuar (de 8/8h, 3x ao dia)
+→ Nos primeiros 2 dias: compressa gelada após evacuação
+→ A partir do D3: banho de assento com água morna após evacuação
 → Manter fezes macias
 
 ### "Apareceu caroço/inchaço"
@@ -205,13 +208,13 @@ Técnica: Hemorroidectomia fechada (Ferguson)
 `;
 
 export const PROTOCOL_FAQ = {
-  dor_forte: `A dor nos primeiros dias pode ser intensa, especialmente durante e após as evacuações. Certifique-se de que está tomando todos os medicamentos nos horários corretos e não apenas quando a dor aparece. Os banhos de assento/compressas geladas ajudam muito. Se mesmo assim a dor for insuportável (acima de 8/10) e impedir você de dormir ou comer, entre em contato com o Dr. João Vítor ou procure atendimento.`,
+  dor_forte: `A dor nos primeiros dias pode ser intensa, especialmente durante e após as evacuações. Certifique-se de que está tomando todos os medicamentos nos horários corretos e não apenas quando a dor aparece. Nos primeiros 2 dias (D0 a D2), use compressas GELADAS 5x/dia por 10 minutos - isso reduz edema e dor. A partir do D3, faça banhos de assento com água MORNA. A pomada deve ser usada de 8/8h, sempre APÓS evacuar. Se mesmo assim a dor for insuportável (acima de 8/10) e impedir você de dormir ou comer, entre em contato com o Dr. João Vítor ou procure atendimento.`,
 
   sangramento: `Pequenas quantidades de sangue vivo são normais, especialmente durante e após as evacuações. Se o sangramento for em pequenas manchas na gaze ou no vaso, está dentro do esperado. Se houver sangramento em jato, coágulos grandes ou sangue em grande quantidade enchendo o vaso sanitário, procure atendimento médico imediatamente.`,
 
   nao_evacuou: `É comum haver um pouco de receio de evacuar nos primeiros dias. No entanto, é importante que a primeira evacuação aconteça nos primeiros 2-3 dias. Continue tomando o laxante à noite, beba bastante água e mantenha alimentação rica em fibras. Não segure a vontade de evacuar. Se passar de 3 dias sem evacuar, entre em contato com o médico.`,
 
-  dor_evacuar: `A dor durante a evacuação é esperada nas primeiras semanas. Use a pomada antes de evacuar para ajudar na lubrificação. Faça um banho de assento morno logo após a evacuação para aliviar o desconforto. Mantenha as fezes macias com o laxante e boa hidratação.`,
+  dor_evacuar: `A dor durante a evacuação é esperada nas primeiras semanas. Use a pomada APÓS evacuar (de 8/8h, 3x ao dia - a posologia correta). Nos primeiros 2 dias (D0 a D2), faça compressas geladas por 10 minutos, 5x ao dia. A partir do D3, faça banhos de assento com água morna após a evacuação para aliviar o desconforto. Mantenha as fezes macias com o laxante e boa hidratação.`,
 
   caroco_inchaco: `Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo Dr. João Vítor no retorno. O uso da Diosmina + Hesperidina e da pomada ajudam a reduzir esses inchaços.`,
 
