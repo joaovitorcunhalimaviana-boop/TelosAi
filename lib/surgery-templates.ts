@@ -11,6 +11,8 @@
  * Follow-ups: D+1, D+2, D+3, D+5, D+7, D+10, D+14
  */
 
+import { toBrasiliaTime } from './date-utils';
+
 // ============================================
 // TYPES
 // ============================================
@@ -419,10 +421,11 @@ export function getSurgeryLabel(surgeryType: SurgeryType): string {
 }
 
 /**
- * Retorna saudação baseada no horário
+ * Retorna saudação baseada no horário de Brasília
  */
 function getGreeting(): string {
-  const hour = new Date().getHours();
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const hour = nowBrasilia.getHours();
 
   if (hour >= 5 && hour < 12) {
     return 'Bom dia';

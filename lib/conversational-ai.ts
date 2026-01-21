@@ -8,6 +8,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
 import { getProtocolForSurgery } from './protocols/hemorroidectomia-protocol';
+import { toBrasiliaTime } from './date-utils';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -603,10 +604,11 @@ Vou te fazer algumas perguntas sobre como você está. Pode responder livremente
 }
 
 /**
- * Retorna saudação apropriada baseada no horário
+ * Retorna saudação apropriada baseada no horário de Brasília
  */
 function getGreeting(): string {
-  const hour = new Date().getHours();
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const hour = nowBrasilia.getHours();
 
   if (hour >= 5 && hour < 12) {
     return 'Bom dia';

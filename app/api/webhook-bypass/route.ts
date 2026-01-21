@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 import Anthropic from '@anthropic-ai/sdk';
 import { getProtocolForSurgery } from '@/lib/protocols/hemorroidectomia-protocol';
 import { sendCriticalRedFlagAlert } from '@/lib/red-flag-alerts';
+import { toBrasiliaTime } from '@/lib/date-utils';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_secreto_123';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -560,9 +561,10 @@ async function markAsRead(messageId: string) {
   } catch (error) {}
 }
 
-// Saudação
+// Saudação baseada no horário de Brasília
 function getGreeting(): string {
-  const hour = new Date().getHours();
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const hour = nowBrasilia.getHours();
   if (hour >= 5 && hour < 12) return 'Bom dia';
   if (hour >= 12 && hour < 18) return 'Boa tarde';
   return 'Boa noite';
