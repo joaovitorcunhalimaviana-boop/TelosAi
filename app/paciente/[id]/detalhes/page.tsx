@@ -62,7 +62,7 @@ interface PatientSummary {
 interface GraphData {
     day: string;
     repouso: number;
-    evacuar: number;
+    evacuar: number | null;
     fullData: FollowUp;
 }
 
@@ -92,12 +92,26 @@ export default function PatientDetailsPage() {
                         .map((f) => {
                             const resp = f.responses[0];
                             const qData = JSON.parse(resp.questionnaireData || '{}') as QuestionnaireData;
+
+                            // Verificar se o paciente evacuou neste dia
+                            const didEvacuate = qData.evacuated === true ||
+                                                qData.bowelMovement === true;
+
+                            // Só mostrar dor durante evacuação se o paciente realmente evacuou
+                            // Se não evacuou, usar null para omitir o ponto do gráfico
+                            let evacPain: number | null = null;
+                            if (didEvacuate) {
+                                const rawEvacPain = qData.painDuringBowel || qData.painDuringBowelMovement ||
+                                                    qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar;
+                                evacPain = rawEvacPain !== undefined && rawEvacPain !== null ? Number(rawEvacPain) : null;
+                            }
+
                             return {
                                 day: `D+${f.dayNumber}`,
                                 // Compatibilidade: IA salva como 'pain', interface usa vários nomes
                                 repouso: Number(qData.painAtRest || qData.pain || qData.dor || qData.nivel_dor || 0),
-                                // Compatibilidade: IA salva como 'painDuringBowel'
-                                evacuar: Number(qData.painDuringBowel || qData.painDuringBowelMovement || qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar || 0),
+                                // Dor durante evacuação - só mostrar se paciente realmente evacuou
+                                evacuar: evacPain,
                                 fullData: f
                             };
                         });
@@ -165,8 +179,8 @@ export default function PatientDetailsPage() {
                                         <YAxis domain={[0, 10]} />
                                         <Tooltip />
                                         <Legend />
-                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#0A2647" strokeWidth={2} />
-                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={2} />
+                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#0A2647" strokeWidth={2} connectNulls={false} />
+                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={2} connectNulls={false} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </CardContent>

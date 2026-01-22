@@ -273,11 +273,18 @@ function getDaySpecificQuestions(
         followUpLogic: 'Sim ou Não. Se quiser, o paciente pode elaborar.'
       },
       {
-        id: 'satisfaction_comments',
+        id: 'positive_feedback',
         category: 'general',
         required: false,
-        text: 'Gostaria de deixar algum comentário ou sugestão sobre o acompanhamento?',
-        contextNote: 'Campo livre e opcional para feedback do paciente'
+        text: 'O que você mais gostou no acompanhamento? Tem algum elogio ou ponto positivo que gostaria de destacar?',
+        contextNote: 'Coletar pontos positivos e elogios do paciente sobre o acompanhamento. Campo opcional.'
+      },
+      {
+        id: 'improvement_suggestions',
+        category: 'general',
+        required: false,
+        text: 'Você tem alguma crítica ou sugestão de como podemos melhorar o acompanhamento para futuros pacientes?',
+        contextNote: 'Coletar críticas construtivas e sugestões de melhoria. Campo opcional mas muito valioso para aprimoramento do serviço.'
       }
     );
   }
@@ -389,12 +396,19 @@ Após coletar os dados clínicos habituais, fazer as perguntas de satisfação:
 2. RECOMENDARIA? (Sim/Não):
    "Você recomendaria este tipo de acompanhamento para outros pacientes?"
 
-3. COMENTÁRIOS (Opcional):
-   "Gostaria de deixar alguma sugestão ou comentário?"
+3. ELOGIOS/PONTOS POSITIVOS (Opcional):
+   "O que você mais gostou no acompanhamento? Tem algum elogio ou ponto positivo?"
+   - Deixar o paciente livre para expressar
+   - Registrar feedback positivo
+
+4. CRÍTICAS/SUGESTÕES DE MELHORIA (Opcional):
+   "Você tem alguma crítica ou sugestão de como podemos melhorar?"
+   - Incentivar feedback honesto
+   - Registrar sugestões de melhoria para futuros pacientes
 
 📝 FINALIZAÇÃO:
 Após coletar a pesquisa de satisfação:
-- Agradecer pelo feedback
+- Agradecer pelo feedback (positivo e construtivo)
 - Desejar boa recuperação final
 - Informar que pode entrar em contato se precisar de algo
 `;

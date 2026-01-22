@@ -96,14 +96,29 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
               const questionnaireData = event.metadata?.questionnaireData
               const hasRedFlags = (event.metadata?.redFlags || []).length > 0
 
+              // Verificar se o paciente evacuou neste dia
+              // Compatibilidade: IA pode salvar como 'bowelMovement', 'evacuated', ou 'evacuation'
+              const didEvacuate = questionnaireData?.bowelMovement === true ||
+                                  questionnaireData?.evacuated === true ||
+                                  questionnaireData?.evacuation === true
+
+              // Só mostrar dor durante evacuação se o paciente realmente evacuou
+              // Se não evacuou, omitir o ponto (null) em vez de mostrar 0
+              let painDuringEvacuation: number | null = null
+              if (didEvacuate) {
+                painDuringEvacuation = questionnaireData?.painDuringEvacuation ??
+                                       questionnaireData?.painDuringBowelMovement ??
+                                       questionnaireData?.painDuringBowel ?? null
+              }
+
               if (painDataMap.has(day) || followUpDays.includes(day)) {
                 painDataMap.set(day, {
                   day,
                   date: new Date(event.date).toLocaleDateString('pt-BR'),
                   // Compatibilidade: IA salva como 'pain', gráfico usa 'painAtRest'
                   painAtRest: questionnaireData?.painAtRest ?? questionnaireData?.pain ?? null,
-                  // Compatibilidade: IA salva como 'painDuringBowelMovement', gráfico usa 'painDuringEvacuation'
-                  painDuringEvacuation: questionnaireData?.painDuringEvacuation ?? questionnaireData?.painDuringBowelMovement ?? null,
+                  // Dor durante evacuação - só mostrar se paciente realmente evacuou
+                  painDuringEvacuation: painDuringEvacuation,
                   hasRedFlag: hasRedFlags || event.metadata?.riskLevel === 'critical' || event.metadata?.riskLevel === 'high',
                 })
               }

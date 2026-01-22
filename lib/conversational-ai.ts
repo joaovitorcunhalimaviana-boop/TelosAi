@@ -63,7 +63,9 @@ export interface QuestionnaireData {
   // Pesquisa de Satisfação (D+14)
   satisfactionRating?: number; // 0-10 (NPS style)
   wouldRecommend?: boolean; // Recomendaria o acompanhamento?
-  satisfactionComments?: string; // Comentários livres
+  positiveFeedback?: string; // Elogios e pontos positivos
+  improvementSuggestions?: string; // Críticas e sugestões de melhoria
+  satisfactionComments?: string; // Comentários livres (legado, manter compatibilidade)
 
   [key: string]: any;
 }
@@ -282,7 +284,8 @@ JSON STRUCTURE:
     // Campos de satisfação (APENAS D+14):
     "satisfactionRating": 9,  // 0-10, nota de satisfação com acompanhamento
     "wouldRecommend": true,  // true/false, recomendaria para outros
-    "satisfactionComments": "Muito bom o acompanhamento"  // comentário opcional
+    "positiveFeedback": "Gostei muito da atenção diária",  // elogios e pontos positivos (opcional)
+    "improvementSuggestions": "Poderia ter lembretes de medicação"  // críticas e sugestões de melhoria (opcional)
     // ... outros campos conforme coletados
   },
   "sendImages": {
@@ -298,8 +301,9 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 - Coletar após todas as perguntas clínicas
 - "satisfactionRating": nota de 0 a 10 (NPS)
 - "wouldRecommend": sim/não (true/false)
-- "satisfactionComments": comentário livre (opcional)
-- Ao finalizar D+14: agradecer, desejar boa recuperação
+- "positiveFeedback": elogios e pontos positivos (perguntar: "O que você mais gostou no acompanhamento?")
+- "improvementSuggestions": críticas e sugestões de melhoria (perguntar: "Tem alguma sugestão de como podemos melhorar?")
+- Ao finalizar D+14: agradecer pelo feedback (positivo e construtivo), desejar boa recuperação
 
 ⚠️ IMPORTANTE:
 - Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
