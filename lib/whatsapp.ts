@@ -346,10 +346,19 @@ export async function sendFollowUpQuestionnaire(
     const response = await sendTemplate(patient.phone, templateName, components, language);
 
     // Marcar que o template foi enviado (para gestão de conversa)
-    const { markTemplateSent } = await import('./conversation-manager');
+    const { markTemplateSent, recordSystemMessage, getOrCreateConversation } = await import('./conversation-manager');
     await markTemplateSent(patient.phone, followUp.id, patient.id);
 
+    // Salvar mensagem do template no histórico para aparecer na visualização
+    const conversation = await getOrCreateConversation(patient.phone, patient.id);
+    const templateMessage = templateName === 'day1'
+      ? `[Template D+1] Olá ${patientFirstName}! Sou a assistente virtual do Dr. João Vitor. Tudo bem com você? 😊 Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
+      : `[Template D+${followUp.dayNumber}] Olá ${patientFirstName}! Tudo bem? 😊 Estou passando para acompanhar sua recuperação. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`;
+
+    await recordSystemMessage(conversation.id, templateMessage);
+
     console.log('✅ Template marked as sent in conversation manager with patientId:', patient.id);
+    console.log('✅ Template message saved to conversation history');
 
     return response;
   } catch (error) {
