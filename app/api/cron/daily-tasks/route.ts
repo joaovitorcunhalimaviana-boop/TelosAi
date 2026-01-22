@@ -15,11 +15,18 @@ import { performDatabaseBackup, sendScheduledFollowUps, renewWhatsAppToken } fro
 
 export async function GET(request: NextRequest) {
   try {
-    // Validar secret do cron (segurança)
+    // Validar secret do cron (segurança) - aceita via header OU query parameter
     const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env.CRON_SECRET?.trim();
 
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    // Aceitar via query parameter para compatibilidade com cron-job.org
+    const url = new URL(request.url);
+    const providedSecretQuery = url.searchParams.get('secret')?.trim();
+    const providedSecretHeader = authHeader?.replace('Bearer ', '').trim();
+
+    const providedSecret = providedSecretHeader || providedSecretQuery;
+
+    if (cronSecret && providedSecret !== cronSecret) {
       logger.error('❌ Unauthorized cron request');
       return NextResponse.json(
         { error: 'Unauthorized' },
