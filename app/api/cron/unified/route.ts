@@ -22,9 +22,15 @@ const CRON_SECRET = process.env.CRON_SECRET?.trim();
 
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação
+    // Verificar autenticação - aceita via header OU via query parameter
     const authHeader = request.headers.get('authorization');
-    const providedSecret = authHeader?.replace('Bearer ', '').trim();
+    const providedSecretHeader = authHeader?.replace('Bearer ', '').trim();
+
+    // Também aceitar via query parameter para compatibilidade com cron-job.org
+    const url = new URL(request.url);
+    const providedSecretQuery = url.searchParams.get('secret')?.trim();
+
+    const providedSecret = providedSecretHeader || providedSecretQuery;
 
     if (CRON_SECRET && providedSecret !== CRON_SECRET) {
       console.error('❌ Unauthorized cron job access attempt');
