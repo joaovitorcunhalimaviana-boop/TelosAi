@@ -113,25 +113,44 @@ async function processMessage(phone: string, text: string) {
       console.log('📋 Usando follow-up do contexto:', followUp?.id, 'D+' + followUp?.dayNumber);
     }
 
-    // Se não tem no contexto, buscar normalmente
+    // Se não tem no contexto, buscar baseado no DIA PÓS-OPERATÓRIO ATUAL
     if (!followUp) {
-      // Primeiro tentar com status 'sent' (foi enviado e aguarda resposta)
+      // Calcular qual é o day number correto para hoje
+      const expectedDayNumber = daysPostOp;
+
+      // Primeiro: tentar buscar o follow-up do dia atual (independente do status)
       followUp = await prisma.followUp.findFirst({
         where: {
           patientId: patient.id,
-          status: 'sent'
-        },
-        orderBy: { sentAt: 'desc' }
+          dayNumber: expectedDayNumber
+        }
       });
 
-      // Se não encontrar 'sent', buscar 'pending' mais próximo
+      if (followUp) {
+        console.log('📋 Follow-up do dia atual (D+' + expectedDayNumber + '):', followUp.id, 'status:', followUp.status);
+      }
+
+      // Se não encontrou para o dia atual, tentar com status 'sent' (foi enviado e aguarda resposta)
       if (!followUp) {
         followUp = await prisma.followUp.findFirst({
           where: {
             patientId: patient.id,
-            status: 'pending'
+            status: 'sent'
           },
-          orderBy: { dayNumber: 'asc' }
+          orderBy: { sentAt: 'desc' }
+        });
+      }
+
+      // Se ainda não encontrou, buscar 'pending' APENAS se for do dia atual ou anterior
+      // (não pegar follow-up de dias futuros!)
+      if (!followUp) {
+        followUp = await prisma.followUp.findFirst({
+          where: {
+            patientId: patient.id,
+            status: 'pending',
+            dayNumber: { lte: expectedDayNumber } // Somente dias até hoje!
+          },
+          orderBy: { dayNumber: 'desc' } // Pegar o mais recente (mais próximo de hoje)
         });
       }
 
