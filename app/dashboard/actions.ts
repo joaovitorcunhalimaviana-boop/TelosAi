@@ -574,8 +574,9 @@ export async function getPatientConversationHistory(patientId: string) {
 }
 
 export async function getRecentPatientActivity(limit = 10): Promise<RecentActivity[]> {
+  // Buscar mais respostas para garantir que temos o suficiente após agrupar por paciente
   const responses = await prisma.followUpResponse.findMany({
-    take: limit,
+    take: limit * 3, // Buscar mais para compensar duplicatas
     orderBy: {
       createdAt: 'desc'
     },
@@ -598,7 +599,21 @@ export async function getRecentPatientActivity(limit = 10): Promise<RecentActivi
     }
   })
 
-  return responses.map(r => ({
+  // Agrupar por paciente - manter apenas a resposta mais recente de cada um
+  const patientMap = new Map<string, typeof responses[0]>()
+
+  for (const r of responses) {
+    const patientId = r.followUp.patient.id
+    // Como já está ordenado por createdAt desc, a primeira ocorrência é a mais recente
+    if (!patientMap.has(patientId)) {
+      patientMap.set(patientId, r)
+    }
+  }
+
+  // Converter para array e limitar
+  const uniqueResponses = Array.from(patientMap.values()).slice(0, limit)
+
+  return uniqueResponses.map(r => ({
     id: r.id,
     patientId: r.followUp.patient.id,
     patientName: r.followUp.patient.name,

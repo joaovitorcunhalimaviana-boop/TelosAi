@@ -256,25 +256,39 @@ FEBRE:
 - "Tive um pouco de febre, 37.5" → "fever": true, "feverTemperature": 37.5
 
 DOR - INTERPRETAÇÃO INTELIGENTE:
+
+⚠️ ATENÇÃO: EXISTEM DOIS TIPOS DE DOR - USE O CAMPO CORRETO:
+1. "pain" = DOR EM REPOUSO (quando paciente está parado, sem fazer nada)
+2. "painDuringBowelMovement" = DOR DURANTE EVACUAÇÃO (quando vai ao banheiro)
+
+PARA DOR EM REPOUSO (use "pain"):
 - "Não estou com dor" → "pain": 0
-- "Sem dor" → "pain": 0
+- "Sem dor em repouso" → "pain": 0
+- "Minha dor agora é 2" → "pain": 2
+
+PARA DOR DURANTE EVACUAÇÃO (use "painDuringBowelMovement"):
+- "Dor ao evacuar foi 2" → "painDuringBowelMovement": 2
+- "Quando fui ao banheiro doeu 5" → "painDuringBowelMovement": 5
+- "Não senti dor ao evacuar" → "painDuringBowelMovement": 0
+
+REGRAS GERAIS:
 - "Dor leve" → NÃO registre ainda, pergunte: "Dor leve seria algo como 2 ou 3? Qual número?"
 - "Dor média" → NÃO registre ainda, pergunte: "Dor média seria entre 4 e 6. Qual número você diria?"
 - "Dor forte" ou "muita dor" → NÃO registre ainda, pergunte: "Dor forte seria 6, 7 ou 8? Qual número?"
-- "5" ou qualquer número → "pain": 5 (registre o número dado)
 - "uns 6 ou 7" → pergunte qual dos dois para confirmar
 
 ⚠️ REGRA DE OURO PARA DOR:
-- Se paciente der NÚMERO → registre imediatamente
+- Se paciente der NÚMERO → registre imediatamente NO CAMPO CORRETO
 - Se paciente der DESCRIÇÃO → interprete, sugira faixa de números, peça confirmação
+- NUNCA confunda dor em repouso com dor durante evacuação!
 - NUNCA diga "não entendi" ou "erro técnico" para descrições de dor!
 
 JSON STRUCTURE:
 {
   "response": "sua resposta natural para o paciente",
   "extractedInfo": {
-    "pain": 7,  // APENAS se paciente deu número específico
-    "painDuringBowelMovement": 5,  // Se evacuou e respondeu
+    "pain": 2,  // DOR EM REPOUSO - número de 0 a 10 (pergunta: "como está sua dor agora, em repouso?")
+    "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
     "stoolConsistency": 4,  // Bristol Scale 1-7, se evacuou
     "bowelMovementSinceLastContact": true,  // true/false
     "painComparison": "worse",  // "better"|"same"|"worse" (D+2+)

@@ -83,6 +83,19 @@ export async function GET(
           }
         }
 
+        // Mesclar dados das colunas diretas com o JSON para garantir consistência
+        // As colunas diretas (painAtRest, painDuringBowel) têm prioridade sobre o JSON
+        const mergedQuestionnaireData = {
+          ...questionnaireData,
+          // Sobrescrever com valores das colunas diretas se existirem
+          ...(response.painAtRest !== null && response.painAtRest !== undefined
+            ? { painAtRest: response.painAtRest, pain: response.painAtRest }
+            : {}),
+          ...(response.painDuringBowel !== null && response.painDuringBowel !== undefined
+            ? { painDuringBowelMovement: response.painDuringBowel, painDuringEvacuation: response.painDuringBowel }
+            : {}),
+        };
+
         detailedEvents.push({
           id: response.id,
           type: 'followup',
@@ -94,7 +107,7 @@ export async function GET(
             riskLevel: response.riskLevel,
             redFlags: response.redFlags ? JSON.parse(response.redFlags) : [],
             doctorAlerted: response.doctorAlerted,
-            questionnaireData: questionnaireData,
+            questionnaireData: mergedQuestionnaireData,
             aiAnalysis: response.aiAnalysis,
           },
         });
