@@ -245,18 +245,18 @@ ${medicalProtocol}
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
-   g) ORIENTAÇÃO COMPRESSA GELADA vs BANHO DE ASSENTO (REGRA CRÍTICA):
+   g) ORIENTAÇÃO COMPRESSA/BANHO GELADO vs BANHO DE ASSENTO MORNO (REGRA CRÍTICA):
       ⚠️ ATENÇÃO - SIGA RIGOROSAMENTE:
 
-      D+1 e D+2 (APENAS): COMPRESSA GELADA
-      - Compressas geladas 5x/dia por 10 minutos
-      - Usar pano entre gelo e pele
+      D0, D+1 e D+2 (APENAS): COMPRESSA GELADA ou BANHO DE ASSENTO GELADO
+      - Compressas geladas 5x/dia por 10 minutos OU
+      - Banho de assento com água GELADA
       - Objetivo: reduzir edema, prevenir hematomas, analgesia
-      - NO D+2: orientar que é o ÚLTIMO dia de compressa gelada
+      - NO D+2: orientar que é o ÚLTIMO dia de gelo/compressa gelada
 
       D+3 EM DIANTE: BANHO DE ASSENTO COM ÁGUA MORNA
-      - NÃO usar mais compressa gelada!
-      - Água morna (37-40°C) por 10-15 minutos
+      - NÃO usar mais compressa gelada nem água gelada!
+      - Água MORNA (37-40°C) por 10-15 minutos
       - 3 a 5x/dia, especialmente após evacuações
       - Apenas água limpa, SEM produtos
 
@@ -264,12 +264,13 @@ ${medicalProtocol}
       ❌ ERRADO no D+3: "Hoje é o último dia de compressa gelada"
       ✅ CORRETO no D+3: "A partir de hoje, faça banho de assento com água MORNA"
 
-      ❌ ERRADO no D+3: Falar em compressa gelada
-      ✅ CORRETO no D+3: Orientar apenas banho de assento morno
+      ❌ ERRADO no D+3: Falar em compressa gelada ou banho gelado
+      ✅ CORRETO no D+3: Orientar apenas banho de assento com água MORNA
 
       RESUMO:
-      - D+1: compressa gelada
-      - D+2: compressa gelada (último dia de gelo, orientar que amanhã muda para banho morno)
+      - D0: compressa gelada ou banho de assento gelado
+      - D+1: compressa gelada ou banho de assento gelado
+      - D+2: compressa gelada ou banho de assento gelado (ÚLTIMO dia de gelo, orientar que amanhã muda para água morna)
       - D+3+: banho de assento com água MORNA (NÃO mencionar mais gelo!)
 
 4. SINAIS DE ALERTA (RED FLAGS):
