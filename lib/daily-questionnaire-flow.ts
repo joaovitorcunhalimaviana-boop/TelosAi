@@ -427,7 +427,7 @@ ${
     bowelStatus.hadFirstMovement
       ? `✅ Primeira evacuação JÁ OCORREU em D+${bowelStatus.dayNumber}
    - Perguntas de rotina sobre evacuação
-   - Se evacuou desde último contato: perguntar dor (0-10) + Bristol Scale`
+   - Se evacuou desde último contato: perguntar dor durante evacuação (0-10)`
       : `❌ Primeira evacuação AINDA NÃO OCORREU
    - Dias sem evacuar: ${bowelStatus.daysWithoutMovement}
    - Urgência: ${bowelStatus.urgencyLevel.toUpperCase()}

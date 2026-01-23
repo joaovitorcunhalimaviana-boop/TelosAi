@@ -369,14 +369,7 @@ export async function processQuestionnaireAnswer(
         console.log('✅ Pain scale image sent');
       }
 
-      if (result.sendImages.bristolScale) {
-        await sendImage(
-          phoneNumber,
-          `${baseUrl}/escala-bristol.png`,
-          'Escala de Bristol - Tipos de Fezes (1-7)'
-        );
-        console.log('✅ Bristol scale image sent');
-      }
+      // Bristol Scale removido - não perguntar mais
     } catch (error) {
       console.error('❌ Error sending images:', error);
       // Continuar mesmo se falhar
