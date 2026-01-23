@@ -29,7 +29,7 @@ export interface QuestionnaireData {
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
   lastBowelMovement?: string; // Quando foi a última evacuação
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
-  stoolConsistency?: number; // Bristol Scale 1-7
+  // stoolConsistency removido - não perguntar mais sobre Bristol
 
   // Sangramento
   bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
@@ -91,7 +91,7 @@ export async function conductConversation(
   urgencyLevel: string;
   sendImages?: {
     painScale?: boolean;
-    bristolScale?: boolean;
+    // bristolScale removido
   };
 }> {
   // Calcular dias pós-operatórios
@@ -178,12 +178,10 @@ ${medicalProtocol}
       - Se SIM:
         * Primeiro: ENVIAR IMAGEM da escala visual analógica de dor
         * Pergunte dor durante evacuação: "Qual foi a dor durante a evacuação? De 0 a 10"
-        * Depois: ENVIAR IMAGEM da Escala de Bristol
-        * Pergunte consistência: "Olhando a imagem que acabei de enviar, qual número de 1 a 7 mais se parece com suas fezes?"
+        * NÃO perguntar sobre consistência/Bristol (removido)
       - Se NÃO: pergunte "Quando foi a última vez que você evacuou?"
       - ⚠️ SEMPRE pergunte "evacuou desde a última vez que conversamos?"
       - ⚠️ NUNCA pergunte "evacuou hoje" ou "evacuou desde ontem"
-      - ⚠️ NUNCA descreva a escala com texto, SEMPRE enviar a IMAGEM
 
       SANGRAMENTO:
       - Nenhum
@@ -305,7 +303,7 @@ ${medicalProtocol}
 
    ☐ Dor em repouso (0-10)
    ☐ Se evacuou desde último contato
-   ☐ Se evacuou: dor ao evacuar + escala Bristol
+   ☐ Se evacuou: dor ao evacuar (0-10)
    ☐ Sangramento (nenhum/leve/moderado/intenso)
    ☐ Se consegue urinar
    ☐ Se teve febre
@@ -366,7 +364,7 @@ JSON STRUCTURE:
   "extractedInfo": {
     "pain": 2,  // DOR EM REPOUSO - número de 0 a 10 (pergunta: "como está sua dor agora, em repouso?")
     "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
-    "stoolConsistency": 4,  // Bristol Scale 1-7, se evacuou
+    // stoolConsistency removido - não perguntar mais
     "bowelMovementSinceLastContact": true,  // true/false
     // painComparison removido - sistema calcula automaticamente
     "medications": true,
@@ -383,7 +381,7 @@ JSON STRUCTURE:
   },
   "sendImages": {
     "painScale": false,  // true se precisa enviar escala de dor
-    "bristolScale": false  // true se precisa enviar escala de Bristol
+    "bristolScale": false  // REMOVIDO - não usar mais
   },
   "isComplete": false,
   "urgency": "low|medium|high|critical",
@@ -401,8 +399,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 ⚠️ IMPORTANTE:
 - Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
 - Não invente ou assuma valores. Se paciente não respondeu algo, não incluir no JSON.
-- Use sendImages.painScale: true ANTES de perguntar sobre dor (em repouso ou durante evacuação)
-- Use sendImages.bristolScale: true ANTES de perguntar sobre consistência das fezes`;
+- Use sendImages.painScale: true ANTES de perguntar sobre dor (em repouso ou durante evacuação)`;
 
   try {
     console.log('🧠 conductConversation - Starting...');
@@ -598,10 +595,7 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
       missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
     }
-    // E a consistência das fezes (Bristol Scale)
-    if (data.stoolConsistency === undefined || data.stoolConsistency === null) {
-      missing.push('Consistência das fezes (Escala de Bristol 1-7)');
-    }
+    // Bristol Scale removido - não perguntar mais
   }
 
   // 3. SANGRAMENTO
