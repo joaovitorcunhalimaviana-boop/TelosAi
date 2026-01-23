@@ -23,7 +23,7 @@ export interface ConversationMessage {
 export interface QuestionnaireData {
   // Dor
   pain?: number; // 0-10 na escala visual analógica
-  painComparison?: 'better' | 'same' | 'worse'; // Comparação com dia anterior
+  // painComparison removido - sistema calcula automaticamente comparando dor de hoje com ontem
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
@@ -229,28 +229,27 @@ ${medicalProtocol}
       ❌ ERRO GRAVE: Não perguntar sobre medicação extra
       ✅ OBRIGATÓRIO: Perguntar em TODOS os dias de follow-up
 
-      COMPARAÇÃO DE DOR (D+2 EM DIANTE):
-      ${daysPostOp >= 2 ? `
-      - Pergunte: "Comparando com ontem, sua dor hoje está melhor, igual ou pior?"
+      COMPARAÇÃO DE DOR (NÃO PERGUNTAR - CALCULAR AUTOMATICAMENTE):
+      ⚠️ NÃO pergunte ao paciente se a dor melhorou/piorou. O sistema calcula isso automaticamente
+      comparando a nota de dor de hoje com a de ontem.
 
-      ⚠️ REGRA CRÍTICA DE LÓGICA - NUNCA ERRE ISSO:
-      - Se dor HOJE > dor ONTEM → dor PIOROU (ex: ontem 0, hoje 1 = PIOROU)
+      Quando for comentar sobre a evolução da dor, use a LÓGICA CORRETA:
+      - Se dor HOJE > dor ONTEM → dor PIOROU (ex: ontem 0, hoje 1 = PIOROU um pouco)
       - Se dor HOJE < dor ONTEM → dor MELHOROU (ex: ontem 5, hoje 3 = MELHOROU)
       - Se dor HOJE = dor ONTEM → dor está IGUAL
 
       ❌ ERRO GRAVE: Dizer "melhorou" quando a dor AUMENTOU
-      ❌ EXEMPLO DE ERRO: "Dor ontem era 0, hoje é 1, que maravilha melhorou!" (ERRADO! Piorou de 0 para 1!)
-      ✅ CORRETO: "Dor ontem era 0, hoje é 1 - a dor aumentou um pouquinho, mas ainda está bem baixa"
+      ❌ EXEMPLO DE ERRO: "Dor ontem era 0, hoje é 1, que maravilha melhorou!" (ERRADO!)
+      ✅ CORRETO: "Dor ontem era 0, hoje é 1 - aumentou um pouquinho, mas ainda está bem baixa"
 
       ${daysPostOp === 2 ? `
-      ⚠️ IMPORTANTE D+2: Se paciente disser que dor PIOROU em relação a D+1:
+      ⚠️ IMPORTANTE D+2: Se dor AUMENTOU em relação a D+1:
       - Isso é NORMAL e ESPERADO (bloqueio pudendo terminando após ~48h)
       - TRANQUILIZAR o paciente
       - Explicar que deve melhorar nos próximos dias
-      ` : `
-      ⚠️ Espera-se melhora progressiva após D+3. Se piorar: investigar e alertar médico.
-      `}
-      ` : '(Não aplicável em D+1)'}
+      ` : daysPostOp >= 3 ? `
+      ⚠️ D+3 em diante: Espera-se melhora progressiva. Se piorar muito: investigar.
+      ` : ''}
 
    e) FLUXO DA CONVERSA:
       - Faça UMA pergunta por vez
@@ -357,7 +356,7 @@ JSON STRUCTURE:
     "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
     "stoolConsistency": 4,  // Bristol Scale 1-7, se evacuou
     "bowelMovementSinceLastContact": true,  // true/false
-    "painComparison": "worse",  // "better"|"same"|"worse" (D+2+)
+    // painComparison removido - sistema calcula automaticamente
     "medications": true,
     "painControlledWithMeds": false,
     "usedExtraMedication": false,  // OBRIGATÓRIO - usou medicação além das prescritas?
