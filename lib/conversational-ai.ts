@@ -54,6 +54,10 @@ export interface QuestionnaireData {
   painControlledWithMeds?: boolean;
   medicationSideEffects?: string;
 
+  // Medicação extra (OBRIGATÓRIO TODOS OS DIAS)
+  usedExtraMedication?: boolean; // Usou alguma medicação além das prescritas?
+  extraMedicationDetails?: string; // Se sim: qual, dose, horário (ex: Tramadol, Codeína, laxativo)
+
   // Atividade (D7+)
   activityLevel?: string;
 
@@ -208,6 +212,13 @@ ${medicalProtocol}
       - Sua dor está controlada com as medicações? Sim/Não
       - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
 
+      MEDICAÇÃO EXTRA (OBRIGATÓRIO PERGUNTAR TODOS OS DIAS):
+      ⚠️ MUITO IMPORTANTE: SEMPRE perguntar se usou alguma medicação ALÉM das prescritas!
+      - Pergunte: "Além das medicações que o Dr. João prescreveu, você tomou alguma outra medicação para dor? (Ex: Tramadol, Codeína, Tylex, outro analgésico, laxante)"
+      - Se SIM: perguntar qual medicação, dose e horário
+      - CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação MUITO DIFERENTE de paciente com dor 5/10 sem opioides!
+      - Esta pergunta é OBRIGATÓRIA em TODOS os dias de follow-up
+
       COMPARAÇÃO DE DOR (D+2 EM DIANTE):
       ${daysPostOp >= 2 ? `
       - Pergunte: "Comparando com ontem, sua dor hoje está melhor, igual ou pior?"
@@ -234,6 +245,33 @@ ${medicalProtocol}
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
+   g) ORIENTAÇÃO COMPRESSA GELADA vs BANHO DE ASSENTO (REGRA CRÍTICA):
+      ⚠️ ATENÇÃO - SIGA RIGOROSAMENTE:
+
+      D+1 e D+2 (APENAS): COMPRESSA GELADA
+      - Compressas geladas 5x/dia por 10 minutos
+      - Usar pano entre gelo e pele
+      - Objetivo: reduzir edema, prevenir hematomas, analgesia
+      - NO D+2: orientar que é o ÚLTIMO dia de compressa gelada
+
+      D+3 EM DIANTE: BANHO DE ASSENTO COM ÁGUA MORNA
+      - NÃO usar mais compressa gelada!
+      - Água morna (37-40°C) por 10-15 minutos
+      - 3 a 5x/dia, especialmente após evacuações
+      - Apenas água limpa, SEM produtos
+
+      ⚠️ ERROS COMUNS QUE VOCÊ NÃO DEVE COMETER:
+      ❌ ERRADO no D+3: "Hoje é o último dia de compressa gelada"
+      ✅ CORRETO no D+3: "A partir de hoje, faça banho de assento com água MORNA"
+
+      ❌ ERRADO no D+3: Falar em compressa gelada
+      ✅ CORRETO no D+3: Orientar apenas banho de assento morno
+
+      RESUMO:
+      - D+1: compressa gelada
+      - D+2: compressa gelada (último dia de gelo, orientar que amanhã muda para banho morno)
+      - D+3+: banho de assento com água MORNA (NÃO mencionar mais gelo!)
+
 4. SINAIS DE ALERTA (RED FLAGS):
    - Dor ≥ 8/10
    - Sangramento volumoso
@@ -254,6 +292,13 @@ FEBRE:
 - "Não tive febre" → "fever": false
 - "Sem febre" → "fever": false
 - "Tive um pouco de febre, 37.5" → "fever": true, "feverTemperature": 37.5
+
+MEDICAÇÃO EXTRA (OBRIGATÓRIO PERGUNTAR):
+- "Não tomei nada além do que foi prescrito" → "usedExtraMedication": false
+- "Só as medicações do médico" → "usedExtraMedication": false
+- "Tomei um Tramadol de manhã" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol de manhã"
+- "Precisei tomar Tylex às 3h da madrugada" → "usedExtraMedication": true, "extraMedicationDetails": "Tylex às 3h"
+- "Tomei um laxante ontem à noite" → "usedExtraMedication": true, "extraMedicationDetails": "Laxante à noite"
 
 DOR - INTERPRETAÇÃO INTELIGENTE:
 
@@ -294,6 +339,8 @@ JSON STRUCTURE:
     "painComparison": "worse",  // "better"|"same"|"worse" (D+2+)
     "medications": true,
     "painControlledWithMeds": false,
+    "usedExtraMedication": false,  // OBRIGATÓRIO - usou medicação além das prescritas?
+    "extraMedicationDetails": "Tramadol 50mg às 14h",  // Se usou: qual, dose, horário
     "fever": false,
     // Campos de satisfação (APENAS D+14):
     "satisfactionRating": 9,  // 0-10, nota de satisfação com acompanhamento
@@ -556,12 +603,19 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     }
   }
 
-  // 7. MEDICAÇÕES
+  // 7. MEDICAÇÕES PRESCRITAS
   if (data.medications === undefined) {
     missing.push('Se está tomando as medicações conforme prescrito');
   }
 
-  // 8. PESQUISA DE SATISFAÇÃO (apenas D+14)
+  // 8. MEDICAÇÃO EXTRA (OBRIGATÓRIO TODOS OS DIAS)
+  if (data.usedExtraMedication === undefined) {
+    missing.push('Se usou alguma medicação EXTRA além das prescritas (Tramadol, Codeína, laxativo, etc)');
+  } else if (data.usedExtraMedication === true && !data.extraMedicationDetails) {
+    missing.push('Qual medicação extra usou, dose e horário');
+  }
+
+  // 9. PESQUISA DE SATISFAÇÃO (apenas D+14)
   if (daysPostOp >= 14) {
     if (data.satisfactionRating === undefined || data.satisfactionRating === null) {
       missing.push('Nota de satisfação com o acompanhamento (0-10)');
