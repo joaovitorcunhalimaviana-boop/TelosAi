@@ -21,11 +21,15 @@ const CRON_SECRET = process.env.CRON_SECRET!;
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação
+    // Verificar autenticação - aceita via header OU query parameter (cron-job.org)
     const authHeader = request.headers.get('authorization');
-    const providedSecret = authHeader?.replace('Bearer ', '');
+    const url = new URL(request.url);
+    const providedSecretQuery = url.searchParams.get('secret')?.trim();
+    const providedSecretHeader = authHeader?.replace('Bearer ', '').trim();
+    const providedSecret = providedSecretHeader || providedSecretQuery;
+    const cronSecret = CRON_SECRET?.trim();
 
-    if (providedSecret !== CRON_SECRET) {
+    if (!providedSecret || providedSecret !== cronSecret) {
       console.error('Unauthorized cron job access attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
