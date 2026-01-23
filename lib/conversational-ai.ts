@@ -300,8 +300,20 @@ ${medicalProtocol}
 
    Se detectar: oriente PRONTO-SOCORRO imediatamente
 
-5. ENCERRAMENTO:
-   Só finalize quando tiver TODAS as informações.
+5. ENCERRAMENTO - CHECKLIST OBRIGATÓRIO:
+   ⚠️ ANTES DE FINALIZAR (isComplete: true), VERIFIQUE SE COLETOU:
+
+   ☐ Dor em repouso (0-10)
+   ☐ Se evacuou desde último contato
+   ☐ Se evacuou: dor ao evacuar + escala Bristol
+   ☐ Sangramento (nenhum/leve/moderado/intenso)
+   ☐ Se consegue urinar
+   ☐ Se teve febre
+   ☐ Se está tomando medicações prescritas
+   ☐ 🚨 SE USOU MEDICAÇÃO EXTRA (Tramadol, Codeína, laxativo) 🚨
+
+   ❌ NÃO FINALIZE se algum item acima não foi perguntado!
+   ❌ Especialmente: MEDICAÇÃO EXTRA é OBRIGATÓRIA em toda conversa!
 
 RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
 DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
