@@ -83,16 +83,18 @@ export async function GET(
           }
         }
 
-        // Mesclar dados das colunas diretas com o JSON para garantir consistência
-        // As colunas diretas (painAtRest, painDuringBowel) têm prioridade sobre o JSON
+        // Mesclar dados - usar JSON como fonte principal, colunas diretas como fallback
+        // Isso garante consistência com o gráfico de "Ver Detalhes" que usa JSON diretamente
         const mergedQuestionnaireData = {
           ...questionnaireData,
-          // Sobrescrever com valores das colunas diretas se existirem
-          ...(response.painAtRest !== null && response.painAtRest !== undefined
-            ? { painAtRest: response.painAtRest, pain: response.painAtRest }
+          // Só adicionar das colunas se não existir no JSON
+          ...(questionnaireData?.painAtRest === undefined && questionnaireData?.pain === undefined &&
+              response.painAtRest !== null && response.painAtRest !== undefined
+            ? { pain: response.painAtRest }
             : {}),
-          ...(response.painDuringBowel !== null && response.painDuringBowel !== undefined
-            ? { painDuringBowelMovement: response.painDuringBowel, painDuringEvacuation: response.painDuringBowel }
+          ...(questionnaireData?.painDuringBowelMovement === undefined && questionnaireData?.painDuringBowel === undefined &&
+              response.painDuringBowel !== null && response.painDuringBowel !== undefined
+            ? { painDuringBowelMovement: response.painDuringBowel }
             : {}),
         };
 

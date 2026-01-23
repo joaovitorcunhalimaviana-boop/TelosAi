@@ -112,11 +112,22 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
               }
 
               if (painDataMap.has(day) || followUpDays.includes(day)) {
+                // Usar EXATAMENTE a mesma lógica do gráfico "Ver Detalhes" que funciona corretamente
+                // Ordem de prioridade: painAtRest > pain > dor > nivel_dor
+                const painAtRestValue = questionnaireData?.painAtRest !== undefined && questionnaireData?.painAtRest !== null
+                  ? Number(questionnaireData.painAtRest)
+                  : questionnaireData?.pain !== undefined && questionnaireData?.pain !== null
+                    ? Number(questionnaireData.pain)
+                    : questionnaireData?.dor !== undefined && questionnaireData?.dor !== null
+                      ? Number(questionnaireData.dor)
+                      : questionnaireData?.nivel_dor !== undefined && questionnaireData?.nivel_dor !== null
+                        ? Number(questionnaireData.nivel_dor)
+                        : null
+
                 painDataMap.set(day, {
                   day,
                   date: new Date(event.date).toLocaleDateString('pt-BR'),
-                  // Compatibilidade: IA salva como 'pain', gráfico usa 'painAtRest'
-                  painAtRest: questionnaireData?.painAtRest ?? questionnaireData?.pain ?? null,
+                  painAtRest: painAtRestValue,
                   // Dor durante evacuação - só mostrar se paciente realmente evacuou
                   painDuringEvacuation: painDuringEvacuation,
                   hasRedFlag: hasRedFlags || event.metadata?.riskLevel === 'critical' || event.metadata?.riskLevel === 'high',
