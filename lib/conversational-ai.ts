@@ -262,33 +262,34 @@ ${medicalProtocol}
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
-   g) ORIENTAÇÃO COMPRESSA GELADA / BANHO DE ASSENTO GELADO vs BANHO DE ASSENTO MORNO (REGRA CRÍTICA):
-      ⚠️ ATENÇÃO - SIGA RIGOROSAMENTE:
+   g) ORIENTAÇÃO DE HOJE SOBRE COMPRESSA/BANHO (DIA ESPECÍFICO D+${daysPostOp}):
+      ═══════════════════════════════════════════════════════════════
+      ${daysPostOp <= 2 ? `
+      🧊 HOJE (D+${daysPostOp}): COMPRESSA GELADA ou BANHO DE ASSENTO GELADO
+      - Compressas geladas 5x/dia por 10 minutos OU banho de assento com água GELADA
+      ${daysPostOp === 2 ? `
+      ⚠️ IMPORTANTE: HOJE É O ÚLTIMO DIA DE GELO!
+      - Orientar: "Hoje é o último dia de compressa gelada/banho gelado"
+      - Orientar: "A partir de amanhã (D+3), troque para banho de assento com água MORNA"
+      ` : `
+      - Continue orientando compressa gelada/banho gelado
+      - NÃO diga "último dia de gelo" (isso só no D+2)
+      `}
+      ` : `
+      🔥 HOJE (D+${daysPostOp}): BANHO DE ASSENTO COM ÁGUA MORNA
+      ═══════════════════════════════════════════════════════════════
+      🚨 ATENÇÃO: NÃO FALE EM GELO! O gelo era só até D+2!
+      🚨 Hoje já é D+${daysPostOp}, então é ÁGUA MORNA!
+      ═══════════════════════════════════════════════════════════════
 
-      D0, D+1 e D+2 (APENAS): COMPRESSA GELADA ou BANHO DE ASSENTO GELADO
-      - Compressas geladas 5x/dia por 10 minutos OU
-      - Banho de assento com água GELADA
-      - Objetivo: reduzir edema, prevenir hematomas, analgesia
-      - NO D+2: orientar que é o ÚLTIMO dia de compressa gelada/banho de assento gelado
-
-      D+3 EM DIANTE: BANHO DE ASSENTO COM ÁGUA MORNA
-      - NÃO usar mais compressa gelada nem banho de assento gelado!
       - Água MORNA (37-40°C) por 10-15 minutos
       - 3 a 5x/dia, especialmente após evacuações
       - Apenas água limpa, SEM produtos
 
-      ⚠️ ERROS COMUNS QUE VOCÊ NÃO DEVE COMETER:
-      ❌ ERRADO no D+3: "Hoje é o último dia de compressa gelada"
-      ✅ CORRETO no D+3: "A partir de hoje, faça banho de assento com água MORNA"
-
-      ❌ ERRADO no D+3: Falar em compressa gelada ou banho de assento gelado
-      ✅ CORRETO no D+3: Orientar apenas banho de assento com água MORNA
-
-      RESUMO:
-      - D0: compressa gelada ou banho de assento GELADO
-      - D+1: compressa gelada ou banho de assento GELADO
-      - D+2: compressa gelada ou banho de assento GELADO (ÚLTIMO dia, orientar que amanhã muda para água MORNA)
-      - D+3+: banho de assento com água MORNA (NÃO mencionar mais gelo!)
+      ❌ ERRADO: "Hoje é o último dia de compressa gelada" (ISSO ERA NO D+2!)
+      ❌ ERRADO: Mencionar gelo, compressa gelada, banho gelado
+      ✅ CORRETO: "Faça banho de assento com água MORNA"
+      `}
 
 4. SINAIS DE ALERTA (RED FLAGS):
    - Dor ≥ 8/10

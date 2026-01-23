@@ -230,19 +230,7 @@ function getDaySpecificQuestions(
     // Nenhuma pergunta específica adicional
   }
 
-  // D+2+: Comparar dor com dia anterior
-  if (dayNumber >= 2 && hasPainHistory) {
-    questions.push({
-      id: 'pain_comparison',
-      category: 'pain',
-      required: false,
-      text: 'Comparando com ontem, sua dor hoje está melhor, igual ou pior?',
-      contextNote:
-        dayNumber === 2
-          ? '⚠️ D+2: Aumento de dor é NORMAL (bloqueio pudendo terminando). Não alarmar o paciente.'
-          : 'Espera-se melhora progressiva após D+3. Piora significativa requer atenção.'
-    });
-  }
+  // Comparação de dor REMOVIDA - sistema calcula automaticamente pela nota de dor
 
   // D+7, D+10, D+14: Perguntar sobre retorno às atividades
   if (dayNumber >= 7) {
