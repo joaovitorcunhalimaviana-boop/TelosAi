@@ -511,27 +511,47 @@ async function saveQuestionnaireResponse(
 
   const riskLevel = riskLevelMap[urgencyLevel] || 'low';
 
-  // Criar resposta de follow-up com conversa incluída
+  // Criar ou atualizar resposta de follow-up com conversa incluída
   const dataToSave = {
     ...answers,
     conversation: conversation
   };
 
-  await prisma.followUpResponse.create({
-    data: {
-      userId,
-      followUpId,
-      questionnaireData: JSON.stringify(dataToSave),
-      riskLevel,
-      // Salvar campos de dor diretamente para consultas
-      painAtRest: answers.pain ?? null,
-      painDuringBowel: answers.painDuringBowelMovement ?? null,
-      bleeding: answers.bleeding === 'severe' || answers.bleeding === 'moderate' ? true : false,
-      fever: answers.fever ?? false
-    }
+  // Verificar se já existe resposta para este follow-up
+  const existingResponse = await prisma.followUpResponse.findFirst({
+    where: { followUpId }
   });
 
-  console.log('✅ Questionário salvo no banco de dados');
+  if (existingResponse) {
+    // Atualizar resposta existente
+    await prisma.followUpResponse.update({
+      where: { id: existingResponse.id },
+      data: {
+        questionnaireData: JSON.stringify(dataToSave),
+        riskLevel,
+        painAtRest: answers.pain ?? null,
+        painDuringBowel: answers.painDuringBowelMovement ?? null,
+        bleeding: answers.bleeding === 'severe' || answers.bleeding === 'moderate' ? true : false,
+        fever: answers.fever ?? false
+      }
+    });
+    console.log('✅ Questionário ATUALIZADO no banco de dados (resposta existente)');
+  } else {
+    // Criar nova resposta
+    await prisma.followUpResponse.create({
+      data: {
+        userId,
+        followUpId,
+        questionnaireData: JSON.stringify(dataToSave),
+        riskLevel,
+        painAtRest: answers.pain ?? null,
+        painDuringBowel: answers.painDuringBowelMovement ?? null,
+        bleeding: answers.bleeding === 'severe' || answers.bleeding === 'moderate' ? true : false,
+        fever: answers.fever ?? false
+      }
+    });
+    console.log('✅ Questionário CRIADO no banco de dados (nova resposta)');
+  }
 }
 
 /**
