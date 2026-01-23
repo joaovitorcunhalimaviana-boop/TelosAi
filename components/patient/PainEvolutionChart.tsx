@@ -62,7 +62,8 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
   const fetchPainData = async () => {
     try {
       setError(null)
-      const response = await fetch(`/api/paciente/${patientId}/timeline`)
+      // Usar a mesma API que o gráfico "Ver Detalhes" usa (via getPatientSummary)
+      const response = await fetch(`/api/paciente/${patientId}`)
 
       if (!response.ok) {
         throw new Error('Falha ao carregar dados de dor')
@@ -70,8 +71,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
 
       const result = await response.json()
 
-      if (result.success) {
-        // Extrair dados de dor do timeline
+      if (result.success && result.data) {
         const painDataMap = new Map<number, PainData>()
 
         // Dias padrão de follow-up
@@ -86,53 +86,60 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
           })
         })
 
-        // Preencher com dados reais
-        result.data.timeline
-          .filter((event: any) => event.type === 'followup' && event.metadata?.riskLevel)
-          .forEach((event: any) => {
-            const dayMatch = event.title.match(/D\+(\d+)/)
-            if (dayMatch) {
-              const day = parseInt(dayMatch[1])
-              const questionnaireData = event.metadata?.questionnaireData
-              const hasRedFlags = (event.metadata?.redFlags || []).length > 0
+        // Processar followUps - EXATAMENTE igual ao gráfico "Ver Detalhes"
+        const followUps = result.data.followUps || []
+        followUps
+          .filter((f: any) => f.responses && f.responses.length > 0)
+          .forEach((f: any) => {
+            const resp = f.responses[0]
+            let qData: any = {}
 
-              // Verificar se o paciente evacuou neste dia
-              // Compatibilidade: IA pode salvar como 'bowelMovement', 'evacuated', ou 'evacuation'
-              const didEvacuate = questionnaireData?.bowelMovement === true ||
-                                  questionnaireData?.evacuated === true ||
-                                  questionnaireData?.evacuation === true
+            // Parse questionnaireData - igual ao gráfico correto
+            try {
+              qData = typeof resp.questionnaireData === 'string'
+                ? JSON.parse(resp.questionnaireData || '{}')
+                : (resp.questionnaireData || {})
+            } catch {
+              qData = {}
+            }
 
-              // Só mostrar dor durante evacuação se o paciente realmente evacuou
-              // Se não evacuou, omitir o ponto (null) em vez de mostrar 0
-              let painDuringEvacuation: number | null = null
-              if (didEvacuate) {
-                painDuringEvacuation = questionnaireData?.painDuringEvacuation ??
-                                       questionnaireData?.painDuringBowelMovement ??
-                                       questionnaireData?.painDuringBowel ?? null
+            const day = f.dayNumber
+
+            // Verificar se o paciente evacuou neste dia
+            const didEvacuate = qData.evacuated === true || qData.bowelMovement === true
+
+            // Dor durante evacuação - só mostrar se paciente realmente evacuou
+            let evacPain: number | null = null
+            if (didEvacuate) {
+              const rawEvacPain = qData.painDuringBowel || qData.painDuringBowelMovement ||
+                                  qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar
+              evacPain = rawEvacPain !== undefined && rawEvacPain !== null ? Number(rawEvacPain) : null
+            }
+
+            // Dor em repouso - EXATAMENTE igual ao gráfico correto
+            // Usa || para fallback (não ??)
+            const repouso = Number(qData.painAtRest || qData.pain || qData.dor || qData.nivel_dor || 0)
+
+            // Red flags
+            let hasRedFlags = false
+            if (resp.redFlags) {
+              try {
+                const flags = typeof resp.redFlags === 'string' ? JSON.parse(resp.redFlags) : resp.redFlags
+                hasRedFlags = Array.isArray(flags) && flags.length > 0
+              } catch {
+                hasRedFlags = false
               }
+            }
+            hasRedFlags = hasRedFlags || resp.riskLevel === 'critical' || resp.riskLevel === 'high'
 
-              if (painDataMap.has(day) || followUpDays.includes(day)) {
-                // Usar EXATAMENTE a mesma lógica do gráfico "Ver Detalhes" que funciona corretamente
-                // Ordem de prioridade: painAtRest > pain > dor > nivel_dor
-                const painAtRestValue = questionnaireData?.painAtRest !== undefined && questionnaireData?.painAtRest !== null
-                  ? Number(questionnaireData.painAtRest)
-                  : questionnaireData?.pain !== undefined && questionnaireData?.pain !== null
-                    ? Number(questionnaireData.pain)
-                    : questionnaireData?.dor !== undefined && questionnaireData?.dor !== null
-                      ? Number(questionnaireData.dor)
-                      : questionnaireData?.nivel_dor !== undefined && questionnaireData?.nivel_dor !== null
-                        ? Number(questionnaireData.nivel_dor)
-                        : null
-
-                painDataMap.set(day, {
-                  day,
-                  date: new Date(event.date).toLocaleDateString('pt-BR'),
-                  painAtRest: painAtRestValue,
-                  // Dor durante evacuação - só mostrar se paciente realmente evacuou
-                  painDuringEvacuation: painDuringEvacuation,
-                  hasRedFlag: hasRedFlags || event.metadata?.riskLevel === 'critical' || event.metadata?.riskLevel === 'high',
-                })
-              }
+            if (followUpDays.includes(day) || painDataMap.has(day)) {
+              painDataMap.set(day, {
+                day,
+                date: resp.createdAt ? new Date(resp.createdAt).toLocaleDateString('pt-BR') : '',
+                painAtRest: repouso,
+                painDuringEvacuation: evacPain,
+                hasRedFlag: hasRedFlags,
+              })
             }
           })
 
