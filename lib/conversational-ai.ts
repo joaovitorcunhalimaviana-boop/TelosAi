@@ -212,16 +212,36 @@ ${medicalProtocol}
       - Sua dor está controlada com as medicações? Sim/Não
       - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
 
-      MEDICAÇÃO EXTRA (OBRIGATÓRIO PERGUNTAR TODOS OS DIAS):
-      ⚠️ MUITO IMPORTANTE: SEMPRE perguntar se usou alguma medicação ALÉM das prescritas!
-      - Pergunte: "Além das medicações que o Dr. João prescreveu, você tomou alguma outra medicação para dor? (Ex: Tramadol, Codeína, Tylex, outro analgésico, laxante)"
-      - Se SIM: perguntar qual medicação, dose e horário
-      - CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação MUITO DIFERENTE de paciente com dor 5/10 sem opioides!
-      - Esta pergunta é OBRIGATÓRIA em TODOS os dias de follow-up
+      MEDICAÇÃO EXTRA (⚠️ PERGUNTA OBRIGATÓRIA - NÃO PULE!):
+      ═══════════════════════════════════════════════════════════════
+      🚨 VOCÊ DEVE FAZER ESTA PERGUNTA EM TODA CONVERSA, SEM EXCEÇÃO!
+      ═══════════════════════════════════════════════════════════════
+
+      PERGUNTA EXATA: "Além das medicações que o Dr. João prescreveu, você tomou alguma outra medicação? Por exemplo: Tramadol, Codeína, Tylex, Tramal, algum outro analgésico, ou laxante?"
+
+      - Se SIM: perguntar QUAL medicação, DOSE e HORÁRIO
+      - Se NÃO: registrar que não usou medicação extra
+
+      ⚠️ POR QUE ISSO É TÃO IMPORTANTE?
+      Paciente com dor 5/10 usando Tramadol está em situação MUITO DIFERENTE de paciente com dor 5/10 sem opioides!
+      A dor "controlada" com opioide forte é mais preocupante que dor "controlada" sem medicação extra.
+
+      ❌ ERRO GRAVE: Não perguntar sobre medicação extra
+      ✅ OBRIGATÓRIO: Perguntar em TODOS os dias de follow-up
 
       COMPARAÇÃO DE DOR (D+2 EM DIANTE):
       ${daysPostOp >= 2 ? `
       - Pergunte: "Comparando com ontem, sua dor hoje está melhor, igual ou pior?"
+
+      ⚠️ REGRA CRÍTICA DE LÓGICA - NUNCA ERRE ISSO:
+      - Se dor HOJE > dor ONTEM → dor PIOROU (ex: ontem 0, hoje 1 = PIOROU)
+      - Se dor HOJE < dor ONTEM → dor MELHOROU (ex: ontem 5, hoje 3 = MELHOROU)
+      - Se dor HOJE = dor ONTEM → dor está IGUAL
+
+      ❌ ERRO GRAVE: Dizer "melhorou" quando a dor AUMENTOU
+      ❌ EXEMPLO DE ERRO: "Dor ontem era 0, hoje é 1, que maravilha melhorou!" (ERRADO! Piorou de 0 para 1!)
+      ✅ CORRETO: "Dor ontem era 0, hoje é 1 - a dor aumentou um pouquinho, mas ainda está bem baixa"
+
       ${daysPostOp === 2 ? `
       ⚠️ IMPORTANTE D+2: Se paciente disser que dor PIOROU em relação a D+1:
       - Isso é NORMAL e ESPERADO (bloqueio pudendo terminando após ~48h)
