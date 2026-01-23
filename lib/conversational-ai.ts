@@ -245,17 +245,17 @@ ${medicalProtocol}
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
-   g) ORIENTAÇÃO COMPRESSA/BANHO GELADO vs BANHO DE ASSENTO MORNO (REGRA CRÍTICA):
+   g) ORIENTAÇÃO COMPRESSA GELADA / BANHO DE ASSENTO GELADO vs BANHO DE ASSENTO MORNO (REGRA CRÍTICA):
       ⚠️ ATENÇÃO - SIGA RIGOROSAMENTE:
 
       D0, D+1 e D+2 (APENAS): COMPRESSA GELADA ou BANHO DE ASSENTO GELADO
       - Compressas geladas 5x/dia por 10 minutos OU
       - Banho de assento com água GELADA
       - Objetivo: reduzir edema, prevenir hematomas, analgesia
-      - NO D+2: orientar que é o ÚLTIMO dia de gelo/compressa gelada
+      - NO D+2: orientar que é o ÚLTIMO dia de compressa gelada/banho de assento gelado
 
       D+3 EM DIANTE: BANHO DE ASSENTO COM ÁGUA MORNA
-      - NÃO usar mais compressa gelada nem água gelada!
+      - NÃO usar mais compressa gelada nem banho de assento gelado!
       - Água MORNA (37-40°C) por 10-15 minutos
       - 3 a 5x/dia, especialmente após evacuações
       - Apenas água limpa, SEM produtos
@@ -264,13 +264,13 @@ ${medicalProtocol}
       ❌ ERRADO no D+3: "Hoje é o último dia de compressa gelada"
       ✅ CORRETO no D+3: "A partir de hoje, faça banho de assento com água MORNA"
 
-      ❌ ERRADO no D+3: Falar em compressa gelada ou banho gelado
+      ❌ ERRADO no D+3: Falar em compressa gelada ou banho de assento gelado
       ✅ CORRETO no D+3: Orientar apenas banho de assento com água MORNA
 
       RESUMO:
-      - D0: compressa gelada ou banho de assento gelado
-      - D+1: compressa gelada ou banho de assento gelado
-      - D+2: compressa gelada ou banho de assento gelado (ÚLTIMO dia de gelo, orientar que amanhã muda para água morna)
+      - D0: compressa gelada ou banho de assento GELADO
+      - D+1: compressa gelada ou banho de assento GELADO
+      - D+2: compressa gelada ou banho de assento GELADO (ÚLTIMO dia, orientar que amanhã muda para água MORNA)
       - D+3+: banho de assento com água MORNA (NÃO mencionar mais gelo!)
 
 4. SINAIS DE ALERTA (RED FLAGS):
