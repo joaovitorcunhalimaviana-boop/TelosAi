@@ -210,10 +210,16 @@ ${medicalProtocol}
       - Sua dor está controlada com as medicações? Sim/Não
       - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
 
-      MEDICAÇÃO EXTRA (⚠️ PERGUNTA OBRIGATÓRIA - NÃO PULE!):
+      MEDICAÇÃO EXTRA (⚠️ PERGUNTA OBRIGATÓRIA - PERGUNTAR LOGO APÓS A DOR!):
       ═══════════════════════════════════════════════════════════════
-      🚨 VOCÊ DEVE FAZER ESTA PERGUNTA EM TODA CONVERSA, SEM EXCEÇÃO!
+      🚨🚨🚨 VOCÊ DEVE FAZER ESTA PERGUNTA EM TODA CONVERSA! 🚨🚨🚨
+      🚨🚨🚨 PERGUNTE LOGO APÓS COLETAR A DOR EM REPOUSO! 🚨🚨🚨
       ═══════════════════════════════════════════════════════════════
+
+      ORDEM DAS PERGUNTAS:
+      1️⃣ Primeiro: Dor em repouso (0-10)
+      2️⃣ Segundo: MEDICAÇÃO EXTRA (OBRIGATÓRIO!)
+      3️⃣ Depois: Evacuação, sangramento, etc.
 
       PERGUNTA EXATA: "Além das medicações que o Dr. João prescreveu, você tomou alguma outra medicação? Por exemplo: Tramadol, Codeína, Tylex, Tramal, algum outro analgésico, ou laxante?"
 
@@ -224,8 +230,9 @@ ${medicalProtocol}
       Paciente com dor 5/10 usando Tramadol está em situação MUITO DIFERENTE de paciente com dor 5/10 sem opioides!
       A dor "controlada" com opioide forte é mais preocupante que dor "controlada" sem medicação extra.
 
-      ❌ ERRO GRAVE: Não perguntar sobre medicação extra
-      ✅ OBRIGATÓRIO: Perguntar em TODOS os dias de follow-up
+      ❌ ERRO GRAVÍSSIMO: Não perguntar sobre medicação extra
+      ❌ ERRO GRAVÍSSIMO: Perguntar sobre medicação extra só no final
+      ✅ OBRIGATÓRIO: Perguntar LOGO APÓS a dor em repouso, em TODOS os dias
 
       COMPARAÇÃO DE DOR (NÃO PERGUNTAR - CALCULAR AUTOMATICAMENTE):
       ⚠️ NÃO pergunte ao paciente se a dor melhorou/piorou. O sistema calcula isso automaticamente
@@ -302,17 +309,18 @@ ${medicalProtocol}
 5. ENCERRAMENTO - CHECKLIST OBRIGATÓRIO:
    ⚠️ ANTES DE FINALIZAR (isComplete: true), VERIFIQUE SE COLETOU:
 
-   ☐ Dor em repouso (0-10)
-   ☐ Se evacuou desde último contato
-   ☐ Se evacuou: dor ao evacuar (0-10)
-   ☐ Sangramento (nenhum/leve/moderado/intenso)
-   ☐ Se consegue urinar
-   ☐ Se teve febre
-   ☐ Se está tomando medicações prescritas
-   ☐ 🚨 SE USOU MEDICAÇÃO EXTRA (Tramadol, Codeína, laxativo) 🚨
+   ☐ 1️⃣ Dor em repouso (0-10)
+   ☐ 2️⃣ 🚨 MEDICAÇÃO EXTRA (Tramadol, Codeína, laxativo) - LOGO APÓS A DOR! 🚨
+   ☐ 3️⃣ Se evacuou desde último contato
+   ☐ 4️⃣ Se evacuou: dor ao evacuar (0-10)
+   ☐ 5️⃣ Sangramento (nenhum/leve/moderado/intenso)
+   ☐ 6️⃣ Se consegue urinar
+   ☐ 7️⃣ Se teve febre
+   ☐ 8️⃣ Se está tomando medicações prescritas
 
    ❌ NÃO FINALIZE se algum item acima não foi perguntado!
-   ❌ Especialmente: MEDICAÇÃO EXTRA é OBRIGATÓRIA em toda conversa!
+   ❌ MEDICAÇÃO EXTRA deve ser a SEGUNDA pergunta (logo após dor)!
+   ❌ Se não perguntou MEDICAÇÃO EXTRA, a conversa NÃO está completa!
 
 RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
 DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
@@ -580,10 +588,18 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
 
   // 1. DOR (sempre obrigatório)
   if (data.pain === undefined || data.pain === null) {
-    missing.push('Nível de dor ATUAL (0-10 na escala visual analógica)');
+    missing.push('🚨 Nível de dor ATUAL (0-10 na escala visual analógica)');
   }
 
-  // 2. EVACUAÇÃO
+  // 2. MEDICAÇÃO EXTRA (OBRIGATÓRIO TODOS OS DIAS - PERGUNTAR CEDO!)
+  // Movido para cima para garantir que seja perguntado
+  if (data.usedExtraMedication === undefined) {
+    missing.push('🚨 MEDICAÇÃO EXTRA: Usou Tramadol, Codeína, Tylex, ou outro analgésico além dos prescritos?');
+  } else if (data.usedExtraMedication === true && !data.extraMedicationDetails) {
+    missing.push('🚨 Qual medicação extra usou, dose e horário');
+  }
+
+  // 3. EVACUAÇÃO
   if (data.bowelMovementSinceLastContact === undefined) {
     missing.push('Se evacuou desde o último contato');
   } else if (data.bowelMovementSinceLastContact === false) {
@@ -599,24 +615,24 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     // Bristol Scale removido - não perguntar mais
   }
 
-  // 3. SANGRAMENTO
+  // 4. SANGRAMENTO
   if (!data.bleeding) {
     missing.push('Informações sobre sangramento (nenhum, leve, moderado, intenso)');
   }
 
-  // 4. URINA
+  // 5. URINA
   if (data.urination === undefined) {
     missing.push('Se está conseguindo urinar normalmente');
   }
 
-  // 5. FEBRE
+  // 6. FEBRE
   if (data.fever === undefined) {
     missing.push('Se teve febre');
   } else if (data.fever === true && !data.feverTemperature) {
     missing.push('Qual foi a temperatura da febre (em °C)');
   }
 
-  // 6. SECREÇÃO PURULENTA (apenas D+3 ou superior)
+  // 7. SECREÇÃO PURULENTA (apenas D+3 ou superior)
   if (daysPostOp >= 3) {
     if (data.discharge === undefined) {
       missing.push('Se tem saída de secreção pela ferida');
@@ -630,16 +646,9 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     }
   }
 
-  // 7. MEDICAÇÕES PRESCRITAS
+  // 8. MEDICAÇÕES PRESCRITAS
   if (data.medications === undefined) {
     missing.push('Se está tomando as medicações conforme prescrito');
-  }
-
-  // 8. MEDICAÇÃO EXTRA (OBRIGATÓRIO TODOS OS DIAS)
-  if (data.usedExtraMedication === undefined) {
-    missing.push('Se usou alguma medicação EXTRA além das prescritas (Tramadol, Codeína, laxativo, etc)');
-  } else if (data.usedExtraMedication === true && !data.extraMedicationDetails) {
-    missing.push('Qual medicação extra usou, dose e horário');
   }
 
   // 9. PESQUISA DE SATISFAÇÃO (apenas D+14)

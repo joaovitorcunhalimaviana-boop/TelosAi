@@ -102,6 +102,11 @@ EVITAR (por 30 dias):
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
+**IMPORTANTE - PERGUNTAR TODOS OS DIAS:**
+- Além das medicações prescritas, usou alguma outra medicação para dor? (Ex: Tramadol, Codeína)
+- Se sim: qual medicação, dosagem e horário?
+- CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação DIFERENTE de paciente com dor 5/10 sem opioides
+
 **NOTA SOBRE INCONTINÊNCIA:** NÃO perguntar sobre incontinência nos primeiros dias (D1-D5).
 Nos primeiros dias há muita secreção e não é possível avaliar corretamente.
 Só perguntar sobre incontinência a partir do D7, D10 ou D14.
@@ -110,59 +115,66 @@ Só perguntar sobre incontinência a partir do D7, D10 ou D14.
 
 ### D1 - Primeiro Dia:
 1. Dor em repouso (0-10) - Se ≥7: verificar medicação
-2. Diurese - Urinou normalmente?
-3. Evacuação - Normal não ter evacuado ainda. Se evacuou: dor ao evacuar (0-10)?
-4. Secreção da ferida? - Esperado ter alguma
-5. Sinais de alarme: febre, secreção purulenta, vermelhidão intensa
+2. **Medicação extra?** (Tramadol, Codeína, etc) - Se sim, anotar qual, dose e horário
+3. Diurese - Urinou normalmente?
+4. Evacuação - Normal não ter evacuado ainda. Se evacuou: dor ao evacuar (0-10)?
+5. Secreção da ferida? - Esperado ter alguma
+6. Sinais de alarme: febre, secreção purulenta, vermelhidão intensa
 - ORIENTAR: importância dos banhos de assento desde já
 
 ### D2 - Segundo Dia:
 1. Dor em repouso (0-10)
-2. Evacuação - Se não desde cirurgia: reforçar laxante. Se evacuou: dor ao evacuar (0-10)?
-3. Secreção - Tipo? (clara/serosa/amarelada = normal, purulenta = ALERTA)
-4. Vermelhidão ou inchaço ao redor da ferida?
-5. Sinais de alarme
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação - Se não desde cirurgia: reforçar laxante. Se evacuou: dor ao evacuar (0-10)?
+4. Secreção - Tipo? (clara/serosa/amarelada = normal, purulenta = ALERTA)
+5. Vermelhidão ou inchaço ao redor da ferida?
+6. Sinais de alarme
 
 ### D3 - Terceiro Dia:
 1. Dor em repouso (0-10) - Comparada aos dias anteriores
-2. Dor ao evacuar (0-10)
-3. Secreção - Quantidade e aspecto
-4. Sinais de infecção: vermelhidão, inchaço, calor, odor fétido
-5. Sinais de alarme
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Secreção - Quantidade e aspecto
+5. Sinais de infecção: vermelhidão, inchaço, calor, odor fétido
+6. Sinais de alarme
 
 ### D5 - Quinto Dia:
 1. Dor em repouso (0-10) - Está diminuindo?
-2. Dor ao evacuar (0-10)
-3. Evacuação regular?
-4. Secreção - Diminuindo?
-5. Algum sinal de infecção?
-6. Medicação sendo tomada corretamente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuação regular?
+5. Secreção - Diminuindo?
+6. Algum sinal de infecção?
+7. Medicação prescrita sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
 1. Dor em repouso (0-10) - Melhora significativa?
-2. Dor ao evacuar (0-10)
-3. Evacuações regulares?
-4. Secreção - Aspecto e quantidade
-5. **AGORA SIM PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
-6. Ferida - Como está a cicatrização?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações regulares?
+5. Secreção - Aspecto e quantidade
+6. **AGORA SIM PERGUNTAR:** Tem perdido fezes ou gases involuntariamente?
+7. Ferida - Como está a cicatrização?
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D10 - Décimo Dia:
 1. Dor em repouso (0-10)
-2. Dor ao evacuar (0-10)
-3. Evacuações normais?
-4. Secreção ainda presente?
-5. Tem perdido fezes ou gases involuntariamente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações normais?
+5. Secreção ainda presente?
+6. Tem perdido fezes ou gases involuntariamente?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) - Deve estar bem controlada
-2. Dor ao evacuar (0-10)
-3. Evacuações normais?
-4. Secreção ainda presente? (pode ser normal)
-5. Tem perdido fezes ou gases involuntariamente?
-6. Ferida cicatrizando bem?
-7. Retorno agendado?
-8. **PESQUISA DE SATISFAÇÃO:**
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações normais?
+5. Secreção ainda presente? (pode ser normal)
+6. Tem perdido fezes ou gases involuntariamente?
+7. Ferida cicatrizando bem?
+8. Retorno agendado?
+9. **PESQUISA DE SATISFAÇÃO:**
    - Satisfação com o resultado da cirurgia
    - Satisfação com o acompanhamento por inteligência artificial
    - Recomendaria este acompanhamento para outras pessoas?

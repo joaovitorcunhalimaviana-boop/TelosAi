@@ -94,54 +94,66 @@ EVITAR (por 30 dias):
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
+**IMPORTANTE - PERGUNTAR TODOS OS DIAS:**
+- Além das medicações prescritas, usou alguma outra medicação para dor? (Ex: Tramadol, Codeína)
+- Se sim: qual medicação, dosagem e horário?
+- CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação DIFERENTE de paciente com dor 5/10 sem opioides
+
 ### D1 - Primeiro Dia:
 1. Dor em repouso (0-10) - Se ≥7: verificar medicação
-2. Diurese - Urinou normalmente?
-3. Evacuação - Normal não ter evacuado ainda
-4. Sinais de alarme: sangramento, febre, espasmo intenso
+2. **Medicação extra?** (Tramadol, Codeína, etc) - Se sim, anotar qual, dose e horário
+3. Diurese - Urinou normalmente?
+4. Evacuação - Normal não ter evacuado ainda
+5. Sinais de alarme: sangramento, febre, espasmo intenso
 
 ### D2 - Segundo Dia:
 1. Dor em repouso (0-10)
-2. Evacuação - Se não desde cirurgia: reforçar laxante
-3. Dor ao evacuar (0-10) - se evacuou
-4. Sangramento - Manchas = normal, Em jato = ALERTA
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação - Se não desde cirurgia: reforçar laxante
+4. Dor ao evacuar (0-10) - se evacuou
+5. Sangramento - Manchas = normal, Em jato = ALERTA
 - ORIENTAR: último dia de gelo, amanhã inicia banho de assento
 
 ### D3 - Terceiro Dia:
 1. Dor em repouso comparada aos dias anteriores
-2. Evacuação e dor ao evacuar (0-10)
-3. Espasmo anal? (Leve/Moderado/Severo)
-4. Sangramento comparado aos dias anteriores
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Evacuação e dor ao evacuar (0-10)
+4. Espasmo anal? (Leve/Moderado/Severo)
+5. Sangramento comparado aos dias anteriores
 - ORIENTAR: como fazer banho de assento - MUITO IMPORTANTE para fissura
 
 ### D5 - Quinto Dia:
 1. Dor em repouso (0-10) - Está diminuindo?
-2. Dor ao evacuar (0-10) - Principal indicador de melhora
-3. Evacuação regular? Constipação?
-4. Espasmo anal melhorando?
-5. Medicação sendo tomada corretamente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10) - Principal indicador de melhora
+4. Evacuação regular? Constipação?
+5. Espasmo anal melhorando?
+6. Medicação prescrita sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
 1. Dor em repouso (0-10) após 1 semana
-2. Dor ao evacuar (0-10) - Melhora significativa?
-3. Evacuações regulares?
-4. Sangramento - Pequenas manchas são esperadas
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10) - Melhora significativa?
+4. Evacuações regulares?
+5. Sangramento - Pequenas manchas são esperadas
 - ORIENTAR: suspender nimesulida e ciclobenzaprina, dipirona SN
 
 ### D10 - Décimo Dia:
 1. Dor em repouso (0-10)
-2. Dor ao evacuar (0-10)
-3. Evacuações normais?
-4. Espasmo anal ainda presente?
-5. Sangramento?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10)
+4. Evacuações normais?
+5. Espasmo anal ainda presente?
+6. Sangramento?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) após 2 semanas
-2. Dor ao evacuar (0-10) - Deve estar bem melhor
-3. Evacuações normais? Constipação resolvida?
-4. Sangramento?
-5. Retorno agendado?
-6. **PESQUISA DE SATISFAÇÃO:**
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Dor ao evacuar (0-10) - Deve estar bem melhor
+4. Evacuações normais? Constipação resolvida?
+5. Sangramento?
+6. Retorno agendado?
+7. **PESQUISA DE SATISFAÇÃO:**
    - Satisfação com o resultado da cirurgia
    - Satisfação com o acompanhamento por inteligência artificial
    - Recomendaria este acompanhamento para outras pessoas?

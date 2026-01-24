@@ -104,58 +104,70 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 
 ## CRONOGRAMA DE PERGUNTAS POR DIA
 
+**IMPORTANTE - PERGUNTAR TODOS OS DIAS:**
+- Além das medicações prescritas, usou alguma outra medicação para dor? (Ex: Tramadol, Codeína)
+- Se sim: qual medicação, dosagem e horário?
+- CONTEXTO: Paciente com dor 5/10 usando Tramadol está em situação DIFERENTE de paciente com dor 5/10 sem opioides
+
 ### D1 - Primeiro Dia:
 1. Dor (0-10) - Se ≥7: verificar medicação
-2. Conseguiu urinar normalmente?
-3. Consegue deitar/ficar de lado confortavelmente?
-4. Ferida: algum sangramento, secreção, abertura?
-5. Febre?
+2. **Medicação extra?** (Tramadol, Codeína, etc) - Se sim, anotar qual, dose e horário
+3. Conseguiu urinar normalmente?
+4. Consegue deitar/ficar de lado confortavelmente?
+5. Ferida: algum sangramento, secreção, abertura?
+6. Febre?
 - ORIENTAR: importância do gelo, evitar sentar sobre a ferida
 
 ### D2 - Segundo Dia:
 1. Dor (0-10) - Comparada a ontem?
-2. Ferida: sangramento, secreção, vermelhidão?
-3. Consegue sentar? (esperado desconforto)
-4. Inchaço na região?
-5. Febre?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: sangramento, secreção, vermelhidão?
+4. Consegue sentar? (esperado desconforto)
+5. Inchaço na região?
+6. Febre?
 - ORIENTAR: gelo é mais importante nos primeiros dias, mas pode continuar se sentir que ajuda
 
 ### D3 - Terceiro Dia:
 1. Dor comparada aos dias anteriores - Diminuindo?
-2. Ferida: Como está? Abriu? Secreção? Vermelhidão?
-3. Edema/inchaço - Diminuindo?
-4. Calor local?
-5. Febre?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: Como está? Abriu? Secreção? Vermelhidão?
+4. Edema/inchaço - Diminuindo?
+5. Calor local?
+6. Febre?
 
 ### D5 - Quinto Dia:
 1. Dor (0-10) - Deve estar melhorando
-2. Ferida: Cicatrizando bem? Sinais de abertura?
-3. Secreção? (Se sim: tipo - clara/purulenta)
-4. Vermelhidão ou inchaço?
-5. Consegue sentar melhor?
-6. Medicação sendo tomada corretamente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: Cicatrizando bem? Sinais de abertura?
+4. Secreção? (Se sim: tipo - clara/purulenta)
+5. Vermelhidão ou inchaço?
+6. Consegue sentar melhor?
+7. Medicação prescrita sendo tomada corretamente?
 
 ### D7 - Sétimo Dia:
 1. Dor em repouso (0-10) após 1 semana - Melhora significativa?
-2. Ferida: Como está a cicatrização?
-3. Houve abertura (deiscência)?
-4. Secreção? Odor?
-5. Consegue sentar confortavelmente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: Como está a cicatrização?
+4. Houve abertura (deiscência)?
+5. Secreção? Odor?
+6. Consegue sentar confortavelmente?
 - ORIENTAR: suspender nimesulida, dipirona SN
 
 ### D10 - Décimo Dia:
 1. Dor em repouso (0-10)
-2. Ferida: Cicatrizando bem?
-3. Alguma secreção ainda?
-4. Consegue sentar normalmente?
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: Cicatrizando bem?
+4. Alguma secreção ainda?
+5. Consegue sentar normalmente?
 
 ### D14 - Décimo Quarto Dia:
 1. Dor em repouso (0-10) após 2 semanas - Deve estar bem melhor
-2. Ferida: Cicatrização completa? Alguma área aberta?
-3. Alguma secreção ainda?
-4. Retomou atividades normais?
-5. Retorno agendado?
-6. **PESQUISA DE SATISFAÇÃO:**
+2. **Medicação extra?** - Registrar detalhes se usou
+3. Ferida: Cicatrização completa? Alguma área aberta?
+4. Alguma secreção ainda?
+5. Retomou atividades normais?
+6. Retorno agendado?
+7. **PESQUISA DE SATISFAÇÃO:**
    - Satisfação com o resultado da cirurgia
    - Satisfação com o acompanhamento por inteligência artificial
    - Recomendaria este acompanhamento para outras pessoas?
