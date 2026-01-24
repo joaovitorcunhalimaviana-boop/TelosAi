@@ -17,20 +17,35 @@ const CRON_SECRET = process.env.CRON_SECRET!;
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação - aceita via header OU query string
+    // Verificar autenticação - múltiplas formas aceitas:
+    // 1. Header Authorization: Bearer <secret>
+    // 2. Query parameter: ?secret=<secret>
+    // 3. Vercel Cron (verifica CRON_SECRET automaticamente via header)
     const authHeader = request.headers.get('authorization');
     const secretFromHeader = authHeader?.replace('Bearer ', '');
     const secretFromQuery = request.nextUrl.searchParams.get('secret');
+    const isVercelCron = request.headers.get('x-vercel-cron') === '1';
 
     const providedSecret = secretFromHeader || secretFromQuery;
 
+    // Log para debug
+    console.log('🔐 Cron auth check:', {
+      hasAuthHeader: !!authHeader,
+      hasQuerySecret: !!secretFromQuery,
+      isVercelCron,
+      cronSecretConfigured: !!CRON_SECRET
+    });
+
+    // Vercel Cron requests ainda precisam do secret correto
     if (providedSecret !== CRON_SECRET) {
-      console.error('Unauthorized cron job access attempt. Provided:', providedSecret, 'Expected:', CRON_SECRET ? '[SET]' : '[NOT SET]');
+      console.error('❌ Unauthorized cron job access. Secret mismatch.');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    console.log('✅ Cron authenticated successfully', isVercelCron ? '(Vercel Cron)' : '(External)');
 
     // Verificar se WhatsApp está configurado
     if (!isWhatsAppConfigured()) {
