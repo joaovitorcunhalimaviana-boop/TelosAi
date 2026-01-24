@@ -30,9 +30,11 @@ const WARNING_THRESHOLD_DAYS = 7 // Alertar quando faltam 7 dias
 
 export async function POST(request: NextRequest) {
   try {
-    // 🔒 Verificar autenticação CRON
+    // 🔒 Verificar autenticação CRON - aceita via header OU query string
     const authHeader = request.headers.get('authorization')
-    const providedSecret = authHeader?.replace('Bearer ', '')
+    const secretFromHeader = authHeader?.replace('Bearer ', '')
+    const secretFromQuery = request.nextUrl.searchParams.get('secret')
+    const providedSecret = secretFromHeader || secretFromQuery
 
     if (providedSecret !== CRON_SECRET) {
       console.error('❌ [check-token] Unauthorized cron job access attempt')

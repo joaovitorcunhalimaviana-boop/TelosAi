@@ -4,8 +4,13 @@ import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
+    // Aceita auth via header OU query string
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const secretFromHeader = authHeader?.replace('Bearer ', '');
+    const secretFromQuery = request.nextUrl.searchParams.get('secret');
+    const providedSecret = secretFromHeader || secretFromQuery;
+
+    if (providedSecret !== process.env.CRON_SECRET) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 

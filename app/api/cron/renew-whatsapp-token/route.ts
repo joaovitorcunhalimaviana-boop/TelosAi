@@ -19,9 +19,11 @@ const DOCTOR_PHONE = process.env.DOCTOR_PHONE_NUMBER!;
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verificar autenticação
+    // Verificar autenticação - aceita via header OU query string
     const authHeader = request.headers.get('authorization');
-    const providedSecret = authHeader?.replace('Bearer ', '');
+    const secretFromHeader = authHeader?.replace('Bearer ', '');
+    const secretFromQuery = request.nextUrl.searchParams.get('secret');
+    const providedSecret = secretFromHeader || secretFromQuery;
 
     if (providedSecret !== CRON_SECRET) {
       console.error('Unauthorized cron job access attempt');
