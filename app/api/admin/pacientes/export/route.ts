@@ -66,10 +66,10 @@ export async function GET(req: NextRequest) {
         "Médico Responsável": paciente.user.nomeCompleto,
         "Email do Médico": paciente.user.email,
         "Tipo de Cirurgia": lastSurgery ? surgeryTypeLabels[lastSurgery.type] || lastSurgery.type : "Sem cirurgia",
-        "Data da Cirurgia": lastSurgery ? new Date(lastSurgery.date).toLocaleDateString("pt-BR") : "N/A",
+        "Data da Cirurgia": lastSurgery ? new Date(lastSurgery.date).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "N/A",
         "Status da Cirurgia": lastSurgery ? (lastSurgery.status === "active" ? "Ativo" : lastSurgery.status) : "N/A",
         "Completude de Dados (%)": lastSurgery ? lastSurgery.dataCompleteness : 0,
-        "Data de Cadastro": new Date(paciente.createdAt).toLocaleDateString("pt-BR"),
+        "Data de Cadastro": new Date(paciente.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }),
       };
     });
 

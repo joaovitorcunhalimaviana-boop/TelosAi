@@ -34,6 +34,7 @@ const updatePatientSchema = z.object({
       hospital: z.string().optional().nullable(),
       durationMinutes: z.number().int().optional().nullable(),
       status: z.string().optional(),
+      doctorNotes: z.string().optional().nullable(),
     })
     .optional(),
 
@@ -329,6 +330,8 @@ export async function PATCH(
           surgeryData.durationMinutes = validatedData.surgery.durationMinutes;
         if (validatedData.surgery.status)
           surgeryData.status = validatedData.surgery.status;
+        if (validatedData.surgery.doctorNotes !== undefined)
+          surgeryData.doctorNotes = validatedData.surgery.doctorNotes;
 
         if (surgeryId) {
           // Update existing surgery

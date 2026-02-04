@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 import { sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { getCurrentUser } from '@/lib/session';
 import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
+import { sleep } from '@/lib/utils';
 
 /**
  * POST - Manually send today's follow-ups
@@ -187,9 +188,3 @@ export async function GET() {
   });
 }
 
-/**
- * Sleep utility
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}

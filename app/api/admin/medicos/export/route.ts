@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
         "WhatsApp Conectado": medico.whatsappConnected ? "Sim" : "Não",
         "Total de Pacientes Cadastrados": medico._count.patients,
         "Total de Cirurgias": medico._count.surgeries,
-        "Data de Cadastro": new Date(medico.createdAt).toLocaleDateString("pt-BR"),
+        "Data de Cadastro": new Date(medico.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }),
       };
     });
 

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { sendWhatsAppToDoctor } from '@/lib/whatsapp';
+import { formatBrasiliaDate } from '@/lib/date-utils';
 
 /**
  * Verifica follow-ups que estão pendentes há muito tempo (6 horas)
@@ -59,7 +60,7 @@ export async function checkAndAlertDoctor() {
             const message = `⚠️ *ALERTA DE FALTA DE RESPOSTA*\n\n` +
                 `O paciente *${patient.name}* (D+${response.followUp.dayNumber}) iniciou o questionário há ${hoursDelayed} horas mas não concluiu.\n\n` +
                 `Status: ${response.followUp.status}\n` +
-                `Última interação: ${response.createdAt.toLocaleTimeString('pt-BR')}`;
+                `Última interação: ${formatBrasiliaDate(response.createdAt, 'long')}`;
 
             // Prioridade: Telefone do médico (whatsapp > whatsappNumber) > Env Var
             const doctorPhoneCandidate = doctor.whatsapp || doctor.whatsappNumber || process.env.DOCTOR_PHONE_NUMBER;

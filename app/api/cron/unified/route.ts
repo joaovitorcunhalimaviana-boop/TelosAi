@@ -13,9 +13,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { sleep } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 import { sendMessage, sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
-import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
+import { toBrasiliaTime, fromBrasiliaTime, getBrasiliaHour, startOfDayBrasilia } from '@/lib/date-utils';
 import { sendDailySummaryToAllDoctors } from '@/lib/daily-summary';
 
 const CRON_SECRET = process.env.CRON_SECRET?.trim();
@@ -32,62 +33,97 @@ export async function GET(request: NextRequest) {
 
     const providedSecret = providedSecretHeader || providedSecretQuery;
 
-    if (CRON_SECRET && providedSecret !== CRON_SECRET) {
+    // Também aceitar header x-vercel-cron para compatibilidade com Vercel
+    const isVercelCron = request.headers.get('x-vercel-cron') === '1';
+
+    if (!isVercelCron && CRON_SECRET && providedSecret !== CRON_SECRET) {
       console.error('❌ Unauthorized cron job access attempt');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Obter hora atual em Brasília
-    const nowBrasilia = toBrasiliaTime(new Date());
-    const currentHour = nowBrasilia.getHours();
+    // Permitir forçar uma tarefa específica via query parameter
+    // Ex: /api/cron/unified?task=reminder-14h ou ?task=reminder-18h
+    const forcedTask = url.searchParams.get('task')?.trim();
+
+    // Obter hora atual em Brasília (usando Intl para confiabilidade)
+    const currentHour = getBrasiliaHour();
 
     console.log(`🕐 Cron Unificado - Hora Brasília: ${currentHour}:00`);
 
     // Verificar se WhatsApp está configurado (necessário para maioria das tarefas)
     const whatsappOk = isWhatsAppConfigured();
 
-    let result: any = { hour: currentHour, task: 'none', success: true };
+    const results: any = { hour: currentHour, tasks: [], success: true };
 
-    // 10:00 BRT - Envio de follow-ups
-    if (currentHour >= 9 && currentHour < 12) {
-      console.log('📨 Executando: Envio de Follow-ups');
-      result = await taskSendFollowUps();
-      result.task = 'send-followups';
+    // Se uma tarefa específica foi forçada via ?task=, executar só ela
+    if (forcedTask) {
+      console.log(`🎯 Tarefa forçada via query parameter: ${forcedTask}`);
+
+      if (forcedTask === 'send-followups') {
+        const r = await taskSendFollowUps();
+        results.tasks.push({ task: 'send-followups', ...r });
+      } else if (forcedTask === 'reminder-14h') {
+        const r = await taskSendReminders('first');
+        results.tasks.push({ task: 'reminder-14h', ...r });
+      } else if (forcedTask === 'reminder-18h') {
+        const r = await taskSendReminders('second');
+        results.tasks.push({ task: 'reminder-18h', ...r });
+      } else if (forcedTask === 'notify-doctor') {
+        const r = await taskNotifyDoctorAndMarkOverdue();
+        results.tasks.push({ task: 'notify-doctor-overdue', ...r });
+      } else {
+        results.tasks.push({ task: 'unknown', error: `Unknown task: ${forcedTask}` });
+      }
+    } else {
+      // Executar TODAS as tarefas aplicáveis ao horário atual
+      // (não usa else-if para evitar que uma tarefa bloqueie outra)
+
+      // 10:00 BRT - Envio de follow-ups
+      if (currentHour >= 9 && currentHour < 12) {
+        console.log('📨 Executando: Envio de Follow-ups');
+        const r = await taskSendFollowUps();
+        results.tasks.push({ task: 'send-followups', ...r });
+      }
+
+      // 14:00 BRT - Primeiro lembrete
+      if (currentHour >= 13 && currentHour < 16) {
+        console.log('🔔 Executando: Primeiro Lembrete (14h)');
+        const r = await taskSendReminders('first');
+        results.tasks.push({ task: 'reminder-14h', ...r });
+      }
+
+      // 18:00 BRT - Segundo lembrete (17h-18h)
+      if (currentHour >= 17 && currentHour < 19) {
+        console.log('🔔 Executando: Segundo Lembrete (18h)');
+        const r = await taskSendReminders('second');
+        results.tasks.push({ task: 'reminder-18h', ...r });
+      }
+
+      // 19:00 BRT - Notificar médico + marcar overdue (19h-21h)
+      if (currentHour >= 19 && currentHour < 21) {
+        console.log('👨‍⚕️ Executando: Notificar Médico + Marcar Overdue');
+        const r = await taskNotifyDoctorAndMarkOverdue();
+        results.tasks.push({ task: 'notify-doctor-overdue', ...r });
+      }
+
+      // 00:00-03:00 BRT - Backup e manutenção
+      if (currentHour >= 0 && currentHour < 4) {
+        console.log('🔧 Executando: Manutenção (backup, token)');
+        const r = await taskMaintenance();
+        results.tasks.push({ task: 'maintenance', ...r });
+      }
     }
-    // 14:00 BRT - Primeiro lembrete
-    else if (currentHour >= 13 && currentHour < 16) {
-      console.log('🔔 Executando: Primeiro Lembrete (14h)');
-      result = await taskSendReminders('first');
-      result.task = 'reminder-14h';
-    }
-    // 18:00 BRT - Segundo lembrete
-    else if (currentHour >= 17 && currentHour < 20) {
-      console.log('🔔 Executando: Segundo Lembrete (18h)');
-      result = await taskSendReminders('second');
-      result.task = 'reminder-18h';
-    }
-    // 19:00 BRT - Notificar médico + marcar overdue
-    else if (currentHour >= 19 && currentHour < 21) {
-      console.log('👨‍⚕️ Executando: Notificar Médico + Marcar Overdue');
-      result = await taskNotifyDoctorAndMarkOverdue();
-      result.task = 'notify-doctor-overdue';
-    }
-    // 00:00-03:00 BRT - Backup e manutenção
-    else if (currentHour >= 0 && currentHour < 4) {
-      console.log('🔧 Executando: Manutenção (backup, token)');
-      result = await taskMaintenance();
-      result.task = 'maintenance';
-    }
-    else {
+
+    if (results.tasks.length === 0) {
       console.log('⏭️ Nenhuma tarefa agendada para este horário');
-      result.task = 'none';
+      results.tasks.push({ task: 'none' });
     }
 
-    result.timestamp = new Date().toISOString();
-    result.hourBrasilia = currentHour;
+    results.timestamp = new Date().toISOString();
+    results.hourBrasilia = currentHour;
 
-    console.log('✅ Cron Unificado concluído:', result.task);
-    return NextResponse.json(result);
+    console.log('✅ Cron Unificado concluído:', results.tasks.map((t: any) => t.task).join(', '));
+    return NextResponse.json(results);
 
   } catch (error: any) {
     console.error('❌ Erro no cron unificado:', error?.message);
@@ -102,11 +138,8 @@ export async function GET(request: NextRequest) {
 // TAREFA: Enviar Follow-ups do dia (10h BRT)
 // ================================================
 async function taskSendFollowUps() {
-  const nowBrasilia = toBrasiliaTime(new Date());
-  nowBrasilia.setHours(0, 0, 0, 0);
-  const todayStart = fromBrasiliaTime(nowBrasilia);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
+  const todayStart = startOfDayBrasilia();
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
   const pendingFollowUps = await prisma.followUp.findMany({
     where: {
@@ -146,11 +179,8 @@ async function taskSendFollowUps() {
 // TAREFA: Enviar Lembretes (14h e 18h BRT)
 // ================================================
 async function taskSendReminders(type: 'first' | 'second') {
-  const nowBrasilia = toBrasiliaTime(new Date());
-  nowBrasilia.setHours(0, 0, 0, 0);
-  const todayStart = fromBrasiliaTime(nowBrasilia);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
+  const todayStart = startOfDayBrasilia();
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
   const results = {
     noResponse: { found: 0, sent: 0, errors: [] as string[] },
@@ -158,10 +188,15 @@ async function taskSendReminders(type: 'first' | 'second') {
   };
 
   // Follow-ups enviados mas não respondidos
+  // CORREÇÃO: Buscar por sentAt OU scheduledDate (garante que funcione mesmo com envio atrasado)
   const unansweredFollowUps = await prisma.followUp.findMany({
     where: {
-      status: 'sent',
-      scheduledDate: { gte: todayStart, lt: todayEnd },
+      status: { in: ['sent', 'in_progress'] },
+      OR: [
+        { sentAt: { gte: todayStart, lt: todayEnd } },
+        { scheduledDate: { gte: todayStart, lt: todayEnd } },
+        { sentAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
+      ],
     },
     include: { patient: true },
   });
@@ -208,7 +243,7 @@ async function taskSendReminders(type: 'first' | 'second') {
         ? `Olá, ${firstName}! 👋\n\nPercebi que não terminamos nossa conversa de hoje. Pode continuar respondendo? Faltam poucas perguntas! 😊`
         : `${firstName}, boa tarde! 😊\n\nAinda estou aguardando suas respostas. Complete o questionário quando puder - é importante para sua recuperação!`;
 
-      await sendMessage(conv.phoneNumber, message);
+      await sendMessage(conv.patient.phone, message);
       results.partialResponse.sent++;
       await sleep(300);
     } catch (error: any) {
@@ -223,15 +258,14 @@ async function taskSendReminders(type: 'first' | 'second') {
 // TAREFA: Notificar médico + Marcar overdue (19h BRT)
 // ================================================
 async function taskNotifyDoctorAndMarkOverdue() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(23, 59, 59, 999);
+  // Usar início do dia de ontem em Brasília para marcar overdue corretamente
+  const yesterdayStart = startOfDayBrasilia(new Date(Date.now() - 24 * 60 * 60 * 1000));
 
   // Marcar como overdue
   const overdueFollowUps = await prisma.followUp.findMany({
     where: {
       status: { in: ['pending', 'sent'] },
-      scheduledDate: { lt: yesterday },
+      scheduledDate: { lt: yesterdayStart },
     },
   });
 
@@ -265,10 +299,6 @@ async function taskNotifyDoctorAndMarkOverdue() {
 async function taskMaintenance() {
   // Por enquanto, apenas log - backup e token são tratados pelo daily-tasks existente
   return { success: true, message: 'Maintenance tasks delegated to daily-tasks' };
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export async function POST(request: NextRequest) {

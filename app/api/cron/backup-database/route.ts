@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from "@/lib/logger";
+import { toBrasiliaTime } from '@/lib/date-utils';
 
 /**
  * Cron job para backup automático do banco de dados
@@ -40,8 +41,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 1. Criar branch de backup com timestamp
-    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    // 1. Criar branch de backup com timestamp (Brasília)
+    const nowBrasilia = toBrasiliaTime(new Date());
+    const timestamp = `${nowBrasilia.getFullYear()}-${String(nowBrasilia.getMonth() + 1).padStart(2, '0')}-${String(nowBrasilia.getDate()).padStart(2, '0')}`;
     const branchName = `backup-${timestamp}`;
 
     logger.debug(`📸 Criando branch de backup: ${branchName}`);

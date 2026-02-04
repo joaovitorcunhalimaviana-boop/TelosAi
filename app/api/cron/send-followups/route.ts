@@ -3,11 +3,11 @@
  * Vercel Cron Job - Send Follow-ups
  * Runs daily at 10:00 AM BRT (Brasília Time) to send scheduled follow-up questionnaires
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
+import { sleep } from '@/lib/utils';
 
 const CRON_SECRET = process.env.CRON_SECRET!;
 
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
       cronSecretConfigured: !!CRON_SECRET
     });
 
-    // Vercel Cron requests ainda precisam do secret correto
-    if (providedSecret !== CRON_SECRET) {
+    // Vercel Cron é automaticamente autorizado, ou precisa do secret correto
+    if (!isVercelCron && providedSecret !== CRON_SECRET) {
       console.error('❌ Unauthorized cron job access. Secret mismatch.');
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -266,11 +266,5 @@ async function checkOverdueFollowUps() {
   }
 }
 
-/**
- * Sleep utility
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 

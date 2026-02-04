@@ -8,7 +8,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
 import { getProtocolForSurgery } from './protocols/hemorroidectomia-protocol';
-import { toBrasiliaTime } from './date-utils';
+import { toBrasiliaTime, getBrasiliaHour } from './date-utils';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -75,6 +75,91 @@ export interface QuestionnaireData {
 }
 
 /**
+ * Busca resumo dos dias anteriores para dar memória à IA
+ * Inclui: dados coletados, preocupações do paciente, menções a orientações médicas
+ */
+async function getPreviousDaysSummary(surgeryId: string, currentDayNumber: number): Promise<string> {
+  try {
+    const previousFollowUps = await prisma.followUp.findMany({
+      where: {
+        surgeryId,
+        status: 'responded',
+        dayNumber: { lt: currentDayNumber },
+      },
+      include: { responses: true },
+      orderBy: { dayNumber: 'asc' },
+    });
+
+    if (previousFollowUps.length === 0) return '';
+
+    let summary = `
+═══════════════════════════════════════════════════════════════
+MEMÓRIA: RESUMO DOS DIAS ANTERIORES
+═══════════════════════════════════════════════════════════════
+⚠️ IMPORTANTE: Use estas informações para NÃO repetir orientações que o paciente já
+contestou ou que o médico já modificou. Se o paciente disse que o médico deu uma
+orientação diferente do protocolo, RESPEITE a orientação do médico.
+
+`;
+
+    for (const followUp of previousFollowUps) {
+      if (!followUp.responses || followUp.responses.length === 0) continue;
+
+      const resp = followUp.responses[0];
+      let data: any = {};
+      try {
+        const parsed = typeof resp.questionnaireData === 'string'
+          ? JSON.parse(resp.questionnaireData)
+          : resp.questionnaireData;
+        data = parsed.extractedData || parsed;
+      } catch { continue; }
+
+      summary += `📅 D+${followUp.dayNumber}:\n`;
+
+      // Dados objetivos
+      if (data.pain !== undefined) summary += `  - Dor em repouso: ${data.pain}/10\n`;
+      if (data.painDuringBowelMovement !== undefined) summary += `  - Dor durante evacuação: ${data.painDuringBowelMovement}/10\n`;
+      if (data.bowelMovementSinceLastContact !== undefined) summary += `  - Evacuou: ${data.bowelMovementSinceLastContact ? 'Sim' : 'Não'}\n`;
+      if (data.bleeding) summary += `  - Sangramento: ${data.bleeding}\n`;
+      if (data.fever === true) summary += `  - Febre: Sim${data.feverTemperature ? ` (${data.feverTemperature}°C)` : ''}\n`;
+      if (data.usedExtraMedication === true) summary += `  - Medicação extra: ${data.extraMedicationDetails || 'Sim'}\n`;
+
+      // Preocupações e menções importantes do paciente
+      if (data.concerns) summary += `  - ⚠️ Preocupação do paciente: "${data.concerns}"\n`;
+
+      // Buscar na conversa menções a orientações do médico ou informações importantes
+      try {
+        const parsed = typeof resp.questionnaireData === 'string'
+          ? JSON.parse(resp.questionnaireData)
+          : resp.questionnaireData;
+        const conversation = parsed.conversation || [];
+        for (const msg of conversation) {
+          if (msg.role === 'user' && typeof msg.content === 'string') {
+            const content = msg.content.toLowerCase();
+            // Detectar menções a orientações médicas diferentes do protocolo
+            if (content.includes('doutor orient') || content.includes('médico orient') ||
+                content.includes('doutor ped') || content.includes('médico ped') ||
+                content.includes('doutor fal') || content.includes('médico fal') ||
+                content.includes('dr.') || content.includes('dr ') ||
+                content.includes('consultório') || content.includes('consulta') ||
+                content.includes('ele mandou') || content.includes('ele pediu')) {
+              summary += `  - 🩺 ORIENTAÇÃO MÉDICA MENCIONADA: "${msg.content}"\n`;
+            }
+          }
+        }
+      } catch { /* ignore parse errors */ }
+
+      summary += '\n';
+    }
+
+    return summary;
+  } catch (error) {
+    console.error('Error building previous days summary:', error);
+    return '';
+  }
+}
+
+/**
  * Conduz conversa com paciente para coletar dados do questionário
  */
 export async function conductConversation(
@@ -94,8 +179,12 @@ export async function conductConversation(
     // bristolScale removido
   };
 }> {
-  // Calcular dias pós-operatórios
-  const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
+  // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const surgeryBrasilia = toBrasiliaTime(surgery.date);
+  const nowDayStart = new Date(nowBrasilia.getFullYear(), nowBrasilia.getMonth(), nowBrasilia.getDate());
+  const surgeryDayStart = new Date(surgeryBrasilia.getFullYear(), surgeryBrasilia.getMonth(), surgeryBrasilia.getDate());
+  const daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
 
   // Obter contexto do questionário diário
   const { getDailyQuestions } = await import('./daily-questionnaire-flow');
@@ -106,6 +195,12 @@ export async function conductConversation(
 
   // Obter protocolo médico oficial para o tipo de cirurgia
   const medicalProtocol = getProtocolForSurgery(surgery.type);
+
+  // Buscar resumo dos dias anteriores (memória entre dias)
+  const previousDaysSummary = await getPreviousDaysSummary(surgery.id, daysPostOp);
+
+  // Buscar notas do médico (orientações específicas para este paciente)
+  const doctorNotes = (surgery as any).doctorNotes || '';
 
   // Construir prompt para Claude
   const systemPrompt = `Você é uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
@@ -120,6 +215,24 @@ CONTEXTO DO PACIENTE:
 === PROTOCOLO MÉDICO OFICIAL (USE COMO REFERÊNCIA PARA TODAS AS ORIENTAÇÕES) ===
 ${medicalProtocol}
 === FIM DO PROTOCOLO ===
+${doctorNotes ? `
+═══════════════════════════════════════════════════════════════
+🩺 NOTAS DO MÉDICO (ORIENTAÇÕES ESPECÍFICAS PARA ESTE PACIENTE)
+═══════════════════════════════════════════════════════════════
+${doctorNotes}
+
+⚠️ ESTAS ORIENTAÇÕES DO MÉDICO TÊM PRIORIDADE SOBRE O PROTOCOLO PADRÃO.
+Se houver conflito entre o protocolo e as notas do médico, SIGA AS NOTAS DO MÉDICO.
+O médico avaliou este paciente pessoalmente e sabe o que é melhor para o caso.
+═══════════════════════════════════════════════════════════════
+` : ''}
+${previousDaysSummary}
+🚨 REGRA SOBRE ORIENTAÇÕES DO MÉDICO:
+Se em dias anteriores o paciente mencionou que o médico deu uma orientação diferente
+do protocolo padrão (ex: trocar água morna por água gelada, mudar medicação, etc.),
+RESPEITE essa orientação. O médico viu o paciente pessoalmente e pode ter adaptado o
+protocolo ao caso específico. NÃO corrija o paciente nem insista no protocolo padrão
+se o médico já orientou diferente.
 
 ⚠️ REGRAS CRÍTICAS - NUNCA VIOLE ESTAS REGRAS:
 
@@ -367,6 +480,13 @@ REGRAS GERAIS:
 - NUNCA confunda dor em repouso com dor durante evacuação!
 - NUNCA diga "não entendi" ou "erro técnico" para descrições de dor!
 
+🚨 DESAMBIGUAÇÃO - USE SUA INTELIGÊNCIA:
+- Você é uma IA, entenda o CONTEXTO do que o paciente disse.
+- Se o paciente falar de dor E evacuação na mesma resposta, entenda que é dor de evacuação.
+- Se ficou QUALQUER dúvida sobre qual dor o paciente está falando, PERGUNTE: "Essa dor que você mencionou é agora em repouso ou foi durante a evacuação?"
+- São dois dados DIFERENTES. Você PRECISA coletar os dois separadamente. Se só coletou um, pergunte o outro.
+- Exemplo: paciente diz "evacuei e doeu 5" → registre painDuringBowelMovement: 5, e PERGUNTE a dor em repouso.
+
 JSON STRUCTURE:
 {
   "response": "sua resposta natural para o paciente",
@@ -560,13 +680,37 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       const urgency = painNumber >= 8 ? 'high' : painNumber >= 6 ? 'medium' : 'low';
       const needsAlert = painNumber >= 8;
 
-      return {
-        aiResponse: `Anotei, dor ${painNumber}/10. ${painNumber >= 7 ? 'Sinto muito que esteja doendo tanto. ' : ''}Agora me conta: você conseguiu evacuar desde a última vez que conversamos?`,
-        updatedData: { ...currentData, pain: painNumber },
-        isComplete: false,
-        needsDoctorAlert: needsAlert,
-        urgencyLevel: urgency
-      };
+      // Se dor em repouso ainda não foi coletada, assumir que é dor em repouso (primeira pergunta)
+      if (currentData.pain === undefined || currentData.pain === null) {
+        return {
+          aiResponse: `Anotei, dor ${painNumber}/10. ${painNumber >= 7 ? 'Sinto muito que esteja doendo tanto. ' : ''}Agora me conta: você precisou tomar alguma medicação além das que o médico receitou?`,
+          updatedData: { ...currentData, pain: painNumber },
+          isComplete: false,
+          needsDoctorAlert: needsAlert,
+          urgencyLevel: urgency
+        };
+      }
+      // Se dor em repouso já coletada e paciente evacuou mas falta dor de evacuação
+      else if (currentData.bowelMovementSinceLastContact === true &&
+               (currentData.painDuringBowelMovement === undefined || currentData.painDuringBowelMovement === null)) {
+        return {
+          aiResponse: `Anotei, dor durante a evacuação ${painNumber}/10. ${painNumber >= 7 ? 'Sinto muito que esteja doendo tanto. ' : ''}Agora me conta sobre o sangramento: como está?`,
+          updatedData: { ...currentData, painDuringBowelMovement: painNumber },
+          isComplete: false,
+          needsDoctorAlert: needsAlert,
+          urgencyLevel: urgency
+        };
+      }
+      // Fallback genérico
+      else {
+        return {
+          aiResponse: `Anotei o número ${painNumber}. Agora me conta: como estão os outros sintomas?`,
+          updatedData: currentData,
+          isComplete: false,
+          needsDoctorAlert: needsAlert,
+          urgencyLevel: urgency
+        };
+      }
     }
 
     // Fallback final: resposta genérica mais amigável
@@ -715,8 +859,7 @@ Vou te fazer algumas perguntas sobre como você está. Pode responder livremente
  * Retorna saudação apropriada baseada no horário de Brasília
  */
 function getGreeting(): string {
-  const nowBrasilia = toBrasiliaTime(new Date());
-  const hour = nowBrasilia.getHours();
+  const hour = getBrasiliaHour();
 
   if (hour >= 5 && hour < 12) {
     return 'Bom dia';

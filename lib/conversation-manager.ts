@@ -244,8 +244,13 @@ export async function startQuestionnaireCollection(
   const conversation = await getOrCreateConversation(phoneNumber, patient.id);
   const context = conversation.context as ConversationContext;
 
-  // Calcular dias pós-operatórios
-  const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
+  // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
+  const { toBrasiliaTime } = await import('./date-utils');
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const surgeryBrasilia = toBrasiliaTime(surgery.date);
+  const nowDayStart = new Date(nowBrasilia.getFullYear(), nowBrasilia.getMonth(), nowBrasilia.getDate());
+  const surgeryDayStart = new Date(surgeryBrasilia.getFullYear(), surgeryBrasilia.getMonth(), surgeryBrasilia.getDate());
+  const daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
 
   // Atualizar estado para coleta de respostas
   await updateConversationState(

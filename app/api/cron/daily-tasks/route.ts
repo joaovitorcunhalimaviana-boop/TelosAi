@@ -55,16 +55,17 @@ export async function GET(request: NextRequest) {
     });
 
     // ============================================
-    // TAREFA 2: ENVIO DE FOLLOW-UPS
+    // TAREFA 2: ENVIO DE FOLLOW-UPS (REMOVIDO)
     // ============================================
-    logger.debug('\n📨 TAREFA 2/2: Envio de follow-ups agendados');
-    const followupResult = await sendScheduledFollowUps();
+    // IMPORTANTE: Follow-ups NÃO devem ser enviados aqui (meia-noite).
+    // O envio correto é feito pelo cron /api/cron/send-followups às 10:00 BRT (13:00 UTC)
+    // configurado no vercel.json. Enviar aqui causava mensagens à meia-noite.
+    logger.debug('\n📨 TAREFA 2: Follow-ups - PULANDO (enviados às 10h pelo cron dedicado)');
 
     results.tasks.push({
       name: 'Send Follow-ups',
-      status: followupResult.success ? 'success' : 'error',
-      message: followupResult.success ? 'Follow-ups processed' : (followupResult.error || 'Failed'),
-      details: followupResult.results
+      status: 'success',
+      message: 'Skipped - follow-ups are sent at 10:00 BRT by dedicated cron (/api/cron/send-followups)',
     });
 
     // ============================================

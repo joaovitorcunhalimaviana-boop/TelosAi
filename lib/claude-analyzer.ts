@@ -6,6 +6,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
+import { toBrasiliaTime } from './date-utils';
 import { z } from 'zod';
 
 const anthropic = new Anthropic({
@@ -119,8 +120,16 @@ export async function analyzePatientMessage(
 ): Promise<MessageAnalysis> {
 
   // Calcular dias pós-operatórios
+  // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
   const daysPostOp = surgery
-    ? Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24))
+    ? (() => {
+        // toBrasiliaTime importado no topo do arquivo
+        const nowBrt = toBrasiliaTime(new Date());
+        const surgeryBrt = toBrasiliaTime(surgery.date);
+        const nowDay = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+        const surgeryDay = new Date(surgeryBrt.getFullYear(), surgeryBrt.getMonth(), surgeryBrt.getDate());
+        return Math.round((nowDay.getTime() - surgeryDay.getTime()) / (1000 * 60 * 60 * 24));
+      })()
     : null;
 
   // Buscar protocolos do médico (se userId fornecido e há cirurgia)
@@ -390,8 +399,16 @@ export function formatDoctorAlert(
   originalMessage: string,
   surgery?: Surgery
 ): string {
+  // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
   const daysPostOp = surgery
-    ? Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24))
+    ? (() => {
+        // toBrasiliaTime importado no topo do arquivo
+        const nowBrt = toBrasiliaTime(new Date());
+        const surgeryBrt = toBrasiliaTime(surgery.date);
+        const nowDay = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+        const surgeryDay = new Date(surgeryBrt.getFullYear(), surgeryBrt.getMonth(), surgeryBrt.getDate());
+        return Math.round((nowDay.getTime() - surgeryDay.getTime()) / (1000 * 60 * 60 * 24));
+      })()
     : null;
 
   let urgencyEmoji = '⚠️';

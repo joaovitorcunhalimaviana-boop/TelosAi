@@ -195,20 +195,15 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="p-2 rounded-lg"
-              style={{ backgroundColor: '#0A2647' }}
-            >
-              <MessageCircle className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-lg">Acompanhamento via WhatsApp</CardTitle>
-              <p className="text-sm text-gray-500 mt-1">
-                {data?.stats.completedFollowUps || 0} de {data?.stats.totalFollowUps || 0} follow-ups respondidos
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            <MessageCircle className="h-4 w-4 md:h-5 md:w-5 text-[#0A2647] shrink-0" />
+            <div className="min-w-0">
+              <CardTitle className="text-base md:text-lg text-[#0A2647]">WhatsApp</CardTitle>
+              <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">
+                {data?.stats.completedFollowUps || 0}/{data?.stats.totalFollowUps || 0} respondidos
               </p>
             </div>
           </div>
@@ -217,9 +212,9 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
             {/* Filtro */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  {filter === 'all' ? 'Todos' : filter === 'alerts' ? 'Alertas' : 'Pendentes'}
+                <Button variant="outline" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm h-8 md:h-9 px-2 md:px-3">
+                  <Filter className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">{filter === 'all' ? 'Todos' : 'Alertas'}</span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -229,7 +224,7 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setFilter('alerts')}>
                   <AlertTriangle className="h-4 w-4 mr-2 text-red-500" />
-                  Com alertas ({data?.stats.highRiskResponses || 0})
+                  Alertas ({data?.stats.highRiskResponses || 0})
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -240,23 +235,24 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
+              className="h-8 md:h-9 w-8 md:w-9 p-0"
             >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3 w-3 md:h-4 md:w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
 
         {/* Stats rápidos */}
         {data && (
-          <div className="flex flex-wrap gap-3 mt-4">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              {data.stats.completedFollowUps} respondidos
+          <div className="flex flex-wrap gap-2 md:gap-3 mt-3 md:mt-4">
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-[10px] md:text-xs px-1.5 md:px-2">
+              <CheckCircle2 className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
+              {data.stats.completedFollowUps}
             </Badge>
             {data.stats.pendingFollowUps > 0 && (
-              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                <Clock className="h-3 w-3 mr-1" />
-                {data.stats.pendingFollowUps} pendentes
+              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-[10px] md:text-xs px-1.5 md:px-2">
+                <Clock className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
+                {data.stats.pendingFollowUps}
               </Badge>
             )}
             {data.stats.overdueFollowUps > 0 && (

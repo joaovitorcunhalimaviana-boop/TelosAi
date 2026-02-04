@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { subDays } from "date-fns"
 import { validateResearchFields } from "@/lib/research-field-validator"
 import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from "@/lib/date-utils"
+import { parseQuestionnaireData } from "@/lib/questionnaire-parser"
 
 export type SurgeryType = "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
 
@@ -279,48 +280,24 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         followUpDay = `D+${daysSinceSurgery}`
       }
 
-      // Extract pain history for sparkline
+      // Extract pain history for sparkline using centralized parser
       const painHistory = surgery.followUps
         .filter(f => f.responses.length > 0)
         .map(f => {
           const response = f.responses[0];
-          let painValue = 0;
-          let evacuationValue = 0;
-
-          // Priority 1: New typed columns
-          if (response.painAtRest !== null && response.painAtRest !== undefined) {
-            painValue = response.painAtRest;
-          } else {
-            // Priority 2: JSON Fallback (Legacy)
-            try {
-              const data = JSON.parse(response.questionnaireData);
-              painValue = Number(data.pain || data.dor || data.nivel_dor || 0);
-            } catch {
-              painValue = 0;
-            }
-          }
-
-          if (response.painDuringBowel !== null && response.painDuringBowel !== undefined) {
-            evacuationValue = response.painDuringBowel;
-          } else {
-            // Priority 2: JSON Fallback (Legacy)
-            try {
-              const data = JSON.parse(response.questionnaireData);
-              // IA salva como painDuringBowel
-              evacuationValue = Number(data.painDuringBowel || data.evacuationPain || data.dor_evacuar || data.pain_evacuation || 0);
-            } catch {
-              evacuationValue = 0;
-            }
-          }
+          const parsed = parseQuestionnaireData(response.questionnaireData, {
+            painAtRest: response.painAtRest,
+            painDuringBowel: response.painDuringBowel,
+          });
 
           return {
             day: `D+${f.dayNumber}`,
-            value: isNaN(painValue) ? 0 : painValue,
-            evacuation: isNaN(evacuationValue) ? 0 : evacuationValue,
-            dayNumber: f.dayNumber // Auxiliar para ordenação
+            value: parsed.painAtRest ?? 0,
+            evacuation: parsed.painDuringEvacuation ?? 0,
+            dayNumber: f.dayNumber,
           };
         })
-        .sort((a, b) => a.dayNumber - b.dayNumber) // Ordenar cronologicamente
+        .sort((a, b) => a.dayNumber - b.dayNumber)
         .map(({ day, value, evacuation }) => ({ day, value, evacuation }));
 
       // Validate research fields if participant
@@ -552,25 +529,95 @@ export interface RecentActivity {
 
 /**
  * Busca o histórico completo de conversas de um paciente
+ * Agrega mensagens de TODAS as fontes: Conversation.messageHistory + FollowUpResponse.questionnaireData
  */
 export async function getPatientConversationHistory(patientId: string) {
-  // Buscar a conversa do paciente
+  const allMessages: Array<{ role: string; content: string; timestamp: string | null; dayNumber?: number }> = [];
+
+  // 1. Buscar mensagens da tabela Conversation (se existir)
   const conversation = await prisma.conversation.findFirst({
     where: { patientId }
   });
 
-  if (!conversation || !conversation.messageHistory) {
-    return [];
+  if (conversation?.messageHistory) {
+    const history = (conversation.messageHistory as any[]) || [];
+    for (const msg of history) {
+      allMessages.push({
+        role: msg.role === 'system' ? 'assistant' : msg.role,
+        content: msg.content,
+        timestamp: msg.timestamp || null
+      });
+    }
   }
 
-  // Formatar mensagens para exibição
-  const messageHistory = (conversation.messageHistory as any[]) || [];
+  // 2. Buscar TODOS os follow-ups com respostas e dados de envio
+  const followUps = await prisma.followUp.findMany({
+    where: { patientId },
+    include: {
+      patient: { select: { name: true } },
+      responses: {
+        orderBy: { createdAt: 'asc' },
+      }
+    },
+    orderBy: { dayNumber: 'asc' }
+  });
 
-  return messageHistory.map((msg: any) => ({
-    role: msg.role === 'system' ? 'assistant' : msg.role,
-    content: msg.content,
-    timestamp: msg.timestamp || null
-  }));
+  for (const followUp of followUps) {
+    // 2a. Se o follow-up foi enviado (template), adicionar mensagem sintética do template
+    if (followUp.sentAt) {
+      const firstName = followUp.patient?.name?.split(' ')[0] || 'Paciente';
+      const templateText = followUp.dayNumber === 1
+        ? `Olá ${firstName}! Sou a assistente virtual do Dr. João Vitor. Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
+        : `Olá ${firstName}! Tudo bem? 😊 Estou passando para fazer o acompanhamento do seu D+${followUp.dayNumber} pós-operatório. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`;
+
+      allMessages.push({
+        role: 'assistant',
+        content: templateText,
+        timestamp: followUp.sentAt.toISOString(),
+        dayNumber: followUp.dayNumber
+      });
+    }
+
+    // 2b. Buscar mensagens de TODOS os FollowUpResponse (fonte principal de conversas)
+    for (const response of followUp.responses) {
+      try {
+        const qData = response.questionnaireData
+          ? JSON.parse(response.questionnaireData)
+          : {};
+        const conv = qData.conversation || [];
+
+        for (const msg of conv) {
+          allMessages.push({
+            role: msg.role === 'system' ? 'assistant' : msg.role,
+            content: msg.content,
+            timestamp: msg.timestamp || response.createdAt?.toISOString() || null,
+            dayNumber: followUp.dayNumber
+          });
+        }
+      } catch {
+        // JSON parse error, skip
+      }
+    }
+  }
+
+  // 3. Remover duplicatas por conteúdo+role (mensagens podem estar em ambas as fontes)
+  const seen = new Set<string>();
+  const uniqueMessages = allMessages.filter(msg => {
+    const key = `${msg.role}:${msg.content.substring(0, 100)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // 4. Ordenar por timestamp
+  uniqueMessages.sort((a, b) => {
+    if (!a.timestamp && !b.timestamp) return 0;
+    if (!a.timestamp) return -1;
+    if (!b.timestamp) return 1;
+    return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+  });
+
+  return uniqueMessages;
 }
 
 export async function getRecentPatientActivity(limit = 10): Promise<RecentActivity[]> {

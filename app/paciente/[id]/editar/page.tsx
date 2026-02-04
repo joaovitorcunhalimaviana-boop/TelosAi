@@ -24,6 +24,7 @@ import { PreOperatorioSection } from "@/components/edit/PreOperatorioSection"
 import { AnestesiaSection } from "@/components/edit/AnestesiaSection"
 import { PrescricaoSection } from "@/components/edit/PrescricaoSection"
 import { DescricaoCompletaSection } from "@/components/edit/DescricaoCompletaSection"
+import { NotasMedicasSection } from "@/components/edit/NotasMedicasSection"
 
 // New patient components
 import { ConversationTimeline } from "@/components/patient/ConversationTimeline"
@@ -259,7 +260,8 @@ export default function EditPatientPage() {
     { id: "preop", label: "Pré-Operatório", component: PreOperatorioSection },
     { id: "anestesia", label: "Anestesia", component: AnestesiaSection },
     { id: "prescricao", label: "Prescrição Pós-Op", component: PrescricaoSection },
-    { id: "descricao", label: "Descrição Completa", component: DescricaoCompletaSection }
+    { id: "descricao", label: "Descrição Completa", component: DescricaoCompletaSection },
+    { id: "notas", label: "Notas do Médico", component: NotasMedicasSection }
   ]
 
   const completionPercentage = (completedSections.size / sections.length) * 100

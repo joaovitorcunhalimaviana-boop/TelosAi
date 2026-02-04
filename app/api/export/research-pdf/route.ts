@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     generator.addParagraph(`Título: ${research.title}`)
     generator.addParagraph(`Descrição: ${research.description}`)
     generator.addParagraph(
-      `Período: ${new Date(research.startDate).toLocaleDateString("pt-BR")} - ${research.endDate ? new Date(research.endDate).toLocaleDateString("pt-BR") : "Em andamento"}`
+      `Período: ${new Date(research.startDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })} - ${research.endDate ? new Date(research.endDate).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "Em andamento"}`
     )
     generator.addParagraph(`Status: ${research.isActive ? "Ativa" : "Inativa"}`)
     generator.addParagraph(`Total de pacientes: ${research.totalPatients}`)

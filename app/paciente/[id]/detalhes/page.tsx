@@ -6,8 +6,10 @@ import { getPatientSummary, getPatientConversationHistory } from "@/app/dashboar
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PostOpDayBadge } from "@/components/ui/badge-variants";
 import { ArrowLeft, MessageCircle, History } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { parseQuestionnaireData } from "@/lib/questionnaire-parser";
 
 // Interfaces para tipagem
 interface ConversationMessage {
@@ -16,30 +18,14 @@ interface ConversationMessage {
     timestamp?: string | null;
 }
 
-interface QuestionnaireData {
-    pain?: string | number;
-    painAtRest?: string | number;
-    dor?: string | number;
-    nivel_dor?: string | number;
-    painDuringBowel?: string | number;
-    painDuringBowelMovement?: string | number;
-    painDuringEvacuation?: string | number;
-    evacuationPain?: string | number;
-    dor_evacuar?: string | number;
-    evacuated?: boolean;
-    bowelMovement?: boolean;
-    fever?: boolean;
-    temperature?: number | string;
-    bleeding?: string | boolean;
-    medications?: boolean;
-    urinated?: boolean;
-    conversation?: ConversationMessage[];
-}
-
 interface FollowUpResponse {
     id: string;
     questionnaireData: string;
     createdAt: Date;
+    painAtRest?: number | null;
+    painDuringBowel?: number | null;
+    bleeding?: boolean | null;
+    fever?: boolean | null;
 }
 
 interface FollowUp {
@@ -86,32 +72,20 @@ export default function PatientDetailsPage() {
                     const typedData = data as unknown as PatientSummary;
                     setPatientData(typedData);
 
-                    // Processar dados para o gráfico
+                    // Processar dados para o gráfico usando parser centralizado
                     const chartData = typedData.followUps
                         .filter((f) => f.responses.length > 0)
                         .map((f) => {
                             const resp = f.responses[0];
-                            const qData = JSON.parse(resp.questionnaireData || '{}') as QuestionnaireData;
-
-                            // Verificar se o paciente evacuou neste dia
-                            const didEvacuate = qData.evacuated === true ||
-                                                qData.bowelMovement === true;
-
-                            // Só mostrar dor durante evacuação se o paciente realmente evacuou
-                            // Se não evacuou, usar null para omitir o ponto do gráfico
-                            let evacPain: number | null = null;
-                            if (didEvacuate) {
-                                const rawEvacPain = qData.painDuringBowel || qData.painDuringBowelMovement ||
-                                                    qData.painDuringEvacuation || qData.evacuationPain || qData.dor_evacuar;
-                                evacPain = rawEvacPain !== undefined && rawEvacPain !== null ? Number(rawEvacPain) : null;
-                            }
+                            const parsed = parseQuestionnaireData(resp.questionnaireData, {
+                                painAtRest: resp.painAtRest,
+                                painDuringBowel: resp.painDuringBowel,
+                            });
 
                             return {
                                 day: `D+${f.dayNumber}`,
-                                // Compatibilidade: IA salva como 'pain', interface usa vários nomes
-                                repouso: Number(qData.painAtRest || qData.pain || qData.dor || qData.nivel_dor || 0),
-                                // Dor durante evacuação - só mostrar se paciente realmente evacuou
-                                evacuar: evacPain,
+                                repouso: parsed.painAtRest ?? 0,
+                                evacuar: parsed.painDuringEvacuation,
                                 fullData: f
                             };
                         });
@@ -147,17 +121,35 @@ export default function PatientDetailsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] px-4 py-4 md:p-6">
+            <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
 
                 {/* Header */}
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" onClick={() => router.back()}>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-2 md:mb-4">
+                    <Button variant="outline" onClick={() => router.back()} className="w-fit hover:scale-105 transition-transform" size="sm">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-blue-900">{patientData.patient.name}</h1>
-                        <p className="text-gray-500">{patientData.type} - {new Date(patientData.date).toLocaleDateString("pt-BR")}</p>
+                        <h1 className="text-xl md:text-3xl font-bold text-[#0A2647]">
+                            {patientData.patient.name}
+                        </h1>
+                        <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-1 text-sm md:text-base">
+                            <span className="text-gray-600">{patientData.type}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-600">
+                                {new Date(patientData.date).toLocaleDateString("pt-BR", {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric'
+                                })}
+                            </span>
+                            {patientData.followUps.length > 0 && (
+                                <>
+                                    <span className="text-gray-400 hidden sm:inline">•</span>
+                                    <PostOpDayBadge day={patientData.followUps[patientData.followUps.length - 1]?.dayNumber || 0} />
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -169,39 +161,55 @@ export default function PatientDetailsPage() {
                         {/* Gráfico de Evolução */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Evolução da Dor</CardTitle>
+                                <CardTitle className="text-[#0A2647]">
+                                    Evolução da Dor
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="h-[300px]">
+                            <CardContent className="h-[250px] md:h-[300px] pt-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={graphData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="day" />
-                                        <YAxis domain={[0, 10]} />
-                                        <Tooltip />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                                        <XAxis dataKey="day" tick={{ fill: '#64748B', fontSize: 12 }} />
+                                        <YAxis domain={[0, 10]} tick={{ fill: '#64748B', fontSize: 12 }} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                                borderRadius: '12px',
+                                                border: '1px solid #E2E8F0',
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                            }}
+                                        />
                                         <Legend />
-                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#0A2647" strokeWidth={2} connectNulls={false} />
-                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={2} connectNulls={false} />
+                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#0A2647" strokeWidth={3} dot={{ fill: '#0A2647', strokeWidth: 2, r: 4 }} connectNulls={false} />
+                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={3} dot={{ fill: '#D4AF37', strokeWidth: 2, r: 4 }} connectNulls={false} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </CardContent>
                         </Card>
 
                         {/* Lista de Follow-ups */}
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
                             {patientData.followUps.map((f) => {
                                 const hasResponse = f.responses.length > 0;
+                                const isSelected = selectedFollowUp?.id === f.id;
                                 return (
                                     <div
                                         key={f.id}
                                         onClick={() => hasResponse && setSelectedFollowUp(f)}
-                                        className={`p-3 rounded-lg border cursor-pointer transition-all text-center
-                                ${selectedFollowUp?.id === f.id ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200 bg-white hover:border-blue-300'}
-                                ${!hasResponse ? 'opacity-50 cursor-not-allowed' : ''}
+                                        className={`p-2 md:p-3 rounded-lg md:rounded-xl border-2 cursor-pointer transition-all duration-200 text-center
+                                ${isSelected
+                                    ? 'border-[#0A2647] bg-gradient-to-br from-[#0A2647] to-[#144272] text-white shadow-lg'
+                                    : hasResponse
+                                        ? 'border-gray-200 bg-white hover:border-blue-400 hover:shadow-md'
+                                        : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                                }
                             `}
                                     >
-                                        <div className="text-sm font-bold text-gray-700">D+{f.dayNumber}</div>
-                                        <div className="text-xs text-gray-500">
-                                            {hasResponse ? 'Respondido' : 'Pendente'}
+                                        <div className={`text-sm md:text-base font-bold ${isSelected ? 'text-white' : 'text-[#0A2647]'}`}>
+                                            D+{f.dayNumber}
+                                        </div>
+                                        <div className={`text-[9px] md:text-[10px] font-medium ${isSelected ? 'text-blue-200' : hasResponse ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                            {hasResponse ? '✓' : '—'}
                                         </div>
                                     </div>
                                 );
@@ -211,8 +219,8 @@ export default function PatientDetailsPage() {
 
                     {/* Coluna Direita: Chat */}
                     <div className="lg:col-span-1">
-                        <Card className="h-[600px] flex flex-col">
-                            <CardHeader className="border-b bg-gray-50">
+                        <Card className="h-[400px] md:h-[600px] flex flex-col">
+                            <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="flex items-center gap-2">
                                         {showFullHistory ? <History className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
@@ -263,7 +271,7 @@ export default function PatientDetailsPage() {
                                     // Mostrar conversa do dia selecionado (comportamento antigo)
                                     selectedFollowUp && selectedFollowUp.responses[0] ? (
                                         (() => {
-                                            const qData = JSON.parse(selectedFollowUp.responses[0].questionnaireData || '{}') as QuestionnaireData;
+                                            const qData = JSON.parse(selectedFollowUp.responses[0].questionnaireData || '{}') as { conversation?: ConversationMessage[] };
                                             const conversation = qData.conversation || [];
 
                                             if (conversation.length === 0) {

@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     doc.setFontSize(10)
     doc.setTextColor(100, 100, 100)
     doc.text(
-      `Gerado em: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`,
+      `Gerado em: ${new Date().toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })} às ${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}`,
       margin,
       y + 5
     )
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       doc.setFont("helvetica", "normal")
       doc.setTextColor(0, 0, 0)
 
-      doc.text(`Data: ${new Date(surgery.date).toLocaleDateString("pt-BR")}`, margin, y)
+      doc.text(`Data: ${new Date(surgery.date).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}`, margin, y)
       y += 7
 
       if (surgery.hospital) {

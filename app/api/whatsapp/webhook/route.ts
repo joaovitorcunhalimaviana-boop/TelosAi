@@ -16,8 +16,10 @@ import {
   validateQuestionnaireData,
   parseJSONSafely,
 } from '@/lib/api-validation';
-import { findApplicableProtocols, formatProtocolsForPrompt } from '@/lib/protocols';
-import { analyzePatientMessageWithGemini } from '@/lib/gemini';
+// Protocolos carregados internamente pelo conductConversation
+import { conductConversation } from '@/lib/conversational-ai';
+import { startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
+// Protocolo carregado internamente pelo conductConversation via getProtocolForSurgery
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
@@ -282,17 +284,59 @@ async function processTextMessage(message: any) {
     const pendingFollowUp = await findPendingFollowUp(patient.id);
 
     if (!pendingFollowUp) {
-      logger.debug(`⚠️ No pending follow-up found for patient`, {
+      logger.debug(`⚠️ No follow-up scheduled for TODAY`, {
         patientId: patient.id,
         patientName: patient.name
       });
-      // Enviar mensagem padrão
-      await sendEmpatheticResponse(
-        phone,
-        `Olá ${patient.name.split(' ')[0]}! Recebi sua mensagem. ` +
-        'No momento não há questionário pendente. ' +
-        'Se tiver alguma urgência, por favor entre em contato com o consultório.'
-      );
+
+      // Buscar próximo follow-up programado (futuro)
+      const nextFollowUp = await prisma.followUp.findFirst({
+        where: {
+          patientId: patient.id,
+          status: 'pending',
+          scheduledDate: { gt: new Date() },
+        },
+        orderBy: { scheduledDate: 'asc' },
+        include: { surgery: true },
+      });
+
+      // Calcular dia pós-operatório atual
+      const surgery = await prisma.surgery.findFirst({
+        where: { patientId: patient.id },
+        orderBy: { date: 'desc' },
+      });
+
+      const firstName = patient.name.split(' ')[0];
+      let message = '';
+
+      if (surgery) {
+        // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
+        const { toBrasiliaTime } = await import('@/lib/date-utils');
+        const nowBrt = toBrasiliaTime(new Date());
+        const surgeryBrt = toBrasiliaTime(surgery.date);
+        const nowDayStart = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+        const surgeryDayStart = new Date(surgeryBrt.getFullYear(), surgeryBrt.getMonth(), surgeryBrt.getDate());
+        const daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (nextFollowUp) {
+          message = `Olá ${firstName}! 👋\n\n` +
+            `Hoje é o *D+${daysPostOp}* do seu pós-operatório. ` +
+            `Não temos questionário programado para hoje.\n\n` +
+            `Seu próximo acompanhamento será no *D+${nextFollowUp.dayNumber}*.\n\n` +
+            `Se tiver alguma dúvida ou preocupação, pode me perguntar que eu respondo! 😊`;
+        } else {
+          message = `Olá ${firstName}! 👋\n\n` +
+            `Hoje é o *D+${daysPostOp}* do seu pós-operatório. ` +
+            `No momento não há mais questionários programados.\n\n` +
+            `Se tiver alguma dúvida ou preocupação, estou à disposição!`;
+        }
+      } else {
+        message = `Olá ${firstName}! Recebi sua mensagem. ` +
+          'No momento não há questionário pendente. ' +
+          'Se tiver alguma urgência, por favor entre em contato com o consultório.';
+      }
+
+      await sendEmpatheticResponse(phone, message);
       return;
     }
 
@@ -601,97 +645,93 @@ async function processQuestionnaireAnswer(
       return;
     }
 
-    // 2. Definir Checklist Dinâmico
+    // 2. Dados já coletados
     const currentData = questionnaireData.extractedData || {};
+
+    // Campos obrigatórios para validação server-side
     const requiredFields = [
-      'painAtRest',
-      'hadBowelMovementSinceLastContact',
-      'takingPrescribedMeds',
-      'bleeding'
+      'pain',               // Dor em repouso (SEMPRE obrigatório)
+      'bowelMovementSinceLastContact',
+      'bleeding',
+      'urination',
+      'fever',
+      'medications',
+      'usedExtraMedication',
     ];
 
-    // Regras condicionais para o checklist
-    if (currentData.painAtRest !== undefined && Number(currentData.painAtRest) > 5) {
-      if (currentData.hasFever === undefined) requiredFields.push('hasFever');
-    }
-    if (currentData.takingExtraMeds === true) {
-      if (!currentData.extraMedsDetails) requiredFields.push('extraMedsDetails');
-    }
-    if (currentData.bleeding && currentData.bleeding !== 'none') {
-      if (!currentData.bleedingDetails) requiredFields.push('bleedingDetails');
+    // Campos condicionalmente obrigatórios
+    // Se paciente evacuou, dor durante evacuação é OBRIGATÓRIA
+    if (currentData.bowelMovementSinceLastContact === true) {
+      requiredFields.push('painDuringBowelMovement');
     }
 
-    // Identificar campos faltantes
-    const missingFields = requiredFields.filter(f => currentData[f] === undefined || currentData[f] === null);
+    // 3. Formatar histórico para o Claude (precisa de timestamps)
+    const claudeHistory = conversationHistory.map((msg: any) => ({
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+      timestamp: msg.timestamp || new Date().toISOString(),
+    }));
 
-    // 3. Buscar protocolos aplicáveis
-    const protocols = await findApplicableProtocols(
-      patient.userId,
-      followUp.surgery.type,
-      followUp.dayNumber,
-      patient.researchId
-    );
-    const protocolText = formatProtocolsForPrompt(protocols);
-
-    // 4. CHAMAR GEMINI
-    const aiResponse = await analyzePatientMessageWithGemini(
-      conversationHistory,
+    // 4. CHAMAR CLAUDE (ANTHROPIC)
+    logger.debug('🧠 Chamando Claude para análise da mensagem...');
+    const aiResult = await conductConversation(
       message,
-      {
-        name: patient.name,
-        surgeryType: followUp.surgery.type,
-        dayNumber: followUp.dayNumber,
-        doctorName: patient.doctorName
-      },
-      {
-        required: requiredFields,
-        missing: missingFields,
-        collected: currentData
-      },
-      protocolText
+      patient,
+      followUp.surgery,
+      claudeHistory,
+      currentData
     );
 
-    // 5. Enviar resposta da IA
-    await sendEmpatheticResponse(phone, aiResponse.message);
-
-    if (aiResponse.needsImage) {
+    // 5. Enviar imagens se necessário (ANTES da resposta de texto)
+    if (aiResult.sendImages?.painScale) {
+      await sendImageScale(phone, 'pain_scale');
       await new Promise(resolve => setTimeout(resolve, 500));
-      await sendImageScale(phone, aiResponse.needsImage);
     }
 
-    // 6. Atualizar histórico e dados
+    // 6. Enviar resposta da IA
+    await sendEmpatheticResponse(phone, aiResult.aiResponse);
+
+    // 7. Atualizar histórico e dados
     conversationHistory.push(
       { role: 'user', content: message },
-      { role: 'assistant', content: aiResponse.message }
+      { role: 'assistant', content: aiResult.aiResponse }
     );
 
-    // Merge inteligente: Só atualiza campos que a IA explicitamente coletou como NÃO nulos,
-    // ou se o campo ainda não existia.
-    const newData = aiResponse.dataCollected || {};
-    const mergedData = { ...currentData };
+    const mergedData = aiResult.updatedData;
 
-    Object.keys(newData).forEach((key) => {
-      // @ts-ignore
-      const val = newData[key];
-      // Só sobrescreve se o valor novo não for nulo/undefined
-      if (val !== null && val !== undefined) {
-        // @ts-ignore
-        mergedData[key] = val;
-      }
-    });
+    // VALIDAÇÃO SERVER-SIDE: Nunca confiar cegamente no isComplete do Claude
+    const updatedMissingFields = requiredFields.filter(f => mergedData[f] === undefined || mergedData[f] === null);
+    const isActuallyComplete = aiResult.isComplete && updatedMissingFields.length === 0;
+
+    if (aiResult.isComplete && updatedMissingFields.length > 0) {
+      logger.warn('⚠️ Claude marcou isComplete=true mas ainda faltam campos:', updatedMissingFields);
+      logger.warn('Dados coletados até agora:', mergedData);
+    }
 
     const updatedQuestionnaireData = {
       conversation: conversationHistory,
       extractedData: mergedData,
-      completed: aiResponse.completed,
-      conversationPhase: aiResponse.completed ? 'completed' : 'in_progress', // Simplificado
+      completed: isActuallyComplete,
+      conversationPhase: isActuallyComplete ? 'completed' : 'in_progress',
     };
 
-    // 7. Salvar no banco
+    // 8. Salvar no banco (incluindo campos dedicados de dor para gráficos)
+    const painAtRestValue = mergedData.pain ?? mergedData.painAtRest ?? null;
+    const painDuringBowelValue = mergedData.painDuringBowelMovement ?? null;
+    const bleedingValue = mergedData.bleeding && mergedData.bleeding !== 'none' ? true : (mergedData.bleeding === 'none' ? false : undefined);
+    const feverValue = mergedData.fever ?? mergedData.hasFever ?? undefined;
+
     if (response) {
       await prisma.followUpResponse.update({
         where: { id: response.id },
-        data: { questionnaireData: JSON.stringify(updatedQuestionnaireData) },
+        data: {
+          questionnaireData: JSON.stringify(updatedQuestionnaireData),
+          // Salvar campos dedicados a cada turno (para gráficos funcionarem em tempo real)
+          ...(painAtRestValue !== null && painAtRestValue !== undefined ? { painAtRest: painAtRestValue } : {}),
+          ...(painDuringBowelValue !== null && painDuringBowelValue !== undefined ? { painDuringBowel: painDuringBowelValue } : {}),
+          ...(bleedingValue !== undefined ? { bleeding: bleedingValue } : {}),
+          ...(feverValue !== undefined ? { fever: feverValue } : {}),
+        },
       });
 
       // Atualizar timestamp do FollowUp para indicar atividade (para o Nudge)
@@ -706,13 +746,24 @@ async function processQuestionnaireAnswer(
           userId: patient.userId,
           questionnaireData: JSON.stringify(updatedQuestionnaireData),
           riskLevel: 'low',
+          ...(painAtRestValue !== null && painAtRestValue !== undefined ? { painAtRest: painAtRestValue } : {}),
+          ...(painDuringBowelValue !== null && painDuringBowelValue !== undefined ? { painDuringBowel: painDuringBowelValue } : {}),
+          ...(bleedingValue !== undefined ? { bleeding: bleedingValue } : {}),
+          ...(feverValue !== undefined ? { fever: feverValue } : {}),
         },
       });
     }
 
-    // 8. Se completou, finalizar
-    if (aiResponse.completed) {
+    // 9. Se REALMENTE completou (validado server-side), finalizar
+    if (isActuallyComplete) {
       await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData as any, response?.id || '');
+    } else if (aiResult.isComplete && updatedMissingFields.length > 0) {
+      logger.info('🔄 Forçando continuação: faltam campos', updatedMissingFields);
+    }
+
+    // 10. Alertar médico se urgência alta
+    if (aiResult.needsDoctorAlert) {
+      logger.warn('🚨 Alerta de urgência detectado!', { urgencyLevel: aiResult.urgencyLevel });
     }
 
   } catch (error) {
@@ -766,9 +817,9 @@ async function finalizeQuestionnaireWithAI(
 
     // Usar painAtRest como painLevel principal (compatibilidade)
     const questionnaireData = {
-      painLevel: extractedData.painAtRest || extractedData.painLevel,
-      painAtRest: extractedData.painAtRest,
-      painDuringBowelMovement: extractedData.painDuringBowelMovement,
+      painLevel: extractedData.painAtRest || extractedData.painLevel || (extractedData as any).pain,
+      painAtRest: extractedData.painAtRest || (extractedData as any).pain,
+      painDuringBowelMovement: extractedData.painDuringBowelMovement || (extractedData as any).painDuringBowelMovement,
       fever: extractedData.hasFever,
       urinaryRetention: extractedData.canUrinate === false,
       bowelMovement: extractedData.hadBowelMovementSinceLastContact || extractedData.hadBowelMovement,
@@ -810,8 +861,8 @@ async function finalizeQuestionnaireWithAI(
           aiResponse: aiAnalysis.empatheticResponse,
           riskLevel: finalRiskLevel,
           redFlags: JSON.stringify(allRedFlags),
-          painAtRest: extractedData.painAtRest,
-          painDuringBowel: extractedData.painDuringBowelMovement,
+          painAtRest: extractedData.painAtRest ?? (extractedData as any).pain ?? null,
+          painDuringBowel: extractedData.painDuringBowelMovement ?? (extractedData as any).painDuringBowelMovement ?? null,
           bleeding: extractedData.bleeding && extractedData.bleeding !== 'none' ? true : false,
           fever: extractedData.hasFever,
         },
@@ -827,8 +878,8 @@ async function finalizeQuestionnaireWithAI(
           aiResponse: aiAnalysis.empatheticResponse,
           riskLevel: finalRiskLevel,
           redFlags: JSON.stringify(allRedFlags),
-          painAtRest: extractedData.painAtRest,
-          painDuringBowel: extractedData.painDuringBowelMovement,
+          painAtRest: extractedData.painAtRest ?? (extractedData as any).pain ?? null,
+          painDuringBowel: extractedData.painDuringBowelMovement ?? (extractedData as any).painDuringBowelMovement ?? null,
           bleeding: extractedData.bleeding && extractedData.bleeding !== 'none' ? true : false,
           fever: extractedData.hasFever,
         },
@@ -1177,46 +1228,80 @@ async function findPatientByPhone(phone: string): Promise<any | null> {
 
 /**
  * Encontra follow-up pendente ou enviado para o paciente
+ * CORRIGIDO: Agora valida se o follow-up está programado para HOJE
+ * Isso evita que respostas em dias não programados (D+4, D+6, etc.)
+ * sejam salvas no follow-up de dias anteriores
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function findPendingFollowUp(patientId: string): Promise<any | null> {
-  // 1. Prioridade: Buscar follow-up ATIVO (sent ou in_progress)
+  // Calcular início e fim do dia de hoje (horário de Brasília convertido para UTC)
+  const todayStart = startOfDayBrasilia();
+  const todayEnd = endOfDayBrasilia();
+
+  logger.debug('🔍 Buscando follow-up para HOJE', {
+    patientId,
+    todayStart: todayStart.toISOString(),
+    todayEnd: todayEnd.toISOString(),
+  });
+
+  // 1. Prioridade: Buscar follow-up ATIVO (sent ou in_progress) PROGRAMADO PARA HOJE
   const activeFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
       status: {
         in: ['sent', 'in_progress'],
       },
+      scheduledDate: {
+        gte: todayStart, // >= início de hoje
+        lte: todayEnd,   // <= fim de hoje
+      },
     },
     include: {
       surgery: true,
     },
     orderBy: {
-      scheduledDate: 'desc', // Se houver múltiplos ativos (erro?), pega o mais recente
+      scheduledDate: 'desc',
     },
   });
 
   if (activeFollowUp) {
+    logger.debug('✅ Follow-up ativo encontrado para HOJE', {
+      followUpId: activeFollowUp.id,
+      dayNumber: activeFollowUp.dayNumber,
+      scheduledDate: activeFollowUp.scheduledDate,
+    });
     return activeFollowUp;
   }
 
-  // 2. Fallback: Buscar follow-up PENDENTE (se houver, mas não deveria bloquear o fluxo)
-  // Se retornarmos um pending aqui, ele vai cair no "No pending follow-up found" lá em cima se não tratarmos?
-  // Na verdade, o código chamador verifica o status.
+  // 2. Fallback: Buscar follow-up PENDENTE PROGRAMADO PARA HOJE
   const pendingFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
       status: 'pending',
+      scheduledDate: {
+        gte: todayStart,
+        lte: todayEnd,
+      },
     },
     include: {
       surgery: true,
     },
     orderBy: {
-      scheduledDate: 'asc', // Priorizar o mais antigo não respondido
+      scheduledDate: 'asc',
     },
   });
 
-  return pendingFollowUp;
+  if (pendingFollowUp) {
+    logger.debug('✅ Follow-up pendente encontrado para HOJE', {
+      followUpId: pendingFollowUp.id,
+      dayNumber: pendingFollowUp.dayNumber,
+      scheduledDate: pendingFollowUp.scheduledDate,
+    });
+    return pendingFollowUp;
+  }
+
+  logger.debug('⚠️ Nenhum follow-up programado para HOJE', { patientId });
+  return null;
 }
 
 

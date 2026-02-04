@@ -6,7 +6,8 @@
 
 import { prisma } from '@/lib/prisma';
 import { createNotification } from '@/lib/notifications/create-notification';
-import { toBrasiliaTime, fromBrasiliaTime, formatBrasiliaDate } from '@/lib/date-utils';
+import { toBrasiliaTime, fromBrasiliaTime, formatBrasiliaDate, startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
+import { sleep } from '@/lib/utils';
 
 interface PatientSummary {
   name: string;
@@ -50,16 +51,13 @@ interface DailySummaryData {
  */
 export async function generateDailySummary(userId: string): Promise<DailySummaryData> {
   // Obter início e fim do dia atual em Brasília
-  const nowBrasilia = toBrasiliaTime(new Date());
-  nowBrasilia.setHours(0, 0, 0, 0);
-  const todayStart = fromBrasiliaTime(nowBrasilia);
-  const todayEnd = new Date(todayStart);
-  todayEnd.setDate(todayEnd.getDate() + 1);
+  const todayStart = startOfDayBrasilia();
+  const todayEnd = endOfDayBrasilia();
 
   // Obter início e fim do dia anterior (para comparar tendências de dor)
-  const yesterdayStart = new Date(todayStart);
-  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-  const yesterdayEnd = new Date(todayStart);
+  const yesterdayDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const yesterdayStart = startOfDayBrasilia(yesterdayDate);
+  const yesterdayEnd = startOfDayBrasilia();
 
   // 1. Buscar follow-ups agendados para hoje
   const todayFollowUps = await prisma.followUp.findMany({
@@ -393,9 +391,3 @@ function parseRedFlags(redFlagsString: string | null): string[] {
   }
 }
 
-/**
- * Helper para aguardar entre envios
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

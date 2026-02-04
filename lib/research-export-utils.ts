@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Utilitários para exportação de dados de pesquisa científica
 import * as XLSX from 'xlsx';
+import { safeParseQuestionnaireJSON } from '@/lib/questionnaire-parser';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -155,14 +156,8 @@ function calculateMedian(values: number[]): number {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseQuestionnaireData(jsonString: string): any {
-  try {
-    return JSON.parse(jsonString);
-  } catch {
-    return {};
-  }
-}
+// Usa safeParseQuestionnaireJSON importado de @/lib/questionnaire-parser
+const parseQuestionnaireData = safeParseQuestionnaireJSON;
 
 function parseRedFlags(jsonString: string | null): string[] {
   if (!jsonString) return [];

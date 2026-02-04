@@ -31,6 +31,8 @@ import {
   FlaskConical,
   Filter,
   X,
+  Stethoscope,
+  CheckCircle2,
 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { FadeIn, SlideIn, StaggerChildren, StaggerItem } from "@/components/animations"
@@ -239,28 +241,44 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
       `}</style>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div id="dashboard-header" className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <div className="flex items-center gap-3">
+        <div id="dashboard-header" className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 md:mb-8 gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Premium Icon */}
+            <div className="hidden md:flex h-14 w-14 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] items-center justify-center shadow-lg">
+              <Stethoscope className="h-7 w-7 text-white" />
+            </div>
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-[#0A2647] pb-1">
-                Dashboard Médico
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Área de Trabalho Médico - {userName}
-              </p>
+              <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
+                <h1 className="text-2xl md:text-4xl font-bold title-premium">
+                  Central Médica
+                </h1>
+                {/* Live Badge */}
+                <span className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 badge-pulse">
+                  <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  LIVE
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-1 md:gap-2 text-muted-foreground">
+                <span className="text-sm md:text-base">Bem-vindo,</span>
+                <span className="text-sm md:text-base font-semibold text-[#0A2647]">Dr. {userName}</span>
+                <span className="hidden sm:inline-flex items-center gap-1.5 ml-2 text-xs text-emerald-600">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Sistema operacional
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Botões de Ação */}
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex w-full md:w-auto">
             {/* Novo Paciente - Highlighted with Golden Color */}
-            <Link href="/cadastro">
+            <Link href="/cadastro" className="w-full md:w-auto">
               <Button
                 size="lg"
-                className="shadow-lg shadow-yellow-500/20 font-semibold hover:opacity-90 transition-all hover:scale-105 active:scale-95 text-base px-8 h-12 hover-glow bg-telos-gold text-telos-blue"
+                className="w-full md:w-auto shadow-lg shadow-yellow-500/20 font-semibold transition-transform hover:scale-105 active:scale-95 text-sm md:text-base px-6 md:px-8 h-11 md:h-12 bg-[#D4AF37] hover:bg-[#D4AF37] text-[#0A2647]"
                 data-tutorial="new-patient-btn"
               >
-                <Plus className="mr-2 h-5 w-5" />
+                <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                 Novo Paciente
               </Button>
             </Link>

@@ -12,8 +12,12 @@ export const geminiResponseSchema = z.object({
     dataCollected: z.object({
         painAtRest: z.union([z.number(), z.string(), z.null()]).optional(),
         painDuringBowelMovement: z.union([z.number(), z.string(), z.null()]).optional(),
+        hadBowelMovementSinceLastContact: z.union([z.boolean(), z.null()]).optional(),
         bleeding: z.union([z.boolean(), z.string(), z.null()]).optional(),
         hasFever: z.union([z.boolean(), z.string(), z.null()]).optional(),
+        takingPrescribedMeds: z.union([z.boolean(), z.null()]).optional(),
+        urinated: z.union([z.boolean(), z.null()]).optional(),
+        usedExtraMedication: z.union([z.boolean(), z.null()]).optional(),
         worry: z.string().nullable().optional(),
         otherSymptoms: z.array(z.string()).optional()
     }),
@@ -98,21 +102,32 @@ DIRETRIZES DE PERSONALIDADE E FLUXO:
 4. **MEMÓRIA**: Use o histórico. Se ele já falou que não tem febre, não pergunte de novo.
 5. **DOR (0-10)**: Sempre que pedir nota de dor, explique a escala (0=sem dor, 10=pior dor).
 6. **RESPOSTAS QUALITATIVAS**: Se o paciente disser "dor média", "muita dor", "um pouco", PEÇA UM NÚMERO. Não tente adivinhar. Explique: "Entendo. Para eu registrar certinho, de 0 a 10, quanto seria essa dor?"
-7. **FINALIZAÇÃO**: Só marque "completed": true quando TODOS os itens do checklist estiverem preenchidos E o paciente não tiver mais dúvidas.
+7. **DUAS DORES SEPARADAS**: Dor em REPOUSO e dor ao EVACUAR são coisas DIFERENTES. SEMPRE pergunte as duas separadamente. Se o paciente disser "dor 5 ao evacuar", registre painDuringBowelMovement=5 e AINDA PERGUNTE a dor em repouso separadamente.
+8. **NUNCA PULE PERGUNTAS**: Você DEVE percorrer TODOS os itens da lista "O Que Falta Descobrir". Se faltam 5 itens, faça 5 perguntas (uma de cada vez). NUNCA marque completed=true enquanto houver itens em "O Que Falta Descobrir".
+
+⚠️ REGRA CRÍTICA DE FINALIZAÇÃO:
+- Olhe o campo "O Que Falta Descobrir" acima.
+- Se essa lista tiver QUALQUER item, completed DEVE ser false.
+- Só marque completed=true quando "O Que Falta Descobrir" estiver VAZIO (todos os itens coletados).
+- Se você marcar completed=true com itens faltando, o sistema vai REJEITAR e continuar perguntando.
 
 FORMATO DE RESPOSTA (JSON ONLY):
 Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
 {
-  "reasoning": "Seu pensamento interno sobre o estado atual e decisão do próximo passo.",
+  "reasoning": "Seu pensamento interno: liste quais itens já foram coletados e quais FALTAM.",
   "message": "Sua resposta textual para o paciente.",
-  "needsImage": "pain_scale" | "bristol_scale" | null, (Use null se não precisar enviar imagem AGORA)
+  "needsImage": "pain_scale" | "bristol_scale" | null,
   "dataCollected": {
     "painAtRest": number (0-10) ou null (NÃO COLOCAR STRING),
     "painDuringBowelMovement": number (0-10) ou null,
+    "hadBowelMovementSinceLastContact": boolean ou null,
     "hasFever": boolean ou null,
-    "bleeding": boolean ou null
+    "bleeding": boolean ou null,
+    "takingPrescribedMeds": boolean ou null,
+    "urinated": boolean ou null,
+    "usedExtraMedication": boolean ou null
   },
-  "completed": boolean, (true se coletou tudo E tirou dúvidas)
+  "completed": boolean, (SOMENTE true quando TODOS os itens do checklist estiverem preenchidos)
   "needsClarification": boolean (true se a resposta do usuário foi confusa ou qualitativa demais)
 }
 `;

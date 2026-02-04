@@ -28,16 +28,19 @@ export async function createFollowUpSchedule({
 }: CreateFollowUpScheduleParams) {
   try {
     const followUpsData = FOLLOW_UP_DAYS.map((dayNumber) => {
-      // Adiciona o número de dias à data da cirurgia
-      const scheduledDate = new Date(surgeryDate);
-      scheduledDate.setDate(scheduledDate.getDate() + dayNumber);
+      // 1. Converter data da cirurgia para Brasília para obter o dia correto
+      const surgeryInBrasilia = toBrasiliaTime(surgeryDate);
+      const surgeryYear = surgeryInBrasilia.getFullYear();
+      const surgeryMonth = surgeryInBrasilia.getMonth();
+      const surgeryDay = surgeryInBrasilia.getDate();
 
-      // Converter para timezone do Brasil
-      const zonedDate = toBrasiliaTime(scheduledDate);
-      zonedDate.setHours(SEND_HOUR, 0, 0, 0);
+      // 2. Criar data no dia correto (dia da cirurgia + dayNumber) às 10:00 BRT
+      const scheduledBrasilia = new Date(surgeryYear, surgeryMonth, surgeryDay + dayNumber, SEND_HOUR, 0, 0, 0);
 
-      // Converter de volta para UTC para salvar no banco
-      const utcDate = fromBrasiliaTime(zonedDate);
+      // 3. Converter de volta para UTC para salvar no banco
+      const utcDate = fromBrasiliaTime(scheduledBrasilia);
+
+      console.log(`📅 Follow-up D+${dayNumber}: ${scheduledBrasilia.toISOString()} BRT → ${utcDate.toISOString()} UTC`);
 
       return {
         surgeryId,

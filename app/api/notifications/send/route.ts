@@ -43,7 +43,6 @@ export interface SendPushNotificationRequest {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verificar se VAPID keys estão configuradas
     if (!vapidPublicKey || !vapidPrivateKey) {
       return NextResponse.json(
         { error: 'VAPID keys não configuradas' },
@@ -54,7 +53,6 @@ export async function POST(request: NextRequest) {
     const body: SendPushNotificationRequest = await request.json();
     const { userId, title, body: notificationBody, ...options } = body;
 
-    // Validar dados
     if (!userId || !title || !notificationBody) {
       return NextResponse.json(
         { error: 'userId, title e body são obrigatórios' },
@@ -62,89 +60,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar todas as subscriptions ativas do usuário
-    const subscriptions = await prisma.pushSubscription.findMany({
-      where: {
-        userId,
-        isActive: true,
-      },
-    });
-
-    if (subscriptions.length === 0) {
-      return NextResponse.json(
-        {
-          success: true,
-          message: 'Nenhuma subscription ativa encontrada',
-          sent: 0,
-        },
-        { status: 200 }
-      );
-    }
-
-    // Preparar payload da notificação
-    const payload = JSON.stringify({
+    const result = await sendPushNotification(userId, {
       title,
       body: notificationBody,
-      icon: options.icon || '/icons/icon-192.png',
-      badge: options.badge || '/icons/icon-192.png',
-      data: {
-        url: options.url || '/dashboard',
-        actions: options.actions || [],
-      },
-      tag: options.tag || `notification-${Date.now()}`,
-      requireInteraction: options.requireInteraction || false,
-      vibrate: options.vibrate || [200, 100, 200],
-      timestamp: Date.now(),
+      icon: options.icon,
+      badge: options.badge,
+      url: options.url,
+      tag: options.tag,
+      requireInteraction: options.requireInteraction,
+      vibrate: options.vibrate,
+      actions: options.actions,
     });
 
-    // Enviar para todas as subscriptions
-    const results = await Promise.allSettled(
-      subscriptions.map(async (subscription) => {
-        try {
-          await webpush.sendNotification(
-            {
-              endpoint: subscription.endpoint,
-              keys: {
-                p256dh: subscription.p256dh,
-                auth: subscription.auth,
-              },
-            },
-            payload,
-            {
-              TTL: 60 * 60 * 24, // 24 horas
-            }
-          );
-          return { success: true, subscriptionId: subscription.id };
-        } catch (error: any) {
-          console.error(`Error sending push to subscription ${subscription.id}:`, error);
-
-          // Se a subscription expirou ou não é mais válida, desativar
-          if (
-            error.statusCode === 410 || // Gone
-            error.statusCode === 404 || // Not Found
-            error.statusCode === 403    // Forbidden
-          ) {
-            await prisma.pushSubscription.update({
-              where: { id: subscription.id },
-              data: { isActive: false },
-            });
-          }
-
-          return { success: false, subscriptionId: subscription.id, error: error.message };
-        }
-      })
-    );
-
-    // Contar sucessos e falhas
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    const failed = results.length - successful;
-
     return NextResponse.json({
-      success: true,
-      message: `Notificação enviada para ${successful} de ${results.length} subscriptions`,
-      sent: successful,
-      failed,
-      total: results.length,
+      success: result.success,
+      message: `Notificação enviada para ${result.sent} de ${result.sent + result.failed} subscriptions`,
+      sent: result.sent,
+      failed: result.failed,
+      total: result.sent + result.failed,
     });
   } catch (error) {
     console.error('Error sending push notification:', error);
@@ -156,7 +89,8 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Helper function para enviar notificação (pode ser importada de outros lugares)
+ * Função centralizada para enviar push notification.
+ * Pode ser importada de outros módulos do servidor.
  */
 export async function sendPushNotification(
   userId: string,
@@ -165,18 +99,19 @@ export async function sendPushNotification(
     body: string;
     url?: string;
     icon?: string;
+    badge?: string;
     tag?: string;
     requireInteraction?: boolean;
+    vibrate?: number[];
+    actions?: Array<{ action: string; title: string; url?: string }>;
   }
 ): Promise<{ success: boolean; sent: number; failed: number }> {
   try {
-    // Verificar se VAPID keys estão configuradas
     if (!vapidPublicKey || !vapidPrivateKey) {
       console.error('VAPID keys não configuradas');
       return { success: false, sent: 0, failed: 0 };
     }
 
-    // Buscar subscriptions ativas
     const subscriptions = await prisma.pushSubscription.findMany({
       where: {
         userId,
@@ -188,22 +123,21 @@ export async function sendPushNotification(
       return { success: true, sent: 0, failed: 0 };
     }
 
-    // Preparar payload
     const payload = JSON.stringify({
       title: notification.title,
       body: notification.body,
       icon: notification.icon || '/icons/icon-192.png',
-      badge: '/icons/icon-192.png',
+      badge: notification.badge || '/icons/icon-192.png',
       data: {
         url: notification.url || '/dashboard',
+        actions: notification.actions || [],
       },
       tag: notification.tag || `notification-${Date.now()}`,
       requireInteraction: notification.requireInteraction || false,
-      vibrate: [200, 100, 200],
+      vibrate: notification.vibrate || [200, 100, 200],
       timestamp: Date.now(),
     });
 
-    // Enviar para todas as subscriptions
     const results = await Promise.allSettled(
       subscriptions.map(async (subscription) => {
         try {

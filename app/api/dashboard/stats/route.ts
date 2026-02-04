@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
+import { startOfDayBrasilia } from '@/lib/date-utils';
 
 // ============================================
 // CACHED DASHBOARD STATS FUNCTION
@@ -12,13 +13,11 @@ const getCachedDashboardStats = unstable_cache(
   async () => {
     const startTime = Date.now();
 
-    // Get today's date at midnight
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get today's date at midnight (Brasília timezone)
+    const today = startOfDayBrasilia();
 
-    // Get date 7 days ago
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    // Get date 7 days ago (Brasília timezone)
+    const sevenDaysAgo = startOfDayBrasilia(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
 
     // Execute all queries in parallel for better performance
     const [

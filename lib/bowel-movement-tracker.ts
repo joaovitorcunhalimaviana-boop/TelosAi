@@ -10,6 +10,7 @@
 
 import { prisma } from './prisma';
 import { Surgery } from '@prisma/client';
+import { toBrasiliaTime } from './date-utils';
 
 export interface BowelMovementStatus {
   hadFirstMovement: boolean;
@@ -198,7 +199,12 @@ export function shouldAlertDoctorAboutConstipation(
   // Se última evacuação foi há mais de 4 dias
   if (lastBowelMovement) {
     const lastBMDate = new Date(lastBowelMovement);
-    const daysSinceLastBM = Math.floor((Date.now() - lastBMDate.getTime()) / (1000 * 60 * 60 * 24));
+    // toBrasiliaTime importado no topo do arquivo
+    const nowBrt = toBrasiliaTime(new Date());
+    const bmBrt = toBrasiliaTime(lastBMDate);
+    const nowDay = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+    const bmDay = new Date(bmBrt.getFullYear(), bmBrt.getMonth(), bmBrt.getDate());
+    const daysSinceLastBM = Math.round((nowDay.getTime() - bmDay.getTime()) / (1000 * 60 * 60 * 24));
     if (daysSinceLastBM >= 4) {
       return true;
     }

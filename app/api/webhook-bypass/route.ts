@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 import Anthropic from '@anthropic-ai/sdk';
 import { getProtocolForSurgery } from '@/lib/protocols/hemorroidectomia-protocol';
 import { sendCriticalRedFlagAlert } from '@/lib/red-flag-alerts';
-import { toBrasiliaTime } from '@/lib/date-utils';
+import { toBrasiliaTime, getBrasiliaHour } from '@/lib/date-utils';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_secreto_123';
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
@@ -94,7 +94,13 @@ async function processMessage(phone: string, text: string) {
       return;
     }
 
-    const daysPostOp = Math.floor((Date.now() - surgery.date.getTime()) / (1000 * 60 * 60 * 24));
+    // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
+    const { toBrasiliaTime } = await import('@/lib/date-utils');
+    const nowBrt = toBrasiliaTime(new Date());
+    const surgeryBrt = toBrasiliaTime(surgery.date);
+    const nowDayStart = new Date(nowBrt.getFullYear(), nowBrt.getMonth(), nowBrt.getDate());
+    const surgeryDayStart = new Date(surgeryBrt.getFullYear(), surgeryBrt.getMonth(), surgeryBrt.getDate());
+    const daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
 
     // 4. Buscar ou criar conversa com histórico (ANTES de buscar follow-up!)
     let conversation = await prisma.conversation.findFirst({
@@ -596,8 +602,7 @@ async function markAsRead(messageId: string) {
 
 // Saudação baseada no horário de Brasília
 function getGreeting(): string {
-  const nowBrasilia = toBrasiliaTime(new Date());
-  const hour = nowBrasilia.getHours();
+  const hour = getBrasiliaHour();
   if (hour >= 5 && hour < 12) return 'Bom dia';
   if (hour >= 12 && hour < 18) return 'Boa tarde';
   return 'Boa noite';

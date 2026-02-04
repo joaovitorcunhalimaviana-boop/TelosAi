@@ -70,6 +70,19 @@ export function formatBrasiliaDate(date: Date, format: 'short' | 'long' = 'short
  *
  * Exemplo: "2025-11-21" → 2025-11-21 00:00:00 BRT → 2025-11-21 03:00:00 UTC
  */
+/**
+ * Retorna a hora atual em Brasília de forma confiável usando formatação Intl
+ * Evita problemas com getHours() em Dates manipulados por toZonedTime
+ */
+export function getBrasiliaHour(): number {
+  const formatter = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: BRASILIA_TZ,
+    hour: 'numeric',
+    hour12: false,
+  });
+  return parseInt(formatter.format(new Date()), 10);
+}
+
 export function parseDateStringToBrasiliaTime(dateString: string): Date {
   // Parse a data como se fosse Brasília (não UTC)
   // Formato esperado: "YYYY-MM-DD"

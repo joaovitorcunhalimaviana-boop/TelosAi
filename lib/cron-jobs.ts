@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { sendFollowUpQuestionnaire, isWhatsAppConfigured, sendEmpatheticResponse, sendDoctorAlert } from '@/lib/whatsapp';
-import { toBrasiliaTime, fromBrasiliaTime } from '@/lib/date-utils';
+import { toBrasiliaTime, fromBrasiliaTime, startOfDayBrasilia } from '@/lib/date-utils';
 import { logger } from '@/lib/logger';
 
 /**
@@ -123,7 +123,8 @@ export async function performDatabaseBackup() {
             throw new Error('NEON_API_KEY ou NEON_PROJECT_ID não configurados');
         }
 
-        const timestamp = new Date().toISOString().split('T')[0];
+        const nowBrasilia = toBrasiliaTime(new Date());
+        const timestamp = `${nowBrasilia.getFullYear()}-${String(nowBrasilia.getMonth() + 1).padStart(2, '0')}-${String(nowBrasilia.getDate()).padStart(2, '0')}`;
         const branchName = `backup-${timestamp}`;
 
         logger.debug(`📸 Criando branch de backup: ${branchName}`);
@@ -228,14 +229,13 @@ async function incrementFailureAttempt(followUpId: string) {
 
 async function checkOverdueFollowUps() {
     try {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        yesterday.setHours(23, 59, 59, 999);
+        // Usar início do dia de ontem em Brasília para marcar overdue corretamente
+        const yesterdayStart = startOfDayBrasilia(new Date(Date.now() - 24 * 60 * 60 * 1000));
 
         const overdueFollowUps = await prisma.followUp.findMany({
             where: {
                 status: { in: ['pending', 'sent'] },
-                scheduledDate: { lt: yesterday },
+                scheduledDate: { lt: yesterdayStart },
             },
         });
 
