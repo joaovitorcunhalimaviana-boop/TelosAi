@@ -3,7 +3,6 @@ import Link from "next/link"
 import { TelosHeader } from "@/components/TelosHeader"
 import { FadeIn, SlideIn, FloatingParticles } from "@/components/animations"
 import { ScrollVideoSection } from "@/components/ScrollVideoSection"
-import { SplineCTA } from "@/components/SplineCTA"
 
 export default function Home() {
   return (
@@ -498,9 +497,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Spline 3D CTA Section */}
-      <SplineCTA />
 
       {/* CTA Section - Fundo claro para contraste com footer */}
       <section className="py-24 relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-100">
