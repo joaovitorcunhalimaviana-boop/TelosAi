@@ -391,21 +391,22 @@ model SurgeryTemplate {
 }
 
 model Research {
-  id            String          @id @default(cuid())
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  userId        String
-  title         String
-  description   String
-  isActive      Boolean         @default(true)
-  startDate     DateTime        @default(now())
-  endDate       DateTime?
-  surgeryType   String?
-  totalPatients Int             @default(0)
-  patients      Patient[]
-  protocols     Protocol[]
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  groups        ResearchGroup[]
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  userId         String
+  title          String
+  description    String
+  isActive       Boolean         @default(true)
+  startDate      DateTime        @default(now())
+  endDate        DateTime?
+  surgeryType    String?
+  totalPatients  Int             @default(0)
+  requiredFields String[]        @default([]) // Array of field paths like ["name", "phone", "dor_d1"]
+  patients       Patient[]
+  protocols      Protocol[]
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups         ResearchGroup[]
 
   @@index([userId])
   @@index([isActive])
