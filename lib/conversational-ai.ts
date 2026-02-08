@@ -7,7 +7,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
-import { getProtocolForSurgery } from './protocols/hemorroidectomia-protocol';
+import { getProtocolsForAI } from './protocols';
 import { toBrasiliaTime, getBrasiliaHour } from './date-utils';
 
 const anthropic = new Anthropic({
@@ -199,8 +199,13 @@ export async function conductConversation(
   // Definir o que ainda precisa ser coletado
   const missingInfo = getMissingInformation(currentData, daysPostOp);
 
-  // Obter protocolo médico oficial para o tipo de cirurgia
-  const medicalProtocol = getProtocolForSurgery(surgery.type);
+  // Buscar protocolos: primeiro tenta banco de dados, fallback para hardcoded
+  const medicalProtocol = await getProtocolsForAI(
+    patient.userId,       // ID do médico responsável
+    surgery.type,         // Tipo de cirurgia
+    daysPostOp,           // Dia pós-operatório
+    patient.researchId    // ID da pesquisa (opcional - está no Patient)
+  );
 
   // Buscar resumo dos dias anteriores (memória entre dias)
   const previousDaysSummary = await getPreviousDaysSummary(surgery.id, daysPostOp);

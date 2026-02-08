@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { getProtocolForSurgery as getDefaultProtocol } from './protocols/hemorroidectomia-protocol';
 
 export interface ApplicableProtocol {
     title: string;
@@ -88,4 +89,46 @@ export function formatProtocolsForPrompt(protocols: ApplicableProtocol[]): strin
     });
 
     return promptText;
+}
+
+/**
+ * Busca protocolos para injetar na IA
+ * 1. Primeiro tenta buscar protocolos personalizados do médico no banco de dados
+ * 2. Se não encontrar, usa o protocolo hardcoded padrão como fallback
+ *
+ * @param userId - ID do médico responsável pelo paciente
+ * @param surgeryType - Tipo de cirurgia (hemorroidectomia, fissura, etc)
+ * @param dayNumber - Dia pós-operatório (D+N)
+ * @param researchId - ID da pesquisa (opcional, para protocolos específicos de pesquisa)
+ */
+export async function getProtocolsForAI(
+  userId: string,
+  surgeryType: string,
+  dayNumber: number,
+  researchId?: string | null
+): Promise<string> {
+  try {
+    // 1. Buscar protocolos personalizados do médico no banco
+    const dbProtocols = await findApplicableProtocols(
+      userId,
+      surgeryType,
+      dayNumber,
+      researchId
+    );
+
+    // 2. Se encontrou protocolos no banco, formatar e retornar
+    if (dbProtocols.length > 0) {
+      logger.info(`📋 Usando ${dbProtocols.length} protocolos do banco para userId=${userId}, surgery=${surgeryType}, D+${dayNumber}`);
+      return formatProtocolsForPrompt(dbProtocols);
+    }
+
+    // 3. Fallback: usar protocolo hardcoded padrão
+    logger.info(`📋 Nenhum protocolo no banco. Usando fallback hardcoded para surgery=${surgeryType}`);
+    return getDefaultProtocol(surgeryType);
+
+  } catch (error) {
+    logger.error('❌ Erro ao buscar protocolos para IA:', error);
+    // Em caso de erro, usar fallback
+    return getDefaultProtocol(surgeryType);
+  }
 }

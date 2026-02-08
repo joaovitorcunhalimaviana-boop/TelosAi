@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Edit2, Trash2, Save, X, ArrowLeft, FileText, Shield } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
+import { PROTOCOL_TEMPLATES, ProtocolTemplate } from '@/lib/protocol-templates'
 
 interface Protocol {
   id: string
@@ -59,6 +60,8 @@ export default function ProtocolsPage() {
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+
+  const [showTemplates, setShowTemplates] = useState(false)
 
   const [formData, setFormData] = useState({
     surgeryType: 'hemorroidectomia',
@@ -217,6 +220,23 @@ export default function ProtocolsPage() {
     }
   }
 
+  const applyTemplate = (template: ProtocolTemplate) => {
+    setFormData({
+      surgeryType: template.surgeryType,
+      category: template.category,
+      title: template.title,
+      dayRangeStart: template.dayRangeStart,
+      dayRangeEnd: template.dayRangeEnd,
+      content: template.content,
+      priority: template.priority,
+      isActive: true,
+      researchId: null
+    });
+    setShowTemplates(false);
+    setIsCreating(true);
+    setEditingId(null);
+  };
+
   const getDayRangeText = (start: number, end: number | null) => {
     if (end === null) {
       return `D+${start} em diante`
@@ -277,7 +297,50 @@ export default function ProtocolsPage() {
           </Card>
         </div>
 
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-end mb-6 gap-3">
+          {/* Botao de Templates */}
+          <div className="relative">
+            <button
+              onClick={() => setShowTemplates(!showTemplates)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Usar Template
+              <svg className={`w-4 h-4 transition-transform ${showTemplates ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showTemplates && (
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50 max-h-96 overflow-y-auto">
+                <div className="p-2 border-b bg-gray-50">
+                  <p className="text-sm font-medium text-gray-700">Templates Disponiveis</p>
+                  <p className="text-xs text-gray-500">Clique para usar como base</p>
+                </div>
+                {PROTOCOL_TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    onClick={() => applyTemplate(template)}
+                    className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b last:border-b-0 transition"
+                  >
+                    <p className="font-medium text-gray-800">{template.name}</p>
+                    <p className="text-sm text-gray-500">{template.description}</p>
+                    <div className="flex gap-2 mt-1">
+                      <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
+                        {template.category}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                        D+{template.dayRangeStart}{template.dayRangeEnd ? `-${template.dayRangeEnd}` : '+'}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <Button
             onClick={handleCreate}
             disabled={isCreating}
