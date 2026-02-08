@@ -215,7 +215,7 @@ export const FISTULA_ANAL_FAQ = {
 
   cicatrizacao: `A cicatrização da fístula anal é mais lenta que outras cirurgias anais, podendo levar 4-6 semanas para fechar completamente. Continue os banhos de assento, que são fundamentais para a cicatrização. A ferida será avaliada nos retornos.`,
 
-  incontinencia: `Uma pequena incontinência para gases pode ocorrer temporariamente após a cirurgia de fístula e geralmente melhora com o tempo. Se você notar incontinência para fezes líquidas ou sólidas, entre em contato imediatamente com o Dr. João Vítor.`,
+  incontinencia: `Uma pequena incontinência para gases pode ocorrer temporariamente após a cirurgia de fístula e geralmente melhora com o tempo. Se você notar incontinência para fezes líquidas ou sólidas, entre em contato imediatamente com seu médico.`,
 
   banho_assento: `Sim, os banhos de assento são fundamentais no tratamento da fístula anal e devem ser feitos DESDE O PRIMEIRO DIA (diferente de outras cirurgias). Faça 3-5 vezes por dia, especialmente após evacuações. Use apenas água morna, sem produtos.`,
 

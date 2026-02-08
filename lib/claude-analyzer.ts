@@ -92,7 +92,7 @@ Mensagem: "Dor 7/10, tomei dipirona mas não aliviou. É D+2 da hemorroidectomia
 Urgência: HIGH
 Categoria: "dor"
 Red Flags: ["dor_refrataria_analgesia"]
-Resposta: "Dor 7/10 que não melhora com dipirona em D+2 precisa avaliação. Dr. João foi notificado e entrará em contato. Se piorar, procure pronto-socorro."
+Resposta: "Dor 7/10 que não melhora com dipirona em D+2 precisa avaliação. Seu médico foi notificado e entrará em contato. Se piorar, procure pronto-socorro."
 
 Exemplo 3:
 Mensagem: "Posso tomar banho hoje? É D+3"
@@ -106,7 +106,7 @@ Mensagem: "Febre 38.8°C e dor forte no local da cirurgia"
 Urgência: CRITICAL
 Categoria: "infecção"
 Red Flags: ["febre_alta", "dor_intensa", "possível_infecção"]
-Resposta: "🚨 Febre alta com dor forte pode indicar infecção. PROCURE PRONTO-SOCORRO AGORA. Dr. João foi notificado."
+Resposta: "🚨 Febre alta com dor forte pode indicar infecção. PROCURE PRONTO-SOCORRO AGORA. Seu médico foi notificado."
 `;
 
 /**

@@ -326,7 +326,8 @@ export async function checkStalledFollowUps() {
 
                 // Enviar Nudge (Lembrete)
                 const firstName = followUp.patient.name.split(' ')[0];
-                const nudgeMessage = `Olá ${firstName}, ainda está aí? 👀\n\nNotei que não terminamos o seu acompanhamento de hoje. É muito importante para o Dr. João saber como você está.\n\nPodemos continuar?`;
+                const doctorName = (followUp.patient as any).user?.nomeCompleto || 'seu médico';
+                const nudgeMessage = `Olá ${firstName}, ainda está aí? 👀\n\nNotei que não terminamos o seu acompanhamento de hoje. É muito importante para ${doctorName} saber como você está.\n\nPodemos continuar?`;
 
                 await sendEmpatheticResponse(followUp.patient.phone, nudgeMessage);
 

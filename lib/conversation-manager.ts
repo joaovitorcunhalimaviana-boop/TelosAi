@@ -420,9 +420,10 @@ export async function processQuestionnaireAnswer(
     }
 
     // Enviar mensagem de agradecimento
+    const doctorName = (patient as any).doctorName || (patient as any).user?.nomeCompleto || 'seu médico';
     const thankYouMessage =
       '✅ Perfeito! Muito obrigada por compartilhar essas informações comigo.\n\n' +
-      'Vou passar tudo para o Dr. João Vitor. Ele vai analisar com atenção e, se necessário, entrará em contato com você.\n\n' +
+      `Vou passar tudo para ${doctorName}. Tudo será analisado com atenção e, se necessário, entrarão em contato com você.\n\n` +
       'Lembre-se: se sentir qualquer sintoma que te preocupe, pode me mandar mensagem a qualquer momento. Estou aqui para ajudar! 😊\n\n' +
       'Boa recuperação! 💙';
 

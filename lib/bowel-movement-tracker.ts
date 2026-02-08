@@ -65,11 +65,11 @@ export async function checkBowelMovementStatus(
   } else if (daysWithoutMovement === 4) {
     // D+4: Preocupação leve
     urgencyLevel = 'concern';
-    message = 'Está há 4 dias sem evacuar. É muito importante tomar os laxantes e se hidratar. Se tiver dificuldade, entre em contato com o Dr. João Vitor.';
+    message = 'Está há 4 dias sem evacuar. É muito importante tomar os laxantes e se hidratar. Se tiver dificuldade, entre em contato com seu médico.';
   } else {
     // D+5+: Urgente
     urgencyLevel = 'urgent';
-    message = `Você está há ${daysWithoutMovement} dias sem evacuar. Isso precisa ser avaliado pelo médico. Por favor, entre em contato com o Dr. João Vitor urgentemente.`;
+    message = `Você está há ${daysWithoutMovement} dias sem evacuar. Isso precisa ser avaliado pelo médico. Por favor, entre em contato com seu médico urgentemente.`;
   }
 
   return {
@@ -163,7 +163,7 @@ export function getBowelMovementQuestions(
           ? 'Quando foi a última vez que você evacuou? Você está tomando os laxantes que o médico receitou?'
           : currentDay === 4
           ? 'Quando foi a última vez que você evacuou? É importante evacuar logo. Você está com medo da dor ou alguma dificuldade?'
-          : 'Quando foi a última vez que você evacuou? Isso é importante. Vou avisar o Dr. João Vitor.'
+          : 'Quando foi a última vez que você evacuou? Isso é importante. Vou avisar seu médico.'
       ],
       contextForAI: getBowelMovementContextMessage(false, currentDay)
     };

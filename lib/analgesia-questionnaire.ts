@@ -171,7 +171,7 @@ export function getAnalgesiaFeedbackMessage(analysis: {
     message += `${index + 1}. ${rec}\n`;
   });
 
-  message += '\nVou passar essas informações para o Dr. João Vitor avaliar.';
+  message += '\nVou passar essas informações para seu médico avaliar.';
 
   return message;
 }

@@ -225,13 +225,15 @@ Como está sua dor agora? De 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua
 
     // 8. Chamar IA com histórico completo e protocolo médico
     console.log('🤖 Chamando IA com histórico de', history.length, 'mensagens, dor anterior:', previousPain, 'dados coletados:', currentCollectedData);
+    const doctorName = (patient as any).doctorName || 'seu médico';
     const { response: aiResponse, extractedData, isComplete } = await callAIWithHistory(
       history,
       patient.name,
       surgery.type,
       daysPostOp,
       previousPain,
-      currentCollectedData
+      currentCollectedData,
+      doctorName
     );
 
     // 9. Adicionar resposta da IA ao histórico
@@ -389,7 +391,8 @@ async function callAIWithHistory(
   surgeryType: string,
   daysPostOp: number,
   previousPain: number | null = null,
-  currentCollectedData: any = {}
+  currentCollectedData: any = {},
+  doctorName: string = 'seu médico'
 ): Promise<{ response: string; extractedData: any; isComplete: boolean }> {
   const firstName = patientName.split(' ')[0];
 
@@ -406,7 +409,7 @@ async function callAIWithHistory(
     ? `\n\nDADOS JÁ COLETADOS NESTA CONVERSA:\n${JSON.stringify(currentCollectedData, null, 2)}\nNÃO pergunte novamente sobre esses dados!`
     : '';
 
-  const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios do Dr. João Vitor.
+  const systemPrompt = `Você é uma assistente médica virtual empática que acompanha pacientes pós-operatórios de ${doctorName}.
 
 CONTEXTO:
 - Paciente: ${firstName}
@@ -431,7 +434,7 @@ REGRAS CRÍTICAS:
 3. Faça UMA pergunta por vez
 4. Se o paciente der resposta vaga, peça esclarecimento específico
 5. Se dor >= 8, sangramento intenso ou febre >= 38°C: alerte para procurar emergência
-6. Quando tiver TODAS as 6 informações, agradeça e diga que vai passar para o Dr. João Vitor
+6. Quando tiver TODAS as 6 informações, agradeça e diga que vai passar para ${doctorName}
 7. Seja empática e use português brasileiro informal
 8. SE o paciente perguntar sobre cuidados, USE O PROTOCOLO para responder
 
@@ -523,7 +526,7 @@ REGRAS DO JSON:
     }
     if (lastAssistantMsg.includes('medicaç')) {
       return {
-        response: `Perfeito, ${firstName}! Muito obrigada pelas informações. Vou passar tudo para o Dr. João Vitor. Boa recuperação! 💙`,
+        response: `Perfeito, ${firstName}! Muito obrigada pelas informações. Vou passar tudo para ${doctorName}. Boa recuperação! 💙`,
         extractedData: {},
         isComplete: true
       };
@@ -533,20 +536,23 @@ REGRAS DO JSON:
   }
 }
 
-// Buscar paciente
+// Buscar paciente (com nome do médico)
 async function findPatient(phone: string) {
   const digits = phone.replace(/\D/g, '');
   const last8 = digits.slice(-8);
   const last9 = digits.slice(-9);
 
   const patients = await prisma.patient.findMany({
-    where: { isActive: true }
+    where: { isActive: true },
+    include: {
+      user: { select: { nomeCompleto: true } }
+    }
   });
 
   for (const p of patients) {
     const pDigits = p.phone.replace(/\D/g, '');
     if (pDigits.slice(-8) === last8 || pDigits.slice(-9) === last9) {
-      return p;
+      return { ...p, doctorName: p.user?.nomeCompleto || 'seu médico' };
     }
   }
   return null;

@@ -207,7 +207,7 @@ export function analyzePainTrend(
 
   if (shouldAlertDoctor) {
     message =
-      'Sua dor está acima do esperado. Vou informar o Dr. João Vitor para avaliar se precisa ajustar suas medicações.';
+      'Sua dor está acima do esperado. Vou informar seu médico para avaliar se precisa ajustar suas medicações.';
   } else if (concernLevel === 'moderate') {
     message =
       'Sua dor está dentro do esperado, mas vou passar para o médico ficar atento à evolução.';

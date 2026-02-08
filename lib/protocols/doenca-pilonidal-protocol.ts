@@ -223,7 +223,7 @@ CRM: 12831
 `;
 
 export const DOENCA_PILONIDAL_FAQ = {
-  deiscencia: `A abertura da ferida (deiscência) é uma complicação que pode acontecer na cirurgia de doença pilonidal. Se isso ocorrer, entre em contato com o Dr. João Vítor para avaliar. Pode ser necessário fazer curativos especiais. A cicatrização por segunda intenção (ferida aberta cicatrizando sozinha) é possível.`,
+  deiscencia: `A abertura da ferida (deiscência) é uma complicação que pode acontecer na cirurgia de doença pilonidal. Se isso ocorrer, entre em contato com seu médico para avaliar. Pode ser necessário fazer curativos especiais. A cicatrização por segunda intenção (ferida aberta cicatrizando sozinha) é possível.`,
 
   secrecao: `Uma secreção clara ou serosa em pequena quantidade pode ser normal. No entanto, se a secreção for purulenta (amarelo-esverdeada) com odor fétido, pode indicar abscesso e você deve entrar em contato imediatamente com o médico.`,
 

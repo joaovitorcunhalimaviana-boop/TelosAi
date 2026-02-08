@@ -79,7 +79,7 @@ export async function analyzePatientMessageWithGemini(
             ]
         });
 
-        const systemPrompt = `Você é a Clara, a assistente de IA da clínica do ${patientContext.doctorName || 'Dr. João'} (Telos.AI).
+        const systemPrompt = `Você é a Clara, a assistente de IA da clínica de ${patientContext.doctorName || 'seu médico'} (Telos.AI).
 Sua missão é acompanhar a recuperação de pacientes pós-cirúrgicos com INTELIGÊNCIA HUMANIZADA e EMPATIA.
 
 CONTEXTO DO PACIENTE:

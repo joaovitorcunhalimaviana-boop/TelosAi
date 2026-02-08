@@ -201,7 +201,7 @@ CRM: 12831
 `;
 
 export const FISSURECTOMIA_FAQ = {
-  dor_evacuar: `A dor ao evacuar é o principal sintoma após a fissurectomia e é esperada nas primeiras semanas. Use a pomada ANTES de evacuar para ajudar na lubrificação. Faça um banho de assento morno LOGO APÓS a evacuação para relaxar o esfíncter. Mantenha as fezes macias com o laxante e boa hidratação. Se a dor for insuportável (acima de 9/10) e impedir você de evacuar, entre em contato com o Dr. João Vítor.`,
+  dor_evacuar: `A dor ao evacuar é o principal sintoma após a fissurectomia e é esperada nas primeiras semanas. Use a pomada ANTES de evacuar para ajudar na lubrificação. Faça um banho de assento morno LOGO APÓS a evacuação para relaxar o esfíncter. Mantenha as fezes macias com o laxante e boa hidratação. Se a dor for insuportável (acima de 9/10) e impedir você de evacuar, entre em contato com seu médico.`,
 
   espasmo_anal: `O espasmo anal (sensação de câimbra ou aperto no ânus) é comum após a fissurectomia. Os banhos de assento com água morna ajudam muito a relaxar a musculatura. A ciclobenzaprina também ajuda no espasmo. Se o espasmo for severo e persistente, entre em contato com o médico.`,
 

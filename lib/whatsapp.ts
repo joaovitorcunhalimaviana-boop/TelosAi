@@ -351,8 +351,10 @@ export async function sendFollowUpQuestionnaire(
 
     // Salvar mensagem do template no histórico para aparecer na visualização
     const conversation = await getOrCreateConversation(patient.phone, patient.id);
+    // Nome do médico dinâmico
+    const doctorName = (patient as any).doctorName || (patient as any).user?.nomeCompleto || 'seu médico';
     const templateMessage = templateName === 'day1'
-      ? `[Template D+1] Olá ${patientFirstName}! Sou a assistente virtual do Dr. João Vitor. Tudo bem com você? 😊 Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
+      ? `[Template D+1] Olá ${patientFirstName}! Sou a assistente virtual de ${doctorName}. Tudo bem com você? 😊 Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
       : `[Template D+${followUp.dayNumber}] Olá ${patientFirstName}! Tudo bem? 😊 Estou passando para acompanhar sua recuperação. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`;
 
     await recordSystemMessage(conversation.id, templateMessage);

@@ -220,7 +220,7 @@ Técnica: Hemorroidectomia fechada (Ferguson)
 `;
 
 export const PROTOCOL_FAQ = {
-  dor_forte: `A dor nos primeiros dias pode ser intensa, especialmente durante e após as evacuações. Certifique-se de que está tomando todos os medicamentos nos horários corretos e não apenas quando a dor aparece. Nos primeiros 2 dias (D0 a D2), use compressas GELADAS 5x/dia por 10 minutos - isso reduz edema e dor. A partir do D3, faça banhos de assento com água MORNA. A pomada deve ser usada de 8/8h, sempre APÓS evacuar. Se mesmo assim a dor for insuportável (acima de 8/10) e impedir você de dormir ou comer, entre em contato com o Dr. João Vítor ou procure atendimento.`,
+  dor_forte: `A dor nos primeiros dias pode ser intensa, especialmente durante e após as evacuações. Certifique-se de que está tomando todos os medicamentos nos horários corretos e não apenas quando a dor aparece. Nos primeiros 2 dias (D0 a D2), use compressas GELADAS 5x/dia por 10 minutos - isso reduz edema e dor. A partir do D3, faça banhos de assento com água MORNA. A pomada deve ser usada de 8/8h, sempre APÓS evacuar. Se mesmo assim a dor for insuportável (acima de 8/10) e impedir você de dormir ou comer, entre em contato com seu médico ou procure atendimento.`,
 
   sangramento: `Pequenas quantidades de sangue vivo são normais, especialmente durante e após as evacuações. Se o sangramento for em pequenas manchas na gaze ou no vaso, está dentro do esperado. Se houver sangramento em jato, coágulos grandes ou sangue em grande quantidade enchendo o vaso sanitário, procure atendimento médico imediatamente.`,
 
@@ -228,11 +228,11 @@ export const PROTOCOL_FAQ = {
 
   dor_evacuar: `A dor durante a evacuação é esperada nas primeiras semanas. Use a pomada APÓS evacuar (de 8/8h, 3x ao dia - a posologia correta). Nos primeiros 2 dias (D0 a D2), faça compressas geladas por 10 minutos, 5x ao dia. A partir do D3, faça banhos de assento com água morna após a evacuação para aliviar o desconforto. Mantenha as fezes macias com o laxante e boa hidratação.`,
 
-  caroco_inchaco: `Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo Dr. João Vítor no retorno. O uso da Diosmina + Hesperidina e da pomada ajudam a reduzir esses inchaços.`,
+  caroco_inchaco: `Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo seu médico no retorno. O uso da Diosmina + Hesperidina e da pomada ajudam a reduzir esses inchaços.`,
 
   secrecao: `Uma secreção clara, rosada ou amarelada é normal e faz parte do processo de cicatrização. Ela pode durar até 3 semanas. Troque a gaze sempre que estiver úmida. Sinais de infecção seriam: secreção amarelo-esverdeada com odor forte e fétido, acompanhada de febre ou piora da dor. Se isso acontecer, procure atendimento.`,
 
-  voltar_trabalho: `Depende do tipo de trabalho. Para atividades leves de escritório, geralmente após 7-10 dias. Para trabalhos que exigem esforço físico, pode levar 3-4 semanas. Converse com o Dr. João Vítor no retorno sobre sua situação específica.`,
+  voltar_trabalho: `Depende do tipo de trabalho. Para atividades leves de escritório, geralmente após 7-10 dias. Para trabalhos que exigem esforço físico, pode levar 3-4 semanas. Converse com seu médico no retorno sobre sua situação específica.`,
 
   dirigir: `Pode dirigir quando não estiver mais usando medicamentos que causem sonolência e quando conseguir sentar e movimentar as pernas sem dor significativa. Geralmente após 7-10 dias, mas varia de pessoa para pessoa.`,
 };

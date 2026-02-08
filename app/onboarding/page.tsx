@@ -3,16 +3,18 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 
 export default function OnboardingPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 4
 
-  // Mock doctor name - in real app, this would come from auth session
-  const doctorName = "Dr. João"
+  // Nome do médico vem da sessão de autenticação
+  const doctorName = session?.user?.name || "Doutor(a)"
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
