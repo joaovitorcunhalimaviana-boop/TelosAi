@@ -92,9 +92,39 @@ export function formatProtocolsForPrompt(protocols: ApplicableProtocol[]): strin
 }
 
 /**
+ * Verifica RAPIDAMENTE se um médico tem protocolos cadastrados para um tipo de cirurgia
+ * Usa count() que é mais rápido que findMany()
+ */
+async function doctorHasCustomProtocols(
+  userId: string,
+  surgeryType: string,
+  researchId?: string | null
+): Promise<boolean> {
+  const normalizedSurgeryType = surgeryType.toLowerCase();
+  const researchFilter = researchId ? { researchId: researchId } : { researchId: null };
+
+  const count = await prisma.protocol.count({
+    where: {
+      userId: userId,
+      isActive: true,
+      surgeryType: normalizedSurgeryType,
+      ...researchFilter
+    }
+  });
+
+  return count > 0;
+}
+
+/**
  * Busca protocolos para injetar na IA
- * 1. Primeiro tenta buscar protocolos personalizados do médico no banco de dados
- * 2. Se não encontrar, usa o protocolo hardcoded padrão como fallback
+ *
+ * LÓGICA DE ISOLAMENTO ESTRITO:
+ * 1. Verifica SE o médico tem QUALQUER protocolo cadastrado para esse tipo de cirurgia
+ * 2. Se TEM → usa APENAS os protocolos dele (NUNCA fallback!)
+ * 3. Se NÃO TEM NENHUM → aí sim usa o fallback hardcoded
+ *
+ * IMPORTANTE: Se Dra. Patrícia cadastrou protocolo de hemorroida,
+ * NUNCA misturar com o protocolo base do Dr. João!
  *
  * @param userId - ID do médico responsável pelo paciente
  * @param surgeryType - Tipo de cirurgia (hemorroidectomia, fissura, etc)
@@ -108,27 +138,41 @@ export async function getProtocolsForAI(
   researchId?: string | null
 ): Promise<string> {
   try {
-    // 1. Buscar protocolos personalizados do médico no banco
-    const dbProtocols = await findApplicableProtocols(
-      userId,
-      surgeryType,
-      dayNumber,
-      researchId
-    );
+    // 1. VERIFICAÇÃO RÁPIDA: médico tem protocolos personalizados?
+    const hasCustomProtocols = await doctorHasCustomProtocols(userId, surgeryType, researchId);
 
-    // 2. Se encontrou protocolos no banco, formatar e retornar
-    if (dbProtocols.length > 0) {
-      logger.info(`📋 Usando ${dbProtocols.length} protocolos do banco para userId=${userId}, surgery=${surgeryType}, D+${dayNumber}`);
-      return formatProtocolsForPrompt(dbProtocols);
+    if (hasCustomProtocols) {
+      // 2A. MÉDICO TEM PROTOCOLOS PRÓPRIOS → usar APENAS os dele, NUNCA fallback!
+      const dbProtocols = await findApplicableProtocols(
+        userId,
+        surgeryType,
+        dayNumber,
+        researchId
+      );
+
+      if (dbProtocols.length > 0) {
+        logger.info(`📋 [CUSTOM] Usando ${dbProtocols.length} protocolos do médico userId=${userId} para ${surgeryType} D+${dayNumber}`);
+        return formatProtocolsForPrompt(dbProtocols);
+      } else {
+        // Médico TEM protocolos, mas não para este dia específico
+        // NÃO usar fallback! Retornar mensagem apropriada
+        logger.info(`📋 [CUSTOM] Médico userId=${userId} tem protocolos de ${surgeryType}, mas nenhum para D+${dayNumber}`);
+        return `=== PROTOCOLOS DO MÉDICO ===
+Este médico tem protocolos personalizados cadastrados para ${surgeryType}.
+No entanto, não há orientações específicas cadastradas para o dia D+${dayNumber}.
+
+Para orientações gerais, siga as boas práticas de pós-operatório.
+Em caso de dúvida, oriente o paciente a entrar em contato com o consultório.`;
+      }
+    } else {
+      // 2B. MÉDICO NÃO TEM PROTOCOLOS → usar fallback hardcoded (protocolo base)
+      logger.info(`📋 [FALLBACK] Médico userId=${userId} não tem protocolos de ${surgeryType}. Usando protocolo base.`);
+      return getDefaultProtocol(surgeryType);
     }
-
-    // 3. Fallback: usar protocolo hardcoded padrão
-    logger.info(`📋 Nenhum protocolo no banco. Usando fallback hardcoded para surgery=${surgeryType}`);
-    return getDefaultProtocol(surgeryType);
 
   } catch (error) {
     logger.error('❌ Erro ao buscar protocolos para IA:', error);
-    // Em caso de erro, usar fallback
+    // Em caso de erro de banco, usar fallback para não travar
     return getDefaultProtocol(surgeryType);
   }
 }
