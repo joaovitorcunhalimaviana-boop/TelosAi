@@ -309,7 +309,8 @@ export async function checkStalledFollowUps() {
                                 followUp.patient.name,
                                 followUp.dayNumber,
                                 'high', // Risco alto pois paciente parou de responder
-                                ['Paciente parou de responder há mais de 12 horas'] // Motivo
+                                ['Paciente parou de responder há mais de 12 horas'], // Motivo
+                                followUp.patient.userId
                             );
 
                             // Marcar que médico foi avisado

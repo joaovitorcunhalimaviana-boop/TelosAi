@@ -10,6 +10,7 @@ import {
 import { fromBrasiliaTime } from '@/lib/date-utils';
 import { AuditLogger } from '@/lib/audit/logger';
 import { getClientIP } from '@/lib/utils/ip';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -147,6 +148,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // SECURITY: Verify user authentication
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in to access this resource'),
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     console.log(`[GET Patient] Fetching patient with ID: ${id}`);
 
@@ -208,6 +218,16 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // SECURITY: Verify patient belongs to the logged-in doctor (medical confidentiality)
+    if (patient.userId !== session.user.id) {
+      console.log(`[GET Patient] Access denied: User ${session.user.id} attempted to access patient of user ${patient.userId}`);
+      return NextResponse.json(
+        buildErrorResponse('Forbidden', 'You do not have permission to access this patient'),
+        { status: 403 }
+      );
+    }
+
     console.log(`[GET Patient] Patient found: ${patient.name}`);
 
     // Calculate completeness for the latest surgery
@@ -262,6 +282,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // SECURITY: Verify user authentication
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in to access this resource'),
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
 
     // Validate ID format
@@ -291,6 +320,15 @@ export async function PATCH(
       return NextResponse.json(
         buildErrorResponse('Patient not found', `No patient found with ID: ${id}`),
         { status: 404 }
+      );
+    }
+
+    // SECURITY: Verify patient belongs to the logged-in doctor (medical confidentiality)
+    if (existingPatient.userId !== session.user.id) {
+      console.log(`[PATCH Patient] Access denied: User ${session.user.id} attempted to modify patient of user ${existingPatient.userId}`);
+      return NextResponse.json(
+        buildErrorResponse('Forbidden', 'You do not have permission to modify this patient'),
+        { status: 403 }
       );
     }
 
@@ -561,6 +599,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // SECURITY: Verify user authentication
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in to access this resource'),
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
 
     // Validate ID format
@@ -580,6 +627,15 @@ export async function DELETE(
       return NextResponse.json(
         buildErrorResponse('Patient not found', `No patient found with ID: ${id}`),
         { status: 404 }
+      );
+    }
+
+    // SECURITY: Verify patient belongs to the logged-in doctor (medical confidentiality)
+    if (existingPatient.userId !== session.user.id) {
+      console.log(`[DELETE Patient] Access denied: User ${session.user.id} attempted to delete patient of user ${existingPatient.userId}`);
+      return NextResponse.json(
+        buildErrorResponse('Forbidden', 'You do not have permission to delete this patient'),
+        { status: 403 }
       );
     }
 

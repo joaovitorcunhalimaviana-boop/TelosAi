@@ -380,35 +380,47 @@ export async function sendEmpatheticResponse(
 }
 
 /**
- * Envia alerta ao médico
+ * Envia alerta ao médico via notificação no dashboard
+ * Cria uma notificação no banco de dados que aparece no painel do médico
  */
 export async function sendDoctorAlert(
   patientName: string,
   dayNumber: number,
   riskLevel: string,
   redFlags: string[],
-  doctorPhone?: string
+  doctorId?: string
 ): Promise<void> {
-  // Número do médico (pode vir do banco de dados ou env var)
-  const doctorPhoneNumber = doctorPhone || process.env.DOCTOR_PHONE_NUMBER;
-
-  if (!doctorPhoneNumber) {
-    console.warn('Doctor phone number not configured. Alert not sent.');
+  if (!doctorId) {
+    console.warn('Doctor ID not provided. Alert notification not created.');
     return;
   }
 
-  const message = `🚨 ALERTA - Paciente: ${patientName}\n\n` +
+  const message = `Paciente: ${patientName}\n` +
     `Dia: D+${dayNumber}\n` +
     `Nível de risco: ${riskLevel.toUpperCase()}\n\n` +
     `Red Flags detectados:\n` +
-    redFlags.map(flag => `• ${flag}`).join('\n') +
-    `\n\nAcesse o sistema para mais detalhes.`;
+    redFlags.map(flag => `• ${flag}`).join('\n');
 
   try {
-    await sendMessage(doctorPhoneNumber, message);
-    console.log('Doctor alert sent successfully');
+    await prisma.notification.create({
+      data: {
+        userId: doctorId,
+        type: 'red_flag',
+        title: 'Alerta de Paciente',
+        message: message,
+        priority: riskLevel === 'critical' ? 'critical' : 'high',
+        read: false,
+        data: {
+          patientName,
+          dayNumber,
+          riskLevel,
+          redFlags,
+        },
+      },
+    });
+    console.log('Doctor alert notification created successfully');
   } catch (error) {
-    console.error('Error sending doctor alert:', error);
+    console.error('Error creating doctor alert notification:', error);
     // Não lançar erro para não quebrar o fluxo principal
   }
 }

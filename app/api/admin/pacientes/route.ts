@@ -13,6 +13,8 @@ export async function GET(req: NextRequest) {
     const medicoId = searchParams.get("medicoId") || "all";
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const order = searchParams.get("order") || "desc";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "20", 10);
 
     const where: any = {};
 
@@ -30,8 +32,20 @@ export async function GET(req: NextRequest) {
       where.userId = medicoId;
     }
 
+    // Build surgery type filter for query if needed
+    const surgeryTypeWhere = surgeryType !== "all"
+      ? { surgeries: { some: { type: surgeryType } } }
+      : {};
+
+    const combinedWhere = { ...where, ...surgeryTypeWhere };
+
+    // Get total count for pagination
+    const totalCount = await prisma.patient.count({ where: combinedWhere });
+    const totalPages = Math.ceil(totalCount / limit);
+    const skip = (page - 1) * limit;
+
     const pacientes = await prisma.patient.findMany({
-      where,
+      where: combinedWhere,
       select: {
         id: true,
         name: true,
@@ -65,18 +79,12 @@ export async function GET(req: NextRequest) {
       orderBy: {
         [sortBy]: order,
       },
+      skip,
+      take: limit,
     });
 
-    // Filter by surgery type if specified
-    let filteredPacientes = pacientes;
-    if (surgeryType !== "all") {
-      filteredPacientes = pacientes.filter(
-        (p) => p.surgeries[0]?.type === surgeryType
-      );
-    }
-
     // Format response
-    const formattedPacientes = filteredPacientes.map((paciente) => {
+    const formattedPacientes = pacientes.map((paciente) => {
       const lastSurgery = paciente.surgeries[0];
 
       return {
@@ -103,7 +111,15 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json(formattedPacientes);
+    return NextResponse.json({
+      data: formattedPacientes,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+      },
+    });
   } catch (error: any) {
     console.error("Error fetching pacientes:", error);
     return NextResponse.json(

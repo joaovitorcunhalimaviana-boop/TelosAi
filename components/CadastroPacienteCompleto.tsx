@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getNowBrasilia, startOfDayBrasilia } from "@/lib/date-utils"
+import { SURGERY_TYPE_LABELS } from "@/lib/constants/surgery-types"
 
 // Schema de validação completo (Admin com campos de pesquisa)
 const completePatientSchema = z.object({
@@ -401,10 +402,10 @@ export function CadastroPacienteCompleto({ onSubmit }: CadastroPacienteCompletoP
               <SelectValue placeholder="Selecione o tipo de cirurgia" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
-              <SelectItem value="fistula">Fistulotomia/Fistulectomia</SelectItem>
-              <SelectItem value="fissura">Fissurectomia</SelectItem>
-              <SelectItem value="pilonidal">Exérese de Cisto Pilonidal</SelectItem>
+              <SelectItem value="hemorroidectomia">{SURGERY_TYPE_LABELS['hemorroidectomia']}</SelectItem>
+              <SelectItem value="fistula">{SURGERY_TYPE_LABELS['fistula']}</SelectItem>
+              <SelectItem value="fissura">{SURGERY_TYPE_LABELS['fissurectomia']}</SelectItem>
+              <SelectItem value="pilonidal">{SURGERY_TYPE_LABELS['doenca_pilonidal']}</SelectItem>
             </SelectContent>
           </Select>
           {errors.surgeryType && (

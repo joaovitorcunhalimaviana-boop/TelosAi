@@ -62,8 +62,8 @@ export function detectRedFlags(input: RedFlagInput): RedFlag[] {
 function detectUniversalRedFlags(input: RedFlagInput): RedFlag[] {
   const flags: RedFlag[] = [];
 
-  // Febre alta (>38°C)
-  if (input.fever && input.temperature && input.temperature >= 38) {
+  // Febre pós-operatória (>37.5°C)
+  if (input.fever && input.temperature && input.temperature > 37.5) {
     flags.push({
       id: 'fever_high',
       severity: input.temperature >= 39 ? 'critical' : 'high',
@@ -78,7 +78,7 @@ function detectUniversalRedFlags(input: RedFlagInput): RedFlag[] {
       id: 'fever_unspecified',
       severity: 'high',
       message: 'Febre presente',
-      recommendation: 'Meça a temperatura e procure atendimento se estiver acima de 38°C.',
+      recommendation: 'Meça a temperatura e procure atendimento se estiver acima de 37.5°C.',
     });
   }
 

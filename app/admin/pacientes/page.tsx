@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, Column } from "@/components/admin/DataTable";
-import { Search, Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
+import { Search, Download, FileSpreadsheet, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { getSurgeryTypeLabel } from "@/lib/constants/surgery-types";
 
 interface Paciente {
   id: string;
@@ -33,19 +35,32 @@ interface Paciente {
   } | null;
 }
 
-const surgeryTypeLabels: Record<string, string> = {
-  hemorroidectomia: "Hemorroidectomia",
-  fistula: "Fístula",
-  fissura: "Fissura",
-  pilonidal: "Pilonidal",
-};
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+const ITEMS_PER_PAGE = 20;
 
 export default function PacientesPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [surgeryTypeFilter, setSurgeryTypeFilter] = useState("all");
   const [exporting, setExporting] = useState(false);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: ITEMS_PER_PAGE,
+    totalCount: 0,
+    totalPages: 0,
+  });
+
+  // Get page from URL query params
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   const loadPacientes = useCallback(async () => {
     setLoading(true);
@@ -53,25 +68,44 @@ export default function PacientesPage() {
       const params = new URLSearchParams({
         search,
         surgeryType: surgeryTypeFilter,
+        page: currentPage.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
       });
       const res = await fetch(`/api/admin/pacientes?${params}`);
-      const data = await res.json();
+      const result = await res.json();
 
       if (res.ok) {
-        setPacientes(data);
+        setPacientes(result.data);
+        setPagination(result.pagination);
       } else {
-        console.error("Error loading pacientes:", data.error);
+        console.error("Error loading pacientes:", result.error);
       }
     } catch (error) {
       console.error("Error loading pacientes:", error);
     } finally {
       setLoading(false);
     }
-  }, [search, surgeryTypeFilter]);
+  }, [search, surgeryTypeFilter, currentPage]);
 
   useEffect(() => {
     loadPacientes();
   }, [loadPacientes]);
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    router.push(`/admin/pacientes?${params.toString()}`);
+  };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.push(`/admin/pacientes?${params.toString()}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, surgeryTypeFilter]);
 
   const handleExport = async (format: "csv" | "excel") => {
     setExporting(true);
@@ -133,7 +167,7 @@ export default function PacientesPage() {
         return (
           <div>
             <Badge variant="default" className="text-xs">
-              {surgeryTypeLabels[value.type] || value.type}
+              {getSurgeryTypeLabel(value.type)}
             </Badge>
             <div className="text-xs text-gray-500 mt-1">
               {new Date(value.date).toLocaleDateString("pt-BR")}
@@ -301,7 +335,7 @@ export default function PacientesPage() {
             <CardContent className="pt-6">
               <div className="text-sm text-gray-600">Total de Pacientes</div>
               <div className="text-2xl font-bold text-blue-600">
-                {pacientes.length}
+                {pagination.totalCount}
               </div>
             </CardContent>
           </Card>
@@ -351,11 +385,49 @@ export default function PacientesPage() {
             </div>
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={pacientes}
-            keyField="id"
-          />
+          <>
+            <DataTable
+              columns={columns}
+              data={pacientes}
+              keyField="id"
+            />
+
+            {/* Pagination Controls */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 px-2">
+                <div className="text-sm text-gray-600">
+                  Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{" "}
+                  {Math.min(pagination.page * pagination.limit, pagination.totalCount)} de{" "}
+                  {pagination.totalCount} pacientes
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={pagination.page <= 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Anterior
+                  </Button>
+                  <span className="text-sm font-medium px-3">
+                    Página {pagination.page} de {pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.totalPages}
+                    className="gap-1"
+                  >
+                    Próximo
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getNowBrasilia, startOfDayBrasilia } from "@/lib/date-utils"
+import { SURGERY_TYPE_LABELS } from "@/lib/constants/surgery-types"
 
 // Schema de validação com Zod
 const simplifiedPatientSchema = z.object({
@@ -240,10 +241,10 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
                 <SelectValue placeholder="Selecione o tipo de cirurgia" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
-                <SelectItem value="fistula">Tratamento Cirúrgico de Fístula Anal</SelectItem>
-                <SelectItem value="fissura">Fissurectomia</SelectItem>
-                <SelectItem value="pilonidal">Tratamento Cirúrgico de Doença Pilonidal</SelectItem>
+                <SelectItem value="hemorroidectomia">{SURGERY_TYPE_LABELS['hemorroidectomia']}</SelectItem>
+                <SelectItem value="fistula">{SURGERY_TYPE_LABELS['fistula']}</SelectItem>
+                <SelectItem value="fissura">{SURGERY_TYPE_LABELS['fissurectomia']}</SelectItem>
+                <SelectItem value="pilonidal">{SURGERY_TYPE_LABELS['doenca_pilonidal']}</SelectItem>
               </SelectContent>
             </Select>
             {errors.surgeryType && (

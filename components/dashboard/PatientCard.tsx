@@ -17,6 +17,7 @@ import { motion } from "framer-motion"
 import { ScaleOnHover } from "@/components/animations"
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts"
 import type { PatientCard as PatientCardType, SurgeryType } from "@/app/dashboard/actions"
+import { getSurgeryTypeLabel } from "@/lib/constants/surgery-types"
 
 interface PatientCardProps {
   patient: PatientCardType
@@ -54,15 +55,6 @@ const isPatientNew = (createdAt: Date): boolean => {
   return hoursDiff <= 24
 }
 
-const getSurgeryTypeLabel = (type: SurgeryType) => {
-  const labels: Record<SurgeryType, string> = {
-    hemorroidectomia: "Hemorroidectomia",
-    fistula: "Fístula",
-    fissura: "Fissura",
-    pilonidal: "Pilonidal",
-  }
-  return labels[type]
-}
 
 const getPatientRiskLevel = (patient: PatientCardType): 'low' | 'medium' | 'high' | 'critical' => {
   if (patient.hasRedFlags && patient.redFlags.length > 0) return 'critical'
@@ -364,7 +356,9 @@ export {
   getCompletenessVariant,
   getCompletenessMessage,
   isPatientNew,
-  getSurgeryTypeLabel,
   getPatientRiskLevel,
   getRiskBorderClass,
 }
+
+// Re-export getSurgeryTypeLabel for backward compatibility
+export { getSurgeryTypeLabel } from "@/lib/constants/surgery-types"

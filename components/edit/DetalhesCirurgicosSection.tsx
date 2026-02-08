@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { SURGERY_TYPE_LABELS } from '@/lib/constants/surgery-types';
 
 interface DetalhesCirurgicosSectionProps {
   patient: any;
@@ -138,10 +139,10 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
             <SelectValue placeholder="Selecione o tipo de cirurgia" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
-            <SelectItem value="fistula">Fístula Anorretal</SelectItem>
-            <SelectItem value="fissura">Fissura Anal</SelectItem>
-            <SelectItem value="cisto_pilonidal">Cisto Pilonidal</SelectItem>
+            <SelectItem value="hemorroidectomia">{SURGERY_TYPE_LABELS['hemorroidectomia']}</SelectItem>
+            <SelectItem value="fistula">{SURGERY_TYPE_LABELS['fistula']}</SelectItem>
+            <SelectItem value="fissura">{SURGERY_TYPE_LABELS['fissurectomia']}</SelectItem>
+            <SelectItem value="cisto_pilonidal">{SURGERY_TYPE_LABELS['doenca_pilonidal']}</SelectItem>
           </SelectContent>
         </Select>
       </div>

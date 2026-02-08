@@ -13,6 +13,9 @@ export async function GET(req: NextRequest) {
     const plan = searchParams.get("plan") || "all";
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const order = searchParams.get("order") || "desc";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "20", 10);
+    const skip = (page - 1) * limit;
 
     const where: Prisma.UserWhereInput = {
       role: "medico",
@@ -31,6 +34,10 @@ export async function GET(req: NextRequest) {
     if (plan !== "all") {
       where.plan = plan;
     }
+
+    // Get total count for pagination
+    const totalCount = await prisma.user.count({ where });
+    const totalPages = Math.ceil(totalCount / limit);
 
     const medicos = await prisma.user.findMany({
       where,
@@ -60,6 +67,8 @@ export async function GET(req: NextRequest) {
       orderBy: {
         [sortBy]: order,
       },
+      skip,
+      take: limit,
     });
 
     // Calculate billing for each doctor
@@ -80,7 +89,15 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json(medicosWithBilling);
+    return NextResponse.json({
+      data: medicosWithBilling,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+      },
+    });
   } catch (error) {
     console.error("Error fetching medicos:", error);
     const message = error instanceof Error ? error.message : "Erro ao buscar médicos";

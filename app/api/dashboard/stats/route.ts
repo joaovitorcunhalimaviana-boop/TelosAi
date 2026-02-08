@@ -4,21 +4,24 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { buildErrorResponse } from '@/lib/api-utils';
 import { startOfDayBrasilia } from '@/lib/date-utils';
+import { auth } from '@/lib/auth';
 
 // ============================================
 // CACHED DASHBOARD STATS FUNCTION
 // ============================================
 
+// SECURITY: Requires userId for patient isolation
 const getCachedDashboardStats = unstable_cache(
-  async () => {
+  async (userId: string) => {
     const startTime = Date.now();
 
-    // Get today's date at midnight (Brasília timezone)
+    // Get today's date at midnight (Brasilia timezone)
     const today = startOfDayBrasilia();
 
-    // Get date 7 days ago (Brasília timezone)
+    // Get date 7 days ago (Brasilia timezone)
     const sevenDaysAgo = startOfDayBrasilia(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
 
+    // SECURITY: All queries filter by userId to ensure doctor only sees their own patients
     // Execute all queries in parallel for better performance
     const [
       totalActivePatients,
@@ -29,9 +32,10 @@ const getCachedDashboardStats = unstable_cache(
       recentSurgeries,
       allSurgeries,
     ] = await Promise.all([
-      // Total active patients
+      // Total active patients (only for this doctor)
       prisma.patient.count({
         where: {
+          userId: userId,
           surgeries: {
             some: {
               status: 'active',
@@ -40,14 +44,17 @@ const getCachedDashboardStats = unstable_cache(
         },
       }),
 
-      // Total pending follow-ups
+      // Total pending follow-ups (only for this doctor's patients)
       prisma.followUp.count({
         where: {
           status: 'pending',
+          patient: {
+            userId: userId,
+          },
         },
       }),
 
-      // Pending follow-ups scheduled for today
+      // Pending follow-ups scheduled for today (only for this doctor's patients)
       prisma.followUp.count({
         where: {
           status: 'pending',
@@ -55,35 +62,54 @@ const getCachedDashboardStats = unstable_cache(
             gte: today,
             lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
           },
+          patient: {
+            userId: userId,
+          },
         },
       }),
 
-      // Overdue follow-ups
+      // Overdue follow-ups (only for this doctor's patients)
       prisma.followUp.count({
         where: {
           status: 'overdue',
+          patient: {
+            userId: userId,
+          },
         },
       }),
 
-      // High-risk alerts (responses with high or critical risk level)
+      // High-risk alerts (only for this doctor's patients)
       prisma.followUpResponse.count({
         where: {
           OR: [{ riskLevel: 'high' }, { riskLevel: 'critical' }],
           doctorAlerted: false, // Not yet alerted
+          followUp: {
+            patient: {
+              userId: userId,
+            },
+          },
         },
       }),
 
-      // Recent surgeries (last 7 days)
+      // Recent surgeries (last 7 days, only for this doctor's patients)
       prisma.surgery.count({
         where: {
           date: {
             gte: sevenDaysAgo,
           },
+          patient: {
+            userId: userId,
+          },
         },
       }),
 
-      // Get all surgeries for average completion rate
+      // Get all surgeries for average completion rate (only for this doctor's patients)
       prisma.surgery.findMany({
+        where: {
+          patient: {
+            userId: userId,
+          },
+        },
         select: {
           dataCompleteness: true,
         },
@@ -310,8 +336,17 @@ const getCachedDashboardStats = unstable_cache(
 
 export async function GET() {
   try {
+    // SECURITY: Get current user session for patient isolation
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        buildErrorResponse('Unauthorized', 'You must be logged in'),
+        { status: 401 }
+      );
+    }
+
     const startTime = Date.now();
-    const stats = await getCachedDashboardStats();
+    const stats = await getCachedDashboardStats(session.user.id);
     const duration = Date.now() - startTime;
 
     console.log(`[CACHE] Dashboard stats request served in ${duration}ms`);

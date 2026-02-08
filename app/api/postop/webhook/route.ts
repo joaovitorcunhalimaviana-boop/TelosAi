@@ -294,7 +294,8 @@ async function processFollowUpResponse(
         patient.name,
         followUp.dayNumber,
         finalRiskLevel,
-        allRedFlags
+        allRedFlags,
+        patient.userId
       );
 
       await prisma.followUpResponse.update({

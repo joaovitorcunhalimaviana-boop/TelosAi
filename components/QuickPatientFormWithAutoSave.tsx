@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail } from "lucide-react"
 import { useAutoSave } from "@/hooks/useAutoSave"
 import { InlineAutoSaveIndicator } from "@/components/AutoSaveIndicator"
+import { SURGERY_TYPE_LABELS } from "@/lib/constants/surgery-types"
 import {
   Card,
   CardContent,
@@ -251,10 +252,10 @@ export function QuickPatientFormWithAutoSave({
                 <SelectValue placeholder="Selecione o tipo de cirurgia" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="hemorroidectomia">Hemorroidectomia</SelectItem>
-                <SelectItem value="fistula">Fístula Anal</SelectItem>
-                <SelectItem value="fissura">Fissura Anal</SelectItem>
-                <SelectItem value="pilonidal">Doença Pilonidal</SelectItem>
+                <SelectItem value="hemorroidectomia">{SURGERY_TYPE_LABELS['hemorroidectomia']}</SelectItem>
+                <SelectItem value="fistula">{SURGERY_TYPE_LABELS['fistula']}</SelectItem>
+                <SelectItem value="fissura">{SURGERY_TYPE_LABELS['fissurectomia']}</SelectItem>
+                <SelectItem value="pilonidal">{SURGERY_TYPE_LABELS['pilonidal']}</SelectItem>
               </SelectContent>
             </Select>
             {errors.surgeryType && (

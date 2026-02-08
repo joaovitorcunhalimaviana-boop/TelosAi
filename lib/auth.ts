@@ -30,7 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               additionalPatientPrice: 350,
               isLifetimePrice: false,
               firstLogin: true,
-              aceitoTermos: true, // Assumir aceite implícito
+              aceitoTermos: false, // Requer aceite explícito dos termos (LGPD)
             },
           });
         }

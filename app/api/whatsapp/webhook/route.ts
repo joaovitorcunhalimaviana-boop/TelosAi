@@ -23,27 +23,55 @@ import { startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
+// ============================================
+// IN-MEMORY RATE LIMITER (fallback when KV unavailable)
+// ============================================
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(ip: string, limit: number = 100, windowSeconds: number = 60): boolean {
+  const now = Date.now();
+  const windowMs = windowSeconds * 1000;
+
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return true; // allowed
+  }
+
+  if (entry.count >= limit) {
+    return false; // rate limited
+  }
+
+  entry.count++;
+  return true; // allowed
+}
+
+// Clean old entries periodically (prevent memory leak)
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [ip, entry] of rateLimitMap.entries()) {
+      if (now > entry.resetTime) {
+        rateLimitMap.delete(ip);
+      }
+    }
+  }, 60000); // Clean every minute
+}
+
 /**
  * GET - Webhook Verification (Meta requirement)
  * Meta envia uma requisição GET para verificar o webhook
  */
 export async function GET(request: NextRequest) {
-  // Rate limiting temporariamente desabilitado devido a erro no KV_REST_API_URL
-  // const ip = getClientIP(request);
-  // const rateLimitResult = await rateLimit(ip, 100, 60);
-
-  // if (!rateLimitResult.success) {
-  //   return NextResponse.json(
-  //     { error: 'Too many requests' },
-  //     {
-  //       status: 429,
-  //       headers: {
-  //         'X-RateLimit-Remaining': '0',
-  //         'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
-  //       }
-  //     }
-  //   );
-  // }
+  // Rate limiting using in-memory fallback
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded' },
+      { status: 429 }
+    );
+  }
 
   const searchParams = request.nextUrl.searchParams;
 
@@ -68,22 +96,14 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting temporariamente desabilitado devido a erro no KV_REST_API_URL
-    // const ip = getClientIP(request);
-    // const rateLimitResult = await rateLimit(ip, 100, 60);
-
-    // if (!rateLimitResult.success) {
-    //   return NextResponse.json(
-    //     { error: 'Too many requests' },
-    //     {
-    //       status: 429,
-    //       headers: {
-    //         'X-RateLimit-Remaining': '0',
-    //         'X-RateLimit-Reset': rateLimitResult.reset?.toString() || '',
-    //       }
-    //     }
-    //   );
-    // }
+    // Rate limiting using in-memory fallback
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
 
     const body = await request.json();
 
@@ -941,7 +961,8 @@ async function finalizeQuestionnaireWithAI(
         patient.name,
         followUp.dayNumber,
         finalRiskLevel,
-        allRedFlags
+        allRedFlags,
+        patient.userId
       );
 
       await prisma.followUpResponse.update({

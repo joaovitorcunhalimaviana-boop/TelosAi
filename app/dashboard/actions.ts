@@ -7,6 +7,7 @@ import { subDays } from "date-fns"
 import { validateResearchFields } from "@/lib/research-field-validator"
 import { getNowBrasilia, startOfDayBrasilia, endOfDayBrasilia } from "@/lib/date-utils"
 import { parseQuestionnaireData } from "@/lib/questionnaire-parser"
+import { auth } from "@/lib/auth"
 
 export type SurgeryType = "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
 
@@ -49,32 +50,39 @@ export interface DashboardFilters {
   researchFilter?: "all" | "non-participants" | string // "all" | "non-participants" | researchId
 }
 
-// Cached version of getDashboardStats
+// Cached version of getDashboardStats - SECURITY: Requires userId for patient isolation
 const getCachedDashboardStatsInternal = unstable_cache(
-  async () => {
+  async (userId: string) => {
     const startTime = Date.now()
     const today = getNowBrasilia()
     const todayStart = startOfDayBrasilia()
     const todayEnd = endOfDayBrasilia()
 
-    // Total de cirurgias hoje
+    // SECURITY: All queries filter by userId to ensure doctor only sees their own patients
+    // Total de cirurgias hoje (only for this doctor's patients)
     const todaySurgeries = await prisma.surgery.count({
       where: {
         date: {
           gte: todayStart,
           lte: todayEnd,
         },
+        patient: {
+          userId: userId,
+        },
       },
     })
 
-    // Pacientes em acompanhamento ativo
+    // Pacientes em acompanhamento ativo (only for this doctor)
     const activePatientsCount = await prisma.surgery.count({
       where: {
         status: "active",
+        patient: {
+          userId: userId,
+        },
       },
     })
 
-    // Follow-ups pendentes para hoje
+    // Follow-ups pendentes para hoje (only for this doctor's patients)
     const pendingFollowUpsToday = await prisma.followUp.count({
       where: {
         scheduledDate: {
@@ -84,10 +92,13 @@ const getCachedDashboardStatsInternal = unstable_cache(
         status: {
           in: ["pending", "sent"],
         },
+        patient: {
+          userId: userId,
+        },
       },
     })
 
-    // Alertas críticos (red flags)
+    // Alertas críticos (red flags) (only for this doctor's patients)
     const criticalAlerts = await prisma.followUpResponse.count({
       where: {
         riskLevel: {
@@ -97,11 +108,16 @@ const getCachedDashboardStatsInternal = unstable_cache(
         createdAt: {
           gte: subDays(today, 7), // Últimos 7 dias
         },
+        followUp: {
+          patient: {
+            userId: userId,
+          },
+        },
       },
     })
 
     const duration = Date.now() - startTime
-    console.log(`[CACHE] Dashboard stats action computed in ${duration}ms`)
+    console.log(`[CACHE] Dashboard stats action computed in ${duration}ms for user ${userId}`)
 
     return {
       todaySurgeries,
@@ -118,24 +134,34 @@ const getCachedDashboardStatsInternal = unstable_cache(
 )
 
 export async function getDashboardStats(): Promise<DashboardStats> {
+  // SECURITY: Get current user session for patient isolation
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
   const startTime = Date.now()
-  const stats = await getCachedDashboardStatsInternal()
+  const stats = await getCachedDashboardStatsInternal(session.user.id)
   const duration = Date.now() - startTime
   console.log(`[CACHE] Dashboard stats action served in ${duration}ms`)
   return stats
 }
 
 // Cached version of getDashboardPatients with filter-based cache key
+// SECURITY: Requires userId for patient isolation
 const getCachedDashboardPatientsInternal = unstable_cache(
-  async (filters: DashboardFilters) => {
+  async (filters: DashboardFilters, userId: string) => {
     const startTime = Date.now()
     const today = getNowBrasilia()
     const todayStart = startOfDayBrasilia()
     const todayEnd = endOfDayBrasilia()
 
-    // Construir filtros dinâmicos
+    // SECURITY: Construct filters with mandatory userId to ensure doctor only sees their own patients
     const whereClause: any = {
       status: "active",
+      patient: {
+        userId: userId,
+      },
     }
 
     // Filtro por tipo de cirurgia
@@ -152,9 +178,7 @@ const getCachedDashboardPatientsInternal = unstable_cache(
       whereClause.dataCompleteness = 100
     } else if (filters.dataStatus === "research-incomplete") {
       // This will be filtered post-query since it requires validation logic
-      if (!whereClause.patient) {
-        whereClause.patient = {}
-      }
+      // SECURITY: Preserve userId filter when adding patient conditions
       whereClause.patient.isResearchParticipant = true
     }
 
@@ -175,8 +199,10 @@ const getCachedDashboardPatientsInternal = unstable_cache(
     }
 
     // Filtro por busca (nome ou telefone)
+    // SECURITY: Merge with existing patient filter to preserve userId
     if (filters.search) {
       whereClause.patient = {
+        ...whereClause.patient,
         OR: [
           {
             name: {
@@ -194,12 +220,10 @@ const getCachedDashboardPatientsInternal = unstable_cache(
     }
 
     // Filtro por pesquisa
+    // SECURITY: Merge with existing patient filter to preserve userId
     if (filters.researchFilter && filters.researchFilter !== "all") {
       if (filters.researchFilter === "non-participants") {
         // Pacientes que NÃO estão em nenhuma pesquisa
-        if (!whereClause.patient) {
-          whereClause.patient = {}
-        }
         whereClause.patient.isResearchParticipant = false
       } else {
         // Filtrar por pesquisa específica (researchId)
@@ -215,9 +239,6 @@ const getCachedDashboardPatientsInternal = unstable_cache(
 
         const groupCodes = researchGroups.map(g => g.groupCode)
 
-        if (!whereClause.patient) {
-          whereClause.patient = {}
-        }
         whereClause.patient.isResearchParticipant = true
         whereClause.patient.researchGroup = {
           in: groupCodes,
@@ -366,10 +387,22 @@ const getCachedDashboardPatientsInternal = unstable_cache(
 export async function getDashboardPatients(
   filters: DashboardFilters = {}
 ): Promise<PatientCard[]> {
-  return getCachedDashboardPatientsInternal(filters)
+  // SECURITY: Get current user session for patient isolation
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
+  return getCachedDashboardPatientsInternal(filters, session.user.id)
 }
 
 export async function getPatientSummary(surgeryId: string) {
+  // SECURITY: Get current user session for patient isolation
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
   const surgery = await prisma.surgery.findUnique({
     where: { id: surgeryId },
     include: {
@@ -406,6 +439,11 @@ export async function getPatientSummary(surgeryId: string) {
       },
     },
   })
+
+  // SECURITY: Verify patient belongs to the logged-in doctor
+  if (surgery && surgery.patient.userId !== session.user.id) {
+    throw new Error("Acesso negado: paciente não pertence a este médico")
+  }
 
   return surgery
 }
@@ -532,6 +570,26 @@ export interface RecentActivity {
  * Agrega mensagens de TODAS as fontes: Conversation.messageHistory + FollowUpResponse.questionnaireData
  */
 export async function getPatientConversationHistory(patientId: string) {
+  // SECURITY: Get current user session for patient isolation
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
+  // SECURITY: Verify patient belongs to the logged-in doctor
+  const patient = await prisma.patient.findUnique({
+    where: { id: patientId },
+    select: { userId: true },
+  })
+
+  if (!patient) {
+    throw new Error("Paciente não encontrado")
+  }
+
+  if (patient.userId !== session.user.id) {
+    throw new Error("Acesso negado: paciente não pertence a este médico")
+  }
+
   const allMessages: Array<{ role: string; content: string; timestamp: string | null; dayNumber?: number }> = [];
 
   // 1. Buscar mensagens da tabela Conversation (se existir)
@@ -627,11 +685,25 @@ export async function getPatientConversationHistory(patientId: string) {
 }
 
 export async function getRecentPatientActivity(limit = 10): Promise<RecentActivity[]> {
+  // SECURITY: Get current user session for patient isolation
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
   // Buscar mais respostas para garantir que temos o suficiente após agrupar por paciente
+  // SECURITY: Filter by userId to ensure doctor only sees their own patients' activity
   const responses = await prisma.followUpResponse.findMany({
     take: limit * 3, // Buscar mais para compensar duplicatas
     orderBy: {
       createdAt: 'desc'
+    },
+    where: {
+      followUp: {
+        patient: {
+          userId: session.user.id,
+        },
+      },
     },
     include: {
       followUp: {

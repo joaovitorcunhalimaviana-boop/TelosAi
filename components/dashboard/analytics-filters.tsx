@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Filter, RefreshCw } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { SURGERY_TYPE_LABELS } from '@/lib/constants/surgery-types';
 
 export interface AnalyticsFilters {
   dateRange: string; // "7", "30", "90", "365", "custom"
@@ -29,10 +30,10 @@ const DATE_RANGE_OPTIONS = [
 
 const SURGERY_TYPE_OPTIONS = [
   { value: 'all', label: 'Todos os tipos' },
-  { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
-  { value: 'fistula', label: 'Fístula Anal' },
-  { value: 'fissura', label: 'Fissura Anal' },
-  { value: 'pilonidal', label: 'Doença Pilonidal' },
+  { value: 'hemorroidectomia', label: SURGERY_TYPE_LABELS['hemorroidectomia'] || 'Hemorroidectomia' },
+  { value: 'fistula', label: SURGERY_TYPE_LABELS['fistula'] || 'Fístula Anal' },
+  { value: 'fissura', label: SURGERY_TYPE_LABELS['fissurectomia'] || 'Fissurectomia' },
+  { value: 'pilonidal', label: SURGERY_TYPE_LABELS['pilonidal'] || 'Doença Pilonidal' },
 ];
 
 export function AnalyticsFilters({

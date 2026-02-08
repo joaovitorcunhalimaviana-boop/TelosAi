@@ -14,11 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Plus, FlaskConical, Users, BarChart3, Play, Pause, Trash2, ChevronDown, ChevronUp, FileText, ArrowLeft, Shield } from 'lucide-react';
+import { getSurgeryTypeLabel } from '@/lib/constants/surgery-types';
 
 const surgeryTypes = [
   { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
-  { value: 'fistula', label: 'Fístula' },
-  { value: 'fissura', label: 'Fissura' },
+  { value: 'fistula', label: 'Fístula Anal' },
+  { value: 'fissura', label: 'Fissurectomia' },
   { value: 'pilonidal', label: 'Doença Pilonidal' },
   { value: 'geral', label: 'Geral (todas)' },
 ];
@@ -680,7 +681,7 @@ export default function PesquisasPage() {
                     <div className="flex flex-wrap gap-2 mt-4">
                       {research.surgeryType && (
                         <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                          🔪 {surgeryTypes.find(t => t.value === research.surgeryType)?.label || research.surgeryType}
+                          🔪 {getSurgeryTypeLabel(research.surgeryType)}
                         </span>
                       )}
                       <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Download, FileSpreadsheet, FileText, Database, ShieldCheck, BookOpen } from 'lucide-react';
+import { SURGERY_TYPE_LABELS } from '@/lib/constants/surgery-types';
 
 export default function ExportarPage() {
   // Estados dos filtros
@@ -36,10 +37,10 @@ export default function ExportarPage() {
 
   // Tipos de cirurgia disponíveis
   const surgeryTypeOptions = [
-    { value: 'hemorroidectomia', label: 'Hemorroidectomia' },
-    { value: 'fistula', label: 'Fístula Anal' },
-    { value: 'fissura', label: 'Fissura Anal' },
-    { value: 'pilonidal', label: 'Doença Pilonidal' },
+    { value: 'hemorroidectomia', label: SURGERY_TYPE_LABELS['hemorroidectomia'] || 'Hemorroidectomia' },
+    { value: 'fistula', label: SURGERY_TYPE_LABELS['fistula'] || 'Fístula Anal' },
+    { value: 'fissura', label: SURGERY_TYPE_LABELS['fissurectomia'] || 'Fissurectomia' },
+    { value: 'pilonidal', label: SURGERY_TYPE_LABELS['pilonidal'] || 'Doença Pilonidal' },
   ];
 
   // Toggle tipo de cirurgia
