@@ -10,6 +10,72 @@ export interface ApplicableProtocol {
 }
 
 /**
+ * ID do médico dono do sistema (Dr. João) - usa protocolo hardcoded
+ * Outros médicos devem cadastrar seus próprios protocolos
+ * Se não configurado, nenhum médico usa fallback hardcoded
+ */
+const SYSTEM_OWNER_USER_ID = process.env.SYSTEM_OWNER_USER_ID || null;
+
+/**
+ * Mensagem para quando não há protocolo cadastrado
+ * A IA deve APENAS coletar dados, SEM dar orientações
+ */
+const NO_PROTOCOL_MESSAGE = `
+═══════════════════════════════════════════════════════════════
+⚠️ MODO COLETA APENAS - SEM PROTOCOLO CADASTRADO
+═══════════════════════════════════════════════════════════════
+
+Este médico NÃO cadastrou protocolo para este tipo de cirurgia.
+
+REGRAS ESTRITAS:
+1. COLETE os dados normalmente (dor, evacuação, sangramento, febre, medicação extra, etc.)
+2. NÃO DÊ ORIENTAÇÕES sobre:
+   - Banho de assento (não diga se deve ou não fazer)
+   - Pomadas ou medicações específicas
+   - Laxantes ou dieta
+   - Compressas geladas ou mornas
+   - Nenhuma orientação médica específica
+
+3. Se o paciente PERGUNTAR sobre orientações:
+   - Diga: "Sou uma assistente de inteligência artificial e minha função é coletar informações sobre como você está se sentindo. Para orientações específicas sobre medicações, banhos ou cuidados, por favor entre em contato diretamente com seu médico ou com o consultório."
+
+4. ALERTAS DE URGÊNCIA continuam funcionando:
+   - Se sangramento intenso → alertar para procurar emergência
+   - Se febre alta → alertar para procurar atendimento
+   - Se dor ≥8/10 → alertar médico
+
+5. Seja empática e acolhedora, mas NÃO invente orientações.
+
+═══════════════════════════════════════════════════════════════
+`;
+
+/**
+ * Mensagem para pesquisa SEM protocolo - ainda mais restritiva
+ */
+const NO_RESEARCH_PROTOCOL_MESSAGE = `
+═══════════════════════════════════════════════════════════════
+🔬 MODO PESQUISA - COLETA APENAS (SEM PROTOCOLO CADASTRADO)
+═══════════════════════════════════════════════════════════════
+
+Este paciente está em uma PESQUISA CIENTÍFICA, mas não há protocolo cadastrado.
+
+REGRAS ABSOLUTAS (pesquisa exige rigor total):
+1. COLETE os dados normalmente (dor, evacuação, sangramento, febre, etc.)
+2. NÃO DÊ NENHUMA ORIENTAÇÃO - absolutamente nenhuma
+3. Se o paciente perguntar QUALQUER coisa sobre cuidados:
+   - Diga: "Você está participando de uma pesquisa científica e eu sou uma assistente de IA responsável apenas pela coleta de dados. Qualquer orientação sobre seu tratamento deve vir diretamente do seu médico pesquisador. Por favor, entre em contato com o consultório para tirar suas dúvidas."
+
+4. ALERTAS DE URGÊNCIA são a única exceção:
+   - Sangramento intenso → alertar emergência
+   - Febre alta (>38.5°C) → alertar emergência
+   - Retenção urinária → alertar emergência
+
+5. Lembre-se: em pesquisa, qualquer orientação fora do protocolo pode invalidar o estudo.
+
+═══════════════════════════════════════════════════════════════
+`;
+
+/**
  * Busca protocolos ativos aplicáveis para um paciente específico
  * Baseado em:
  * 1. Médico responsável (userId)
@@ -118,13 +184,22 @@ async function doctorHasCustomProtocols(
 /**
  * Busca protocolos para injetar na IA
  *
- * LÓGICA DE ISOLAMENTO ESTRITO:
- * 1. Verifica SE o médico tem QUALQUER protocolo cadastrado para esse tipo de cirurgia
- * 2. Se TEM → usa APENAS os protocolos dele (NUNCA fallback!)
- * 3. Se NÃO TEM NENHUM → aí sim usa o fallback hardcoded
+ * LÓGICA ATUALIZADA:
  *
- * IMPORTANTE: Se Dra. Patrícia cadastrou protocolo de hemorroida,
- * NUNCA misturar com o protocolo base do Dr. João!
+ * 1. PESQUISA (researchId existe):
+ *    - Busca protocolo da pesquisa no banco
+ *    - Se TEM → usa ESTRITAMENTE (não inventa nada)
+ *    - Se NÃO TEM → MODO COLETA (não dá orientações, só coleta dados)
+ *
+ * 2. PACIENTE NORMAL (sem pesquisa):
+ *    - Busca protocolo do médico no banco
+ *    - Se TEM → usa normalmente
+ *    - Se NÃO TEM:
+ *      a) Se é o médico dono do sistema (Dr. João) → usa protocolo hardcoded
+ *      b) Se é outro médico → MODO COLETA (não dá orientações)
+ *
+ * REGRA DE OURO: Perguntas SEMPRE são feitas (independe de protocolo).
+ * Orientações SÓ são dadas se estiverem no protocolo.
  *
  * @param userId - ID do médico responsável pelo paciente
  * @param surgeryType - Tipo de cirurgia (hemorroidectomia, fissura, etc)
@@ -138,41 +213,101 @@ export async function getProtocolsForAI(
   researchId?: string | null
 ): Promise<string> {
   try {
-    // 1. VERIFICAÇÃO RÁPIDA: médico tem protocolos personalizados?
-    const hasCustomProtocols = await doctorHasCustomProtocols(userId, surgeryType, researchId);
+    // ═══════════════════════════════════════════════════════════════
+    // CASO 1: PACIENTE EM PESQUISA
+    // ═══════════════════════════════════════════════════════════════
+    if (researchId) {
+      logger.info(`🔬 [PESQUISA] Buscando protocolo para pesquisa=${researchId}, surgery=${surgeryType}, D+${dayNumber}`);
 
-    if (hasCustomProtocols) {
-      // 2A. MÉDICO TEM PROTOCOLOS PRÓPRIOS → usar APENAS os dele, NUNCA fallback!
-      const dbProtocols = await findApplicableProtocols(
+      // Buscar protocolo específico da pesquisa
+      const researchProtocols = await findApplicableProtocols(
         userId,
         surgeryType,
         dayNumber,
         researchId
       );
 
+      if (researchProtocols.length > 0) {
+        // TEM protocolo de pesquisa → usar ESTRITAMENTE
+        logger.info(`🔬 [PESQUISA] Usando ${researchProtocols.length} protocolos da pesquisa`);
+
+        let protocolText = formatProtocolsForPrompt(researchProtocols);
+        protocolText += `\n
+═══════════════════════════════════════════════════════════════
+🔬 ATENÇÃO: PACIENTE EM PESQUISA CIENTÍFICA
+═══════════════════════════════════════════════════════════════
+- Use APENAS as orientações acima - não invente nem adicione nada
+- Se algo não está no protocolo, NÃO oriente sobre isso
+- Se o paciente perguntar algo fora do protocolo, peça para contatar o médico
+- Rigor total é essencial para validade da pesquisa
+═══════════════════════════════════════════════════════════════`;
+        return protocolText;
+      } else {
+        // Pesquisa SEM protocolo → MODO COLETA (não orienta NADA)
+        logger.warn(`🔬 [PESQUISA] ⚠️ Pesquisa ${researchId} SEM protocolo cadastrado! Modo coleta apenas.`);
+        return NO_RESEARCH_PROTOCOL_MESSAGE;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASO 2: PACIENTE NORMAL (não está em pesquisa)
+    // ═══════════════════════════════════════════════════════════════
+
+    // Verificar se médico tem protocolos cadastrados no banco
+    const hasCustomProtocols = await doctorHasCustomProtocols(userId, surgeryType, null);
+
+    if (hasCustomProtocols) {
+      // Médico TEM protocolos cadastrados → usar os dele
+      const dbProtocols = await findApplicableProtocols(
+        userId,
+        surgeryType,
+        dayNumber,
+        null // Sem pesquisa
+      );
+
       if (dbProtocols.length > 0) {
-        logger.info(`📋 [CUSTOM] Usando ${dbProtocols.length} protocolos do médico userId=${userId} para ${surgeryType} D+${dayNumber}`);
+        logger.info(`📋 [CUSTOM] Usando ${dbProtocols.length} protocolos do médico userId=${userId}`);
         return formatProtocolsForPrompt(dbProtocols);
       } else {
-        // Médico TEM protocolos, mas não para este dia específico
-        // NÃO usar fallback! Retornar mensagem apropriada
-        logger.info(`📋 [CUSTOM] Médico userId=${userId} tem protocolos de ${surgeryType}, mas nenhum para D+${dayNumber}`);
+        // Tem protocolos mas não para este dia → orientar de forma genérica
+        logger.info(`📋 [CUSTOM] Médico tem protocolos, mas não para D+${dayNumber}`);
         return `=== PROTOCOLOS DO MÉDICO ===
 Este médico tem protocolos personalizados cadastrados para ${surgeryType}.
 No entanto, não há orientações específicas cadastradas para o dia D+${dayNumber}.
 
-Para orientações gerais, siga as boas práticas de pós-operatório.
-Em caso de dúvida, oriente o paciente a entrar em contato com o consultório.`;
+Oriente o paciente a entrar em contato com o consultório para dúvidas específicas.
+Continue coletando os dados normalmente (dor, evacuação, sangramento, etc.).`;
       }
-    } else {
-      // 2B. MÉDICO NÃO TEM PROTOCOLOS → usar fallback hardcoded (protocolo base)
-      logger.info(`📋 [FALLBACK] Médico userId=${userId} não tem protocolos de ${surgeryType}. Usando protocolo base.`);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CASO 3: MÉDICO NÃO TEM PROTOCOLOS CADASTRADOS
+    // ═══════════════════════════════════════════════════════════════
+
+    // Verificar se é o médico dono do sistema (Dr. João)
+    if (SYSTEM_OWNER_USER_ID && userId === SYSTEM_OWNER_USER_ID) {
+      // É o Dr. João → usar protocolo hardcoded (fallback)
+      logger.info(`📋 [OWNER] Médico é o dono do sistema. Usando protocolo hardcoded.`);
       return getDefaultProtocol(surgeryType);
     }
 
+    // Outro médico sem protocolos → MODO COLETA (não dá orientações)
+    logger.warn(`📋 [SEM PROTOCOLO] Médico userId=${userId} não tem protocolos de ${surgeryType}. Modo coleta apenas.`);
+    return NO_PROTOCOL_MESSAGE;
+
   } catch (error) {
     logger.error('❌ Erro ao buscar protocolos para IA:', error);
-    // Em caso de erro de banco, usar fallback para não travar
-    return getDefaultProtocol(surgeryType);
+
+    // Em caso de erro:
+    // - Se é pesquisa → modo coleta (seguro, não vaza protocolo)
+    // - Se é normal e é o dono → usa hardcoded
+    // - Se é normal e outro médico → modo coleta
+    if (researchId) {
+      return NO_RESEARCH_PROTOCOL_MESSAGE;
+    }
+    if (SYSTEM_OWNER_USER_ID && userId === SYSTEM_OWNER_USER_ID) {
+      return getDefaultProtocol(surgeryType);
+    }
+    return NO_PROTOCOL_MESSAGE;
   }
 }
