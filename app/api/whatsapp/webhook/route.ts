@@ -648,18 +648,37 @@ async function processQuestionnaireAnswer(
     // 2. Dados já coletados
     const currentData = questionnaireData.extractedData || {};
 
-    // Campos obrigatórios para validação server-side
+    // Campos obrigatórios para validação server-side (base)
     const requiredFields = [
       'pain',               // Dor em repouso (SEMPRE obrigatório)
       'bowelMovementSinceLastContact',
       'bleeding',
-      'urination',
       'fever',
       'medications',
       'usedExtraMedication',
+      'additionalSymptoms', // NOVO: Todos os dias (pergunta final)
     ];
 
-    // Campos condicionalmente obrigatórios
+    // Campos condicionalmente obrigatórios por dia
+    const dayNumber = followUp.dayNumber || 1;
+
+    // URINA: apenas D+1 (retenção pós-anestesia imediata)
+    if (dayNumber === 1) {
+      requiredFields.push('urination');
+    }
+
+    // SECREÇÃO: a partir de D+3
+    if (dayNumber >= 3) {
+      requiredFields.push('discharge');
+    }
+
+    // D+14: Pesquisa de satisfação
+    if (dayNumber >= 14) {
+      requiredFields.push('satisfactionRating');
+      requiredFields.push('wouldRecommend');
+      requiredFields.push('improvementSuggestions');
+    }
+
     // Se paciente evacuou, dor durante evacuação é OBRIGATÓRIA
     if (currentData.bowelMovementSinceLastContact === true) {
       requiredFields.push('painDuringBowelMovement');

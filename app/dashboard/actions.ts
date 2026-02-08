@@ -554,7 +554,12 @@ export async function getPatientConversationHistory(patientId: string) {
   const followUps = await prisma.followUp.findMany({
     where: { patientId },
     include: {
-      patient: { select: { name: true } },
+      patient: {
+        select: {
+          name: true,
+          user: { select: { nomeCompleto: true } }
+        }
+      },
       responses: {
         orderBy: { createdAt: 'asc' },
       }
@@ -566,8 +571,9 @@ export async function getPatientConversationHistory(patientId: string) {
     // 2a. Se o follow-up foi enviado (template), adicionar mensagem sintética do template
     if (followUp.sentAt) {
       const firstName = followUp.patient?.name?.split(' ')[0] || 'Paciente';
+      const doctorName = (followUp.patient as any)?.user?.nomeCompleto || 'seu médico';
       const templateText = followUp.dayNumber === 1
-        ? `Olá ${firstName}! Sou a assistente virtual do Dr. João Vitor. Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
+        ? `Olá ${firstName}! Sou a assistente virtual de ${doctorName}. Hoje é seu primeiro dia após a cirurgia e gostaria de saber como está se sentindo. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`
         : `Olá ${firstName}! Tudo bem? 😊 Estou passando para fazer o acompanhamento do seu D+${followUp.dayNumber} pós-operatório. Posso fazer algumas perguntas rápidas? Responda SIM para começarmos!`;
 
       allMessages.push({

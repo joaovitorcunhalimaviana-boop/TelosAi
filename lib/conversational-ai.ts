@@ -71,6 +71,9 @@ export interface QuestionnaireData {
   improvementSuggestions?: string; // Críticas e sugestões de melhoria
   satisfactionComments?: string; // Comentários livres (legado, manter compatibilidade)
 
+  // Sintomas adicionais (TODOS OS DIAS - pergunta final)
+  additionalSymptoms?: string | null; // "Deseja relatar mais alguma coisa?"
+
   [key: string]: any;
 }
 
@@ -164,7 +167,7 @@ orientação diferente do protocolo, RESPEITE a orientação do médico.
  */
 export async function conductConversation(
   userMessage: string,
-  patient: Patient,
+  patient: Patient & { doctorName?: string; user?: { nomeCompleto: string } },
   surgery: Surgery,
   conversationHistory: ConversationMessage[],
   currentData: QuestionnaireData
@@ -179,6 +182,9 @@ export async function conductConversation(
     // bristolScale removido
   };
 }> {
+  // Nome do médico: patient.doctorName (webhook) > patient.user (Prisma) > fallback
+  const nomeMedico = patient.doctorName || patient.user?.nomeCompleto || 'seu médico';
+
   // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
   const nowBrasilia = toBrasiliaTime(new Date());
   const surgeryBrasilia = toBrasiliaTime(surgery.date);
@@ -334,7 +340,7 @@ se o médico já orientou diferente.
       2️⃣ Segundo: MEDICAÇÃO EXTRA (OBRIGATÓRIO!)
       3️⃣ Depois: Evacuação, sangramento, etc.
 
-      PERGUNTA EXATA: "Além das medicações que o Dr. João prescreveu, você tomou alguma outra medicação? Por exemplo: Tramadol, Codeína, Tylex, Tramal, algum outro analgésico, ou laxante?"
+      PERGUNTA EXATA: "Além das medicações que ${nomeMedico} prescreveu, você tomou alguma outra medicação? Por exemplo: Tramadol, Codeína, Tylex, Tramal, algum outro analgésico, ou laxante?"
 
       - Se SIM: perguntar QUAL medicação, DOSE e HORÁRIO
       - Se NÃO: registrar que não usou medicação extra
@@ -427,13 +433,35 @@ se o médico já orientou diferente.
    ☐ 3️⃣ Se evacuou desde último contato
    ☐ 4️⃣ Se evacuou: dor ao evacuar (0-10)
    ☐ 5️⃣ Sangramento (nenhum/leve/moderado/intenso)
-   ☐ 6️⃣ Se consegue urinar
+   ☐ 6️⃣ [APENAS D+1] Se consegue urinar
    ☐ 7️⃣ Se teve febre
    ☐ 8️⃣ Se está tomando medicações prescritas
+   ☐ 9️⃣ [A PARTIR DE D+3] Secreção pela ferida
+   ☐ 🔟 [APENAS D+14] Nota de satisfação (0-10)
+   ☐ 1️⃣1️⃣ [APENAS D+14] Recomendaria o acompanhamento?
+   ☐ 1️⃣2️⃣ [APENAS D+14] Sugestões ou críticas de melhoria
+   ☐ 1️⃣3️⃣ [TODOS OS DIAS - NO FINAL] Sintomas adicionais ("Deseja relatar mais alguma coisa?")
 
-   ❌ NÃO FINALIZE se algum item acima não foi perguntado!
+   ❌ NÃO FINALIZE se algum item obrigatório do dia não foi perguntado!
    ❌ MEDICAÇÃO EXTRA deve ser a SEGUNDA pergunta (logo após dor)!
    ❌ Se não perguntou MEDICAÇÃO EXTRA, a conversa NÃO está completa!
+   ❌ Se D+14 e não coletou satisfação/recomendação/sugestões, NÃO está completa!
+   ❌ Se não perguntou SINTOMAS ADICIONAIS no final, NÃO está completa!
+
+6. SECREÇÃO DE FERIDA (A PARTIR DE D+3):
+   ⚠️ IMPORTANTE: Secreção é COMUM no pós-operatório de feridas!
+
+   SECREÇÃO NORMAL (não preocupa):
+   - Clara, serosa (tipo água)
+   - Serossanguinolenta (rosada, com um pouco de sangue)
+   - Amarelada clara
+   → Orientar: "Isso é normal no processo de cicatrização. Mantenha a higiene local."
+
+   SECREÇÃO ANORMAL (preocupa - alertar médico):
+   - Purulenta (pus: amarelo-esverdeado, espesso, com cheiro forte)
+   - Com odor fétido
+   - Acompanhada de febre ou vermelhidão intensa
+   → Marcar urgency: "high", needsDoctorAlert: true
 
 RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
 DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
@@ -451,6 +479,25 @@ MEDICAÇÃO EXTRA (OBRIGATÓRIO PERGUNTAR):
 - "Tomei um Tramadol de manhã" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol de manhã"
 - "Precisei tomar Tylex às 3h da madrugada" → "usedExtraMedication": true, "extraMedicationDetails": "Tylex às 3h"
 - "Tomei um laxante ontem à noite" → "usedExtraMedication": true, "extraMedicationDetails": "Laxante à noite"
+
+SATISFAÇÃO (D+14 APENAS):
+- "Dou nota 9" → "satisfactionRating": 9
+- "Nota 8, muito bom" → "satisfactionRating": 8
+- "Recomendo sim" → "wouldRecommend": true
+- "Com certeza indicaria" → "wouldRecommend": true
+- "Não indicaria não" → "wouldRecommend": false
+- "Acho que não recomendaria" → "wouldRecommend": false
+- "Poderia ter mais horários" → "improvementSuggestions": "Poderia ter mais horários"
+- "Nenhuma sugestão, foi ótimo" → "improvementSuggestions": "Nenhuma sugestão"
+- "Gostei muito do atendimento" → "positiveFeedback": "Gostei muito do atendimento"
+
+SINTOMAS ADICIONAIS (TODOS OS DIAS - PERGUNTA FINAL):
+- "Não, só isso" → "additionalSymptoms": null
+- "Nada mais" → "additionalSymptoms": null
+- "Era só isso mesmo" → "additionalSymptoms": null
+- "Tive uma coceira" → "additionalSymptoms": "Coceira"
+- "Senti uma fisgada" → "additionalSymptoms": "Fisgada"
+- "Tive dor de cabeça" → "additionalSymptoms": "Dor de cabeça"
 
 DOR - INTERPRETAÇÃO INTELIGENTE:
 
@@ -764,9 +811,11 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     missing.push('Informações sobre sangramento (nenhum, leve, moderado, intenso)');
   }
 
-  // 5. URINA
-  if (data.urination === undefined) {
-    missing.push('Se está conseguindo urinar normalmente');
+  // 5. URINA (apenas D+1 - retenção pós-anestesia imediata)
+  if (daysPostOp === 1) {
+    if (data.urination === undefined) {
+      missing.push('Se está conseguindo urinar normalmente');
+    }
   }
 
   // 6. FEBRE
@@ -803,25 +852,36 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     if (data.wouldRecommend === undefined) {
       missing.push('Se recomendaria o acompanhamento para outros pacientes');
     }
-    // satisfactionComments é opcional
+    if (data.improvementSuggestions === undefined) {
+      missing.push('Sugestões ou críticas de melhoria');
+    }
   }
 
-  // Concerns é sempre opcional
+  // 10. SINTOMAS ADICIONAIS (todos os dias - pergunta final)
+  if (data.additionalSymptoms === undefined) {
+    missing.push('Deseja relatar mais alguma coisa ao médico');
+  }
 
   return missing;
 }
 
 /**
  * Inicia conversa com saudação personalizada
+ * @param patient - Paciente (com user ou doctorName opcional para nome do médico)
+ * @param doctorName - Nome do médico (opcional, fallback para patient.doctorName ou patient.user?.nomeCompleto)
  */
 export async function getInitialGreeting(
-  patient: Patient,
+  patient: Patient & { user?: { nomeCompleto: string }; doctorName?: string },
   surgery: Surgery,
   dayNumber: number,
-  phoneNumber: string
+  phoneNumber: string,
+  doctorName?: string
 ): Promise<string> {
   const greeting = getGreeting();
   const firstName = patient.name.split(' ')[0];
+
+  // Nome do médico: parâmetro > patient.doctorName (webhook) > patient.user (Prisma) > fallback
+  const nomeMedico = doctorName || patient.doctorName || patient.user?.nomeCompleto || 'seu médico';
 
   // Obter mensagem de introdução do dia
   const { getIntroductionMessage } = await import('./daily-questionnaire-flow');
@@ -848,11 +908,13 @@ export async function getInitialGreeting(
 
   return `${greeting}, ${firstName}! 👋
 
-Aqui é a assistente de acompanhamento pós-operatório do Dr. João Vitor.
+Aqui é a assistente de inteligência artificial de acompanhamento pós-operatório do(a) ${nomeMedico}.
+
+⚠️ *Importante:* Sou uma IA — não sou médica e não prescrevo medicamentos. Meu papel é coletar informações sobre como você está e repassar tudo certinho para o(a) ${nomeMedico}. 😊
 
 ${introMessage}
 
-Vou te fazer algumas perguntas sobre como você está. Pode responder livremente que eu vou anotando tudo certinho. 😊`;
+Vou te fazer algumas perguntas. Pode responder livremente!`;
 }
 
 /**
