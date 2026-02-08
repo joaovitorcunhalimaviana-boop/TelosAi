@@ -83,40 +83,46 @@ export async function POST(
       );
     }
 
-    // Update patient
-    const updatedPatient = await prisma.patient.update({
-      where: {
-        id: patientId,
-      },
-      data: {
-        isResearchParticipant: true,
-        researchGroup: `${research.title} - Grupo ${body.groupCode}`,
-        researchNotes: body.notes || null,
-      },
-    });
-
-    // Update group patient count
-    await prisma.researchGroup.update({
-      where: {
-        id: group.id,
-      },
-      data: {
-        patientCount: {
-          increment: 1,
+    // Use transaction to ensure atomicity
+    const updatedPatient = await prisma.$transaction(async (tx) => {
+      // Update patient with research association
+      const patient = await tx.patient.update({
+        where: {
+          id: patientId,
         },
-      },
-    });
-
-    // Update research total patients
-    await prisma.research.update({
-      where: {
-        id: research.id,
-      },
-      data: {
-        totalPatients: {
-          increment: 1,
+        data: {
+          isResearchParticipant: true,
+          researchId: research.id,
+          researchGroup: body.groupCode,
+          researchNotes: body.notes || null,
         },
-      },
+      });
+
+      // Update group patient count
+      await tx.researchGroup.update({
+        where: {
+          id: group.id,
+        },
+        data: {
+          patientCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      // Update research total patients
+      await tx.research.update({
+        where: {
+          id: research.id,
+        },
+        data: {
+          totalPatients: {
+            increment: 1,
+          },
+        },
+      });
+
+      return patient;
     });
 
     return NextResponse.json({
@@ -155,11 +161,18 @@ export async function DELETE(
     const userId = session.user.id;
     const { id: patientId } = await params;
 
-    // Verify patient belongs to user
+    // Verify patient belongs to user and get research info
     const patient = await prisma.patient.findFirst({
       where: {
         id: patientId,
         userId,
+      },
+      include: {
+        research: {
+          include: {
+            groups: true,
+          },
+        },
       },
     });
 
@@ -177,16 +190,47 @@ export async function DELETE(
       );
     }
 
-    // Update patient
-    const updatedPatient = await prisma.patient.update({
-      where: {
-        id: patientId,
-      },
-      data: {
-        isResearchParticipant: false,
-        researchGroup: null,
-        researchNotes: null,
-      },
+    // Find the research group by the groupCode stored in researchGroup
+    let researchGroupId: string | null = null;
+    if (patient.research && patient.researchGroup) {
+      const group = patient.research.groups.find(g => g.groupCode === patient.researchGroup);
+      if (group) {
+        researchGroupId = group.id;
+      }
+    }
+
+    // Use transaction to ensure atomicity
+    const updatedPatient = await prisma.$transaction(async (tx) => {
+      // Update patient to remove research association
+      const updated = await tx.patient.update({
+        where: {
+          id: patientId,
+        },
+        data: {
+          isResearchParticipant: false,
+          researchId: null,
+          researchGroup: null,
+          researchNotes: null,
+        },
+      });
+
+      // Decrement group patient count
+      if (researchGroupId) {
+        await tx.researchGroup.update({
+          where: { id: researchGroupId },
+          data: { patientCount: { decrement: 1 } },
+        });
+      }
+
+      // Decrement research total patients
+      if (patient.researchId) {
+        await tx.research.update({
+          where: { id: patient.researchId },
+          data: { totalPatients: { decrement: 1 } },
+        });
+      }
+
+      return updated;
     });
 
     return NextResponse.json({

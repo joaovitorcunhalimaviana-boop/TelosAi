@@ -194,7 +194,6 @@ export default function ComparacaoPage() {
   const [groups, setGroups] = useState<GroupData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOutcome, setSelectedOutcome] = useState<string>('pain');
-  const [selectedSubgroup, setSelectedSubgroup] = useState<string>('all');
   const [visibleGroups, setVisibleGroups] = useState<Set<string>>(new Set());
   const [aiInsights, setAiInsights] = useState<string[]>([]);
   const [showAiInsights, setShowAiInsights] = useState(false);
@@ -1651,112 +1650,6 @@ export default function ComparacaoPage() {
         </CardHeader>
         <CardContent>
           <SurvivalAnalysisSection researchId={researchId} groups={getVisibleGroups()} />
-        </CardContent>
-      </Card>
-
-      {/* Subgroup Analysis */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Análise de Subgrupos</CardTitle>
-          <CardDescription>
-            Comparações estratificadas por características dos pacientes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <Select value={selectedSubgroup} onValueChange={setSelectedSubgroup}>
-              <SelectTrigger className="w-64">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Pacientes</SelectItem>
-                <SelectItem value="age">Por Faixa Etária</SelectItem>
-                <SelectItem value="sex">Por Sexo</SelectItem>
-                <SelectItem value="comorbidity">Por Comorbidades</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedSubgroup === 'age' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                {['< 40 anos', '40-60 anos', '> 60 anos'].map((ageGroup, index) => (
-                  <div key={ageGroup} className="p-4 border rounded-lg">
-                    <h5 className="font-semibold mb-3">{ageGroup}</h5>
-                    <div className="space-y-2">
-                      {getVisibleGroups().map(group => (
-                        <div key={group.id} className="flex justify-between text-sm">
-                          <span>Grupo {group.groupCode}</span>
-                          <span className="font-medium">
-                            {(Math.random() * 3 + 4).toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500">
-                Dor média no Dia 7 estratificada por faixa etária. Valores são simulados para demonstração.
-              </p>
-            </div>
-          )}
-
-          {selectedSubgroup === 'sex' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {['Masculino', 'Feminino'].map(sex => (
-                  <div key={sex} className="p-4 border rounded-lg">
-                    <h5 className="font-semibold mb-3">{sex}</h5>
-                    <div className="space-y-2">
-                      {getVisibleGroups().map(group => (
-                        <div key={group.id} className="flex justify-between text-sm">
-                          <span>Grupo {group.groupCode}</span>
-                          <span className="font-medium">
-                            {(Math.random() * 3 + 4).toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500">
-                Dor média no Dia 7 estratificada por sexo. Valores são simulados para demonstração.
-              </p>
-            </div>
-          )}
-
-          {selectedSubgroup === 'comorbidity' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {['Sem comorbidades', 'Com comorbidades'].map(status => (
-                  <div key={status} className="p-4 border rounded-lg">
-                    <h5 className="font-semibold mb-3">{status}</h5>
-                    <div className="space-y-2">
-                      {getVisibleGroups().map(group => (
-                        <div key={group.id} className="flex justify-between text-sm">
-                          <span>Grupo {group.groupCode}</span>
-                          <span className="font-medium">
-                            {(Math.random() * 3 + 4).toFixed(1)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500">
-                Dor média no Dia 7 estratificada por presença de comorbidades. Valores são simulados para demonstração.
-              </p>
-            </div>
-          )}
-
-          {selectedSubgroup === 'all' && (
-            <div className="text-center py-8 text-gray-500">
-              Selecione um critério de estratificação acima para visualizar a análise de subgrupos
-            </div>
-          )}
         </CardContent>
       </Card>
 

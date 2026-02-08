@@ -10,6 +10,16 @@ import {
   interpretCramerV,
 } from '@/lib/research-export-utils';
 import { auth } from '@/lib/auth';
+import {
+  mean,
+  standardDeviation,
+  tTest,
+  chiSquareTest,
+  anovaOneWay,
+  median,
+  min,
+  max
+} from '@/lib/statistics';
 
 // ============================================
 // GET - RESEARCH STATISTICS AND ANALYTICS
@@ -102,8 +112,7 @@ export async function GET(
       const ages = groupPatients
         .filter((p) => p.age !== null)
         .map((p) => p.age as number);
-      const avgAge =
-        ages.length > 0 ? ages.reduce((a, b) => a + b, 0) / ages.length : 0;
+      const avgAge = ages.length > 0 ? mean(ages) : 0;
 
       const sexDistribution = groupPatients.reduce(
         (acc, p) => {
@@ -129,10 +138,7 @@ export async function GET(
       const completeness = groupPatients
         .flatMap((p) => p.surgeries)
         .map((s) => s.dataCompleteness);
-      const avgCompleteness =
-        completeness.length > 0
-          ? completeness.reduce((a, b) => a + b, 0) / completeness.length
-          : 0;
+      const avgCompleteness = completeness.length > 0 ? mean(completeness) : 0;
 
       // Comorbidities
       const comorbidities = groupPatients
@@ -226,8 +232,7 @@ export async function GET(
     // Overall statistics
     const totalPatients = patients.length;
     const allAges = patients.filter((p) => p.age !== null).map((p) => p.age as number);
-    const overallAvgAge =
-      allAges.length > 0 ? allAges.reduce((a, b) => a + b, 0) / allAges.length : 0;
+    const overallAvgAge = allAges.length > 0 ? mean(allAges) : 0;
 
     const overallSexDistribution = patients.reduce(
       (acc, p) => {
@@ -241,35 +246,24 @@ export async function GET(
     const allSurgeries = patients.flatMap((p) => p.surgeries);
     const overallCompleteness =
       allSurgeries.length > 0
-        ? allSurgeries.reduce((a, b) => a + b.dataCompleteness, 0) / allSurgeries.length
+        ? mean(allSurgeries.map((s) => s.dataCompleteness))
         : 0;
 
 
 
-    // T-test for continuous variables (simplified)
-    const tTest = (group1: number[], group2: number[]) => {
+    // T-test for continuous variables using library function
+    const performTTest = (group1: number[], group2: number[]) => {
       if (group1.length === 0 || group2.length === 0) return null;
 
-      const mean1 = group1.reduce((a, b) => a + b, 0) / group1.length;
-      const mean2 = group2.reduce((a, b) => a + b, 0) / group2.length;
-
-      const variance1 =
-        group1.reduce((acc, val) => acc + Math.pow(val - mean1, 2), 0) /
-        (group1.length - 1);
-      const variance2 =
-        group2.reduce((acc, val) => acc + Math.pow(val - mean2, 2), 0) /
-        (group2.length - 1);
-
-      const pooledVariance =
-        ((group1.length - 1) * variance1 + (group2.length - 1) * variance2) /
-        (group1.length + group2.length - 2);
-
-      const tStatistic =
-        (mean1 - mean2) /
-        Math.sqrt(pooledVariance * (1 / group1.length + 1 / group2.length));
+      const result = tTest(group1, group2);
+      const mean1 = mean(group1);
+      const mean2 = mean(group2);
 
       return {
-        tStatistic: Math.round(tStatistic * 1000) / 1000,
+        tStatistic: Math.round(result.tStatistic * 1000) / 1000,
+        pValue: result.pValue,
+        degreesOfFreedom: result.degreesOfFreedom,
+        significant: result.significant,
         mean1: Math.round(mean1 * 10) / 10,
         mean2: Math.round(mean2 * 10) / 10,
         difference: Math.round((mean1 - mean2) * 10) / 10,
@@ -290,7 +284,7 @@ export async function GET(
 
       statisticalTests = {
         testType: 't-test',
-        ageTTest: tTest(group1Ages, group2Ages),
+        ageTTest: performTTest(group1Ages, group2Ages),
       };
     } else if (groupStats.length >= 3) {
       // ANOVA for 3+ groups

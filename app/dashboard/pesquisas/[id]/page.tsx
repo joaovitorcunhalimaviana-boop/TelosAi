@@ -34,9 +34,6 @@ import {
   Calendar,
   Activity,
   TrendingUp,
-  Download,
-  Mail,
-  Filter,
   ChevronLeft,
   AlertCircle,
   CheckCircle2,
@@ -135,18 +132,6 @@ export default function ResearchStatsPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleExportPDF = () => {
-    toast.info('Exportação de PDF em desenvolvimento');
-  };
-
-  const handleExportData = () => {
-    toast.info('Exportação de dados em desenvolvimento');
-  };
-
-  const handleEmailReport = () => {
-    toast.info('Envio de relatório por email em desenvolvimento');
   };
 
   if (status === 'loading' || loading) {
@@ -252,21 +237,6 @@ export default function ResearchStatsPage() {
             )}
           </div>
 
-          {/* Export Actions */}
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <Download className="mr-2 h-4 w-4" />
-              Exportar PDF
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleExportData}>
-              <Download className="mr-2 h-4 w-4" />
-              Exportar Dados
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleEmailReport}>
-              <Mail className="mr-2 h-4 w-4" />
-              Enviar Email
-            </Button>
-          </div>
         </div>
       </div>
 
