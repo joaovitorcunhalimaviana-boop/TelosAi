@@ -274,6 +274,22 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
                 </div>
               )}
 
+              {/* Clinical indicators */}
+              {(patient.latestResponse?.usedExtraMedication || patient.latestResponse?.localCareAdherence === false) && (
+                <div className="flex flex-wrap gap-1.5">
+                  {patient.latestResponse?.usedExtraMedication && (
+                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                      Med. extra{patient.latestResponse.extraMedicationDetails ? `: ${patient.latestResponse.extraMedicationDetails}` : ''}
+                    </Badge>
+                  )}
+                  {patient.latestResponse?.localCareAdherence === false && (
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">
+                      Cuidados locais
+                    </Badge>
+                  )}
+                </div>
+              )}
+
               {/* Quick Action Buttons - WhatsApp & Phone */}
               <div className="flex gap-2 pb-2 border-b border-gray-200" data-tutorial="quick-actions">
                 <Button

@@ -15,6 +15,17 @@ export interface ParsedQuestionnaireData {
   urinated: boolean
   concerns: string | null
   hasRedFlags: boolean
+  usedExtraMedication: boolean
+  extraMedicationDetails: string | null
+  localCareAdherence: boolean | null
+  additionalSymptoms: string | null
+  discharge: boolean | null
+  dischargeType: string | null
+  dischargeAmount: string | null
+  satisfactionRating: number | null
+  wouldRecommend: boolean | null
+  positiveFeedback: string | null
+  improvementSuggestions: string | null
 }
 
 interface DbResponseColumns {
@@ -122,6 +133,33 @@ export function parseQuestionnaireData(
   // --- Preocupações ---
   const concerns = get(['concerns']) ?? null
 
+  // --- Medicação extra ---
+  const usedExtraMedication = get(['usedExtraMedication', 'usedExtraMeds']) === true
+
+  // --- Detalhes da medicação extra ---
+  const extraMedicationDetails = get(['extraMedicationDetails', 'extraMedsDetails']) ?? null
+
+  // --- Cuidados locais ---
+  const localCareRaw = get(['localCareAdherence', 'ointmentAdherence'])
+  const localCareAdherence = localCareRaw !== undefined ? localCareRaw === true : null
+
+  // --- Sintomas adicionais ---
+  const additionalSymptoms = get(['additionalSymptoms']) ?? null
+
+  // --- Secreção ---
+  const dischargeRaw = get(['discharge', 'hasPurulentDischarge'])
+  const discharge = dischargeRaw !== undefined ? dischargeRaw === true : null
+  const dischargeType = get(['dischargeType']) ?? null
+  const dischargeAmount = get(['dischargeAmount']) ?? null
+
+  // --- Satisfação (D+14) ---
+  const satisfactionRatingRaw = get(['satisfactionRating'])
+  const satisfactionRating = satisfactionRatingRaw !== undefined ? Number(satisfactionRatingRaw) : null
+  const wouldRecommendRaw = get(['wouldRecommend'])
+  const wouldRecommend = wouldRecommendRaw !== undefined ? wouldRecommendRaw === true : null
+  const positiveFeedback = get(['positiveFeedback']) ?? null
+  const improvementSuggestions = get(['improvementSuggestions', 'satisfactionComments']) ?? null
+
   // --- Red flags ---
   let hasRedFlags = false
   if (dbResponse?.redFlags) {
@@ -149,5 +187,16 @@ export function parseQuestionnaireData(
     urinated,
     concerns,
     hasRedFlags,
+    usedExtraMedication,
+    extraMedicationDetails,
+    localCareAdherence,
+    additionalSymptoms,
+    discharge,
+    dischargeType,
+    dischargeAmount,
+    satisfactionRating: satisfactionRating !== null && !isNaN(satisfactionRating) ? satisfactionRating : null,
+    wouldRecommend,
+    positiveFeedback,
+    improvementSuggestions,
   }
 }

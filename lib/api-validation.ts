@@ -346,7 +346,6 @@ export const postOpDataSchema = z.object({
   hadBowelMovementSinceLastContact: z.boolean().optional().nullable(),
   hadBowelMovement: z.boolean().optional().nullable(), // Legacy
   bowelMovementTime: z.string().optional().nullable(),
-  bristolScale: z.number().min(1).max(7).optional().nullable(),
   isFirstBowelMovement: z.boolean().optional().nullable(),
 
   // SANGRAMENTO
@@ -384,7 +383,7 @@ export const postOpDataSchema = z.object({
  */
 export const claudeAIResponseSchema = z.object({
   message: z.string().min(1, 'Mensagem da IA é obrigatória'),
-  needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable().optional(),
+  needsImage: z.enum(['pain_scale']).nullable().optional(),
   dataCollected: z.record(z.string(), z.any()).default({}),
   completed: z.boolean().default(false),
   needsClarification: z.boolean().optional().default(false),
@@ -459,13 +458,6 @@ export function validatePostOpDataByDay(
   const warnings: string[] = [];
   const errors: string[] = [];
 
-  // Bristol Scale só é válida em D+5 e D+10
-  if (data.bristolScale !== null && data.bristolScale !== undefined) {
-    if (dayNumber !== 5 && dayNumber !== 10) {
-      warnings.push(`Bristol Scale coletada em D+${dayNumber}, mas só é esperada em D+5 e D+10`);
-    }
-  }
-
   // Pesquisa de satisfação só em D+14
   if (dayNumber !== 14) {
     if (data.painControlSatisfaction !== null && data.painControlSatisfaction !== undefined) {
@@ -493,10 +485,6 @@ export function validatePostOpDataByDay(
 
   if (data.hadBowelMovementSinceLastContact === false && data.painDuringBowelMovement !== null) {
     errors.push('Dor durante evacuação informada mas paciente não evacuou');
-  }
-
-  if (data.hadBowelMovementSinceLastContact === false && data.bristolScale !== null) {
-    errors.push('Bristol Scale informada mas paciente não evacuou');
   }
 
   // Alerta para dor alta

@@ -82,6 +82,30 @@ export async function POST(request: NextRequest) {
     };
 
     // PASSO 1: Aplicar red flags determinísticos
+    // Mapear discharge: o questionário pode enviar discharge como boolean + dischargeType,
+    // mas o red-flags system espera discharge como 'none' | 'serous' | 'purulent' | 'abundant'
+    let redFlagDischarge: 'none' | 'serous' | 'purulent' | 'abundant' | undefined;
+    if (typeof questionnaireData.discharge === 'boolean') {
+      // Novo formato: discharge (boolean) + dischargeType (string)
+      if (!questionnaireData.discharge) {
+        redFlagDischarge = 'none';
+      } else if (questionnaireData.dischargeType) {
+        // Mapear dischargeType para o formato esperado pelo red-flags
+        const dischargeTypeMap: Record<string, 'serous' | 'purulent' | 'abundant'> = {
+          clear: 'serous',
+          yellowish: 'serous',
+          purulent: 'purulent',
+          bloody: 'abundant',
+        };
+        redFlagDischarge = dischargeTypeMap[questionnaireData.dischargeType] || 'serous';
+      } else {
+        redFlagDischarge = 'serous'; // Tem secreção mas tipo não especificado
+      }
+    } else {
+      // Formato legado: discharge já é string enum
+      redFlagDischarge = questionnaireData.discharge as 'none' | 'serous' | 'purulent' | 'abundant' | undefined;
+    }
+
     const redFlagInput = {
       surgeryType: surgery.type as 'hemorroidectomia' | 'fistula' | 'fissura' | 'pilonidal',
       dayNumber: followUp.dayNumber,
@@ -92,12 +116,28 @@ export async function POST(request: NextRequest) {
       bleeding: questionnaireData.bleeding as 'none' | 'light' | 'moderate' | 'severe' | undefined,
       fever: questionnaireData.fever,
       temperature: questionnaireData.temperature,
-      discharge: questionnaireData.discharge as 'none' | 'serous' | 'purulent' | 'abundant' | undefined,
+      discharge: redFlagDischarge,
       additionalSymptoms: questionnaireData.additionalSymptoms,
     };
 
     const detectedRedFlags = detectRedFlags(redFlagInput);
-    const deterministicRiskLevel = getRiskLevel(detectedRedFlags);
+    let deterministicRiskLevel = getRiskLevel(detectedRedFlags);
+
+    // Escalar risco se paciente usou opioides/medicação extra junto com dor alta
+    if (
+      questionnaireData.usedExtraMedication &&
+      questionnaireData.painLevel != null &&
+      questionnaireData.painLevel >= 7
+    ) {
+      // Dor alta + necessidade de medicação extra = sinal preocupante
+      const riskLevels = ['low', 'medium', 'high', 'critical'];
+      const currentIndex = riskLevels.indexOf(deterministicRiskLevel);
+      if (currentIndex < riskLevels.length - 1 && currentIndex < 2) {
+        // Escalar no máximo até 'high' por este critério sozinho
+        deterministicRiskLevel = riskLevels[Math.min(currentIndex + 1, 2)] as
+          | 'low' | 'medium' | 'high' | 'critical';
+      }
+    }
 
     // PASSO 2: Enviar para Claude AI para análise contextual
     const aiAnalysis = await analyzeFollowUpResponse({

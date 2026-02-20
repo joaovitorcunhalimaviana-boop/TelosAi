@@ -464,34 +464,60 @@ Por favor, me diga um número de 0 a 10, onde:
       logger.debug('📊 Enviando escala de dor...');
       await sendImageScale(phone, 'pain_scale');
 
-      // 3. Criar registro de resposta com a conversa inicial
-      await prisma.followUpResponse.create({
-        data: {
-          followUpId: pendingFollowUp.id,
-          userId: patient.userId,
-          questionnaireData: JSON.stringify({
-            conversation: [
-              { role: 'user', content: text },
-              { role: 'assistant', content: initialMessage }
-            ],
-            extractedData: {},
-            completed: false,
-            conversationPhase: 'collecting_pain_at_rest',
-            hadFirstBowelMovement: hadFirstBowelMovement
-          }),
-          riskLevel: 'low',
-        },
-      });
+      // 3. Criar registro de resposta + atualizar status em transação (previne race condition)
+      try {
+        await prisma.$transaction(async (tx) => {
+          // Verificar status dentro da transação para prevenir race condition
+          const currentFollowUp = await tx.followUp.findUnique({
+            where: { id: pendingFollowUp.id },
+            select: { status: true },
+          });
 
-      // 4. Atualizar follow-up para status "in_progress"
-      await prisma.followUp.update({
-        where: { id: pendingFollowUp.id },
-        data: {
-          status: 'in_progress',
-        },
-      });
+          if (currentFollowUp?.status !== 'sent' && currentFollowUp?.status !== 'pending') {
+            throw new Error('ALREADY_STARTED');
+          }
 
-      // Invalidate dashboard cache
+          await tx.followUpResponse.create({
+            data: {
+              followUpId: pendingFollowUp.id,
+              userId: patient.userId,
+              questionnaireData: JSON.stringify({
+                conversation: [
+                  { role: 'user', content: text },
+                  { role: 'assistant', content: initialMessage }
+                ],
+                extractedData: {},
+                completed: false,
+                conversationPhase: 'collecting_pain_at_rest',
+                hadFirstBowelMovement: hadFirstBowelMovement
+              }),
+              riskLevel: 'low',
+            },
+          });
+
+          await tx.followUp.update({
+            where: { id: pendingFollowUp.id },
+            data: {
+              status: 'in_progress',
+            },
+          });
+        });
+      } catch (txError: any) {
+        if (txError?.message === 'ALREADY_STARTED') {
+          logger.warn('⚠️ Questionário já foi iniciado (race condition prevenida)', {
+            followUpId: pendingFollowUp.id,
+            patientId: patient.id,
+          });
+          await sendEmpatheticResponse(
+            phone,
+            `${patient.name.split(' ')[0]}, o questionário já foi iniciado. Por favor, continue respondendo as perguntas. 😊`
+          );
+          return;
+        }
+        throw txError; // Re-throw outros erros
+      }
+
+      // Invalidate dashboard cache (fora da transação)
       invalidateDashboardStats();
 
       logger.debug('✅ Questionário iniciado - aguardando resposta do paciente sobre dor');
@@ -527,7 +553,6 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://sistema-pos-operator
 
 const MEDICAL_IMAGES = {
   painScale: `${APP_URL}/escala-dor.png`,
-  bristolScale: `${APP_URL}/escala-bristol.png`,
 };
 
 /**
@@ -546,7 +571,6 @@ interface PostOpData {
   // EVACUAÇÃO - dados detalhados
   hadBowelMovementSinceLastContact?: boolean | null; // Evacuou desde última conversa?
   bowelMovementTime?: string | null; // Hora aproximada da evacuação (para primeira evacuação)
-  bristolScale?: number | null; // 1-7 - Escala de Bristol (APENAS D+5 e D+10)
   isFirstBowelMovement?: boolean | null; // Flag se é a primeira evacuação pós-op
 
   // SANGRAMENTO
@@ -587,7 +611,7 @@ interface PostOpData {
 interface ClaudeAIResponse {
   reasoning?: string; // NOVO: Raciocínio (Chain of Thought)
   message: string;
-  needsImage?: 'pain_scale' | 'bristol_scale' | null;
+  needsImage?: 'pain_scale' | null;
   dataCollected: Partial<PostOpData>;
   completed: boolean;
   needsClarification: boolean;
@@ -595,20 +619,13 @@ interface ClaudeAIResponse {
 }
 
 /**
- * Envia imagem de escala (Dor ou Bristol)
+ * Envia imagem de escala de Dor
  */
-async function sendImageScale(phone: string, scaleType: 'pain_scale' | 'bristol_scale') {
+async function sendImageScale(phone: string, scaleType: 'pain_scale') {
   try {
-    const captions = {
-      pain_scale: '📊 *Escala de Dor*\n\nPor favor, indique um número de 0 a 10.',
-      bristol_scale: '📊 *Escala de Bristol*\n\nUse esta escala para classificar suas fezes de 1 a 7.',
-    };
+    const caption = '📊 *Escala de Dor*\n\nPor favor, indique um número de 0 a 10.';
 
-    const imageUrl = scaleType === 'pain_scale'
-      ? MEDICAL_IMAGES.painScale
-      : MEDICAL_IMAGES.bristolScale;
-
-    await sendImage(phone, imageUrl, captions[scaleType]);
+    await sendImage(phone, MEDICAL_IMAGES.painScale, caption);
 
     logger.debug(`✅ Imagem ${scaleType} enviada para ${phone}`);
   } catch (error) {
@@ -677,6 +694,7 @@ async function processQuestionnaireAnswer(
       'medications',
       'usedExtraMedication',
       'additionalSymptoms', // NOVO: Todos os dias (pergunta final)
+      'localCareAdherence',
     ];
 
     // Campos condicionalmente obrigatórios por dia
@@ -833,14 +851,12 @@ async function finalizeQuestionnaireWithAI(
         followUp.surgeryId,
         followUp.dayNumber,
         extractedData.painDuringBowelMovement || 0,
-        extractedData.bristolScale || 4, // Default Bristol 4 (normal)
         new Date(),
         extractedData.bowelMovementTime || undefined
       );
       logger.debug('✅ Primeira evacuação registrada!', {
         dayNumber: followUp.dayNumber,
         painDuringBM: extractedData.painDuringBowelMovement,
-        bristolScale: extractedData.bristolScale,
         bowelMovementTime: extractedData.bowelMovementTime
       });
     }
@@ -863,7 +879,6 @@ async function finalizeQuestionnaireWithAI(
       urinaryRetention: extractedData.canUrinate === false,
       bowelMovement: extractedData.hadBowelMovementSinceLastContact || extractedData.hadBowelMovement,
       bowelMovementTime: extractedData.bowelMovementTime,
-      bristolScale: extractedData.bristolScale,
       bleeding: typeof extractedData.bleeding === 'string'
         ? bleedingMap[extractedData.bleeding]
         : (extractedData.bleeding ? 'light' : 'none'),
@@ -1340,7 +1355,46 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
     return pendingFollowUp;
   }
 
-  logger.debug('⚠️ Nenhum follow-up programado para HOJE', { patientId });
+  // 3. Secondary: Se nada encontrado para hoje, verificar follow-ups de ONTEM ainda não respondidos
+  // (paciente respondendo com atraso)
+  const yesterdayStart = new Date(todayStart);
+  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
+  logger.debug('🔍 Nenhum follow-up para hoje, verificando ONTEM...', {
+    patientId,
+    yesterdayStart: yesterdayStart.toISOString(),
+    yesterdayEnd: todayStart.toISOString(),
+  });
+
+  const yesterdayFollowUp = await prisma.followUp.findFirst({
+    where: {
+      patientId,
+      status: {
+        in: ['sent', 'in_progress'],
+      },
+      scheduledDate: {
+        gte: yesterdayStart,
+        lt: todayStart,
+      },
+    },
+    include: {
+      surgery: true,
+    },
+    orderBy: {
+      scheduledDate: 'desc',
+    },
+  });
+
+  if (yesterdayFollowUp) {
+    logger.debug('✅ Follow-up de ONTEM encontrado (paciente respondendo com atraso)', {
+      followUpId: yesterdayFollowUp.id,
+      dayNumber: yesterdayFollowUp.dayNumber,
+      scheduledDate: yesterdayFollowUp.scheduledDate,
+    });
+    return yesterdayFollowUp;
+  }
+
+  logger.debug('⚠️ Nenhum follow-up programado para HOJE nem ONTEM', { patientId });
   return null;
 }
 

@@ -9,7 +9,6 @@
  */
 
 import { prisma } from './prisma';
-import { Surgery } from '@prisma/client';
 import { toBrasiliaTime } from './date-utils';
 
 export interface BowelMovementStatus {
@@ -87,7 +86,6 @@ export async function recordFirstBowelMovement(
   surgeryId: string,
   dayNumber: number,
   painDuringBowelMovement: number,
-  stoolConsistency: number, // Bristol Scale 1-7
   timestamp: Date = new Date(),
   bowelMovementTime?: string // Hora aproximada da evacuação
 ): Promise<void> {
@@ -106,8 +104,7 @@ export async function recordFirstBowelMovement(
     dayNumber,
     timestamp,
     bowelMovementTime,
-    painDuringBowelMovement,
-    stoolConsistency
+    painDuringBowelMovement
   });
 }
 
@@ -153,8 +150,7 @@ export function getBowelMovementQuestions(
     return {
       mainQuestion: 'Você evacuou desde a última vez que conversamos?',
       followUpIfYes: [
-        'Que ótimo! Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.',
-        'Como estava a consistência das fezes? Vou te mostrar as opções do 1 ao 7:\n1 - Pedaços duros separados (muito constipado)\n2 - Em forma de salsicha, mas com pedaços\n3 - Salsicha com rachaduras na superfície\n4 - Salsicha lisa e macia (IDEAL)\n5 - Pedaços macios com bordas definidas\n6 - Pedaços fofos com bordas irregulares\n7 - Aquosa, sem pedaços sólidos (diarreia)'
+        'Que ótimo! Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.'
       ],
       followUpIfNo: [
         currentDay <= 2
@@ -172,8 +168,7 @@ export function getBowelMovementQuestions(
     return {
       mainQuestion: 'Você evacuou desde a última vez que conversamos?',
       followUpIfYes: [
-        'Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.',
-        'Como estava a consistência? (Use a mesma escala de 1 a 7 que te mostrei antes)'
+        'Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.'
       ],
       followUpIfNo: [
         'Quando foi a última evacuação?'
@@ -211,41 +206,4 @@ export function shouldAlertDoctorAboutConstipation(
   }
 
   return false;
-}
-
-/**
- * Analisa consistência das fezes (Bristol Scale)
- */
-export function analyzeBristolScale(value: number): {
-  category: 'constipated' | 'normal' | 'loose' | 'diarrhea';
-  message: string;
-  shouldAlert: boolean;
-} {
-  if (value >= 1 && value <= 2) {
-    return {
-      category: 'constipated',
-      message: 'Fezes endurecidas indicam constipação. Continue tomando os laxantes.',
-      shouldAlert: false
-    };
-  } else if (value >= 3 && value <= 5) {
-    return {
-      category: 'normal',
-      message: 'Consistência normal das fezes.',
-      shouldAlert: false
-    };
-  } else if (value === 6) {
-    return {
-      category: 'loose',
-      message: 'Fezes amolecidas. Se persistir, informe o médico.',
-      shouldAlert: false
-    };
-  } else if (value === 7) {
-    return {
-      category: 'diarrhea',
-      message: 'Diarreia presente. Importante o médico saber disso.',
-      shouldAlert: true
-    };
-  } else {
-    throw new Error('Invalid Bristol Scale value. Must be 1-7.');
-  }
 }

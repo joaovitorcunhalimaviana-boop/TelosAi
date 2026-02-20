@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
 export const geminiResponseSchema = z.object({
     reasoning: z.string(),
     message: z.string(),
-    needsImage: z.enum(['pain_scale', 'bristol_scale']).nullable(),
+    needsImage: z.enum(['pain_scale']).nullable(),
     dataCollected: z.object({
         painAtRest: z.union([z.number(), z.string(), z.null()]).optional(),
         painDuringBowelMovement: z.union([z.number(), z.string(), z.null()]).optional(),
@@ -116,7 +116,7 @@ Você deve responder EXCLUSIVAMENTE um objeto JSON com a seguinte estrutura:
 {
   "reasoning": "Seu pensamento interno: liste quais itens já foram coletados e quais FALTAM.",
   "message": "Sua resposta textual para o paciente.",
-  "needsImage": "pain_scale" | "bristol_scale" | null,
+  "needsImage": "pain_scale" | null,
   "dataCollected": {
     "painAtRest": number (0-10) ou null (NÃO COLOCAR STRING),
     "painDuringBowelMovement": number (0-10) ou null,

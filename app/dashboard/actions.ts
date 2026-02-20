@@ -39,6 +39,9 @@ export interface PatientCard {
   painHistory: { day: string; value: number; evacuation: number }[]
   latestResponse?: {
     riskLevel: "low" | "medium" | "high" | "critical"
+    usedExtraMedication?: boolean
+    extraMedicationDetails?: string | null
+    localCareAdherence?: boolean | null
   } | null
 }
 
@@ -357,9 +360,18 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         researchDataComplete,
         researchMissingFieldsCount,
         painHistory, // Adicionado campo de histórico de dor
-        latestResponse: latestResponse ? {
-          riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical"
-        } : null,
+        latestResponse: latestResponse ? (() => {
+          const parsedLatest = parseQuestionnaireData(latestResponse.questionnaireData, {
+            painAtRest: latestResponse.painAtRest,
+            painDuringBowel: latestResponse.painDuringBowel,
+          });
+          return {
+            riskLevel: latestResponse.riskLevel as "low" | "medium" | "high" | "critical",
+            usedExtraMedication: parsedLatest.usedExtraMedication,
+            extraMedicationDetails: parsedLatest.extraMedicationDetails,
+            localCareAdherence: parsedLatest.localCareAdherence,
+          };
+        })() : null,
       }
     })
 

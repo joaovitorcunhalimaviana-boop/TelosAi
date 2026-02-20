@@ -374,7 +374,6 @@ export async function processQuestionnaireAnswer(
         console.log('✅ Pain scale image sent');
       }
 
-      // Bristol Scale removido - não perguntar mais
     } catch (error) {
       console.error('❌ Error sending images:', error);
       // Continuar mesmo se falhar
@@ -490,13 +489,11 @@ async function saveQuestionnaireResponse(
     await recordFirstBowelMovement(
       followUp.surgeryId,
       followUp.dayNumber,
-      answers.painDuringBowelMovement || 0,
-      answers.stoolConsistency || 4
+      answers.painDuringBowelMovement || 0
     );
     console.log('✅ First bowel movement recorded:', {
       dayNumber: followUp.dayNumber,
-      painDuringBM: answers.painDuringBowelMovement,
-      stoolConsistency: answers.stoolConsistency
+      painDuringBM: answers.painDuringBowelMovement
     });
   }
 

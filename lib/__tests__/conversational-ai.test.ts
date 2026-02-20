@@ -99,7 +99,6 @@ describe('conversational-ai', () => {
               },
               sendImages: {
                 painScale: false,
-                bristolScale: false,
               },
               isComplete: false,
               urgency: 'medium',
@@ -132,7 +131,6 @@ describe('conversational-ai', () => {
               extractedInfo: {},
               sendImages: {
                 painScale: false,
-                bristolScale: false,
               },
               isComplete: false,
               urgency: 'low',
@@ -165,7 +163,6 @@ describe('conversational-ai', () => {
               extractedInfo: {},
               sendImages: {
                 painScale: true,
-                bristolScale: false,
               },
               isComplete: false,
               urgency: 'low',
@@ -186,43 +183,6 @@ describe('conversational-ai', () => {
       // Resposta vaga não deve ser extraída
       expect(result.updatedData.pain).toBeUndefined();
       expect(result.sendImages?.painScale).toBe(true);
-    });
-
-    it('should validate stool consistency (Bristol Scale 1-7)', async () => {
-      mockAnthropicCreate.mockResolvedValue({
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify({
-              response: 'Obrigado, registrei que foi tipo 4 da escala.',
-              extractedInfo: {
-                bowelMovementSinceLastContact: true,
-                painDuringBowelMovement: 3,
-                stoolConsistency: 4,
-              },
-              sendImages: {
-                painScale: false,
-                bristolScale: false,
-              },
-              isComplete: false,
-              urgency: 'low',
-              needsDoctorAlert: false,
-            }),
-          },
-        ],
-      });
-
-      const result = await conductConversation(
-        'Evacuei sim, dor foi 3 e consistência tipo 4',
-        mockPatient,
-        mockSurgery,
-        [],
-        { bowelMovementSinceLastContact: true }
-      );
-
-      expect(result.updatedData.stoolConsistency).toBe(4);
-      expect(result.updatedData.stoolConsistency).toBeGreaterThanOrEqual(1);
-      expect(result.updatedData.stoolConsistency).toBeLessThanOrEqual(7);
     });
 
     it('should handle API errors gracefully', async () => {
@@ -253,7 +213,6 @@ describe('conversational-ai', () => {
                 pain: 5,
                 bowelMovementSinceLastContact: true,
                 painDuringBowelMovement: 4,
-                stoolConsistency: 3,
                 bleeding: 'minimal',
                 urination: true,
                 fever: false,
@@ -261,7 +220,6 @@ describe('conversational-ai', () => {
               },
               sendImages: {
                 painScale: false,
-                bristolScale: false,
               },
               isComplete: true,
               urgency: 'low',
@@ -301,7 +259,6 @@ describe('conversational-ai', () => {
               },
               sendImages: {
                 painScale: false,
-                bristolScale: false,
               },
               isComplete: false,
               urgency: 'low',
@@ -336,7 +293,6 @@ describe('conversational-ai', () => {
                 pain: 3,
                 bowelMovementSinceLastContact: true,
                 painDuringBowelMovement: 2,
-                stoolConsistency: 4,
                 bleeding: 'none',
                 urination: true,
                 fever: false,
@@ -345,7 +301,6 @@ describe('conversational-ai', () => {
               },
               sendImages: {
                 painScale: false,
-                bristolScale: false,
               },
               isComplete: true,
               urgency: 'low',
@@ -364,7 +319,6 @@ describe('conversational-ai', () => {
           pain: 3,
           bowelMovementSinceLastContact: true,
           painDuringBowelMovement: 2,
-          stoolConsistency: 4,
           bleeding: 'none',
           urination: true,
           fever: false,

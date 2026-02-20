@@ -21,13 +21,16 @@ export interface QuestionnaireData {
   urinaryRetentionHours?: number | null;
   bowelMovement?: boolean | null;
   bowelMovementTime?: string | null;
-  bristolScale?: number | null;
   bleeding?: string | null; // none, light, moderate, severe
   fever?: boolean | null;
   temperature?: number | null;
-  discharge?: string | null; // none, serous, purulent, abundant
+  discharge?: boolean | string | null; // boolean (new) or string (legacy: none, serous, purulent, abundant)
+  dischargeType?: string | null; // clear, yellowish, purulent, bloody
   additionalSymptoms?: string[] | null;
   concerns?: string | null;
+  usedExtraMedication?: boolean | null;
+  extraMedicationDetails?: string | null;
+  localCareAdherence?: boolean | null;
 }
 
 export interface AnalysisInput {
@@ -106,10 +109,12 @@ ${detectedRedFlags.length > 0 ? detectedRedFlags.map(rf => `- ${rf}`).join('\n')
 2. Identifique TODOS os sinais de alerta (Red Flags), como:
    - Febre > 37.8°C
    - Dor intensa (> 7) ou crescente
+   - Dor alta + uso de medicação extra (especialmente opioides) = sinal mais preocupante
    - Sangramento moderado-intenso
    - Secreção purulenta
    - Retenção urinária
    - Vômitos ou outros sintomas graves
+   - Não adesão aos cuidados locais orientados
 
 3. Gere uma resposta empática e acolhedora para o paciente, que:
    - Reconheça seus sintomas
@@ -217,8 +222,7 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
   // Evacuação
   if (data.bowelMovement != null) {
     const timeInfo = data.bowelMovementTime ? ` (Horário: ${data.bowelMovementTime})` : '';
-    const bristolInfo = data.bristolScale != null ? ` (Bristol: ${data.bristolScale})` : '';
-    parts.push(`- Evacuação: ${data.bowelMovement ? 'SIM' : 'NÃO'}${timeInfo}${bristolInfo}`);
+    parts.push(`- Evacuação: ${data.bowelMovement ? 'SIM' : 'NÃO'}${timeInfo}`);
   }
 
   // Sangramento
@@ -244,14 +248,50 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
   }
 
   // Secreção
-  if (data.discharge) {
-    const dischargeTranslation: Record<string, string> = {
-      none: 'nenhuma',
-      serous: 'serosa (clara)',
-      purulent: 'purulenta',
-      abundant: 'abundante',
-    };
-    parts.push(`- Secreção: ${dischargeTranslation[data.discharge] || data.discharge}`);
+  if (data.discharge != null) {
+    if (typeof data.discharge === 'boolean') {
+      // Novo formato: discharge (boolean) + dischargeType (string)
+      if (data.discharge) {
+        const dischargeTypeTranslation: Record<string, string> = {
+          clear: 'clara',
+          yellowish: 'amarelada',
+          purulent: 'purulenta',
+          bloody: 'sanguinolenta',
+        };
+        const typeLabel = data.dischargeType
+          ? (dischargeTypeTranslation[data.dischargeType] || data.dischargeType)
+          : 'tipo não especificado';
+        parts.push(`- Secreção: SIM (${typeLabel})`);
+      } else {
+        parts.push('- Secreção: NÃO');
+      }
+    } else if (typeof data.discharge === 'string' && data.discharge !== 'none') {
+      // Formato legado: discharge como string enum
+      const dischargeTranslation: Record<string, string> = {
+        none: 'nenhuma',
+        serous: 'serosa (clara)',
+        purulent: 'purulenta',
+        abundant: 'abundante',
+      };
+      parts.push(`- Secreção: ${dischargeTranslation[data.discharge] || data.discharge}`);
+    }
+  }
+
+  // Medicação extra
+  if (data.usedExtraMedication != null) {
+    if (data.usedExtraMedication) {
+      const details = data.extraMedicationDetails
+        ? ` (${data.extraMedicationDetails})`
+        : '';
+      parts.push(`- Usou medicação extra (além das prescritas): SIM${details}`);
+    } else {
+      parts.push('- Usou medicação extra: NÃO');
+    }
+  }
+
+  // Cuidados locais
+  if (data.localCareAdherence != null) {
+    parts.push(`- Adesão aos cuidados locais: ${data.localCareAdherence ? 'SIM' : 'NÃO'}`);
   }
 
   // Sintomas adicionais

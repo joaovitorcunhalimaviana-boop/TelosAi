@@ -24,7 +24,6 @@ interface QuestionnaireData {
   painDuringEvacuation?: number
   hadBowelMovement?: boolean
   bowelMovementTime?: string
-  bristolScale?: number
   bleeding?: string | boolean
   hasFever?: boolean
   temperature?: number
@@ -35,10 +34,24 @@ interface QuestionnaireData {
   // Formato da IA (compatibilidade)
   pain?: number
   painDuringBowel?: number
+  painDuringBowelMovement?: number
   evacuated?: boolean
+  bowelMovementSinceLastContact?: boolean
   fever?: boolean
   medications?: boolean
   urinated?: boolean
+  usedExtraMedication?: boolean
+  extraMedicationDetails?: string
+  localCareAdherence?: boolean
+  additionalSymptoms?: string | null
+  discharge?: boolean
+  dischargeType?: string
+  dischargeAmount?: string
+  satisfactionRating?: number
+  wouldRecommend?: boolean
+  positiveFeedback?: string
+  improvementSuggestions?: string
+  concerns?: string
   [key: string]: any
 }
 
@@ -67,14 +80,18 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
     ...rawData,
     // Dor em repouso: aceitar painAtRest ou pain
     painAtRest: rawData.painAtRest ?? rawData.pain,
-    // Dor durante evacuação: aceitar painDuringEvacuation ou painDuringBowel
-    painDuringEvacuation: rawData.painDuringEvacuation ?? rawData.painDuringBowel,
+    // Dor durante evacuação: also check painDuringBowelMovement
+    painDuringEvacuation: rawData.painDuringEvacuation ?? rawData.painDuringBowel ?? rawData.painDuringBowelMovement,
     // Evacuação: aceitar hadBowelMovement ou evacuated
     hadBowelMovement: rawData.hadBowelMovement ?? rawData.evacuated,
     // Febre: aceitar hasFever ou fever
     hasFever: rawData.hasFever ?? rawData.fever,
     // Medicações: aceitar usedPrescribedMeds ou medications
     usedPrescribedMeds: rawData.usedPrescribedMeds ?? rawData.medications,
+    // Medicação extra: aceitar usedExtraMeds ou usedExtraMedication
+    usedExtraMeds: rawData.usedExtraMeds ?? rawData.usedExtraMedication,
+    // Detalhes da medicação extra
+    extraMedsDetails: rawData.extraMedsDetails ?? rawData.extraMedicationDetails,
     // Sangramento: converter boolean para string se necessário
     bleeding: typeof rawData.bleeding === 'boolean'
       ? (rawData.bleeding ? 'leve' : 'none')
@@ -97,20 +114,6 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
       case 'medium': return 'MÉDIO'
       default: return 'BAIXO'
     }
-  }
-
-  const getBristolDescription = (scale?: number) => {
-    if (!scale) return null
-    const descriptions: Record<number, string> = {
-      1: "Caroços duros separados",
-      2: "Forma de salsicha com caroços",
-      3: "Salsicha com rachaduras",
-      4: "Forma de cobra, lisa",
-      5: "Pedaços macios",
-      6: "Pedaços fofos, pastoso",
-      7: "Líquido, sem pedaços",
-    }
-    return descriptions[scale] || ""
   }
 
   const getBleedingLabel = (bleeding?: string) => {
@@ -282,20 +285,6 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                       )}
                     </div>
 
-                    {/* Bristol */}
-                    {data.bristolScale && (
-                      <div className="bg-white rounded-lg p-3 border shadow-sm">
-                        <div className="flex items-center gap-2 text-gray-600 mb-1">
-                          <span className="text-xs font-medium">Escala Bristol</span>
-                        </div>
-                        <div className="text-2xl font-bold text-gray-800">
-                          {data.bristolScale}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {getBristolDescription(data.bristolScale)}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Evacuação */}
@@ -355,6 +344,100 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                       </p>
                     )}
                   </div>
+
+                  {/* Secreção */}
+                  {(data.discharge === true || data.hasPurulentDischarge) && (
+                    <div className="bg-white rounded-lg p-3 border shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        <span className="font-medium">Secreção pela ferida</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {data.dischargeType && (
+                          <Badge variant="outline" className={`${data.dischargeType === 'purulent' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
+                            {data.dischargeType === 'clear' ? 'Clara' : data.dischargeType === 'yellowish' ? 'Amarelada' : data.dischargeType === 'purulent' ? 'Purulenta' : data.dischargeType === 'bloody' ? 'Sanguinolenta' : data.dischargeType}
+                          </Badge>
+                        )}
+                        {data.dischargeAmount && (
+                          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                            {data.dischargeAmount === 'minimal' ? 'Pouca' : data.dischargeAmount === 'moderate' ? 'Moderada' : data.dischargeAmount === 'abundant' ? 'Muita' : data.dischargeAmount}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Cuidados Locais */}
+                  {data.localCareAdherence !== undefined && (
+                    <div className="bg-white rounded-lg p-3 border shadow-sm">
+                      <div className="flex items-center gap-2">
+                        {data.localCareAdherence ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        )}
+                        <span className="font-medium">
+                          Cuidados locais: {data.localCareAdherence ? 'Seguindo orientações' : 'Não está seguindo'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sintomas Adicionais */}
+                  {data.additionalSymptoms && (
+                    <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                        <span className="font-medium text-yellow-900">Sintomas Adicionais</span>
+                      </div>
+                      <p className="text-sm text-yellow-800">{data.additionalSymptoms}</p>
+                    </div>
+                  )}
+
+                  {/* Preocupações */}
+                  {data.concerns && (
+                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-purple-900">Preocupações do Paciente</span>
+                      </div>
+                      <p className="text-sm text-purple-800">{data.concerns}</p>
+                    </div>
+                  )}
+
+                  {/* Pesquisa de Satisfação */}
+                  {data.satisfactionRating !== undefined && (
+                    <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-indigo-900">Pesquisa de Satisfação (D+14)</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <span className="text-xs text-indigo-600">Nota</span>
+                          <div className={`text-2xl font-bold ${(data.satisfactionRating ?? 0) >= 9 ? 'text-green-600' : (data.satisfactionRating ?? 0) >= 7 ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {data.satisfactionRating}/10
+                          </div>
+                        </div>
+                        {data.wouldRecommend !== undefined && (
+                          <div>
+                            <span className="text-xs text-indigo-600">Recomendaria?</span>
+                            <div className={`text-lg font-bold ${data.wouldRecommend ? 'text-green-600' : 'text-red-600'}`}>
+                              {data.wouldRecommend ? 'Sim' : 'Não'}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      {data.positiveFeedback && (
+                        <p className="text-sm text-indigo-800 mt-2">
+                          <strong>Elogios:</strong> {data.positiveFeedback}
+                        </p>
+                      )}
+                      {data.improvementSuggestions && (
+                        <p className="text-sm text-indigo-800 mt-1">
+                          <strong>Sugestões:</strong> {data.improvementSuggestions}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Red Flags */}
                   {response.redFlags.length > 0 && (

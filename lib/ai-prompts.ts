@@ -41,15 +41,43 @@ export interface ExpectedOutcomes {
  * Define expectativas clínicas para Hemorroidectomia
  */
 function getHemorroidectomiaExpectations(day: number): ExpectedOutcomes {
-  if (day <= 3) {
+  if (day === 1) {
     return {
-      painRange: 'Dor intensa (7-9/10)',
+      painRange: 'Dor mínima a leve (0-4/10) — bloqueio pudendo ativo',
       bleedingExpected: true,
       bleedingLevel: 'Leve a moderado',
-      bowelMovement: 'Primeira evacuação pode ocorrer D+1-3 com dor intensa',
+      bowelMovement: 'Primeira evacuação pode não ter ocorrido ainda (normal)',
       specificExpectations: [
-        'Pico de dor nas primeiras 48-72h',
+        'Bloqueio do nervo pudendo ATIVO (~48h de duração)',
+        'Dor mínima em repouso esperada',
         'Retenção urinária comum em D+1 (até 25% dos casos)',
+        'Sangramento leve ao evacuar é esperado',
+        'Uso regular de analgésicos conforme prescrito',
+      ],
+    };
+  } else if (day === 2) {
+    return {
+      painRange: 'Dor moderada a intensa (2-7/10) — bloqueio terminando, aumento é NORMAL',
+      bleedingExpected: true,
+      bleedingLevel: 'Leve a moderado',
+      bowelMovement: 'Primeira evacuação pode ocorrer com dor intensa',
+      specificExpectations: [
+        'Bloqueio pudendo está TERMINANDO — aumento de dor é ESPERADO',
+        'Paciente pode ficar assustado com aumento da dor em relação a D+1',
+        'TRANQUILIZAR: aumento de dor D+1→D+2 é normal',
+        'Sangramento leve ao evacuar é esperado',
+        'Uso regular de analgésicos potentes',
+      ],
+    };
+  } else if (day === 3) {
+    return {
+      painRange: 'Dor moderada (2-6/10) — pico inflamatório',
+      bleedingExpected: true,
+      bleedingLevel: 'Leve a moderado',
+      bowelMovement: 'Primeira evacuação deve ocorrer ou estar próxima',
+      specificExpectations: [
+        'Pico de resposta inflamatória',
+        'Dor deve começar a MELHORAR após este dia',
         'Sangramento leve ao evacuar é esperado',
         'Uso regular de analgésicos potentes',
       ],

@@ -225,9 +225,21 @@ function getDaySpecificQuestions(
 ): QuestionDefinition[] {
   const questions: QuestionDefinition[] = [];
 
-  // D+1: Apenas perguntas básicas
+  // Aderência a cuidados locais (genérico - depende do protocolo do médico)
+  questions.push({
+    id: 'local_care_adherence',
+    category: 'general',
+    required: true,
+    text: 'Está seguindo os cuidados locais orientados pelo médico? (como uso de pomadas, banhos de assento, compressas)',
+    followUpLogic: `
+      Se NÃO: investigar motivo e reforçar importância
+      Consultar o PROTOCOLO MÉDICO para saber quais cuidados específicos orientar
+    `
+  });
+
+  // D+1: Apenas perguntas básicas (aderência já adicionada acima)
   if (dayNumber === 1) {
-    // Nenhuma pergunta específica adicional
+    // Nenhuma pergunta específica adicional além da aderência
   }
 
   // Comparação de dor REMOVIDA - sistema calcula automaticamente pela nota de dor
@@ -439,6 +451,13 @@ ${
 
 LEMBRAR: SEMPRE perguntar "evacuou desde a última vez que conversamos?"
           NUNCA perguntar "evacuou hoje?" ou "evacuou desde ontem?"
+
+═══════════════════════════════════════════════════════════════
+CUIDADOS LOCAIS
+═══════════════════════════════════════════════════════════════
+
+Perguntar se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas).
+Consultar o PROTOCOLO MÉDICO OFICIAL para saber quais cuidados específicos o médico prescreveu.
 `;
 
   // Contexto sobre dor (se houver histórico)

@@ -32,6 +32,8 @@ interface PainData {
   painAtRest: number | null
   painDuringEvacuation: number | null
   hasRedFlag: boolean
+  usedExtraMedication: boolean
+  extraMedicationDetails: string | null
 }
 
 interface PainEvolutionChartProps {
@@ -69,6 +71,8 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             painAtRest: null,
             painDuringEvacuation: null,
             hasRedFlag: false,
+            usedExtraMedication: false,
+            extraMedicationDetails: null,
           })
         })
 
@@ -95,6 +99,8 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                 painAtRest: parsed.painAtRest ?? 0,
                 painDuringEvacuation: parsed.painDuringEvacuation,
                 hasRedFlag: parsed.hasRedFlags,
+                usedExtraMedication: parsed.usedExtraMedication,
+                extraMedicationDetails: parsed.extraMedicationDetails,
               })
             }
           })
@@ -148,10 +154,34 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
     if (value === null || value === undefined || cx === undefined || cy === undefined) return null
 
     const isRedFlag = payload.hasRedFlag
+    const usedMeds = payload.usedExtraMedication
     const radius = isRedFlag ? 6 : 4
     let fill = '#10B981' // verde
     if (value >= 7) fill = '#DC2626' // vermelho
     else if (value >= 4) fill = '#F59E0B' // amarelo
+
+    if (usedMeds) {
+      return (
+        <g key={`dot-med-${cx}-${cy}`}>
+          <circle
+            cx={cx}
+            cy={cy}
+            r={radius + 1}
+            fill={fill}
+            stroke="#8B5CF6"
+            strokeWidth={2.5}
+          />
+          <text
+            x={cx}
+            y={cy - 12}
+            textAnchor="middle"
+            fontSize={11}
+          >
+            💊
+          </text>
+        </g>
+      )
+    }
 
     return (
       <circle
@@ -271,6 +301,10 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             <div className="w-3 h-3 rounded-full border-2 border-red-500 bg-white" />
             <span>Com alerta</span>
           </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-100 flex items-center justify-center text-[6px] leading-none">💊</div>
+            <span>Usou medicação extra (Tramadol, Codeína, etc.)</span>
+          </div>
         </div>
       </CardHeader>
 
@@ -319,7 +353,10 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                     if (value === null) return [null, null]
                     const label = name === 'painAtRest' ? 'Dor em repouso' : 'Dor durante evacuação'
                     const suffix = props.payload.hasRedFlag && name === 'painAtRest' ? ' ⚠️ ALERTA' : ''
-                    return [`${value}/10${suffix}`, label]
+                    const medSuffix = props.payload.usedExtraMedication && name === 'painAtRest'
+                      ? ` 💊 ${props.payload.extraMedicationDetails || 'Medicação extra'}`
+                      : ''
+                    return [`${value}/10${suffix}${medSuffix}`, label]
                   }}
                   labelFormatter={(label: string, payload: readonly any[]) => {
                     const item = payload?.[0]?.payload

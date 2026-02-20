@@ -23,13 +23,11 @@ export interface ConversationMessage {
 export interface QuestionnaireData {
   // Dor
   pain?: number; // 0-10 na escala visual analógica
-  // painComparison removido - sistema calcula automaticamente comparando dor de hoje com ontem
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
   lastBowelMovement?: string; // Quando foi a última evacuação
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
-  // stoolConsistency removido - não perguntar mais sobre Bristol
 
   // Sangramento
   bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
@@ -70,6 +68,9 @@ export interface QuestionnaireData {
   positiveFeedback?: string; // Elogios e pontos positivos
   improvementSuggestions?: string; // Críticas e sugestões de melhoria
   satisfactionComments?: string; // Comentários livres (legado, manter compatibilidade)
+
+  // Aderência a cuidados locais (genérico - depende do protocolo do médico)
+  localCareAdherence?: boolean; // Está seguindo os cuidados locais orientados pelo médico?
 
   // Sintomas adicionais (TODOS OS DIAS - pergunta final)
   additionalSymptoms?: string | null; // "Deseja relatar mais alguma coisa?"
@@ -179,7 +180,6 @@ export async function conductConversation(
   urgencyLevel: string;
   sendImages?: {
     painScale?: boolean;
-    // bristolScale removido
   };
 }> {
   // Nome do médico: patient.doctorName (webhook) > patient.user (Prisma) > fallback
@@ -265,47 +265,19 @@ se o médico já orientou diferente.
       ❌ PROIBIDO: "Então posso anotar como 7?"
       ✅ CORRETO: "Entendi. Me diz um número de 0 a 10 para eu anotar?"
 
-   c) ESCALA DE DOR - INTERPRETAÇÃO INTELIGENTE:
-      - SEMPRE colete dor usando escala 0-10
-      - PORÉM, seja INTELIGENTE para interpretar respostas descritivas:
-
-      ✅ SE o paciente der uma resposta DESCRITIVA sobre dor, você DEVE:
-         1. PRIMEIRO: Reconhecer e validar o que ele disse
-         2. SEGUNDO: Interpretar e sugerir um número aproximado
-         3. TERCEIRO: Pedir confirmação ou ajuste
-
-      ✅ MAPEAMENTO SUGERIDO (use como guia):
-         - "sem dor", "nenhuma dor", "zero dor" → sugerir 0-1
-         - "dor leve", "pouca dor", "quase nada" → sugerir 1-3
-         - "dor média", "moderada", "suportável", "mais ou menos" → sugerir 4-6
-         - "dor forte", "muita dor", "doendo bastante" → sugerir 6-8
-         - "dor muito forte", "insuportável", "horrível" → sugerir 8-10
-
-      ✅ EXEMPLOS DE RESPOSTAS CORRETAS:
-
-      Paciente: "Estou com uma dor média"
-      Você: "Entendi, uma dor média. Pensando na escala de 0 a 10, onde 0 é sem dor e 10 é a pior dor da sua vida, uma dor média seria algo entre 4 e 6. Você diria que está mais perto de qual número?"
-
-      Paciente: "Está doendo bastante"
-      Você: "Percebo que está doendo bastante, sinto muito. Na escala de 0 a 10, isso seria algo como 6, 7 ou 8? Qual número você acha que representa melhor sua dor agora?"
-
-      Paciente: "Tá bem leve"
-      Você: "Que bom que está leve! Seria algo como 2 ou 3 na escala? Qual número você diria?"
-
-      ⚠️ IMPORTANTE: NUNCA diga "não entendi" ou "tive um problema técnico" para respostas descritivas!
-      Se o paciente descrever a dor de QUALQUER forma, você DEVE interpretar e pedir confirmação.
+   c) ESCALA DE DOR - INTERPRETAÇÃO:
+      - Número direto → registrar imediatamente
+      - Descrição verbal → sugerir faixa e pedir confirmação:
+        sem dor→0-1, leve→1-3, média→4-6, forte→6-8, insuportável→8-10
+      - NUNCA diga "não entendi" para descrições de dor
+      - Dois tipos: "pain" (repouso) e "painDuringBowelMovement" (evacuação) — coletar AMBOS separadamente
 
    d) OUTRAS INFORMAÇÕES:
 
-      EVACUAÇÃO (MUITO IMPORTANTE):
-      - Pergunte: "Você evacuou desde a última vez que conversamos?"
-      - Se SIM:
-        * Primeiro: ENVIAR IMAGEM da escala visual analógica de dor
-        * Pergunte dor durante evacuação: "Qual foi a dor durante a evacuação? De 0 a 10"
-        * NÃO perguntar sobre consistência/Bristol (removido)
-      - Se NÃO: pergunte "Quando foi a última vez que você evacuou?"
-      - ⚠️ SEMPRE pergunte "evacuou desde a última vez que conversamos?"
-      - ⚠️ NUNCA pergunte "evacuou hoje" ou "evacuou desde ontem"
+      EVACUAÇÃO:
+      - Perguntar: "Evacuou desde a última vez que conversamos?" (NUNCA "evacuou hoje")
+      - Se SIM: perguntar dor durante evacuação (0-10). NÃO perguntar Bristol.
+      - Se NÃO: perguntar quando foi a última vez
 
       SANGRAMENTO:
       - Nenhum
@@ -334,29 +306,11 @@ se o médico já orientou diferente.
       - Sua dor está controlada com as medicações? Sim/Não
       - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
 
-      MEDICAÇÃO EXTRA (⚠️ PERGUNTA OBRIGATÓRIA - PERGUNTAR LOGO APÓS A DOR!):
-      ═══════════════════════════════════════════════════════════════
-      🚨🚨🚨 VOCÊ DEVE FAZER ESTA PERGUNTA EM TODA CONVERSA! 🚨🚨🚨
-      🚨🚨🚨 PERGUNTE LOGO APÓS COLETAR A DOR EM REPOUSO! 🚨🚨🚨
-      ═══════════════════════════════════════════════════════════════
-
-      ORDEM DAS PERGUNTAS:
-      1️⃣ Primeiro: Dor em repouso (0-10)
-      2️⃣ Segundo: MEDICAÇÃO EXTRA (OBRIGATÓRIO!)
-      3️⃣ Depois: Evacuação, sangramento, etc.
-
-      PERGUNTA EXATA: "Além das medicações que ${nomeMedico} prescreveu, você tomou alguma outra medicação? Por exemplo: Tramadol, Codeína, Tylex, Tramal, algum outro analgésico, ou laxante?"
-
-      - Se SIM: perguntar QUAL medicação, DOSE e HORÁRIO
-      - Se NÃO: registrar que não usou medicação extra
-
-      ⚠️ POR QUE ISSO É TÃO IMPORTANTE?
-      Paciente com dor 5/10 usando Tramadol está em situação MUITO DIFERENTE de paciente com dor 5/10 sem opioides!
-      A dor "controlada" com opioide forte é mais preocupante que dor "controlada" sem medicação extra.
-
-      ❌ ERRO GRAVÍSSIMO: Não perguntar sobre medicação extra
-      ❌ ERRO GRAVÍSSIMO: Perguntar sobre medicação extra só no final
-      ✅ OBRIGATÓRIO: Perguntar LOGO APÓS a dor em repouso, em TODOS os dias
+      MEDICAÇÃO EXTRA (⚠️ OBRIGATÓRIO - 2ª PERGUNTA, LOGO APÓS DOR):
+      Perguntar: "Além das medicações que ${nomeMedico} prescreveu, você tomou alguma outra? (Tramadol, Codeína, Tylex, laxante)"
+      - Se SIM: qual, dose e horário
+      - Se NÃO: registrar que não usou
+      Contexto clínico: Dor 5/10 com opioide ≠ dor 5/10 sem opioide.
 
       COMPARAÇÃO DE DOR (NÃO PERGUNTAR - CALCULAR AUTOMATICAMENTE):
       ⚠️ NÃO pergunte ao paciente se a dor melhorou/piorou. O sistema calcula isso automaticamente
@@ -371,14 +325,7 @@ se o médico já orientou diferente.
       ❌ EXEMPLO DE ERRO: "Dor ontem era 0, hoje é 1, que maravilha melhorou!" (ERRADO!)
       ✅ CORRETO: "Dor ontem era 0, hoje é 1 - aumentou um pouquinho, mas ainda está bem baixa"
 
-      ${daysPostOp === 2 ? `
-      ⚠️ IMPORTANTE D+2: Se dor AUMENTOU em relação a D+1:
-      - Isso é NORMAL e ESPERADO (bloqueio pudendo terminando após ~48h)
-      - TRANQUILIZAR o paciente
-      - Explicar que deve melhorar nos próximos dias
-      ` : daysPostOp >= 3 ? `
-      ⚠️ D+3 em diante: Espera-se melhora progressiva. Se piorar muito: investigar.
-      ` : ''}
+      ${daysPostOp === 2 ? '⚠️ D+2: Aumento de dor é NORMAL (bloqueio terminando). Tranquilizar.' : daysPostOp >= 3 ? '⚠️ D+3+: Espera-se melhora progressiva.' : ''}
 
    e) FLUXO DA CONVERSA:
       - Faça UMA pergunta por vez
@@ -393,34 +340,11 @@ se o médico já orientou diferente.
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
-   g) ORIENTAÇÃO DE HOJE SOBRE COMPRESSA/BANHO (DIA ESPECÍFICO D+${daysPostOp}):
-      ═══════════════════════════════════════════════════════════════
-      ${daysPostOp <= 2 ? `
-      🧊 HOJE (D+${daysPostOp}): COMPRESSA GELADA ou BANHO DE ASSENTO GELADO
-      - Compressas geladas 5x/dia por 10 minutos OU banho de assento com água GELADA
-      ${daysPostOp === 2 ? `
-      ⚠️ IMPORTANTE: HOJE É O ÚLTIMO DIA DE GELO!
-      - Orientar: "Hoje é o último dia de compressa gelada/banho gelado"
-      - Orientar: "A partir de amanhã (D+3), troque para banho de assento com água MORNA"
-      ` : `
-      - Continue orientando compressa gelada/banho gelado
-      - NÃO diga "último dia de gelo" (isso só no D+2)
-      `}
-      ` : `
-      🔥 HOJE (D+${daysPostOp}): BANHO DE ASSENTO COM ÁGUA MORNA
-      ═══════════════════════════════════════════════════════════════
-      🚨 ATENÇÃO: NÃO FALE EM GELO! O gelo era só até D+2!
-      🚨 Hoje já é D+${daysPostOp}, então é ÁGUA MORNA!
-      ═══════════════════════════════════════════════════════════════
-
-      - Água MORNA (37-40°C) por 10-15 minutos
-      - 3 a 5x/dia, especialmente após evacuações
-      - Apenas água limpa, SEM produtos
-
-      ❌ ERRADO: "Hoje é o último dia de compressa gelada" (ISSO ERA NO D+2!)
-      ❌ ERRADO: Mencionar gelo, compressa gelada, banho gelado
-      ✅ CORRETO: "Faça banho de assento com água MORNA"
-      `}
+   g) CUIDADOS LOCAIS (ORIENTAÇÕES DO PROTOCOLO):
+      - Consulte o PROTOCOLO MÉDICO OFICIAL acima para orientar sobre cuidados locais
+      - Se o protocolo menciona compressas, banhos de assento, pomadas, etc., pergunte ao paciente se está seguindo
+      - NÃO invente orientações de cuidados locais — use APENAS o que está no protocolo do médico
+      - Se não há protocolo registrado (modo coleta), NÃO oriente sobre cuidados locais
 
 4. SINAIS DE ALERTA (RED FLAGS):
    - Dor ≥ 8/10
@@ -430,28 +354,9 @@ se o médico já orientou diferente.
 
    Se detectar: oriente PRONTO-SOCORRO imediatamente
 
-5. ENCERRAMENTO - CHECKLIST OBRIGATÓRIO:
-   ⚠️ ANTES DE FINALIZAR (isComplete: true), VERIFIQUE SE COLETOU:
-
-   ☐ 1️⃣ Dor em repouso (0-10)
-   ☐ 2️⃣ 🚨 MEDICAÇÃO EXTRA (Tramadol, Codeína, laxativo) - LOGO APÓS A DOR! 🚨
-   ☐ 3️⃣ Se evacuou desde último contato
-   ☐ 4️⃣ Se evacuou: dor ao evacuar (0-10)
-   ☐ 5️⃣ Sangramento (nenhum/leve/moderado/intenso)
-   ☐ 6️⃣ [APENAS D+1] Se consegue urinar
-   ☐ 7️⃣ Se teve febre
-   ☐ 8️⃣ Se está tomando medicações prescritas
-   ☐ 9️⃣ [A PARTIR DE D+3] Secreção pela ferida
-   ☐ 🔟 [APENAS D+14] Nota de satisfação (0-10)
-   ☐ 1️⃣1️⃣ [APENAS D+14] Recomendaria o acompanhamento?
-   ☐ 1️⃣2️⃣ [APENAS D+14] Sugestões ou críticas de melhoria
-   ☐ 1️⃣3️⃣ [TODOS OS DIAS - NO FINAL] Sintomas adicionais ("Deseja relatar mais alguma coisa?")
-
-   ❌ NÃO FINALIZE se algum item obrigatório do dia não foi perguntado!
-   ❌ MEDICAÇÃO EXTRA deve ser a SEGUNDA pergunta (logo após dor)!
-   ❌ Se não perguntou MEDICAÇÃO EXTRA, a conversa NÃO está completa!
-   ❌ Se D+14 e não coletou satisfação/recomendação/sugestões, NÃO está completa!
-   ❌ Se não perguntou SINTOMAS ADICIONAIS no final, NÃO está completa!
+5. ENCERRAMENTO:
+   ⚠️ NÃO finalize (isComplete: true) até coletar TODAS as informações listadas em "INFORMAÇÕES OBRIGATÓRIAS" acima.
+   Ordem: 1)Dor → 2)Medicação extra → 3)Evacuação → 4)Sangramento → 5)Urina(D+1) → 6)Febre → 7)Medicações → 8)Cuidados locais → 9)Secreção(D+3+) → 10)Satisfação(D+14) → 11)Sintomas adicionais(ÚLTIMO)
 
 6. SECREÇÃO DE FERIDA (A PARTIR DE D+3):
    ⚠️ IMPORTANTE: Secreção é COMUM no pós-operatório de feridas!
@@ -474,16 +379,17 @@ DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
 EXAMPLES OF PARSING (MUITO IMPORTANTE - SIGA ESTES EXEMPLOS):
 
 FEBRE:
-- "Não tive febre" → "fever": false
+- "Tive febre, 37.5" → "fever": true, "feverTemperature": 37.5
 - "Sem febre" → "fever": false
-- "Tive um pouco de febre, 37.5" → "fever": true, "feverTemperature": 37.5
 
-MEDICAÇÃO EXTRA (OBRIGATÓRIO PERGUNTAR):
-- "Não tomei nada além do que foi prescrito" → "usedExtraMedication": false
-- "Só as medicações do médico" → "usedExtraMedication": false
+MEDICAÇÃO EXTRA:
+- "Não tomei nada além do prescrito" → "usedExtraMedication": false
 - "Tomei um Tramadol de manhã" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol de manhã"
-- "Precisei tomar Tylex às 3h da madrugada" → "usedExtraMedication": true, "extraMedicationDetails": "Tylex às 3h"
 - "Tomei um laxante ontem à noite" → "usedExtraMedication": true, "extraMedicationDetails": "Laxante à noite"
+
+CUIDADOS LOCAIS:
+- "Estou fazendo tudo" / "sim" → "localCareAdherence": true
+- "Não estou fazendo" → "localCareAdherence": false
 
 SATISFAÇÃO (D+14 APENAS):
 - "Dou nota 9" → "satisfactionRating": 9
@@ -504,40 +410,13 @@ SINTOMAS ADICIONAIS (TODOS OS DIAS - PERGUNTA FINAL):
 - "Senti uma fisgada" → "additionalSymptoms": "Fisgada"
 - "Tive dor de cabeça" → "additionalSymptoms": "Dor de cabeça"
 
-DOR - INTERPRETAÇÃO INTELIGENTE:
-
-⚠️ ATENÇÃO: EXISTEM DOIS TIPOS DE DOR - USE O CAMPO CORRETO:
-1. "pain" = DOR EM REPOUSO (quando paciente está parado, sem fazer nada)
-2. "painDuringBowelMovement" = DOR DURANTE EVACUAÇÃO (quando vai ao banheiro)
-
-PARA DOR EM REPOUSO (use "pain"):
-- "Não estou com dor" → "pain": 0
-- "Sem dor em repouso" → "pain": 0
-- "Minha dor agora é 2" → "pain": 2
-
-PARA DOR DURANTE EVACUAÇÃO (use "painDuringBowelMovement"):
-- "Dor ao evacuar foi 2" → "painDuringBowelMovement": 2
-- "Quando fui ao banheiro doeu 5" → "painDuringBowelMovement": 5
-- "Não senti dor ao evacuar" → "painDuringBowelMovement": 0
-
-REGRAS GERAIS:
-- "Dor leve" → NÃO registre ainda, pergunte: "Dor leve seria algo como 2 ou 3? Qual número?"
-- "Dor média" → NÃO registre ainda, pergunte: "Dor média seria entre 4 e 6. Qual número você diria?"
-- "Dor forte" ou "muita dor" → NÃO registre ainda, pergunte: "Dor forte seria 6, 7 ou 8? Qual número?"
-- "uns 6 ou 7" → pergunte qual dos dois para confirmar
-
-⚠️ REGRA DE OURO PARA DOR:
-- Se paciente der NÚMERO → registre imediatamente NO CAMPO CORRETO
-- Se paciente der DESCRIÇÃO → interprete, sugira faixa de números, peça confirmação
-- NUNCA confunda dor em repouso com dor durante evacuação!
-- NUNCA diga "não entendi" ou "erro técnico" para descrições de dor!
-
-🚨 DESAMBIGUAÇÃO - USE SUA INTELIGÊNCIA:
-- Você é uma IA, entenda o CONTEXTO do que o paciente disse.
-- Se o paciente falar de dor E evacuação na mesma resposta, entenda que é dor de evacuação.
-- Se ficou QUALQUER dúvida sobre qual dor o paciente está falando, PERGUNTE: "Essa dor que você mencionou é agora em repouso ou foi durante a evacuação?"
-- São dois dados DIFERENTES. Você PRECISA coletar os dois separadamente. Se só coletou um, pergunte o outro.
-- Exemplo: paciente diz "evacuei e doeu 5" → registre painDuringBowelMovement: 5, e PERGUNTE a dor em repouso.
+DOR - CAMPOS E DESAMBIGUAÇÃO:
+⚠️ Dois campos DISTINTOS — coletar AMBOS separadamente:
+- "pain" = DOR EM REPOUSO → "Minha dor agora é 2" → "pain": 2
+- "painDuringBowelMovement" = DOR DURANTE EVACUAÇÃO → "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5
+- Descrição verbal → sugerir faixa numérica e pedir confirmação (NÃO registrar sem número)
+- Se mencionou dor + evacuação juntos → é dor de evacuação. PERGUNTE a dor em repouso separadamente.
+- Na dúvida: "Essa dor é em repouso ou durante a evacuação?"
 
 JSON STRUCTURE:
 {
@@ -545,9 +424,7 @@ JSON STRUCTURE:
   "extractedInfo": {
     "pain": 2,  // DOR EM REPOUSO - número de 0 a 10 (pergunta: "como está sua dor agora, em repouso?")
     "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
-    // stoolConsistency removido - não perguntar mais
     "bowelMovementSinceLastContact": true,  // true/false
-    // painComparison removido - sistema calcula automaticamente
     "medications": true,
     "painControlledWithMeds": false,
     "usedExtraMedication": false,  // OBRIGATÓRIO - usou medicação além das prescritas?
@@ -561,8 +438,7 @@ JSON STRUCTURE:
     // ... outros campos conforme coletados
   },
   "sendImages": {
-    "painScale": false,  // true se precisa enviar escala de dor
-    "bristolScale": false  // REMOVIDO - não usar mais
+    "painScale": false  // true se precisa enviar escala de dor
   },
   "isComplete": false,
   "urgency": "low|medium|high|critical",
@@ -808,7 +684,6 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
       missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
     }
-    // Bristol Scale removido - não perguntar mais
   }
 
   // 4. SANGRAMENTO
@@ -849,7 +724,12 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     missing.push('Se está tomando as medicações conforme prescrito');
   }
 
-  // 9. PESQUISA DE SATISFAÇÃO (apenas D+14)
+  // 9. ADERÊNCIA A CUIDADOS LOCAIS (todos os dias)
+  if (data.localCareAdherence === undefined) {
+    missing.push('Se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas)');
+  }
+
+  // 11. PESQUISA DE SATISFAÇÃO (apenas D+14)
   if (daysPostOp >= 14) {
     if (data.satisfactionRating === undefined || data.satisfactionRating === null) {
       missing.push('Nota de satisfação com o acompanhamento (0-10)');

@@ -531,7 +531,6 @@ function formatIndividualData(
         // Estrutura para capturar dados separadamente por dia
         const painAtRestByDay: { [key: number]: number | null } = {};
         const painDuringBowelByDay: { [key: number]: number | null } = {};
-        const bristolByDay: { [key: number]: number | null } = {};
         let firstBowelMovementDay: number | null = null;
         let firstBowelMovementTime: string | null = null;
         let npsScore: number | null = null;
@@ -554,11 +553,6 @@ function formatIndividualData(
             // Dor durante evacuação
             if (extracted.painDuringBowelMovement !== undefined && extracted.painDuringBowelMovement !== null) {
               painDuringBowelByDay[followUp.dayNumber] = extracted.painDuringBowelMovement;
-            }
-
-            // Bristol Scale (registrar para D+5 e D+10)
-            if (extracted.bristolScale !== undefined && extracted.bristolScale !== null) {
-              bristolByDay[followUp.dayNumber] = extracted.bristolScale;
             }
 
             // Primeira evacuação (registrar a primeira ocorrência)
@@ -590,10 +584,6 @@ function formatIndividualData(
         [1, 2, 3, 5, 7, 10, 14].forEach(day => {
           baseRow[`Dor_Evacuacao_D${day}`] = painDuringBowelByDay[day] ?? null;
         });
-
-        // Bristol Scale (apenas D+5 e D+10)
-        baseRow['Bristol_D5'] = bristolByDay[5] ?? null;
-        baseRow['Bristol_D10'] = bristolByDay[10] ?? null;
 
         // Primeira evacuação
         baseRow['Primeira_Evacuacao_Dia'] = firstBowelMovementDay;
@@ -1026,8 +1016,6 @@ function createGlossary(): any[] {
     { Campo: 'EVACUAÇÃO', Descricao: '' },
     { Campo: 'Primeira_Evacuacao_Dia', Descricao: 'Dia pós-operatório da primeira evacuação (D+1, D+2, etc)' },
     { Campo: 'Primeira_Evacuacao_Horario', Descricao: 'Horário aproximado da primeira evacuação' },
-    { Campo: 'Bristol_D5', Descricao: 'Escala de Bristol no D+5 (1-7). 1-2=constipação, 3-5=normal, 6-7=diarréia' },
-    { Campo: 'Bristol_D10', Descricao: 'Escala de Bristol no D+10 (1-7). 1-2=constipação, 3-5=normal, 6-7=diarréia' },
     { Campo: '', Descricao: '' },
     { Campo: 'SATISFAÇÃO (D+14)', Descricao: '' },
     { Campo: 'Satisfacao_Controle_Dor', Descricao: 'Satisfação com o controle da dor pós-operatória (0-10)' },
@@ -1048,15 +1036,6 @@ function createGlossary(): any[] {
     { Campo: 'medium', Descricao: 'Risco médio - atenção necessária' },
     { Campo: 'high', Descricao: 'Alto risco - contato com médico recomendado' },
     { Campo: 'critical', Descricao: 'Risco crítico - intervenção imediata' },
-    { Campo: '', Descricao: '' },
-    { Campo: 'ESCALA DE BRISTOL', Descricao: '' },
-    { Campo: '1', Descricao: 'Pedaços duros separados (muito constipado)' },
-    { Campo: '2', Descricao: 'Em forma de salsicha, mas com pedaços' },
-    { Campo: '3', Descricao: 'Salsicha com rachaduras na superfície' },
-    { Campo: '4', Descricao: 'Salsicha lisa e macia (IDEAL)' },
-    { Campo: '5', Descricao: 'Pedaços macios com bordas definidas' },
-    { Campo: '6', Descricao: 'Pedaços fofos com bordas irregulares' },
-    { Campo: '7', Descricao: 'Aquosa, sem pedaços sólidos (diarreia)' },
   ];
 }
 
