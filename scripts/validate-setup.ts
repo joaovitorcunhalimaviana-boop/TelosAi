@@ -4,7 +4,7 @@
  * Verifica se todas as dependências e configurações necessárias estão corretas
  */
 
-import { anthropic } from '../lib/anthropic';
+import { genAI } from '../lib/anthropic';
 import { detectRedFlags, getRiskLevel } from '../lib/red-flags';
 import { AI_CONFIG } from '../lib/config';
 
@@ -52,11 +52,11 @@ function logTest(category: string, test: string, passed: boolean, message?: stri
 async function validateEnvironment() {
   logHeader('1. VALIDAÇÃO DE VARIÁVEIS DE AMBIENTE');
 
-  // ANTHROPIC_API_KEY
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  // GOOGLE_GENERATIVE_AI_API_KEY
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   logTest(
     'Environment',
-    'ANTHROPIC_API_KEY configurada',
+    'GOOGLE_GENERATIVE_AI_API_KEY configurada',
     !!apiKey && apiKey !== 'your-api-key-here',
     apiKey ? 'Chave encontrada' : 'Chave não configurada ou usando valor padrão'
   );
@@ -83,19 +83,19 @@ async function validateEnvironment() {
 async function validateDependencies() {
   logHeader('2. VALIDAÇÃO DE DEPENDÊNCIAS');
 
-  // @anthropic-ai/sdk
+  // @google/generative-ai
   try {
-    const pkg = require('@anthropic-ai/sdk/package.json');
+    const pkg = require('@google/generative-ai/package.json');
     logTest(
       'Dependencies',
-      '@anthropic-ai/sdk instalado',
+      '@google/generative-ai instalado',
       true,
       `Versão: ${pkg.version}`
     );
   } catch (error) {
     logTest(
       'Dependencies',
-      '@anthropic-ai/sdk instalado',
+      '@google/generative-ai instalado',
       false,
       'Pacote não encontrado'
     );
@@ -138,42 +138,25 @@ async function validateDependencies() {
   }
 }
 
-async function validateAnthropicClient() {
-  logHeader('3. VALIDAÇÃO DO CLIENTE ANTHROPIC');
+async function validateGeminiClient() {
+  logHeader('3. VALIDAÇÃO DO CLIENTE GEMINI');
 
   // Cliente inicializado
   logTest(
-    'Anthropic',
+    'Gemini',
     'Cliente inicializado',
-    !!anthropic,
-    'Cliente Anthropic criado com sucesso'
-  );
-
-  // Configuração do modelo
-  logTest(
-    'Anthropic',
-    'Modelo configurado',
-    AI_CONFIG.model === 'claude-sonnet-4-5-20250929',
-    `Modelo: ${AI_CONFIG.model}`
+    !!genAI,
+    'Cliente Gemini criado com sucesso'
   );
 
   // Teste de conexão (se API key estiver configurada)
-  if (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'your-api-key-here') {
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     try {
-      const message = await anthropic.messages.create({
-        model: AI_CONFIG.model,
-        max_tokens: 50,
-        messages: [
-          {
-            role: 'user',
-            content: 'Responda apenas com "OK"',
-          },
-        ],
-      });
-
-      const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-05-20' });
+      const result = await model.generateContent('Responda apenas com "OK"');
+      const responseText = result.response.text();
       logTest(
-        'Anthropic',
+        'Gemini',
         'Teste de conexão com API',
         responseText.includes('OK'),
         'API respondeu corretamente'
@@ -181,7 +164,7 @@ async function validateAnthropicClient() {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       logTest(
-        'Anthropic',
+        'Gemini',
         'Teste de conexão com API',
         false,
         `Erro: ${errorMessage}`
@@ -189,7 +172,7 @@ async function validateAnthropicClient() {
     }
   } else {
     logTest(
-      'Anthropic',
+      'Gemini',
       'Teste de conexão com API',
       false,
       'Pulado (API key não configurada)'
@@ -365,7 +348,7 @@ async function runValidation() {
 
   await validateEnvironment();
   await validateDependencies();
-  await validateAnthropicClient();
+  await validateGeminiClient();
   await validateRedFlagsSystem();
   await validateFileStructure();
   await validateDatabase();
