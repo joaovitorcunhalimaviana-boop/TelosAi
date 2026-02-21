@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, Clock, Users, AlertCircle } from "lucide-react"
+import { Clock, Users, UsersRound, AlertCircle } from "lucide-react"
 import { StaggerChildren, StaggerItem, CountUp, ScaleOnHover } from "@/components/animations"
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion"
 import type { DashboardStats } from "@/app/dashboard/actions"
@@ -24,20 +24,20 @@ export function StatsCards({ stats }: StatsCardsProps) {
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
       staggerDelay={0.1}
     >
-      {/* Cirurgias Hoje */}
+      {/* Pacientes Totais */}
       <StaggerItem>
         <ScaleOnHover>
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
-            data-tutorial="stats-today-surgeries"
+            data-tutorial="stats-total-patients"
             style={{ borderColor: PRIMARY_COLOR }}
           >
             <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Cirurgias Hoje
+                  Pacientes Totais
                 </CardTitle>
-                <Calendar
+                <UsersRound
                   className="h-5 w-5"
                   style={{ color: PRIMARY_COLOR }}
                   aria-hidden="true"
@@ -47,9 +47,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
             <CardContent>
               <div className="text-3xl font-bold" style={{ color: PRIMARY_COLOR }}>
                 {prefersReducedMotion ? (
-                  stats?.todaySurgeries || 0
+                  stats?.totalPatients || 0
                 ) : (
-                  <CountUp value={stats?.todaySurgeries || 0} duration={1} delay={0.3} />
+                  <CountUp value={stats?.totalPatients || 0} duration={1} delay={0.3} />
                 )}
               </div>
             </CardContent>

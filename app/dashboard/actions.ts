@@ -12,7 +12,7 @@ import { auth } from "@/lib/auth"
 export type SurgeryType = "hemorroidectomia" | "fistula" | "fissura" | "pilonidal"
 
 export interface DashboardStats {
-  todaySurgeries: number
+  totalPatients: number
   activePatientsCount: number
   pendingFollowUpsToday: number
   criticalAlerts: number
@@ -63,13 +63,10 @@ const getCachedDashboardStatsInternal = unstable_cache(
     const todayEnd = endOfDayBrasilia()
 
     // SECURITY: All queries filter by userId to ensure doctor only sees their own patients
-    // Total de cirurgias hoje (only for this doctor's patients)
-    const todaySurgeries = await prisma.surgery.count({
+    // Total de pacientes (ativos + concluídos, exclui excluídos pois cascade delete remove do banco)
+    const totalPatients = await prisma.surgery.count({
       where: {
-        date: {
-          gte: todayStart,
-          lte: todayEnd,
-        },
+        status: { in: ["active", "completed"] },
         patient: {
           userId: userId,
         },
@@ -86,7 +83,7 @@ const getCachedDashboardStatsInternal = unstable_cache(
       },
     })
 
-    // Follow-ups pendentes para hoje (only for this doctor's patients)
+    // Follow-ups pendentes para hoje (only for this doctor's patients, apenas cirurgias ativas)
     const pendingFollowUpsToday = await prisma.followUp.count({
       where: {
         scheduledDate: {
@@ -95,6 +92,9 @@ const getCachedDashboardStatsInternal = unstable_cache(
         },
         status: {
           in: ["pending", "sent"],
+        },
+        surgery: {
+          status: "active",
         },
         patient: {
           userId: userId,
@@ -124,7 +124,7 @@ const getCachedDashboardStatsInternal = unstable_cache(
     console.log(`[CACHE] Dashboard stats action computed in ${duration}ms for user ${userId}`)
 
     return {
-      todaySurgeries,
+      totalPatients,
       activePatientsCount,
       pendingFollowUpsToday,
       criticalAlerts,
