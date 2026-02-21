@@ -80,6 +80,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
     period: "all",
     search: "",
     researchFilter: "all",
+    followUpStatus: "active" as const,
   })
 
   const [searchInput, setSearchInput] = useState("")
@@ -346,7 +347,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                         variant="ghost"
                         size="sm"
                         className="h-auto p-0 text-xs text-muted-foreground hover:text-primary"
-                        onClick={() => setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: searchInput, researchFilter: "all" })}
+                        onClick={() => setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: searchInput, researchFilter: "all", followUpStatus: filters.followUpStatus })}
                       >
                         Limpar
                       </Button>
@@ -479,7 +480,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: "", researchFilter: "all" })
+                    setFilters({ surgeryType: "all", dataStatus: "all", period: "all", search: "", researchFilter: "all", followUpStatus: filters.followUpStatus })
                     setSearchInput("")
                   }}
                   className="text-xs ml-auto h-6 px-2 text-muted-foreground hover:text-destructive"
@@ -504,12 +505,30 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
             </Alert>
           )}
 
-          <div className="flex items-center gap-2 mb-4">
-            <UserCheck className="h-6 w-6 text-blue-600" aria-hidden="true" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Pacientes em Acompanhamento
-            </h2>
-            <Badge variant="secondary" className="ml-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setFilters(prev => ({ ...prev, followUpStatus: "active" as const }))}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  filters.followUpStatus !== "completed"
+                    ? "bg-[#0A2647] text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                }`}
+              >
+                Em Acompanhamento
+              </button>
+              <button
+                onClick={() => setFilters(prev => ({ ...prev, followUpStatus: "completed" as const }))}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  filters.followUpStatus === "completed"
+                    ? "bg-[#0A2647] text-white shadow-sm"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                }`}
+              >
+                Concluídos
+              </button>
+            </div>
+            <Badge variant="secondary" className="ml-0 sm:ml-2 w-fit">
               {patients.length} {patients.length === 1 ? "paciente" : "pacientes"}
             </Badge>
           </div>
@@ -520,10 +539,14 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                 <CardContent className="py-12 text-center">
                   <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    Nenhum paciente encontrado
+                    {filters.followUpStatus === "completed"
+                      ? "Nenhum paciente com acompanhamento concluído"
+                      : "Nenhum paciente em acompanhamento"}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Nenhum paciente corresponde aos filtros selecionados.
+                    {filters.followUpStatus === "completed"
+                      ? "Nenhum paciente concluiu o acompanhamento ainda."
+                      : "Nenhum paciente corresponde aos filtros selecionados."}
                     <br />
                     Tente ajustar os filtros ou cadastre um novo paciente.
                   </p>

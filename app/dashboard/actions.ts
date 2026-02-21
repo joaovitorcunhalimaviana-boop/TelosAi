@@ -51,6 +51,7 @@ export interface DashboardFilters {
   period?: "today" | "7days" | "30days" | "all"
   search?: string
   researchFilter?: "all" | "non-participants" | string // "all" | "non-participants" | researchId
+  followUpStatus?: "active" | "completed" | "all"
 }
 
 // Cached version of getDashboardStats - SECURITY: Requires userId for patient isolation
@@ -161,7 +162,11 @@ const getCachedDashboardPatientsInternal = unstable_cache(
 
     // SECURITY: Construct filters with mandatory userId to ensure doctor only sees their own patients
     const whereClause: any = {
-      status: "active",
+      status: filters.followUpStatus === "completed"
+        ? "completed"
+        : filters.followUpStatus === "all"
+          ? { in: ["active", "completed"] }
+          : "active", // default to active
       patient: {
         userId: userId,
       },
