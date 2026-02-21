@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sleep } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
-import { sendMessage, sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
+import { sendMessage, sendTemplate, sendFollowUpQuestionnaire, isWhatsAppConfigured } from '@/lib/whatsapp';
 import { toBrasiliaTime, fromBrasiliaTime, getBrasiliaHour, startOfDayBrasilia } from '@/lib/date-utils';
 import { sendDailySummaryToAllDoctors } from '@/lib/daily-summary';
 
@@ -214,18 +214,14 @@ async function taskSendReminders(type: 'first' | 'second') {
 
   results.partialResponse.found = partialConversations.length;
 
-  // Enviar lembretes para não respondidos
+  // Enviar lembretes para não respondidos (usando template aprovado)
   for (const followUp of unansweredFollowUps) {
     try {
       const hasPartial = partialConversations.some(c => c.patientId === followUp.patientId);
       if (hasPartial) continue;
 
-      const firstName = followUp.patient.name.split(' ')[0];
-      const message = type === 'first'
-        ? `Olá, ${firstName}! 👋\n\nPercebi que você ainda não respondeu o acompanhamento de hoje.\n\nPode me contar como está se sentindo? Responda "sim" para começarmos! 🙏`
-        : `Boa tarde, ${firstName}! 😊\n\nEstou preocupada com você! Ainda não tive notícias suas hoje.\n\nComo está se sentindo depois da cirurgia? Responda "sim" quando puder!`;
-
-      await sendMessage(followUp.patient.phone, message);
+      // Usar template aprovado pela Meta (funciona fora da janela de 24h)
+      await sendTemplate(followUp.patient.phone, 'acompanhamento_medico', [], 'pt_BR');
       results.noResponse.sent++;
       await sleep(300);
     } catch (error: any) {
@@ -233,17 +229,13 @@ async function taskSendReminders(type: 'first' | 'second') {
     }
   }
 
-  // Enviar lembretes para parciais
+  // Enviar lembretes para parciais (usando template aprovado)
   for (const conv of partialConversations) {
     try {
       if (!conv.patient) continue;
 
-      const firstName = conv.patient.name.split(' ')[0];
-      const message = type === 'first'
-        ? `Olá, ${firstName}! 👋\n\nPercebi que não terminamos nossa conversa de hoje. Pode continuar respondendo? Faltam poucas perguntas! 😊`
-        : `${firstName}, boa tarde! 😊\n\nAinda estou aguardando suas respostas. Complete o questionário quando puder - é importante para sua recuperação!`;
-
-      await sendMessage(conv.patient.phone, message);
+      // Usar template aprovado pela Meta (funciona fora da janela de 24h)
+      await sendTemplate(conv.patient.phone, 'acompanhamento_medico', [], 'pt_BR');
       results.partialResponse.sent++;
       await sleep(300);
     } catch (error: any) {
