@@ -873,3 +873,62 @@ export async function getTodayTasks(): Promise<TodayTasksResult> {
     pendingToday: pendingToday.map(f => mapToTask(f, 'pending_today')),
   }
 }
+
+/**
+ * Marca uma cirurgia como "completed", movendo o paciente para a aba "Concluídos".
+ */
+export async function completeSurgery(surgeryId: string): Promise<{ success: boolean; error?: string }> {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { success: false, error: "Não autenticado" }
+  }
+
+  const surgery = await prisma.surgery.findUnique({
+    where: { id: surgeryId },
+    include: { patient: { select: { userId: true } } },
+  })
+
+  if (!surgery) {
+    return { success: false, error: "Cirurgia não encontrada" }
+  }
+
+  if (surgery.patient.userId !== session.user.id) {
+    return { success: false, error: "Acesso negado" }
+  }
+
+  await prisma.surgery.update({
+    where: { id: surgeryId },
+    data: { status: 'completed' },
+  })
+
+  return { success: true }
+}
+
+/**
+ * Exclui um paciente e todos os dados relacionados (cascade delete).
+ */
+export async function deletePatient(patientId: string): Promise<{ success: boolean; error?: string }> {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { success: false, error: "Não autenticado" }
+  }
+
+  const patient = await prisma.patient.findUnique({
+    where: { id: patientId },
+    select: { userId: true, name: true },
+  })
+
+  if (!patient) {
+    return { success: false, error: "Paciente não encontrado" }
+  }
+
+  if (patient.userId !== session.user.id) {
+    return { success: false, error: "Acesso negado" }
+  }
+
+  await prisma.patient.delete({
+    where: { id: patientId },
+  })
+
+  return { success: true }
+}

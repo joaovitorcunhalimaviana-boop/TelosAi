@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -7,9 +8,11 @@ import { Badge } from "@/components/ui/badge"
 import {
   AlertCircle,
   Calendar,
+  CheckCircle2,
   FlaskConical,
   MessageCircle,
   Phone,
+  Trash2,
 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -17,12 +20,14 @@ import { motion } from "framer-motion"
 import { ScaleOnHover } from "@/components/animations"
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts"
 import type { PatientCard as PatientCardType, SurgeryType } from "@/app/dashboard/actions"
+import { completeSurgery, deletePatient } from "@/app/dashboard/actions"
 import { getSurgeryTypeLabel } from "@/lib/constants/surgery-types"
 
 interface PatientCardProps {
   patient: PatientCardType
   userName: string
   onAddToResearch?: (patientId: string) => void
+  onPatientChanged?: () => void
   showResearchButton?: boolean
 }
 
@@ -73,8 +78,11 @@ const getRiskBorderClass = (riskLevel: 'low' | 'medium' | 'high' | 'critical') =
   return borders[riskLevel]
 }
 
-export function PatientCard({ patient, userName, onAddToResearch, showResearchButton = false }: PatientCardProps) {
+export function PatientCard({ patient, userName, onAddToResearch, onPatientChanged, showResearchButton = false }: PatientCardProps) {
   const router = useRouter()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmComplete, setConfirmComplete] = useState(false)
+  const [loading, setLoading] = useState<'delete' | 'complete' | null>(null)
   const riskLevel = getPatientRiskLevel(patient)
   const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
 
@@ -85,6 +93,38 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
 
   const handlePhoneClick = () => {
     window.open(`tel:${patient.phone.replace(/\D/g, '')}`, '_self')
+  }
+
+  const handleCompleteSurgery = async () => {
+    if (!confirmComplete) {
+      setConfirmComplete(true)
+      return
+    }
+    setLoading('complete')
+    const result = await completeSurgery(patient.id)
+    setLoading(null)
+    setConfirmComplete(false)
+    if (result.success) {
+      onPatientChanged?.()
+    } else {
+      alert(result.error || 'Erro ao concluir acompanhamento')
+    }
+  }
+
+  const handleDeletePatient = async () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      return
+    }
+    setLoading('delete')
+    const result = await deletePatient(patient.patientId)
+    setLoading(null)
+    setConfirmDelete(false)
+    if (result.success) {
+      onPatientChanged?.()
+    } else {
+      alert(result.error || 'Erro ao excluir paciente')
+    }
   }
 
   return (
@@ -357,6 +397,40 @@ export function PatientCard({ patient, userName, onAddToResearch, showResearchBu
                     Adicionar à Pesquisa
                   </Button>
                 )}
+
+                {/* Concluir acompanhamento / Excluir paciente */}
+                <div className="flex gap-2">
+                  {patient.status === 'active' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`flex-1 gap-1.5 text-xs ${confirmComplete
+                        ? 'border-green-600 bg-green-50 text-green-700 hover:bg-green-100'
+                        : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                      }`}
+                      onClick={handleCompleteSurgery}
+                      onBlur={() => setConfirmComplete(false)}
+                      disabled={loading === 'complete'}
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {loading === 'complete' ? 'Concluindo...' : confirmComplete ? 'Confirmar?' : 'Concluir'}
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`gap-1.5 text-xs ${confirmDelete
+                      ? 'border-red-600 bg-red-50 text-red-700 hover:bg-red-100'
+                      : 'border-gray-300 text-gray-400 hover:text-red-600 hover:border-red-300'
+                    }`}
+                    onClick={handleDeletePatient}
+                    onBlur={() => setConfirmDelete(false)}
+                    disabled={loading === 'delete'}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {loading === 'delete' ? 'Excluindo...' : confirmDelete ? 'Confirmar exclusão?' : 'Excluir'}
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>

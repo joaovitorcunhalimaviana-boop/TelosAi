@@ -121,6 +121,15 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
     loadDashboard()
   }, [filters])
 
+  const reloadPatients = async () => {
+    const [statsData, patientsData] = await Promise.all([
+      getDashboardStats(),
+      getDashboardPatients(filters),
+    ])
+    setStats(statsData)
+    setPatients(patientsData)
+  }
+
   // Debounce para busca
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -572,6 +581,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                       userName={userName}
                       showResearchButton={researches.length > 0}
                       onAddToResearch={handleOpenResearchModal}
+                      onPatientChanged={reloadPatients}
                     />
                   </StaggerItem>
                 ))}
