@@ -4,15 +4,13 @@
  * Integrado com protocolo médico oficial
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
 import { getProtocolsForAI } from './protocols';
 import { toBrasiliaTime, getBrasiliaHour } from './date-utils';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
 
 export interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -485,29 +483,43 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     });
 
     console.log('🧠 Messages array length:', messages.length);
-    console.log('🧠 Calling Anthropic API...');
+    console.log('🧠 Calling Gemini API...');
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 1024,
-      temperature: 0.1, // Reduzido para garantir formato JSON estrito
-      system: systemPrompt,
-      messages: messages,
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash-preview-05-20',
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      ],
+      systemInstruction: systemPrompt,
     });
 
-    console.log('🧠 Anthropic API response received!');
-    console.log('🧠 Response content length:', response.content.length);
+    // Converter histórico para formato Gemini (role 'assistant' → 'model', content → parts)
+    const geminiHistory = messages.slice(0, -1).map((msg: any) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }));
 
-    const content = response.content[0];
-    if (content.type !== 'text') {
-      console.error('🧠 ERROR: Unexpected response type:', content.type);
-      throw new Error('Unexpected response type from Claude');
-    }
+    const chat = model.startChat({
+      history: geminiHistory,
+      generationConfig: {
+        maxOutputTokens: 1024,
+        temperature: 0.1,
+        responseMimeType: 'application/json',
+      },
+    });
 
-    console.log('🧠 Raw response text (first 500 chars):', content.text.substring(0, 500));
+    // Enviar a última mensagem do usuário
+    const geminiResponse = await chat.sendMessage(userMessage);
+    const responseText = geminiResponse.response.text();
+
+    console.log('🧠 Gemini API response received!');
+    console.log('🧠 Raw response text (first 500 chars):', responseText.substring(0, 500));
 
     // Limpar markdown formatting se presente
-    let cleanText = content.text.trim();
+    let cleanText = responseText.trim();
 
     // Remove markdown code blocks if explicitly wrapped
     if (cleanText.includes('```')) {
@@ -520,7 +532,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 
     if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
       console.error('Invalid AI response structure (brackets mismatch):', cleanText);
-      throw new Error('No JSON found in Claude response');
+      throw new Error('No JSON found in Gemini response');
     }
 
     const jsonString = cleanText.substring(startIndex, endIndex + 1);

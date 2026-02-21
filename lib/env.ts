@@ -15,9 +15,9 @@ const envSchema = z.object({
   NEXTAUTH_URL: z.string().url('NEXTAUTH_URL deve ser uma URL válida'),
   AUTH_URL: z.string().url('AUTH_URL deve ser uma URL válida').optional(),
 
-  // Anthropic Claude API
-  ANTHROPIC_API_KEY: z.string()
-    .startsWith('sk-ant-', 'ANTHROPIC_API_KEY deve começar com sk-ant-'),
+  // Google Gemini API
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string()
+    .min(1, 'GOOGLE_GENERATIVE_AI_API_KEY é obrigatória'),
 
   // WhatsApp Business Cloud API
   WHATSAPP_PHONE_NUMBER_ID: z.string().min(1),

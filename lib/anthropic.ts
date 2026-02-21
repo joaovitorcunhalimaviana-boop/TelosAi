@@ -1,9 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-// Cliente Anthropic configurado
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+// Cliente Gemini configurado
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
 
 export interface PatientData {
   name: string;
@@ -141,22 +139,27 @@ Retorne APENAS um objeto JSON válido no seguinte formato (sem markdown, sem exp
 }`;
 
   try {
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 2000,
-      temperature: 0.3, // Baixa temperatura para maior consistência
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash-preview-05-20',
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
       ],
     });
 
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: 2000,
+        temperature: 0.3,
+        responseMimeType: 'application/json',
+      },
+    });
+
     // Extrair resposta
-    const responseText = message.content[0].type === 'text'
-      ? message.content[0].text
-      : '';
+    const responseText = result.response.text();
 
     // Parse JSON
     const analysis: AnalysisOutput = JSON.parse(responseText);
@@ -307,4 +310,4 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
   return parts.length > 0 ? parts.join('\n') : 'Nenhum dado fornecido';
 }
 
-export { anthropic };
+export { genAI };
