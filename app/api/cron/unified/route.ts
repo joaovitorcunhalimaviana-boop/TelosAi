@@ -220,8 +220,16 @@ async function taskSendReminders(type: 'first' | 'second') {
       const hasPartial = partialConversations.some(c => c.patientId === followUp.patientId);
       if (hasPartial) continue;
 
-      // Usar template aprovado pela Meta (funciona fora da janela de 24h)
-      await sendTemplate(followUp.patient.phone, 'acompanhamento_medico', [], 'pt_BR');
+      // Usar template 'otherdays' aprovado pela Meta (funciona fora da janela de 24h)
+      const firstName = followUp.patient.name.split(' ')[0];
+      await sendTemplate(followUp.patient.phone, 'otherdays', [
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', parameter_name: 'customer_name', text: firstName }
+          ]
+        }
+      ], 'pt_BR');
       results.noResponse.sent++;
       await sleep(300);
     } catch (error: any) {
@@ -234,8 +242,16 @@ async function taskSendReminders(type: 'first' | 'second') {
     try {
       if (!conv.patient) continue;
 
-      // Usar template aprovado pela Meta (funciona fora da janela de 24h)
-      await sendTemplate(conv.patient.phone, 'acompanhamento_medico', [], 'pt_BR');
+      // Usar template 'otherdays' aprovado pela Meta (funciona fora da janela de 24h)
+      const firstName = conv.patient.name.split(' ')[0];
+      await sendTemplate(conv.patient.phone, 'otherdays', [
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', parameter_name: 'customer_name', text: firstName }
+          ]
+        }
+      ], 'pt_BR');
       results.partialResponse.sent++;
       await sleep(300);
     } catch (error: any) {
