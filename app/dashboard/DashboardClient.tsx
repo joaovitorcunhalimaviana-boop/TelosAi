@@ -270,7 +270,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
               </div>
               <div className="flex flex-wrap items-center gap-1 md:gap-2 text-muted-foreground">
                 <span className="text-sm md:text-base">Bem-vindo,</span>
-                <span className="text-sm md:text-base font-semibold text-[#0A2647]">Dr. {userName}</span>
+                <span className="text-sm md:text-base font-semibold text-[#0A2647]">{userName}</span>
                 <span className="hidden sm:inline-flex items-center gap-1.5 ml-2 text-xs text-emerald-600">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   Sistema operacional
