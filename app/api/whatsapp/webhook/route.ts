@@ -950,6 +950,15 @@ async function finalizeQuestionnaireWithAI(
       },
     });
 
+    // Auto-complete surgery when D+14 follow-up is responded
+    if (followUp.dayNumber >= 14) {
+      await prisma.surgery.update({
+        where: { id: followUp.surgeryId },
+        data: { status: 'completed' }
+      });
+      logger.info(`✅ Surgery ${followUp.surgeryId} marked as completed (D+${followUp.dayNumber} responded)`);
+    }
+
     // Invalidate dashboard cache
     invalidateDashboardStats();
 

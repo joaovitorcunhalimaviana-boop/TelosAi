@@ -582,6 +582,25 @@ export interface RecentActivity {
   isRead: boolean
 }
 
+export interface TodayTask {
+  id: string
+  followUpId: string
+  patientId: string
+  patientName: string
+  patientPhone: string
+  surgeryType: string
+  dayNumber: number
+  scheduledDate: Date
+  status: 'overdue' | 'in_progress' | 'pending_today'
+  followUpStatus: string // original status from DB (pending, sent, in_progress)
+}
+
+export interface TodayTasksResult {
+  overdue: TodayTask[]
+  inProgress: TodayTask[]
+  pendingToday: TodayTask[]
+}
+
 /**
  * Busca o histórico completo de conversas de um paciente
  * Agrega mensagens de TODAS as fontes: Conversation.messageHistory + FollowUpResponse.questionnaireData
@@ -766,4 +785,91 @@ export async function getRecentPatientActivity(limit = 10): Promise<RecentActivi
     timestamp: r.createdAt,
     isRead: r.doctorAlerted
   }))
+}
+
+/**
+ * Busca as tarefas de hoje para o dashboard:
+ * - Follow-ups atrasados (dias anteriores, não respondidos)
+ * - Follow-ups em andamento (paciente começou mas não terminou)
+ * - Follow-ups pendentes para hoje (agendados para hoje, aguardando envio/resposta)
+ * Exclui pacientes com cirurgias finalizadas (status "completed")
+ */
+export async function getTodayTasks(): Promise<TodayTasksResult> {
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new Error("Não autenticado")
+  }
+
+  const userId = session.user.id
+  const todayStart = startOfDayBrasilia()
+  const todayEnd = endOfDayBrasilia()
+
+  // Follow-ups pendentes para hoje (agendados para hoje, não respondidos)
+  const pendingToday = await prisma.followUp.findMany({
+    where: {
+      userId,
+      status: { in: ['pending', 'sent'] },
+      scheduledDate: {
+        gte: todayStart,
+        lte: todayEnd,
+      },
+      surgery: { status: 'active' },
+    },
+    include: {
+      surgery: { select: { type: true } },
+      patient: { select: { id: true, name: true, phone: true } },
+    },
+    orderBy: { scheduledDate: 'asc' },
+  })
+
+  // Follow-ups atrasados (dias anteriores, não respondidos)
+  const overdue = await prisma.followUp.findMany({
+    where: {
+      userId,
+      status: { in: ['sent', 'pending'] },
+      scheduledDate: { lt: todayStart },
+      surgery: { status: 'active' },
+    },
+    include: {
+      surgery: { select: { type: true } },
+      patient: { select: { id: true, name: true, phone: true } },
+    },
+    orderBy: { scheduledDate: 'asc' },
+  })
+
+  // Follow-ups em andamento (paciente começou mas não terminou)
+  const inProgress = await prisma.followUp.findMany({
+    where: {
+      userId,
+      status: 'in_progress',
+      surgery: { status: 'active' },
+    },
+    include: {
+      surgery: { select: { type: true } },
+      patient: { select: { id: true, name: true, phone: true } },
+    },
+    orderBy: { scheduledDate: 'asc' },
+  })
+
+  const mapToTask = (
+    followUp: typeof pendingToday[0],
+    taskStatus: 'overdue' | 'in_progress' | 'pending_today'
+  ): TodayTask => ({
+    id: followUp.id,
+    followUpId: followUp.id,
+    patientId: followUp.patient.id,
+    patientName: followUp.patient.name,
+    patientPhone: followUp.patient.phone,
+    surgeryType: followUp.surgery.type,
+    dayNumber: followUp.dayNumber,
+    scheduledDate: followUp.scheduledDate,
+    status: taskStatus,
+    followUpStatus: followUp.status,
+  })
+
+  return {
+    overdue: overdue.map(f => mapToTask(f, 'overdue')),
+    inProgress: inProgress.map(f => mapToTask(f, 'in_progress')),
+    pendingToday: pendingToday.map(f => mapToTask(f, 'pending_today')),
+  }
 }

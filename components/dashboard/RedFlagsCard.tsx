@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, ExternalLink } from "lucide-react"
+import { AlertCircle, ExternalLink, MessageCircle, Phone } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -120,86 +120,110 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                 >
                   <Card className="border-2 border-red-300 hover:border-red-400 transition-all hover:shadow-lg" role="article" aria-label={`Alerta urgente: ${redFlag.patient.name}, ${getRiskLabel(redFlag.response.riskLevel)}`}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 space-y-3">
-                          {/* Header com nome e risco */}
-                          <div className="flex items-start gap-3 flex-wrap">
-                            <div className="flex-1">
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                                {redFlag.patient.name}
-                              </h3>
-                              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                <Badge variant="outline" className="text-xs">
-                                  {getSurgeryTypeLabel(redFlag.surgery.type)}
-                                </Badge>
-                                <Badge variant="secondary" className="text-xs">
-                                  D+{redFlag.followUp.dayNumber}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {format(
-                                    new Date(redFlag.response.createdAt),
-                                    "dd/MM/yyyy 'às' HH:mm",
-                                    { locale: ptBR }
-                                  )}
-                                </span>
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-3">
+                            {/* Header com nome e risco */}
+                            <div className="flex items-start gap-3 flex-wrap">
+                              <div className="flex-1">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                  {redFlag.patient.name}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  <Badge variant="outline" className="text-xs">
+                                    {getSurgeryTypeLabel(redFlag.surgery.type)}
+                                  </Badge>
+                                  <Badge variant="secondary" className="text-xs">
+                                    D+{redFlag.followUp.dayNumber}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(
+                                      new Date(redFlag.response.createdAt),
+                                      "dd/MM/yyyy 'às' HH:mm",
+                                      { locale: ptBR }
+                                    )}
+                                  </span>
+                                </div>
                               </div>
+                              <Badge
+                                className={`${getRiskColor(redFlag.response.riskLevel)} text-sm font-bold px-3 py-1 shrink-0`}
+                              >
+                                {getRiskLabel(redFlag.response.riskLevel)}
+                              </Badge>
                             </div>
-                            <Badge
-                              className={`${getRiskColor(redFlag.response.riskLevel)} text-sm font-bold px-3 py-1 shrink-0`}
-                            >
-                              {getRiskLabel(redFlag.response.riskLevel)}
-                            </Badge>
-                          </div>
 
-                          {/* Red Flags */}
-                          {redFlag.response.redFlags.length > 0 && (
-                            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200">
-                              <p className="text-sm font-semibold text-red-900 dark:text-red-100 mb-2">
-                                Sintomas Preocupantes:
-                              </p>
-                              <ul className="space-y-1">
-                                {redFlag.response.redFlags.slice(0, 3).map((flag, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="text-sm text-red-800 dark:text-red-200 flex items-start gap-2"
-                                  >
-                                    <span className="text-red-500 mt-0.5">•</span>
-                                    <span>{getRedFlagLabel(flag)}</span>
-                                  </li>
-                                ))}
-                                {redFlag.response.redFlags.length > 3 && (
-                                  <li className="text-sm text-red-700 dark:text-red-300 font-medium">
-                                    + {redFlag.response.redFlags.length - 3} outros sintomas
-                                  </li>
+                            {/* Red Flags */}
+                            {redFlag.response.redFlags.length > 0 && (
+                              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200">
+                                <p className="text-sm font-semibold text-red-900 dark:text-red-100 mb-2">
+                                  Sintomas Preocupantes:
+                                </p>
+                                <ul className="space-y-1">
+                                  {redFlag.response.redFlags.slice(0, 3).map((flag, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="text-sm text-red-800 dark:text-red-200 flex items-start gap-2"
+                                    >
+                                      <span className="text-red-500 mt-0.5">•</span>
+                                      <span>{getRedFlagLabel(flag)}</span>
+                                    </li>
+                                  ))}
+                                  {redFlag.response.redFlags.length > 3 && (
+                                    <li className="text-sm text-red-700 dark:text-red-300 font-medium">
+                                      + {redFlag.response.redFlags.length - 3} outros sintomas
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+
+                            {/* Visualizado badge */}
+                            {redFlag.isViewed && redFlag.lastViewedAt && (
+                              <div className="text-xs text-gray-500">
+                                Visualizado em{' '}
+                                {format(
+                                  new Date(redFlag.lastViewedAt),
+                                  "dd/MM/yyyy 'às' HH:mm",
+                                  { locale: ptBR }
                                 )}
-                              </ul>
-                            </div>
-                          )}
-
-                          {/* Visualizado badge */}
-                          {redFlag.isViewed && redFlag.lastViewedAt && (
-                            <div className="text-xs text-gray-500">
-                              Visualizado em{' '}
-                              {format(
-                                new Date(redFlag.lastViewedAt),
-                                "dd/MM/yyyy 'às' HH:mm",
-                                { locale: ptBR }
-                              )}
-                            </div>
-                          )}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Botão de ação */}
-                        <div className="shrink-0">
+                        {/* Botões de ação */}
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
                           <Button
                             onClick={() => handleViewPatient(redFlag.patient.id, redFlag.id)}
                             className="bg-red-600 hover:bg-red-700 text-white font-bold gap-2"
-                            size="lg"
+                            size="sm"
                             aria-label={`Ver detalhes urgentes de ${redFlag.patient.name}`}
                           >
                             VER AGORA
                             <ExternalLink className="h-4 w-4" aria-hidden="true" />
                           </Button>
+                          {redFlag.patient.phone && (
+                            <>
+                              <a
+                                href={`https://wa.me/${redFlag.patient.phone.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+                                aria-label={`Enviar WhatsApp para ${redFlag.patient.name}`}
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                                WhatsApp
+                              </a>
+                              <a
+                                href={`tel:${redFlag.patient.phone}`}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                aria-label={`Ligar para ${redFlag.patient.name}`}
+                              >
+                                <Phone className="h-3.5 w-3.5" />
+                                Ligar
+                              </a>
+                            </>
+                          )}
                         </div>
                       </div>
                     </CardContent>

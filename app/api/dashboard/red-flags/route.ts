@@ -28,7 +28,8 @@ export async function GET() {
             patient: {
               select: {
                 id: true,
-                name: true
+                name: true,
+                phone: true
               }
             },
             surgery: {
@@ -79,7 +80,8 @@ export async function GET() {
         id: response.id,
         patient: {
           id: response.followUp.patient.id,
-          name: response.followUp.patient.name
+          name: response.followUp.patient.name,
+          phone: response.followUp.patient.phone
         },
         surgery: {
           id: response.followUp.surgery.id,

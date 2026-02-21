@@ -301,7 +301,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
           onView={markAsViewed}
         />
 
-        {/* Smart Inbox Section */}
+        {/* Tarefas de Hoje Section */}
         <div className="mb-6">
           <SmartInbox />
         </div>

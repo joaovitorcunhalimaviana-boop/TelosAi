@@ -248,6 +248,7 @@ async function checkOverdueFollowUps() {
     console.log(`Found ${overdueFollowUps.length} overdue follow-ups`);
 
     // Atualizar status para 'overdue'
+    const now = Date.now();
     for (const followUp of overdueFollowUps) {
       await prisma.followUp.update({
         where: { id: followUp.id },
@@ -255,6 +256,18 @@ async function checkOverdueFollowUps() {
           status: 'overdue',
         },
       });
+
+      // If D+14 follow-up is overdue by 3+ days, auto-complete the surgery
+      if (followUp.dayNumber >= 14) {
+        const daysSinceScheduled = Math.floor((now - new Date(followUp.scheduledDate).getTime()) / (1000 * 60 * 60 * 24));
+        if (daysSinceScheduled >= 3) {
+          await prisma.surgery.update({
+            where: { id: followUp.surgeryId },
+            data: { status: 'completed' }
+          });
+          console.log(`✅ Surgery auto-completed: D+${followUp.dayNumber} overdue by ${daysSinceScheduled} days (surgery ${followUp.surgeryId})`);
+        }
+      }
     }
 
     if (overdueFollowUps.length > 0) {

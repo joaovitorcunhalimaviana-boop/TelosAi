@@ -5,6 +5,7 @@ export interface RedFlag {
   patient: {
     id: string
     name: string
+    phone: string
   }
   surgery: {
     id: string
