@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       step2 = { success: false, error: e.message, stack: e.stack?.substring(0, 500) };
     }
 
-    // Step 3: Test conductConversation with real patient
+    // Step 3: Test conductConversation with empty history (basic test)
     let step3: any = {};
     try {
       const patient = await prisma.patient.findFirst({
@@ -116,11 +116,111 @@ export async function GET(request: NextRequest) {
       step3 = { success: false, error: e.message, stack: e.stack?.substring(0, 500) };
     }
 
+    // Step 4: EXACT webhook simulation - find patient by phone, load follow-up with history
+    const phone = request.nextUrl.searchParams.get('phone') || '5583998663089';
+    let step4: any = {};
+    try {
+      // Normalize phone (same as webhook does)
+      const normalizedPhone = phone.replace(/\D/g, '');
+
+      // Find patient by phone (same logic as webhook)
+      const allPatients = await prisma.patient.findMany({
+        where: { isActive: true },
+        include: {
+          user: { select: { nomeCompleto: true } },
+          surgeries: { orderBy: { date: 'desc' }, take: 1 }
+        }
+      });
+
+      const matchedPatient = allPatients.find((p: any) => {
+        const pPhone = p.phone?.replace(/\D/g, '') || '';
+        return pPhone === normalizedPhone || pPhone.endsWith(normalizedPhone.slice(-11)) || normalizedPhone.endsWith(pPhone.slice(-11));
+      });
+
+      if (!matchedPatient) {
+        step4 = { success: false, error: `No patient found for phone ${normalizedPhone}`, totalPatients: allPatients.length };
+      } else {
+        // Find active follow-up (same as webhook)
+        const followUp = await prisma.followUp.findFirst({
+          where: {
+            patientId: matchedPatient.id,
+            status: 'in_progress',
+          },
+          include: { surgery: true },
+          orderBy: { scheduledFor: 'desc' },
+        });
+
+        if (!followUp) {
+          step4 = { success: false, error: 'No in_progress follow-up found', patientName: matchedPatient.name };
+        } else {
+          // Load conversation history (EXACTLY like webhook)
+          const response = await prisma.followUpResponse.findFirst({
+            where: { followUpId: followUp.id },
+            orderBy: { createdAt: 'desc' },
+          });
+
+          let questionnaireData: any = { conversation: [], extractedData: {}, completed: false };
+          try {
+            if (response?.questionnaireData) {
+              questionnaireData = typeof response.questionnaireData === 'string'
+                ? JSON.parse(response.questionnaireData)
+                : response.questionnaireData;
+            }
+          } catch { /* ignore parse errors */ }
+
+          const conversationHistory = questionnaireData.conversation || [];
+          const currentData = questionnaireData.extractedData || {};
+
+          // Build claudeHistory (EXACTLY like webhook line 726)
+          const claudeHistory = conversationHistory.map((m: any) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: m.timestamp || new Date().toISOString(),
+          }));
+
+          step4 = {
+            patientName: matchedPatient.name,
+            followUpId: followUp.id,
+            followUpStatus: followUp.status,
+            dayNumber: followUp.dayNumber,
+            conversationHistoryLength: conversationHistory.length,
+            conversationHistory: conversationHistory.map((m: any) => ({ role: m.role, content: m.content?.substring(0, 100) })),
+            currentData,
+            questionnaireCompleted: questionnaireData.completed,
+          };
+
+          // NOW call conductConversation with the EXACT same params as webhook
+          try {
+            const surgery = followUp.surgery || matchedPatient.surgeries?.[0];
+            const aiResult = await conductConversation(
+              msg,
+              matchedPatient,
+              surgery,
+              claudeHistory,
+              currentData
+            );
+            step4.aiCallSuccess = true;
+            step4.aiResponse = aiResult.aiResponse;
+            step4.aiUpdatedData = aiResult.updatedData;
+            step4.aiIsComplete = aiResult.isComplete;
+            step4.aiUrgencyLevel = aiResult.urgencyLevel;
+          } catch (aiError: any) {
+            step4.aiCallSuccess = false;
+            step4.aiError = aiError.message;
+            step4.aiErrorStack = aiError.stack?.substring(0, 800);
+          }
+        }
+      }
+    } catch (e: any) {
+      step4 = { success: false, error: e.message, stack: e.stack?.substring(0, 500) };
+    }
+
     return NextResponse.json({
       testMessage: msg,
       step1_envCheck: step1,
       step2_basicGemini: step2,
       step3_conductConversation: step3,
+      step4_webhookSimulation: step4,
     });
   } catch (error: any) {
     return NextResponse.json(
