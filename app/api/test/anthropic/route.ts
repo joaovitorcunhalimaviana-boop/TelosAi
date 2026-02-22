@@ -19,7 +19,7 @@ export async function POST() {
 
     // Testar conexão com a API
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-05-20' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const result = await model.generateContent('Responda apenas "OK" se você está funcionando.');
     const responseText = result.response.text();
@@ -27,7 +27,7 @@ export async function POST() {
     return NextResponse.json({
       configured: true,
       connected: true,
-      model: 'gemini-2.5-flash-preview-05-20',
+      model: 'gemini-2.5-flash',
       response: responseText,
     });
   } catch (error: any) {
