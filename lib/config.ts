@@ -9,7 +9,7 @@ import type { SurgeryType, FollowUpDay } from '@/types/followup';
 // ============================================
 
 export const AI_CONFIG = {
-  model: 'claude-sonnet-4-5-20250929',
+  model: 'claude-haiku-4-5-20251001',
   maxTokens: 2000,
   temperature: 0.3, // Baixa temperatura para maior consistência
   timeout: 30000, // 30 segundos

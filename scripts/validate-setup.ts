@@ -153,7 +153,7 @@ async function validateAnthropicClient() {
   logTest(
     'Anthropic',
     'Modelo configurado',
-    AI_CONFIG.model === 'claude-sonnet-4-5-20250929',
+    AI_CONFIG.model === 'claude-haiku-4-5-20251001',
     `Modelo: ${AI_CONFIG.model}`
   );
 

@@ -638,7 +638,7 @@ async function sendImageScale(phone: string, scaleType: 'pain_scale') {
  */
 // Função legada callClaudeAPI removida.
 
-// Funções legadas (determineCurrentPhase, interpretResponseLocally) removidas em favor da integração com Gemini 100%.
+// Funções legadas (determineCurrentPhase, interpretResponseLocally) removidas em favor da integração com IA conversacional.
 
 /**
  * Processa resposta do questionário com IA conversacional
@@ -650,7 +650,7 @@ async function processQuestionnaireAnswer(
   message: string
 ) {
   try {
-    logger.debug('🔄 Processando resposta com IA Gemini...', {
+    logger.debug('🔄 Processando resposta com IA Claude...', {
       patientId: patient.id,
       followUpId: followUp.id,
       message: message.substring(0, 100),
@@ -824,7 +824,7 @@ async function processQuestionnaireAnswer(
     }
 
   } catch (error) {
-    logger.error('❌ Erro ao processar resposta com Gemini:', error);
+    logger.error('❌ Erro ao processar resposta com Claude:', error);
     await sendEmpatheticResponse(phone, 'Tive um erro ao processar. Pode responder novamente?');
   }
 }

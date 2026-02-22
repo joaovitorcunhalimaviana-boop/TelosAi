@@ -488,7 +488,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.log('🧠 Calling Anthropic API...');
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       temperature: 0.1, // Reduzido para garantir formato JSON estrito
       system: systemPrompt,
