@@ -10,6 +10,7 @@ import {
   Calendar,
   CheckCircle2,
   FlaskConical,
+  TestTube2,
   MessageCircle,
   Phone,
   Trash2,
@@ -20,7 +21,7 @@ import { motion } from "framer-motion"
 import { ScaleOnHover } from "@/components/animations"
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts"
 import type { PatientCard as PatientCardType, SurgeryType } from "@/app/dashboard/actions"
-import { completeSurgery, deletePatient } from "@/app/dashboard/actions"
+import { completeSurgery, deletePatient, toggleTestPatient } from "@/app/dashboard/actions"
 import { getSurgeryTypeLabel } from "@/lib/constants/surgery-types"
 
 interface PatientCardProps {
@@ -82,7 +83,8 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
   const router = useRouter()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmComplete, setConfirmComplete] = useState(false)
-  const [loading, setLoading] = useState<'delete' | 'complete' | null>(null)
+  const [loading, setLoading] = useState<'delete' | 'complete' | 'test' | null>(null)
+  const [isTest, setIsTest] = useState(patient.isTest || false)
   const riskLevel = getPatientRiskLevel(patient)
   const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
 
@@ -108,6 +110,15 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
       onPatientChanged?.()
     } else {
       alert(result.error || 'Erro ao concluir acompanhamento')
+    }
+  }
+
+  const handleToggleTest = async () => {
+    setLoading('test')
+    const result = await toggleTestPatient(patient.patientId)
+    setLoading(null)
+    if (result.success) {
+      setIsTest(result.isTest ?? false)
     }
   }
 
@@ -149,6 +160,18 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   <CardTitle className="text-lg flex-1">
                     {patient.patientName}
                   </CardTitle>
+                  {isTest && (
+                    <Badge
+                      className="font-semibold text-xs px-2 py-1 shrink-0"
+                      style={{
+                        backgroundColor: '#FEF3C7',
+                        color: '#92400E',
+                        border: '1px solid #F59E0B',
+                      }}
+                    >
+                      TESTE
+                    </Badge>
+                  )}
                   {isPatientNew(patient.patientCreatedAt) && (
                     <Badge
                       className="badge-pulse font-semibold text-xs px-2 py-1 shrink-0"
@@ -398,7 +421,7 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   </Button>
                 )}
 
-                {/* Concluir acompanhamento / Excluir paciente */}
+                {/* Concluir / Teste / Excluir */}
                 <div className="flex gap-2">
                   {patient.status === 'active' && (
                     <Button
@@ -416,6 +439,19 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                       {loading === 'complete' ? 'Concluindo...' : confirmComplete ? 'Confirmar?' : 'Concluir'}
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`gap-1.5 text-xs ${isTest
+                      ? 'border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                      : 'border-gray-300 text-gray-400 hover:text-amber-600 hover:border-amber-300'
+                    }`}
+                    onClick={handleToggleTest}
+                    disabled={loading === 'test'}
+                  >
+                    <TestTube2 className="h-3.5 w-3.5" />
+                    {loading === 'test' ? '...' : isTest ? 'Teste' : 'Teste'}
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"

@@ -33,6 +33,7 @@ export interface PatientCard {
   patientId: string
   patientCreatedAt: Date // For NEW badge detection
   isResearchParticipant: boolean // For research badge
+  isTest: boolean // For test patient marking
   researchGroup: string | null // Research group name
   researchDataComplete: boolean // Research fields validation
   researchMissingFieldsCount: number // Number of missing required fields
@@ -361,6 +362,7 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         patientId: surgery.patientId,
         patientCreatedAt: surgery.patient.createdAt,
         isResearchParticipant: surgery.patient.isResearchParticipant,
+        isTest: surgery.patient.isTest,
         researchGroup: surgery.patient.researchGroup,
         researchDataComplete,
         researchMissingFieldsCount,
@@ -931,4 +933,31 @@ export async function deletePatient(patientId: string): Promise<{ success: boole
   })
 
   return { success: true }
+}
+
+export async function toggleTestPatient(patientId: string): Promise<{ success: boolean; isTest?: boolean; error?: string }> {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return { success: false, error: "Não autenticado" }
+  }
+
+  const patient = await prisma.patient.findUnique({
+    where: { id: patientId },
+    select: { userId: true, isTest: true },
+  })
+
+  if (!patient) {
+    return { success: false, error: "Paciente não encontrado" }
+  }
+
+  if (patient.userId !== session.user.id) {
+    return { success: false, error: "Acesso negado" }
+  }
+
+  const updated = await prisma.patient.update({
+    where: { id: patientId },
+    data: { isTest: !patient.isTest },
+  })
+
+  return { success: true, isTest: updated.isTest }
 }

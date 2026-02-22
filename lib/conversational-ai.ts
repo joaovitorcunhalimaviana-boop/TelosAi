@@ -22,7 +22,7 @@ export interface ConversationMessage {
 
 export interface QuestionnaireData {
   // Dor
-  pain?: number; // 0-10 na escala visual analógica
+  pain?: number; // 0-10 na escala numérica
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
@@ -714,7 +714,7 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
 
   // 1. DOR (sempre obrigatório)
   if (data.pain === undefined || data.pain === null) {
-    missing.push('🚨 Nível de dor ATUAL (0-10 na escala visual analógica)');
+    missing.push('🚨 Nível de dor ATUAL (0-10 na escala numérica)');
   }
 
   // 2. MEDICAÇÃO EXTRA (OBRIGATÓRIO TODOS OS DIAS - PERGUNTAR CEDO!)
@@ -736,7 +736,7 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
   } else if (data.bowelMovementSinceLastContact === true) {
     // Se evacuou, perguntar a dor durante a evacuação
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
-      missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
+      missing.push('Dor durante a evacuação (0-10 na escala numérica)');
     }
     // Perguntar horário da primeira evacuação
     if (!data.bowelMovementTime) {
@@ -840,7 +840,7 @@ export async function getInitialGreeting(
     await sendImage(
       phoneNumber,
       imageUrl,
-      'Escala Visual Analógica de Dor (0-10)'
+      'Escala Numérica de Dor (0-10)'
     );
 
     console.log('✅ Pain scale image sent before initial greeting');

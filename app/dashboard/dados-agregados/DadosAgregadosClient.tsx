@@ -140,13 +140,13 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
     csv += `Taxa de resposta: ${data.overview.responseRate}%\n\n`;
 
     // Pain at rest
-    csv += "DOR EM REPOUSO (EVA 0-10)\n";
+    csv += "DOR EM REPOUSO (EN 0-10)\n";
     csv += "Tipo de Cirurgia,Dia,N,Media,DP,Mediana,Min,Max\n";
     filterByType(data.painAtRest).forEach((row) => {
       csv += `${row.surgeryType},D+${row.day},${row.n},${row.mean},${row.sd},${row.median},${row.min},${row.max}\n`;
     });
 
-    csv += "\nDOR DURANTE EVACUACAO (EVA 0-10)\n";
+    csv += "\nDOR DURANTE EVACUACAO (EN 0-10)\n";
     csv += "Tipo de Cirurgia,Dia,N,Media,DP,Mediana,Min,Max\n";
     filterByType(data.painDuringBowel).forEach((row) => {
       csv += `${row.surgeryType},D+${row.day},${row.n},${row.mean},${row.sd},${row.median},${row.min},${row.max}\n`;
@@ -224,7 +224,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               Dados Agregados
             </h1>
             <p className="text-lg text-muted-foreground">
-              Dados para publicação científica - Dr. {userName}
+              Dados para publicação científica - {userName}
             </p>
           </div>
           <div className="flex gap-3">
@@ -344,7 +344,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
                 Evolução da Dor em Repouso (Média ± IC)
               </CardTitle>
               <CardDescription>
-                Escala Visual Analógica (EVA) 0-10, por tipo de cirurgia
+                Escala Numérica (EN) 0-10, por tipo de cirurgia
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -375,7 +375,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         {/* Pain at Rest Table */}
         <Card className="mb-6 border-2">
           <CardHeader>
-            <CardTitle>Dor em Repouso por Dia (EVA 0-10)</CardTitle>
+            <CardTitle>Dor em Repouso por Dia (EN 0-10)</CardTitle>
             <CardDescription>Formato publicável: Média ± DP</CardDescription>
           </CardHeader>
           <CardContent>
@@ -422,7 +422,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         {/* Pain During Bowel Movement Table */}
         <Card className="mb-6 border-2">
           <CardHeader>
-            <CardTitle>Dor ao Evacuar por Dia (EVA 0-10)</CardTitle>
+            <CardTitle>Dor ao Evacuar por Dia (EN 0-10)</CardTitle>
             <CardDescription>Formato publicável: Média ± DP</CardDescription>
           </CardHeader>
           <CardContent>
@@ -652,7 +652,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               Pacientes marcados como teste são automaticamente excluídos de todos os cálculos.
             </p>
             <p>
-              A dor é medida pela Escala Visual Analógica (EVA) de 0 a 10 pontos, coletada diariamente via WhatsApp por IA conversacional.
+              A dor é medida pela Escala Numérica (EN) de 0 a 10 pontos, coletada diariamente via WhatsApp por IA conversacional.
             </p>
             <p>
               Dados de satisfação são coletados no D+14 pós-operatório.
