@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
             status: 'in_progress',
           },
           include: { surgery: true },
-          orderBy: { scheduledFor: 'desc' },
+          orderBy: { scheduledDate: 'desc' },
         });
 
         if (!followUp) {
