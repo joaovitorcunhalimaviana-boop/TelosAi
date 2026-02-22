@@ -88,11 +88,11 @@ Red Flags: ["sangramento_volumoso", "dor_intensa"]
 Resposta: "🚨 ATENÇÃO - PROCURE O PRONTO-SOCORRO IMEDIATAMENTE. Sangramento volumoso em pós-operatório é emergência. Vá agora ou ligue 192 (SAMU)."
 
 Exemplo 2:
-Mensagem: "Dor 7/10, tomei dipirona mas não aliviou. É D+2 da hemorroidectomia"
+Mensagem: "Dor 7/10, tomei o analgésico mas não aliviou. É D+2 da hemorroidectomia"
 Urgência: HIGH
 Categoria: "dor"
 Red Flags: ["dor_refrataria_analgesia"]
-Resposta: "Dor 7/10 que não melhora com dipirona em D+2 precisa avaliação. Seu médico foi notificado e entrará em contato. Se piorar, procure pronto-socorro."
+Resposta: "Dor 7/10 que não melhora com a medicação em D+2 precisa avaliação. Seu médico foi notificado e entrará em contato. Se piorar, procure pronto-socorro."
 
 Exemplo 3:
 Mensagem: "Posso tomar banho hoje? É D+3"

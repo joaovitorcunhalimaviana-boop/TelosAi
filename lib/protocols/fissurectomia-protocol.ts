@@ -11,13 +11,9 @@ export const FISSURECTOMIA_PROTOCOL = `
 ## PRESCRIÇÃO PADRÃO DE ALTA
 
 ### Medicamentos Via Oral:
-| Medicamento | Posologia | Duração |
-|-------------|-----------|---------|
-| Muvinlax ou PEGLax | 1 sachê à noite | Até retorno |
-| Dipirona 1g | 1 cp de 6/6h | 7 dias |
-| Paracetamol 750mg (se alergia) | 1 cp de 6/6h | 7 dias |
-| Nimesulida 100mg | 1 cp de 12/12h (fixo) | 7 dias |
-| Ciclobenzaprina 5mg | 1 cp à noite | 7 dias |
+- Medicações prescritas conforme receita médica (a prescrição varia por paciente)
+- ⚠️ NÃO CITAR nomes de medicamentos específicos ao paciente — cada paciente pode ter prescrição diferente (alergias, ajustes individuais)
+- Apenas perguntar: "Está tomando as medicações conforme prescrito?"
 
 ### Pomada Manipulada:
 - Pomada manipulada conforme prescrição médica (composição varia por paciente — NÃO detalhar fórmula)
@@ -173,7 +169,7 @@ EVITAR (por 30 dias):
 ### "Tenho espasmo anal (sensação de câimbra)"
 → Comum na fissurectomia
 → Banhos de assento ajudam muito a relaxar
-→ Ciclobenzaprina ajuda no espasmo
+→ O relaxante muscular prescrito ajuda no espasmo
 → Se severo e persistente: contato com médico
 
 ### "Estou sangrando ao evacuar"

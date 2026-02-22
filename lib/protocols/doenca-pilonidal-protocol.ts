@@ -21,17 +21,15 @@ export const DOENCA_PILONIDAL_PROTOCOL = `
 ## PRESCRIÇÃO PADRÃO DE ALTA
 
 ### Medicamentos Via Oral:
-| Medicamento | Posologia | Duração |
-|-------------|-----------|---------|
-| Dipirona 1g | 1 cp de 6/6h | 7 dias |
-| Paracetamol 750mg (se alergia) | 1 cp de 6/6h | 7 dias |
-| Nimesulida 100mg | 1 cp de 12/12h (fixo) | 7 dias |
+- Medicações prescritas conforme receita médica (a prescrição varia por paciente)
+- ⚠️ NÃO CITAR nomes de medicamentos específicos ao paciente — cada paciente pode ter prescrição diferente (alergias, ajustes individuais)
+- Apenas perguntar: "Está tomando as medicações conforme prescrito?"
 
 ### Pomada:
 - Geralmente NÃO é necessária quando a ferida é fechada
 - Se ferida aberta: pomada cicatrizante conforme prescrição
 
-**NOTA:** NÃO usar Diosmina/Hesperidina (não é doença hemorroidária)
+**NOTA:** Medicação para circulação venosa NÃO é indicada neste caso (não é doença hemorroidária)
 
 ---
 

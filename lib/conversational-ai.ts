@@ -253,10 +253,11 @@ RESPEITE essa orientação. O médico viu o paciente pessoalmente e pode ter ada
 protocolo ao caso específico. NÃO corrija o paciente nem insista no protocolo padrão
 se o médico já orientou diferente.
 
-⚠️ REGRA SOBRE POMADA:
-- NUNCA detalhe a composição/fórmula da pomada manipulada para o paciente
-- A composição varia por paciente, então diga apenas "pomada manipulada" ou "pomada prescrita pelo médico"
-- Oriente apenas sobre posologia (8/8h, após evacuar) e modo de uso
+⚠️ REGRA SOBRE MEDICAÇÕES E POMADA:
+- NUNCA cite nomes de medicamentos específicos (dipirona, nimesulida, ciclobenzaprina, diosmina, etc.)
+- A prescrição varia por paciente (alergias, ajustes), então diga apenas "medicações prescritas" ou "conforme a receita"
+- Para pomada: diga apenas "pomada prescrita" — NUNCA detalhe composição/fórmula
+- Oriente apenas sobre posologia genérica (horários, modo de uso)
 
 ⚠️ REGRAS CRÍTICAS - NUNCA VIOLE ESTAS REGRAS:
 
@@ -314,13 +315,13 @@ se o médico já orientou diferente.
         * Quantidade: pouca, moderada, muita
       ` : '(Não perguntar - paciente está em D+' + daysPostOp + ')'}
 
-      MEDICAÇÕES E ANALGESIA:
-      - Está tomando as medicações conforme prescrito? Sim/Não
-      - Sua dor está controlada com as medicações? Sim/Não
-      - Tem efeitos colaterais? (náusea, sonolência, constipação, etc)
+      MEDICAÇÕES PRESCRITAS:
+      - Perguntar: "Está tomando as medicações conforme prescrito?"
+      - ⚠️ NÃO CITAR nomes de medicamentos — dizer apenas "medicações prescritas" ou "conforme a receita"
+      - Se não está tomando: perguntar por quê
 
-      MEDICAÇÃO EXTRA (⚠️ OBRIGATÓRIO - 2ª PERGUNTA, LOGO APÓS DOR):
-      Perguntar: "Além das medicações que ${nomeMedico} prescreveu, você tomou alguma outra? (Tramadol, Codeína, Tylex, laxante)"
+      MEDICAÇÃO EXTRA (⚠️ OBRIGATÓRIO - PERGUNTAR SEMPRE):
+      Perguntar: "Além do que foi prescrito, você tomou alguma outra medicação por conta própria?"
       - Se SIM: qual, dose e horário
       - Se NÃO: registrar que não usou
       Contexto clínico: Dor 5/10 com opioide ≠ dor 5/10 sem opioide.
@@ -368,9 +369,24 @@ se o médico já orientou diferente.
 
    Se detectar: oriente PRONTO-SOCORRO imediatamente
 
-5. ENCERRAMENTO:
-   ⚠️ NÃO finalize (isComplete: true) até coletar TODAS as informações listadas em "INFORMAÇÕES OBRIGATÓRIAS" acima.
-   Ordem: 1)Dor → 2)Medicação extra → 3)Evacuação → 4)Sangramento → 5)Urina(D+1) → 6)Febre → 7)Medicações → 8)Cuidados locais → 9)Secreção(D+3+) → 10)Satisfação(D+14) → 11)Sintomas adicionais(ÚLTIMO)
+5. ENCERRAMENTO - CHECKLIST OBRIGATÓRIO:
+   ⚠️ NÃO finalize (isComplete: true) até TODOS os itens abaixo terem sido coletados.
+   ANTES de finalizar, verifique CADA item desta lista:
+
+   ✅ pain (dor 0-10) — COLETOU?
+   ✅ usedExtraMedication (medicação extra além do prescrito) — PERGUNTOU?
+   ✅ bowelMovementSinceLastContact (evacuação) — PERGUNTOU?
+   ✅ bleeding (sangramento) — PERGUNTOU?
+   ${daysPostOp === 1 ? '✅ urination (urina - OBRIGATÓRIO no D+1) — PERGUNTOU?' : ''}
+   ✅ fever (febre) — PERGUNTOU?
+   ✅ medications (tomando medicações prescritas) — PERGUNTOU?
+   ✅ localCareAdherence (cuidados locais: pomada, banho de assento) — PERGUNTOU?
+   ${daysPostOp >= 3 ? '✅ discharge (secreção na ferida) — PERGUNTOU?' : ''}
+   ✅ additionalSymptoms (algo mais a relatar) — PERGUNTOU?
+
+   Se QUALQUER item acima não foi coletado, NÃO marque isComplete: true.
+
+   Ordem recomendada: 1)Dor → 2)Medicação extra → 3)Evacuação → 4)Sangramento → 5)Urina(D+1) → 6)Febre → 7)Medicações prescritas → 8)Cuidados locais → 9)Secreção(D+3+) → 10)Sintomas adicionais(ÚLTIMO)
 
 6. SECREÇÃO DE FERIDA (A PARTIR DE D+3):
    ⚠️ IMPORTANTE: Secreção é COMUM no pós-operatório de feridas!
@@ -556,16 +572,20 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 
     // Validação server-side: não aceitar isComplete se ainda faltam dados obrigatórios
     let isComplete = result.isComplete || false;
+    let aiResponse = result.response;
     if (isComplete) {
       const stillMissing = getMissingInformation(updatedData, daysPostOp);
       if (stillMissing.length > 0) {
         console.log('⚠️ IA marcou isComplete=true mas ainda faltam dados:', stillMissing);
         isComplete = false;
+        // Substituir a despedida da IA por uma pergunta sobre o que falta
+        const nextMissing = stillMissing[0];
+        aiResponse = `Antes de encerrar, preciso perguntar mais uma coisa: ${nextMissing}`;
       }
     }
 
     return {
-      aiResponse: result.response,
+      aiResponse,
       updatedData,
       isComplete,
       needsDoctorAlert: result.needsDoctorAlert || false,

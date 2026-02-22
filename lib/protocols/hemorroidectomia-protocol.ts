@@ -11,14 +11,9 @@ export const HEMORROIDECTOMIA_PROTOCOL = `
 ## PRESCRIÇÃO PADRÃO DE ALTA
 
 ### Medicamentos Via Oral:
-| Medicamento | Posologia | Duração |
-|-------------|-----------|---------|
-| Diosmina + Hesperidina 1000mg | 1 cp de 12/12h | 15 dias |
-| Muvinlax ou PEGLax | 1 sachê à noite | Até retorno |
-| Dipirona 1g | 1 cp de 6/6h | 7 dias |
-| Paracetamol 750mg (se alergia) | 1 cp de 6/6h | 7 dias |
-| Nimesulida 100mg | 1 cp de 12/12h (fixo) | 7 dias |
-| Ciclobenzaprina 5mg | 1 cp à noite | 7 dias |
+- Medicações prescritas conforme receita médica (a prescrição varia por paciente)
+- ⚠️ NÃO CITAR nomes de medicamentos específicos ao paciente — cada paciente pode ter prescrição diferente (alergias, ajustes individuais)
+- Apenas perguntar: "Está tomando as medicações conforme prescrito?"
 
 ### Pomada Manipulada:
 - Pomada manipulada conforme prescrição médica (composição varia por paciente — NÃO detalhar fórmula)
@@ -228,7 +223,7 @@ export const PROTOCOL_FAQ = {
 
   dor_evacuar: `A dor durante a evacuação é esperada nas primeiras semanas. Use a pomada APÓS evacuar (de 8/8h, 3x ao dia - a posologia correta). Nos primeiros 2 dias (D0 a D2), faça compressas geladas por 10 minutos, 5x ao dia OU banho de assento com água gelada. A partir do D3, troque para banhos de assento com água morna após a evacuação para aliviar o desconforto. Mantenha as fezes macias com o laxante e boa hidratação.`,
 
-  caroco_inchaco: `Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo seu médico no retorno. O uso da Diosmina + Hesperidina e da pomada ajudam a reduzir esses inchaços.`,
+  caroco_inchaco: `Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo seu médico no retorno. As medicações prescritas e a pomada ajudam a reduzir esses inchaços.`,
 
   secrecao: `Uma secreção clara, rosada ou amarelada é normal e faz parte do processo de cicatrização. Ela pode durar até 3 semanas. Troque a gaze sempre que estiver úmida. Sinais de infecção seriam: secreção amarelo-esverdeada com odor forte e fétido, acompanhada de febre ou piora da dor. Se isso acontecer, procure atendimento.`,
 

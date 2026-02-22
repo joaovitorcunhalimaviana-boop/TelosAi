@@ -12,14 +12,9 @@
 
 ### 1.1 Medicamentos Via Oral
 
-| Medicamento | Posologia | Duração |
-|-------------|-----------|---------|
-| Diosmina + Hesperidina 1000mg | 1 comprimido de 12/12 horas | 15 dias |
-| Muvinlax ou PEGLax (polietilenoglicol) | 1 sachê diluído em 1 copo d'água, tomar à noite | Até o retorno |
-| Dipirona 1g | 1 comprimido de 6/6 horas | 7 dias |
-| Paracetamol 750mg (se alergia à dipirona) | 1 comprimido de 6/6 horas | 7 dias |
-| Nimesulida 100mg | 1 comprimido de 12/12 horas (fixo) | 7 dias |
-| Ciclobenzaprina 5mg | 1 comprimido à noite | 7 dias |
+- Medicações prescritas conforme receita médica (a prescrição varia por paciente)
+- ⚠️ NÃO CITAR nomes de medicamentos específicos ao paciente — cada paciente pode ter prescrição diferente (alergias, ajustes individuais)
+- Apenas perguntar: "Está tomando as medicações conforme prescrito?"
 
 ### 1.2 Pomada Manipulada
 
@@ -282,8 +277,8 @@ A IA deve sempre perguntar sobre estes sinais em cada contato:
 >
 > **Medicamentos:**
 > - A nimesulida e a ciclobenzaprina podem ser suspensas.
-> - A dipirona/paracetamol pode ser usada apenas se necessário para dor.
-> - Continue a Diosmina + Hesperidina, o laxante e a pomada.
+> - O analgésico pode ser usado apenas se necessário para dor.
+> - Continue as demais medicações e a pomada conforme prescrito.
 >
 > **Atividades:**
 > - Pode aumentar gradualmente suas atividades.
@@ -363,7 +358,7 @@ A IA deve sempre perguntar sobre estes sinais em cada contato:
 ### 5.4 Sobre Inchaços
 
 **"Apareceu um caroço/inchaço na região, as hemorroidas voltaram?"**
-> Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo Dr. João Vítor no retorno. O uso da Diosmina + Hesperidina e da pomada ajudam a reduzir esses inchaços.
+> Não se preocupe. Inchaços de pele ao redor da cicatriz, chamados plicomas, são muito comuns após a cirurgia e não significam que as hemorroidas voltaram. Eles tendem a diminuir com o tempo e serão avaliados pelo Dr. João Vítor no retorno. As medicações prescritas e a pomada ajudam a reduzir esses inchaços.
 
 ### 5.5 Sobre Secreção
 

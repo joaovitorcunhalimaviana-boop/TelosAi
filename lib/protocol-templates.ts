@@ -109,19 +109,17 @@ export const PROTOCOL_TEMPLATES: ProtocolTemplate[] = [
     title: 'Diosmina + Hesperidina (Daflon/Velunid)',
     dayRangeStart: 0,
     dayRangeEnd: 14,
-    content: `DIOSMINA + HESPERIDINA (DAFLON / VELUNID)
+    content: `MEDICAMENTO PARA CIRCULAÇÃO (específico para hemorroidas)
 
-📌 COMO TOMAR:
-- 1000mg de 12/12h (ou 2 comprimidos de 500mg 2x/dia)
+📌 ORIENTAÇÃO:
+- Tomar conforme prescrito na receita médica
 - Por 15 dias
+- ⚠️ NÃO citar nome do medicamento ao paciente (prescrição pode variar)
 
 📌 BENEFÍCIOS:
 - Reduz inchaço (edema)
 - Melhora a circulação
-- Ajuda na cicatrização
-- Reduz os plicomas (inchaços de pele)
-
-⚠️ Este medicamento é específico para cirurgia de hemorroidas`,
+- Ajuda na cicatrização`,
     priority: 70
   },
   {
@@ -135,9 +133,9 @@ export const PROTOCOL_TEMPLATES: ProtocolTemplate[] = [
     dayRangeEnd: null,
     content: `LAXANTE - MANTER FEZES MACIAS
 
-📌 OPÇÕES:
-- Muvinlax ou PEGLax: 1 sachê à noite
-- Lactulose: 15ml à noite
+📌 ORIENTAÇÃO:
+- Tomar o laxante conforme prescrito na receita
+- ⚠️ NÃO citar nome do laxante ao paciente (prescrição pode variar)
 
 📌 OBJETIVO:
 - Fezes macias = menos dor ao evacuar
@@ -163,19 +161,16 @@ Evacuar é fundamental para a cicatrização.`,
     dayRangeEnd: 7,
     content: `MEDICAÇÕES PARA DOR
 
-📌 ANALGÉSICOS (usar de horário, não só quando doer):
-- Dipirona 1g: 1 comprimido de 6/6h por 7 dias
-- OU Paracetamol 750mg: 1 comprimido de 6/6h (se alergia à dipirona)
+📌 ORIENTAÇÃO:
+- Tomar as medicações conforme prescrito na receita médica
+- Tomar nos horários certos, não apenas quando doer
+- ⚠️ NÃO citar nomes de medicamentos ao paciente (prescrição pode variar por paciente)
 
-📌 ANTI-INFLAMATÓRIO:
-- Nimesulida 100mg: 1 comprimido de 12/12h (fixo) por 7 dias
-- Tomar APÓS as refeições
+📌 IMPORTANTE:
+- Anti-inflamatório: tomar APÓS as refeições
+- Relaxante muscular: pode dar sonolência (tomar à noite)
 
-📌 RELAXANTE MUSCULAR:
-- Ciclobenzaprina 5mg: 1 comprimido à noite por 7 dias
-- Pode dar sonolência
-
-⚠️ D+7: Suspender nimesulida e ciclobenzaprina. Dipirona usar se necessário.`,
+⚠️ D+7: Algumas medicações podem ser suspensas conforme orientação médica.`,
     priority: 75
   },
 
