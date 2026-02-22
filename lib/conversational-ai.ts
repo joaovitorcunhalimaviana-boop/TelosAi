@@ -502,20 +502,44 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       parts: [{ text: msg.content }],
     }));
 
-    const chat = model.startChat({
-      history: geminiHistory,
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.1,
-        responseMimeType: 'application/json',
-      },
-    });
+    // Retry logic: tentar até 3 vezes com delay entre tentativas
+    const MAX_RETRIES = 3;
+    let lastError: any = null;
+    let responseText = '';
 
-    // Enviar a última mensagem do usuário
-    const geminiResponse = await chat.sendMessage(userMessage);
-    const responseText = geminiResponse.response.text();
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🧠 Gemini API attempt ${attempt}/${MAX_RETRIES}...`);
 
-    console.log('🧠 Gemini API response received!');
+        const chat = model.startChat({
+          history: geminiHistory,
+          generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.1,
+            responseMimeType: 'application/json',
+          },
+        });
+
+        const geminiResponse = await chat.sendMessage(userMessage);
+        responseText = geminiResponse.response.text();
+        console.log(`🧠 Gemini API response received on attempt ${attempt}!`);
+        lastError = null;
+        break; // Success - exit retry loop
+      } catch (retryError: any) {
+        lastError = retryError;
+        console.error(`🧠 Gemini API attempt ${attempt} failed:`, retryError?.message);
+        if (attempt < MAX_RETRIES) {
+          const delay = attempt * 1000; // 1s, 2s
+          console.log(`🧠 Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    if (lastError) {
+      throw lastError; // All retries failed
+    }
+
     console.log('🧠 Raw response text (first 500 chars):', responseText.substring(0, 500));
 
     // Limpar markdown formatting se presente
