@@ -1309,7 +1309,11 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
     todayEnd: todayEnd.toISOString(),
   });
 
-  // 1. Prioridade: Buscar follow-up ATIVO (sent ou in_progress) PROGRAMADO PARA HOJE
+  // 1. MÁXIMA PRIORIDADE: Follow-up já ENVIADO aguardando resposta (sent/in_progress)
+  // Busca hoje E ontem — paciente pode responder de madrugada (após meia-noite)
+  const yesterdayStart = new Date(todayStart);
+  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
   const activeFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
@@ -1317,8 +1321,8 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
         in: ['sent', 'in_progress'],
       },
       scheduledDate: {
-        gte: todayStart, // >= início de hoje
-        lte: todayEnd,   // <= fim de hoje
+        gte: yesterdayStart, // Inclui ontem (respostas de madrugada)
+        lte: todayEnd,
       },
     },
     include: {
@@ -1330,7 +1334,7 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
   });
 
   if (activeFollowUp) {
-    logger.debug('✅ Follow-up ativo encontrado para HOJE', {
+    logger.debug('✅ Follow-up ativo encontrado (já enviado, aguardando resposta)', {
       followUpId: activeFollowUp.id,
       dayNumber: activeFollowUp.dayNumber,
       scheduledDate: activeFollowUp.scheduledDate,
@@ -1339,6 +1343,7 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
   }
 
   // 2. Fallback: Buscar follow-up PENDENTE PROGRAMADO PARA HOJE
+  // (só chega aqui se não há nenhum follow-up enviado aguardando resposta)
   const pendingFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
@@ -1363,45 +1368,6 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
       scheduledDate: pendingFollowUp.scheduledDate,
     });
     return pendingFollowUp;
-  }
-
-  // 3. Secondary: Se nada encontrado para hoje, verificar follow-ups de ONTEM ainda não respondidos
-  // (paciente respondendo com atraso)
-  const yesterdayStart = new Date(todayStart);
-  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-
-  logger.debug('🔍 Nenhum follow-up para hoje, verificando ONTEM...', {
-    patientId,
-    yesterdayStart: yesterdayStart.toISOString(),
-    yesterdayEnd: todayStart.toISOString(),
-  });
-
-  const yesterdayFollowUp = await prisma.followUp.findFirst({
-    where: {
-      patientId,
-      status: {
-        in: ['sent', 'in_progress'],
-      },
-      scheduledDate: {
-        gte: yesterdayStart,
-        lt: todayStart,
-      },
-    },
-    include: {
-      surgery: true,
-    },
-    orderBy: {
-      scheduledDate: 'desc',
-    },
-  });
-
-  if (yesterdayFollowUp) {
-    logger.debug('✅ Follow-up de ONTEM encontrado (paciente respondendo com atraso)', {
-      followUpId: yesterdayFollowUp.id,
-      dayNumber: yesterdayFollowUp.dayNumber,
-      scheduledDate: yesterdayFollowUp.scheduledDate,
-    });
-    return yesterdayFollowUp;
   }
 
   logger.debug('⚠️ Nenhum follow-up programado para HOJE nem ONTEM', { patientId });
