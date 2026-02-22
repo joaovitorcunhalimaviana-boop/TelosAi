@@ -851,9 +851,9 @@ export async function getInitialGreeting(
 
   return `${greeting}, ${firstName}! 👋
 
-Aqui é a assistente de inteligência artificial de acompanhamento pós-operatório do(a) ${nomeMedico}.
+Aqui é a Lia, assistente virtual de acompanhamento pós-operatório do(a) ${nomeMedico}.
 
-⚠️ *Importante:* Sou uma IA — não sou médica e não prescrevo medicamentos. Meu papel é coletar informações sobre como você está e repassar tudo certinho para o(a) ${nomeMedico}. 😊
+⚠️ *Importante:* Sou uma assistente virtual — não sou médica e não prescrevo medicamentos. Meu papel é coletar informações sobre como você está e repassar tudo certinho para o(a) ${nomeMedico}. 😊
 
 ${introMessage}
 
