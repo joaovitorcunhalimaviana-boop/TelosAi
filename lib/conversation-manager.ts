@@ -349,6 +349,16 @@ export async function processQuestionnaireAnswer(
       timestamp: msg.timestamp
     }));
 
+  // Buscar dayNumber do follow-up para evitar erro de cálculo por relógio (respostas após meia-noite)
+  let followUpDayNumber: number | undefined;
+  if (context.followUpId) {
+    const followUp = await prisma.followUp.findUnique({
+      where: { id: context.followUpId },
+      select: { dayNumber: true }
+    });
+    followUpDayNumber = followUp?.dayNumber;
+  }
+
   // Usar IA conversacional para processar resposta
   const { conductConversation } = await import('./conversational-ai');
   const result = await conductConversation(
@@ -356,7 +366,8 @@ export async function processQuestionnaireAnswer(
     patient,
     surgery,
     conversationMessages,
-    currentData
+    currentData,
+    followUpDayNumber
   );
 
   // Enviar imagens se a IA solicitou

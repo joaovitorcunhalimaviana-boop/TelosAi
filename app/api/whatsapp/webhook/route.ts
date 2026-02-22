@@ -736,7 +736,8 @@ async function processQuestionnaireAnswer(
       patient,
       followUp.surgery,
       claudeHistory,
-      currentData
+      currentData,
+      followUp.dayNumber
     );
 
     // 5. Enviar imagens se necessário (ANTES da resposta de texto)

@@ -171,7 +171,8 @@ export async function conductConversation(
   patient: Patient & { doctorName?: string; user?: { nomeCompleto: string } },
   surgery: Surgery,
   conversationHistory: ConversationMessage[],
-  currentData: QuestionnaireData
+  currentData: QuestionnaireData,
+  followUpDayNumber?: number
 ): Promise<{
   aiResponse: string;
   updatedData: QuestionnaireData;
@@ -185,12 +186,19 @@ export async function conductConversation(
   // Nome do médico: patient.doctorName (webhook) > patient.user (Prisma) > fallback
   const nomeMedico = patient.doctorName || patient.user?.nomeCompleto || 'seu médico';
 
-  // Calcular dias pós-operatórios usando timezone de Brasília (evita off-by-one)
-  const nowBrasilia = toBrasiliaTime(new Date());
-  const surgeryBrasilia = toBrasiliaTime(surgery.date);
-  const nowDayStart = new Date(nowBrasilia.getFullYear(), nowBrasilia.getMonth(), nowBrasilia.getDate());
-  const surgeryDayStart = new Date(surgeryBrasilia.getFullYear(), surgeryBrasilia.getMonth(), surgeryBrasilia.getDate());
-  const daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
+  // Usar o dayNumber do follow-up (fonte confiável) em vez de calcular pelo relógio.
+  // Isso evita que respostas após meia-noite sejam contadas como dia seguinte.
+  let daysPostOp: number;
+  if (followUpDayNumber !== undefined) {
+    daysPostOp = followUpDayNumber;
+  } else {
+    // Fallback: calcular pelo relógio (para chamadas que não passam dayNumber)
+    const nowBrasilia = toBrasiliaTime(new Date());
+    const surgeryBrasilia = toBrasiliaTime(surgery.date);
+    const nowDayStart = new Date(nowBrasilia.getFullYear(), nowBrasilia.getMonth(), nowBrasilia.getDate());
+    const surgeryDayStart = new Date(surgeryBrasilia.getFullYear(), surgeryBrasilia.getMonth(), surgeryBrasilia.getDate());
+    daysPostOp = Math.round((nowDayStart.getTime() - surgeryDayStart.getTime()) / (1000 * 60 * 60 * 24));
+  }
 
   // Obter contexto do questionário diário
   const { getDailyQuestions } = await import('./daily-questionnaire-flow');
