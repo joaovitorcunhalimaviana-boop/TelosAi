@@ -285,9 +285,9 @@ se o médico já orientou diferente.
       - Moderado (mancha a roupa íntima)
       - Intenso (encheu o vaso sanitário)
 
-      URINA:
-      - Consegue urinar normalmente? Sim/Não
-      - Se não: quais dificuldades?
+      URINA${daysPostOp === 1 ? ' (⚠️ OBRIGATÓRIO NO D+1 - risco de retenção urinária pós-anestesia)' : ' (apenas D+1)'}:
+      ${daysPostOp === 1 ? `- PERGUNTAR OBRIGATORIAMENTE: "Está conseguindo urinar normalmente?"
+      - Se não: quais dificuldades? (retenção urinária é RED FLAG no D+1)` : '- Não perguntar (paciente está em D+' + daysPostOp + ')'}
 
       FEBRE:
       - Teve febre? Sim/Não
@@ -340,11 +340,12 @@ se o médico já orientou diferente.
       - Demonstre que se importa
       - MAS sempre colete os dados objetivos
 
-   g) CUIDADOS LOCAIS (ORIENTAÇÕES DO PROTOCOLO):
-      - Consulte o PROTOCOLO MÉDICO OFICIAL acima para orientar sobre cuidados locais
+   g) CUIDADOS LOCAIS (⚠️ OBRIGATÓRIO - PERGUNTAR SEMPRE):
+      - PERGUNTAR OBRIGATORIAMENTE: "Está seguindo os cuidados locais? (pomadas, banho de assento, compressas)"
+      - Consulte o PROTOCOLO MÉDICO OFICIAL acima para orientar sobre cuidados locais específicos
       - Se o protocolo menciona compressas, banhos de assento, pomadas, etc., pergunte ao paciente se está seguindo
       - NÃO invente orientações de cuidados locais — use APENAS o que está no protocolo do médico
-      - Se não há protocolo registrado (modo coleta), NÃO oriente sobre cuidados locais
+      - Se não há protocolo registrado (modo coleta), apenas pergunte se está fazendo cuidados locais sem orientar
 
 4. SINAIS DE ALERTA (RED FLAGS):
    - Dor ≥ 8/10
@@ -540,10 +541,20 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       ...result.extractedInfo
     };
 
+    // Validação server-side: não aceitar isComplete se ainda faltam dados obrigatórios
+    let isComplete = result.isComplete || false;
+    if (isComplete) {
+      const stillMissing = getMissingInformation(updatedData, daysPostOp);
+      if (stillMissing.length > 0) {
+        console.log('⚠️ IA marcou isComplete=true mas ainda faltam dados:', stillMissing);
+        isComplete = false;
+      }
+    }
+
     return {
       aiResponse: result.response,
       updatedData,
-      isComplete: result.isComplete || false,
+      isComplete,
       needsDoctorAlert: result.needsDoctorAlert || false,
       urgencyLevel: result.urgency || 'low',
       sendImages: result.sendImages
