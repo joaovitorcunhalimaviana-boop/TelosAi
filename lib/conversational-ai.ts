@@ -591,6 +591,9 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.error('🧠 Error stack:', error?.stack);
     console.error('🧠 User message was:', userMessage);
 
+    // Store error for diagnostics (accessible via _geminiError in response)
+    const geminiErrorInfo = `[FALLBACK] ${error?.message || 'Unknown error'}`;
+
     // Fallback inteligente: tentar entender a mensagem mesmo sem IA
     const userMessageLower = userMessage.toLowerCase().trim();
 
@@ -683,8 +686,10 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       updatedData: currentData,
       isComplete: false,
       needsDoctorAlert: false,
-      urgencyLevel: 'low'
-    };
+      urgencyLevel: 'low',
+      _fromFallback: true,
+      _geminiError: geminiErrorInfo
+    } as any;
   }
 }
 

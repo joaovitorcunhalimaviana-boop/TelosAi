@@ -106,6 +106,8 @@ export async function GET(request: NextRequest) {
           );
           step3 = {
             success: true,
+            fromFallback: (result as any)._fromFallback || false,
+            geminiError: (result as any)._geminiError || null,
             aiResponse: result.aiResponse,
             updatedData: result.updatedData,
             isComplete: result.isComplete,
