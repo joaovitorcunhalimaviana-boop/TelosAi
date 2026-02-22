@@ -23,12 +23,7 @@
 
 ### 1.2 Pomada Manipulada
 
-**Composição:**
-- Diltiazem 2%
-- Lidocaína 2%
-- Vitamina E 5%
-- Metronidazol 10%
-- Sucralfato 10%
+- Pomada manipulada conforme prescrição médica (composição varia por paciente — NÃO detalhar fórmula)
 
 **Posologia:** Aplicar na região da ferida operatória de 8/8 horas por 15 dias.
 

@@ -20,7 +20,7 @@ export const FISSURECTOMIA_PROTOCOL = `
 | Ciclobenzaprina 5mg | 1 cp à noite | 7 dias |
 
 ### Pomada Manipulada:
-- Diltiazem 2% + Lidocaína 2% + Vitamina E 5% + Metronidazol 10% + Sucralfato 10%
+- Pomada manipulada conforme prescrição médica (composição varia por paciente — NÃO detalhar fórmula)
 - Aplicar de 8/8h por 15 dias
 
 ---

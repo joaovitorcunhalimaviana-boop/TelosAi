@@ -93,12 +93,9 @@ export const PROTOCOL_TEMPLATES: ProtocolTemplate[] = [
 - Pode usar antes de evacuar para lubrificar (se dor muito intensa)
 - Quantidade: "uma ervilha" de pomada
 
-📌 COMPOSIÇÃO TÍPICA:
-- Diltiazem 2% (relaxa esfíncter)
-- Lidocaína 2% (anestésico)
-- Vitamina E 5% (cicatrizante)
-- Metronidazol 10% (previne infecção)
-- Sucralfato 10% (protege a mucosa)
+📌 IMPORTANTE:
+- Pomada manipulada conforme prescrição médica (composição varia por paciente)
+- NÃO detalhar a composição/fórmula da pomada para o paciente
 
 ⚠️ A pomada é COMPLEMENTAR aos banhos de assento, não substitui!`,
     priority: 80
