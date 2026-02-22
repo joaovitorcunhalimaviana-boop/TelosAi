@@ -3,13 +3,15 @@
  * Analisa mensagens de pacientes e classifica urgência
  */
 
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
 import { toBrasiliaTime } from './date-utils';
 import { z } from 'zod';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+});
 
 export type UrgencyLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
@@ -300,30 +302,33 @@ ${protocolsSection}
 MENSAGEM DO PACIENTE:
 "${message}"`;
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash-lite',
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1024,
+      temperature: 0.3,
+      // 🎯 SYSTEM PROMPT com cache control
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' } // Cache por 5 minutos
+        }
       ],
-      systemInstruction: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: userMessage,
+        },
+      ],
     });
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-      generationConfig: {
-        maxOutputTokens: 1024,
-        temperature: 0.3,
-        responseMimeType: 'application/json',
-      },
-    });
-
-    const responseText = result.response.text();
+    const content = response.content[0];
+    if (content.type !== 'text') {
+      throw new Error('Unexpected response type from Claude');
+    }
 
     // Extrair JSON da resposta
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('No JSON found in Claude response');
     }

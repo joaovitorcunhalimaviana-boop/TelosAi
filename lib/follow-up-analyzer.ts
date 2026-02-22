@@ -9,7 +9,7 @@
  * - Alertas ao médico quando necessário
  */
 
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { getAnalysisPrompt, type AnalysisPromptParams } from './ai-prompts';
 import { SurgeryType, detectRedFlags } from './surgery-templates';
 
@@ -40,17 +40,30 @@ export interface FollowUpAnalysisParams {
 }
 
 // ============================================
-// CONFIGURAÇÃO GEMINI
+// CONFIGURAÇÃO ANTHROPIC
 // ============================================
 
-const GEMINI_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || '');
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const MODEL = 'claude-sonnet-4-5-20250929';
 
 /**
  * Verifica se a API está configurada
  */
 export function isAIConfigured(): boolean {
-  return !!GEMINI_API_KEY;
+  return !!ANTHROPIC_API_KEY;
+}
+
+/**
+ * Cria cliente Anthropic
+ */
+function getAnthropicClient(): Anthropic {
+  if (!ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY não configurada');
+  }
+
+  return new Anthropic({
+    apiKey: ANTHROPIC_API_KEY,
+  });
 }
 
 // ============================================
@@ -85,28 +98,25 @@ export async function analyzeFollowUpResponse(
       hasComorbidities,
     });
 
-    // Chamar Gemini AI
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash-lite',
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    // Chamar Claude AI
+    const anthropic = getAnthropicClient();
+
+    const message = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 2048,
+      temperature: 0.3, // Mais conservador para análise médica
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
       ],
     });
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        maxOutputTokens: 2048,
-        temperature: 0.3,
-        responseMimeType: 'application/json',
-      },
-    });
-
     // Extrair resposta
-    const responseText = result.response.text();
+    const responseText = message.content[0].type === 'text'
+      ? message.content[0].text
+      : '';
 
     // Parse JSON da resposta
     let analysis: AnalysisResult;

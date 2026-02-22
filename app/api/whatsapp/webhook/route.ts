@@ -21,9 +21,6 @@ import { conductConversation } from '@/lib/conversational-ai';
 import { startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
 // Protocolo carregado internamente pelo conductConversation via getProtocolForSurgery
 
-// Aumentar timeout do Vercel para 60s (Gemini API pode demorar)
-export const maxDuration = 60;
-
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN!;
 
 // ============================================

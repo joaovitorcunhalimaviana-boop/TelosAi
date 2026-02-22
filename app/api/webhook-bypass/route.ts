@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { getProtocolForSurgery } from '@/lib/protocols/hemorroidectomia-protocol';
 import { sendCriticalRedFlagAlert } from '@/lib/red-flag-alerts';
 import { toBrasiliaTime, getBrasiliaHour } from '@/lib/date-utils';
@@ -14,7 +14,9 @@ const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu_token_sec
 const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '866244236573219';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+});
 
 // Verificação do webhook (GET)
 export async function GET(request: NextRequest) {
@@ -461,61 +463,49 @@ REGRAS DO JSON:
 - isComplete = true SOMENTE quando tiver TODOS os 6 campos coletados`;
 
   try {
-    // Converter histórico para formato Gemini
-    const geminiHistory = history.map(msg => ({
-      role: msg.role === 'assistant' ? 'model' as const : 'user' as const,
-      parts: [{ text: msg.content }],
+    const messages = history.map(msg => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content
     }));
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash-lite',
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      ],
-      systemInstruction: systemPrompt,
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 800,
+      temperature: 0.5,
+      system: systemPrompt,
+      messages: messages as any
     });
 
-    const chat = model.startChat({
-      history: geminiHistory.slice(0, -1),
-      generationConfig: {
-        maxOutputTokens: 800,
-        temperature: 0.5,
-        responseMimeType: 'application/json',
-      },
-    });
-
-    const lastMsg = geminiHistory[geminiHistory.length - 1];
-    const result = await chat.sendMessage(lastMsg.parts[0].text);
-    const responseText = result.response.text();
-
-    // Tentar parsear JSON
-    try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          response: parsed.response || responseText,
-          extractedData: parsed.extractedData || {},
-          isComplete: parsed.isComplete || false
-        };
+    const content = response.content[0];
+    if (content.type === 'text') {
+      // Tentar parsear JSON
+      try {
+        const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return {
+            response: parsed.response || content.text,
+            extractedData: parsed.extractedData || {},
+            isComplete: parsed.isComplete || false
+          };
+        }
+      } catch (e) {
+        // Se não for JSON, retornar texto direto
       }
-    } catch (e) {
-      // Se não for JSON, retornar texto direto
+
+      // Verificar se está completo pelo texto
+      const isComplete = content.text.toLowerCase().includes('obrigad') &&
+                        (content.text.toLowerCase().includes('dr.') ||
+                         content.text.toLowerCase().includes('boa recuperação'));
+
+      return {
+        response: content.text,
+        extractedData: {},
+        isComplete
+      };
     }
 
-    // Verificar se está completo pelo texto
-    const isComplete = responseText.toLowerCase().includes('obrigad') &&
-                      (responseText.toLowerCase().includes('dr.') ||
-                       responseText.toLowerCase().includes('boa recuperação'));
-
-    return {
-      response: responseText,
-      extractedData: {},
-      isComplete
-    };
+    throw new Error('Resposta inesperada');
   } catch (error: any) {
     console.error('❌ Erro na IA:', error?.message);
 

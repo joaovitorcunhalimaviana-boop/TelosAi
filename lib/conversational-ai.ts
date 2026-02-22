@@ -4,13 +4,15 @@
  * Integrado com protocolo médico oficial
  */
 
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { Patient, Surgery } from '@prisma/client';
 import { prisma } from './prisma';
 import { getProtocolsForAI } from './protocols';
 import { toBrasiliaTime, getBrasiliaHour } from './date-utils';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || '');
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+});
 
 export interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -483,67 +485,29 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     });
 
     console.log('🧠 Messages array length:', messages.length);
-    console.log('🧠 Calling Gemini API...');
+    console.log('🧠 Calling Anthropic API...');
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash-lite',
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      ],
-      systemInstruction: systemPrompt,
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1024,
+      temperature: 0.1, // Reduzido para garantir formato JSON estrito
+      system: systemPrompt,
+      messages: messages,
     });
 
-    // Converter histórico para formato Gemini (role 'assistant' → 'model', content → parts)
-    const geminiHistory = messages.slice(0, -1).map((msg: any) => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }],
-    }));
+    console.log('🧠 Anthropic API response received!');
+    console.log('🧠 Response content length:', response.content.length);
 
-    // Retry logic: tentar até 3 vezes com delay entre tentativas
-    const MAX_RETRIES = 3;
-    let lastError: any = null;
-    let responseText = '';
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        console.log(`🧠 Gemini API attempt ${attempt}/${MAX_RETRIES}...`);
-
-        const chat = model.startChat({
-          history: geminiHistory,
-          generationConfig: {
-            maxOutputTokens: 1024,
-            temperature: 0.1,
-            responseMimeType: 'application/json',
-          },
-        });
-
-        const geminiResponse = await chat.sendMessage(userMessage);
-        responseText = geminiResponse.response.text();
-        console.log(`🧠 Gemini API response received on attempt ${attempt}!`);
-        lastError = null;
-        break; // Success - exit retry loop
-      } catch (retryError: any) {
-        lastError = retryError;
-        console.error(`🧠 Gemini API attempt ${attempt} failed:`, retryError?.message);
-        if (attempt < MAX_RETRIES) {
-          const delay = attempt * 1000; // 1s, 2s
-          console.log(`🧠 Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
+    const content = response.content[0];
+    if (content.type !== 'text') {
+      console.error('🧠 ERROR: Unexpected response type:', content.type);
+      throw new Error('Unexpected response type from Claude');
     }
 
-    if (lastError) {
-      throw lastError; // All retries failed
-    }
-
-    console.log('🧠 Raw response text (first 500 chars):', responseText.substring(0, 500));
+    console.log('🧠 Raw response text (first 500 chars):', content.text.substring(0, 500));
 
     // Limpar markdown formatting se presente
-    let cleanText = responseText.trim();
+    let cleanText = content.text.trim();
 
     // Remove markdown code blocks if explicitly wrapped
     if (cleanText.includes('```')) {
@@ -556,7 +520,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 
     if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
       console.error('Invalid AI response structure (brackets mismatch):', cleanText);
-      throw new Error('No JSON found in Gemini response');
+      throw new Error('No JSON found in Claude response');
     }
 
     const jsonString = cleanText.substring(startIndex, endIndex + 1);
@@ -590,9 +554,6 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.error('🧠 Error message:', error?.message);
     console.error('🧠 Error stack:', error?.stack);
     console.error('🧠 User message was:', userMessage);
-
-    // Store error for diagnostics (accessible via _geminiError in response)
-    const geminiErrorInfo = `[FALLBACK] ${error?.message || 'Unknown error'}`;
 
     // Fallback inteligente: tentar entender a mensagem mesmo sem IA
     const userMessageLower = userMessage.toLowerCase().trim();
@@ -686,10 +647,8 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       updatedData: currentData,
       isComplete: false,
       needsDoctorAlert: false,
-      urgencyLevel: 'low',
-      _fromFallback: true,
-      _geminiError: geminiErrorInfo
-    } as any;
+      urgencyLevel: 'low'
+    };
   }
 }
 

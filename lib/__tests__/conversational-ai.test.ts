@@ -5,10 +5,10 @@
 
 import { conductConversation, QuestionnaireData } from '../conversational-ai';
 import { Patient, Surgery } from '@prisma/client';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 
-// Mock do Google Generative AI SDK
-jest.mock('@google/generative-ai');
+// Mock do Anthropic SDK
+jest.mock('@anthropic-ai/sdk');
 
 // Mock do prisma
 jest.mock('../prisma', () => ({
@@ -32,7 +32,7 @@ jest.mock('../whatsapp', () => ({
 }));
 
 describe('conversational-ai', () => {
-  let mockSendMessage: jest.Mock;
+  let mockAnthropicCreate: jest.Mock;
   let mockPatient: Patient;
   let mockSurgery: Surgery;
 
@@ -40,18 +40,14 @@ describe('conversational-ai', () => {
     // Limpar todos os mocks antes de cada teste
     jest.clearAllMocks();
 
-    // Setup do mock do Gemini
-    mockSendMessage = jest.fn();
-    const mockStartChat = jest.fn().mockReturnValue({
-      sendMessage: mockSendMessage,
-    });
-    const mockGetGenerativeModel = jest.fn().mockReturnValue({
-      startChat: mockStartChat,
-    });
-    (GoogleGenerativeAI as jest.MockedClass<typeof GoogleGenerativeAI>).mockImplementation(
+    // Setup do mock do Anthropic
+    mockAnthropicCreate = jest.fn();
+    (Anthropic as jest.MockedClass<typeof Anthropic>).mockImplementation(
       () =>
       ({
-        getGenerativeModel: mockGetGenerativeModel,
+        messages: {
+          create: mockAnthropicCreate,
+        },
       } as any)
     );
 
@@ -92,9 +88,11 @@ describe('conversational-ai', () => {
   describe('conductConversation', () => {
     it('should extract valid pain score from conversation', async () => {
       // Mock da resposta da API do Claude
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response: 'Entendi. Sua dor está em nível 7.',
               extractedInfo: {
                 pain: 7,
@@ -106,7 +104,8 @@ describe('conversational-ai', () => {
               urgency: 'medium',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
@@ -123,9 +122,11 @@ describe('conversational-ai', () => {
     });
 
     it('should validate pain score range (0-10)', async () => {
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response: 'Por favor, me diga um número entre 0 e 10.',
               extractedInfo: {},
               sendImages: {
@@ -135,7 +136,8 @@ describe('conversational-ai', () => {
               urgency: 'low',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
@@ -151,9 +153,11 @@ describe('conversational-ai', () => {
     });
 
     it('should reject vague pain responses', async () => {
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response:
                 'Entendo que está com bastante dor. Preciso que você me diga um número de 0 a 10 para eu registrar certinho.',
               extractedInfo: {},
@@ -164,7 +168,8 @@ describe('conversational-ai', () => {
               urgency: 'low',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
@@ -181,7 +186,7 @@ describe('conversational-ai', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      mockSendMessage.mockRejectedValue(new Error('API Error'));
+      mockAnthropicCreate.mockRejectedValue(new Error('API Error'));
 
       const result = await conductConversation(
         'Teste',
@@ -198,9 +203,11 @@ describe('conversational-ai', () => {
     });
 
     it('should apply Zod schema validation (structured data)', async () => {
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response: 'Registrado!',
               extractedInfo: {
                 pain: 5,
@@ -218,7 +225,8 @@ describe('conversational-ai', () => {
               urgency: 'low',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
@@ -240,9 +248,11 @@ describe('conversational-ai', () => {
     });
 
     it('should return nextQuestion correctly', async () => {
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response: 'Você evacuou desde a última vez que conversamos?',
               extractedInfo: {
                 pain: 5,
@@ -254,7 +264,8 @@ describe('conversational-ai', () => {
               urgency: 'low',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
@@ -271,9 +282,11 @@ describe('conversational-ai', () => {
     });
 
     it('should identify when conversation is complete', async () => {
-      mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => JSON.stringify({
+      mockAnthropicCreate.mockResolvedValue({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
               response:
                 'Perfeito! Tenho todas as informações. Obrigada e melhoras!',
               extractedInfo: {
@@ -293,7 +306,8 @@ describe('conversational-ai', () => {
               urgency: 'low',
               needsDoctorAlert: false,
             }),
-        },
+          },
+        ],
       });
 
       const result = await conductConversation(
