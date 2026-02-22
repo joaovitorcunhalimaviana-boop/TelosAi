@@ -119,6 +119,7 @@ model Patient {
   consentTermFileUrl    String?
   consentTermSigned     Boolean              @default(false)
   whatsappConsent       Boolean              @default(false)
+  isTest                Boolean              @default(false)
   consentTerms          ConsentTerm[]
   conversations         Conversation[]
   followUps             FollowUp[]

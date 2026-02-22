@@ -65,6 +65,16 @@ export function DashboardHeader() {
             Pesquisas
           </Link>
 
+          {(isMedico || isAdmin) && (
+            <Link
+              href="/dashboard/dados-agregados"
+              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/dados-agregados' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+                }`}
+            >
+              Dados Agregados
+            </Link>
+          )}
+
           {isMedico && (
             <Link
               href="/dashboard/billing"

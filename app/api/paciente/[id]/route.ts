@@ -25,6 +25,7 @@ const updatePatientSchema = z.object({
   sex: z.string().optional().nullable(),
   phone: z.string().optional(),
   email: z.string().email().optional().nullable(),
+  isTest: z.boolean().optional(),
 
   // Surgery data
   surgery: z
@@ -345,6 +346,8 @@ export async function PATCH(
     if (validatedData.phone) patientUpdateData.phone = validatedData.phone;
     if (validatedData.email !== undefined)
       patientUpdateData.email = validatedData.email;
+    if (validatedData.isTest !== undefined)
+      patientUpdateData.isTest = validatedData.isTest;
 
     // Start transaction
     await prisma.$transaction(async (tx) => {

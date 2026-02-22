@@ -500,7 +500,9 @@ async function saveQuestionnaireResponse(
     await recordFirstBowelMovement(
       followUp.surgeryId,
       followUp.dayNumber,
-      answers.painDuringBowelMovement || 0
+      answers.painDuringBowelMovement || 0,
+      new Date(),
+      answers.bowelMovementTime || undefined
     );
     console.log('✅ First bowel movement recorded:', {
       dayNumber: followUp.dayNumber,

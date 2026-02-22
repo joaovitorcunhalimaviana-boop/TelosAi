@@ -5,6 +5,26 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+// Helper statistics functions
+function mean(arr: number[]): number {
+  if (arr.length === 0) return 0;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function standardDeviation(arr: number[]): number {
+  if (arr.length < 2) return 0;
+  const m = mean(arr);
+  const squaredDiffs = arr.map(x => Math.pow(x - m, 2));
+  return Math.sqrt(squaredDiffs.reduce((a, b) => a + b, 0) / (arr.length - 1));
+}
+
+function median(arr: number[]): number {
+  if (arr.length === 0) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -13,29 +33,28 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const dateRange = searchParams.get("dateRange") || "30"; // dias
+    const dateRange = searchParams.get("dateRange") || "30";
     const surgeryType = searchParams.get("surgeryType") || "all";
+    const includeAggregated = searchParams.get("aggregated") === "true";
 
-    // Calcular data de início baseada no range
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(dateRange));
 
-    // Filtro base
+    // Base filter - ALWAYS exclude test patients
     const baseFilter: any = {
       userId: user.id,
-      date: {
-        gte: startDate,
-      },
+      date: { gte: startDate },
+      patient: { isTest: false },
     };
 
     if (surgeryType !== "all") {
       baseFilter.type = surgeryType;
     }
 
-    // 1. EVOLUÇÃO DA DOR MÉDIA (D+1 a D+14)
+    // 1. EVOLUÇÃO DA DOR MÉDIA
     const painEvolution = await getPainEvolution(user.id, baseFilter);
 
-    // 2. TAXA DE COMPLICAÇÕES POR TIPO DE CIRURGIA
+    // 2. TAXA DE COMPLICAÇÕES
     const complicationsRate = await getComplicationsRate(user.id, startDate, surgeryType);
 
     // 3. FOLLOW-UPS POR STATUS
@@ -44,6 +63,12 @@ export async function GET(req: NextRequest) {
     // 4. RED FLAGS POR CATEGORIA
     const redFlagsByCategory = await getRedFlagsByCategory(user.id, startDate, surgeryType);
 
+    // 5. DADOS AGREGADOS (para publicação científica)
+    let aggregatedData = null;
+    if (includeAggregated) {
+      aggregatedData = await getAggregatedData(user.id);
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -51,6 +76,7 @@ export async function GET(req: NextRequest) {
         complicationsRate,
         followUpsByStatus,
         redFlagsByCategory,
+        ...(aggregatedData && { aggregatedData }),
       },
     });
   } catch (error) {
@@ -62,20 +88,17 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Função auxiliar: Evolução da dor média
+// Pain evolution - FIXED: uses `pain` field, filters test patients
 async function getPainEvolution(userId: string, baseFilter: any) {
   const surgeries = await prisma.surgery.findMany({
     where: baseFilter,
     include: {
       followUps: {
-        include: {
-          responses: true,
-        },
+        include: { responses: true },
       },
     },
   });
 
-  // Agrupar por dia e tipo de cirurgia
   const painByDayAndType: Record<string, Record<number, number[]>> = {};
 
   surgeries.forEach((surgery) => {
@@ -88,13 +111,15 @@ async function getPainEvolution(userId: string, baseFilter: any) {
       followUp.responses.forEach((response) => {
         try {
           const data = JSON.parse(response.questionnaireData);
-          const painLevel = data.painLevel || data.dor || 0;
+          // FIX: use correct field name `pain` (not painLevel/dor)
+          const painLevel = data.pain;
+          if (painLevel === undefined || painLevel === null) return;
           const day = followUp.dayNumber;
 
           if (!painByDayAndType[surgeryType][day]) {
             painByDayAndType[surgeryType][day] = [];
           }
-          painByDayAndType[surgeryType][day].push(painLevel);
+          painByDayAndType[surgeryType][day].push(Number(painLevel));
         } catch (e) {
           console.error("Erro ao parsear questionnaireData:", e);
         }
@@ -102,13 +127,11 @@ async function getPainEvolution(userId: string, baseFilter: any) {
     });
   });
 
-  // Calcular médias
   const result: any[] = [];
   const days = [1, 2, 3, 5, 7, 10, 14];
 
   days.forEach((day) => {
     const dayData: any = { day: `D+${day}` };
-
     Object.keys(painByDayAndType).forEach((surgeryType) => {
       const painValues = painByDayAndType[surgeryType][day] || [];
       if (painValues.length > 0) {
@@ -118,18 +141,18 @@ async function getPainEvolution(userId: string, baseFilter: any) {
         dayData[surgeryType] = null;
       }
     });
-
     result.push(dayData);
   });
 
   return result;
 }
 
-// Função auxiliar: Taxa de complicações
+// Complications rate - filter test patients
 async function getComplicationsRate(userId: string, startDate: Date, surgeryType: string) {
   const filter: any = {
     userId,
     date: { gte: startDate },
+    patient: { isTest: false },
   };
 
   if (surgeryType !== "all") {
@@ -138,9 +161,7 @@ async function getComplicationsRate(userId: string, startDate: Date, surgeryType
 
   const surgeries = await prisma.surgery.findMany({
     where: filter,
-    include: {
-      details: true,
-    },
+    include: { details: true },
   });
 
   let withComplications = 0;
@@ -188,15 +209,19 @@ async function getComplicationsRate(userId: string, startDate: Date, surgeryType
   };
 }
 
-// Função auxiliar: Follow-ups por status
+// Follow-ups by status - filter test patients
 async function getFollowUpsByStatus(userId: string, startDate: Date, surgeryType: string) {
   const filter: any = {
     userId,
     scheduledDate: { gte: startDate },
+    surgery: {
+      patient: { isTest: false },
+    },
   };
 
   if (surgeryType !== "all") {
     filter.surgery = {
+      ...filter.surgery,
       type: surgeryType,
     };
   }
@@ -229,20 +254,23 @@ async function getFollowUpsByStatus(userId: string, startDate: Date, surgeryType
   }));
 }
 
-// Função auxiliar: Red flags por categoria
+// Red flags by category - filter test patients
 async function getRedFlagsByCategory(userId: string, startDate: Date, surgeryType: string) {
   const filter: any = {
     userId,
     createdAt: { gte: startDate },
+    followUp: {
+      surgery: {
+        patient: { isTest: false },
+      },
+    },
   };
 
   const responses = await prisma.followUpResponse.findMany({
     where: filter,
     include: {
       followUp: {
-        include: {
-          surgery: true,
-        },
+        include: { surgery: true },
       },
     },
   });
@@ -256,7 +284,6 @@ async function getRedFlagsByCategory(userId: string, startDate: Date, surgeryTyp
   };
 
   responses.forEach((response) => {
-    // Filtrar por tipo de cirurgia se especificado
     if (surgeryType !== "all" && response.followUp.surgery.type !== surgeryType) {
       return;
     }
@@ -288,4 +315,267 @@ async function getRedFlagsByCategory(userId: string, startDate: Date, surgeryTyp
     category,
     count,
   }));
+}
+
+// ============================================
+// AGGREGATED DATA FOR SCIENTIFIC PUBLICATION
+// ============================================
+async function getAggregatedData(userId: string) {
+  // Get ALL surgeries (no date filter) excluding test patients
+  const surgeries = await prisma.surgery.findMany({
+    where: {
+      userId,
+      patient: { isTest: false },
+    },
+    include: {
+      patient: true,
+      followUps: {
+        include: {
+          responses: true,
+        },
+      },
+    },
+  });
+
+  const totalPatients = new Set(surgeries.map(s => s.patientId)).size;
+  const totalSurgeries = surgeries.length;
+
+  // Count by surgery type
+  const bySurgeryType: Record<string, number> = {};
+  surgeries.forEach(s => {
+    bySurgeryType[s.type] = (bySurgeryType[s.type] || 0) + 1;
+  });
+
+  // Response rate
+  const totalFollowUps = surgeries.reduce((sum, s) => sum + s.followUps.length, 0);
+  const respondedFollowUps = surgeries.reduce((sum, s) =>
+    sum + s.followUps.filter(f => f.status === 'responded').length, 0);
+  const responseRate = totalFollowUps > 0 ? ((respondedFollowUps / totalFollowUps) * 100) : 0;
+
+  // Pain at rest by day and surgery type
+  const painAtRest = getPainByDayAndType(surgeries, 'pain');
+
+  // Pain during bowel movement by day and surgery type
+  const painDuringBowel = getPainByDayAndType(surgeries, 'painDuringBowelMovement');
+
+  // First bowel movement stats by surgery type
+  const firstBowelMovement = getFirstBowelMovementStats(surgeries);
+
+  // Extra medication usage by day and surgery type
+  const extraMedication = getExtraMedicationStats(surgeries);
+
+  // Satisfaction stats by surgery type
+  const satisfaction = getSatisfactionStats(surgeries);
+
+  // Complications by day and surgery type
+  const complications = getComplicationStats(surgeries);
+
+  return {
+    overview: {
+      totalPatients,
+      totalSurgeries,
+      responseRate: parseFloat(responseRate.toFixed(1)),
+      bySurgeryType: Object.entries(bySurgeryType).map(([type, count]) => ({
+        surgeryType: type,
+        count,
+      })),
+    },
+    painAtRest,
+    painDuringBowel,
+    firstBowelMovement,
+    extraMedication,
+    satisfaction,
+    complications,
+  };
+}
+
+function getPainByDayAndType(surgeries: any[], painField: string) {
+  const data: Record<string, Record<number, number[]>> = {};
+
+  surgeries.forEach(surgery => {
+    const type = surgery.type;
+    if (!data[type]) data[type] = {};
+
+    surgery.followUps.forEach((followUp: any) => {
+      followUp.responses.forEach((response: any) => {
+        try {
+          const qData = JSON.parse(response.questionnaireData);
+          const extracted = qData.extractedData || qData;
+          const val = extracted[painField];
+          if (val !== undefined && val !== null && typeof Number(val) === 'number' && !isNaN(Number(val))) {
+            const day = followUp.dayNumber;
+            if (!data[type][day]) data[type][day] = [];
+            data[type][day].push(Number(val));
+          }
+        } catch { /* skip */ }
+      });
+    });
+  });
+
+  const result: any[] = [];
+  const allTypes = Object.keys(data);
+  const allDays = new Set<number>();
+  allTypes.forEach(type => Object.keys(data[type]).forEach(d => allDays.add(Number(d))));
+  const sortedDays = [...allDays].sort((a, b) => a - b);
+
+  sortedDays.forEach(day => {
+    allTypes.forEach(type => {
+      const values = data[type][day] || [];
+      if (values.length > 0) {
+        result.push({
+          day,
+          surgeryType: type,
+          n: values.length,
+          mean: parseFloat(mean(values).toFixed(1)),
+          sd: parseFloat(standardDeviation(values).toFixed(1)),
+          median: parseFloat(median(values).toFixed(1)),
+          min: Math.min(...values),
+          max: Math.max(...values),
+        });
+      }
+    });
+  });
+
+  return result;
+}
+
+function getFirstBowelMovementStats(surgeries: any[]) {
+  const byType: Record<string, number[]> = {};
+
+  surgeries.forEach(surgery => {
+    if (surgery.hadFirstBowelMovement && surgery.firstBowelMovementDay) {
+      const type = surgery.type;
+      if (!byType[type]) byType[type] = [];
+      byType[type].push(surgery.firstBowelMovementDay);
+    }
+  });
+
+  return Object.entries(byType).map(([type, days]) => ({
+    surgeryType: type,
+    n: days.length,
+    meanDay: parseFloat(mean(days).toFixed(1)),
+    sd: parseFloat(standardDeviation(days).toFixed(1)),
+    medianDay: parseFloat(median(days).toFixed(1)),
+    min: Math.min(...days),
+    max: Math.max(...days),
+  }));
+}
+
+function getExtraMedicationStats(surgeries: any[]) {
+  const data: Record<string, Record<number, { used: number; total: number }>> = {};
+
+  surgeries.forEach(surgery => {
+    const type = surgery.type;
+    if (!data[type]) data[type] = {};
+
+    surgery.followUps.forEach((followUp: any) => {
+      followUp.responses.forEach((response: any) => {
+        try {
+          const qData = JSON.parse(response.questionnaireData);
+          const extracted = qData.extractedData || qData;
+          const day = followUp.dayNumber;
+          if (!data[type][day]) data[type][day] = { used: 0, total: 0 };
+          data[type][day].total++;
+          if (extracted.usedExtraMedication === true) {
+            data[type][day].used++;
+          }
+        } catch { /* skip */ }
+      });
+    });
+  });
+
+  const result: any[] = [];
+  Object.entries(data).forEach(([type, days]) => {
+    Object.entries(days).forEach(([day, counts]) => {
+      result.push({
+        day: Number(day),
+        surgeryType: type,
+        percentUsed: parseFloat(((counts.used / counts.total) * 100).toFixed(1)),
+        used: counts.used,
+        n: counts.total,
+      });
+    });
+  });
+
+  return result.sort((a, b) => a.day - b.day || a.surgeryType.localeCompare(b.surgeryType));
+}
+
+function getSatisfactionStats(surgeries: any[]) {
+  const byType: Record<string, { ratings: number[]; wouldRecommend: number; total: number }> = {};
+
+  surgeries.forEach(surgery => {
+    const type = surgery.type;
+
+    surgery.followUps.forEach((followUp: any) => {
+      if (followUp.dayNumber < 14) return; // Satisfaction only on D+14
+
+      followUp.responses.forEach((response: any) => {
+        try {
+          const qData = JSON.parse(response.questionnaireData);
+          const extracted = qData.extractedData || qData;
+
+          if (extracted.satisfactionRating !== undefined && extracted.satisfactionRating !== null) {
+            if (!byType[type]) byType[type] = { ratings: [], wouldRecommend: 0, total: 0 };
+            byType[type].ratings.push(Number(extracted.satisfactionRating));
+            byType[type].total++;
+            if (extracted.wouldRecommend === true) {
+              byType[type].wouldRecommend++;
+            }
+          }
+        } catch { /* skip */ }
+      });
+    });
+  });
+
+  return Object.entries(byType).map(([type, data]) => ({
+    surgeryType: type,
+    n: data.total,
+    meanRating: parseFloat(mean(data.ratings).toFixed(1)),
+    sd: parseFloat(standardDeviation(data.ratings).toFixed(1)),
+    medianRating: parseFloat(median(data.ratings).toFixed(1)),
+    wouldRecommendPercent: data.total > 0 ? parseFloat(((data.wouldRecommend / data.total) * 100).toFixed(1)) : 0,
+  }));
+}
+
+function getComplicationStats(surgeries: any[]) {
+  const data: Record<string, Record<number, { fever: number; bleeding: number; retention: number; total: number }>> = {};
+
+  surgeries.forEach(surgery => {
+    const type = surgery.type;
+    if (!data[type]) data[type] = {};
+
+    surgery.followUps.forEach((followUp: any) => {
+      followUp.responses.forEach((response: any) => {
+        try {
+          const qData = JSON.parse(response.questionnaireData);
+          const extracted = qData.extractedData || qData;
+          const day = followUp.dayNumber;
+          if (!data[type][day]) data[type][day] = { fever: 0, bleeding: 0, retention: 0, total: 0 };
+          data[type][day].total++;
+
+          if (extracted.fever === true) data[type][day].fever++;
+          if (extracted.bleeding && extracted.bleeding !== 'none') data[type][day].bleeding++;
+          if (extracted.urination === false) data[type][day].retention++;
+        } catch { /* skip */ }
+      });
+    });
+  });
+
+  const result: any[] = [];
+  Object.entries(data).forEach(([type, days]) => {
+    Object.entries(days).forEach(([day, counts]) => {
+      if (counts.total > 0) {
+        result.push({
+          day: Number(day),
+          surgeryType: type,
+          n: counts.total,
+          feverRate: parseFloat(((counts.fever / counts.total) * 100).toFixed(1)),
+          bleedingRate: parseFloat(((counts.bleeding / counts.total) * 100).toFixed(1)),
+          retentionRate: parseFloat(((counts.retention / counts.total) * 100).toFixed(1)),
+        });
+      }
+    });
+  });
+
+  return result.sort((a, b) => a.day - b.day || a.surgeryType.localeCompare(b.surgeryType));
 }

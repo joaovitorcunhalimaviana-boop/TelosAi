@@ -28,6 +28,7 @@ export interface QuestionnaireData {
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
   lastBowelMovement?: string; // Quando foi a última evacuação
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
+  bowelMovementTime?: string; // Horário aproximado da primeira evacuação
 
   // Sangramento
   bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
@@ -291,6 +292,8 @@ se o médico já orientou diferente.
       EVACUAÇÃO:
       - Perguntar: "Evacuou desde a última vez que conversamos?" (NUNCA "evacuou hoje")
       - Se SIM: perguntar dor durante evacuação (0-10). NÃO perguntar Bristol.
+      - Se SIM e é primeira evacuação pós-cirurgia: perguntar também "Mais ou menos que horas foi?"
+      - Registrar horário em bowelMovementTime (ex: "de manhã", "14h", "à noite")
       - Se NÃO: perguntar quando foi a última vez
 
       SANGRAMENTO:
@@ -440,6 +443,12 @@ SINTOMAS ADICIONAIS (TODOS OS DIAS - PERGUNTA FINAL):
 - "Senti uma fisgada" → "additionalSymptoms": "Fisgada"
 - "Tive dor de cabeça" → "additionalSymptoms": "Dor de cabeça"
 
+HORÁRIO DA EVACUAÇÃO (quando é primeira evacuação):
+- "De manhã cedo" → "bowelMovementTime": "de manhã cedo"
+- "Umas 14h" → "bowelMovementTime": "14h"
+- "À noite, umas 22h" → "bowelMovementTime": "22h"
+- "Logo depois do almoço" → "bowelMovementTime": "depois do almoço"
+
 DOR - CAMPOS E DESAMBIGUAÇÃO:
 ⚠️ Dois campos DISTINTOS — coletar AMBOS separadamente:
 - "pain" = DOR EM REPOUSO → "Minha dor agora é 2" → "pain": 2
@@ -455,6 +464,7 @@ JSON STRUCTURE:
     "pain": 2,  // DOR EM REPOUSO - número de 0 a 10 (pergunta: "como está sua dor agora, em repouso?")
     "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
     "bowelMovementSinceLastContact": true,  // true/false
+    "bowelMovementTime": "14h",  // Horário aproximado da evacuação (se primeira vez)
     "medications": true,
     "painControlledWithMeds": false,
     "usedExtraMedication": false,  // OBRIGATÓRIO - usou medicação além das prescritas?
@@ -727,6 +737,10 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     // Se evacuou, perguntar a dor durante a evacuação
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
       missing.push('Dor durante a evacuação (0-10 na escala visual analógica)');
+    }
+    // Perguntar horário da primeira evacuação
+    if (!data.bowelMovementTime) {
+      missing.push('Horário aproximado da evacuação (ex: "de manhã", "às 14h", "à noite")');
     }
   }
 

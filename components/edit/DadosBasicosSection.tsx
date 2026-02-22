@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ResearchRequiredIndicator } from '@/components/ResearchRequiredBadge';
 
 interface DadosBasicosSectionProps {
@@ -24,7 +25,8 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
     phone: patient?.phone || '',
     email: patient?.email || '',
     hospital: patient?.hospital || '',
-    surgeryDuration: patient?.surgeryDuration || ''
+    surgeryDuration: patient?.surgeryDuration || '',
+    isTest: patient?.isTest || false
   });
 
   const [age, setAge] = useState<number | null>(null);
@@ -255,6 +257,25 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             min="0"
             className="mt-1"
           />
+        </div>
+
+        {/* Paciente de Teste */}
+        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <Checkbox
+            id="isTest"
+            checked={formData.isTest}
+            onCheckedChange={(checked) =>
+              setFormData(prev => ({ ...prev, isTest: checked === true }))
+            }
+          />
+          <div>
+            <Label htmlFor="isTest" className="text-sm font-medium text-amber-800 cursor-pointer">
+              Paciente de teste
+            </Label>
+            <p className="text-xs text-amber-600 mt-0.5">
+              Pacientes de teste são excluídos dos dados agregados e estatísticas para publicação.
+            </p>
+          </div>
         </div>
       </div>
     </Card>
