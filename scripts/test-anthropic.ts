@@ -12,7 +12,7 @@ async function testGeminiConnection() {
     console.log('🔑 API Key presente:', !!process.env.GOOGLE_GENERATIVE_AI_API_KEY);
 
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent('Responda apenas com a palavra "OK" se você estiver funcionando.');
         const response = result.response.text();
 

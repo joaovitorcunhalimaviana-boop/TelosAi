@@ -152,7 +152,7 @@ async function validateGeminiClient() {
   // Teste de conexão (se API key estiver configurada)
   if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
       const result = await model.generateContent('Responda apenas com "OK"');
       const responseText = result.response.text();
       logTest(
