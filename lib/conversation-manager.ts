@@ -342,7 +342,7 @@ export async function processQuestionnaireAnswer(
   // Obter histórico de conversação
   const messageHistory = (conversation.messageHistory as any[]) || [];
   const conversationMessages = messageHistory
-    .slice(-10) // Últimas 10 mensagens para contexto
+    .slice(-20) // Últimas 20 mensagens para contexto (10 turnos de conversa)
     .map(msg => ({
       role: msg.role === 'system' ? 'assistant' : msg.role,
       content: msg.content,

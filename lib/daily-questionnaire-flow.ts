@@ -35,6 +35,7 @@ export interface QuestionDefinition {
     | 'urination'
     | 'fever'
     | 'discharge'
+    | 'medications'
     | 'analgesia'
     | 'general';
   required: boolean;
@@ -65,6 +66,15 @@ export async function getDailyQuestions(
         'SEMPRE enviar imagem da escala visual analógica ANTES desta pergunta. NUNCA aceitar respostas vagas.'
     }
   ];
+
+  // Pergunta sobre medicação extra (após dor, antes de evacuação)
+  baseQuestions.push({
+    id: 'used_extra_medication',
+    category: 'medications',
+    required: true,
+    text: 'Além das medicações prescritas pelo médico, você tomou alguma outra medicação por conta própria? (Tramadol, Codeína, laxante, etc.)',
+    followUpLogic: `Se sim: perguntar qual medicação, dose e horário`
+  });
 
   // Perguntas sobre evacuação (variam se já evacuou ou não)
   const bowelQuestions = getBowelMovementQuestions(

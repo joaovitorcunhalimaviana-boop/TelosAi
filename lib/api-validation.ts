@@ -354,9 +354,15 @@ export const postOpDataSchema = z.object({
 
   // ANALGÉSICOS
   takingPrescribedMeds: z.boolean().optional().nullable(),
+  medications: z.boolean().optional().nullable(), // Alias for takingPrescribedMeds
   prescribedMedsDetails: z.string().optional().nullable(),
   takingExtraMeds: z.boolean().optional().nullable(),
+  usedExtraMedication: z.boolean().optional().nullable(), // Alias for takingExtraMeds
   extraMedsDetails: z.string().optional().nullable(),
+  extraMedicationDetails: z.string().optional().nullable(), // Alias for extraMedsDetails
+
+  // CUIDADOS LOCAIS
+  localCareAdherence: z.boolean().optional().nullable(),
 
   // SECREÇÃO PURULENTA (apenas D+3 em diante)
   hasPurulentDischarge: z.boolean().optional().nullable(),

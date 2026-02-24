@@ -478,10 +478,13 @@ JSON STRUCTURE:
     "painDuringBowelMovement": 5,  // DOR DURANTE EVACUAÇÃO - número de 0 a 10 (pergunta: "qual foi a dor ao evacuar?")
     "bowelMovementSinceLastContact": true,  // true/false
     "bowelMovementTime": "14h",  // Horário aproximado da evacuação (se primeira vez)
-    "medications": true,
+    "bleeding": "none",  // OBRIGATÓRIO - nenhum, leve, moderado, intenso
+    "medications": true,  // OBRIGATÓRIO - tomando medicações prescritas?
     "painControlledWithMeds": false,
     "usedExtraMedication": false,  // OBRIGATÓRIO - usou medicação além das prescritas?
     "extraMedicationDetails": "Tramadol 50mg às 14h",  // Se usou: qual, dose, horário
+    "localCareAdherence": true,  // OBRIGATÓRIO - cuidados locais (pomada, banho de assento)
+    "additionalSymptoms": null,  // OBRIGATÓRIO - null se nada a relatar
     "fever": false,
     // Campos de satisfação (APENAS D+14):
     "satisfactionRating": 9,  // 0-10, nota de satisfação com acompanhamento
