@@ -791,7 +791,14 @@ async function processQuestionnaireAnswer(
     const mergedData = aiResult.updatedData;
 
     // VALIDAÇÃO SERVER-SIDE: Nunca confiar cegamente no isComplete do Claude
-    const updatedMissingFields = requiredFields.filter(f => mergedData[f] === undefined || mergedData[f] === null);
+    // Campos que aceitam null como valor válido (ex: "nada mais a relatar" = null)
+    const nullableFields = ['additionalSymptoms', 'concerns'];
+    const updatedMissingFields = requiredFields.filter(f => {
+      if (nullableFields.includes(f)) {
+        return mergedData[f] === undefined; // null é válido para estes campos
+      }
+      return mergedData[f] === undefined || mergedData[f] === null;
+    });
     const isActuallyComplete = aiResult.isComplete && updatedMissingFields.length === 0;
 
     if (aiResult.isComplete && updatedMissingFields.length > 0) {

@@ -191,14 +191,14 @@ export async function getDailyQuestions(
     }
   );
 
-  // Pergunta final sobre preocupações (sempre opcional)
+  // Pergunta final sobre sintomas adicionais (sempre a última)
   const finalQuestions: QuestionDefinition[] = [
     {
-      id: 'concerns',
+      id: 'additional_symptoms',
       category: 'general',
-      required: false,
-      text: 'Tem alguma dúvida ou preocupação que gostaria de compartilhar comigo?',
-      contextNote: 'Campo livre para o paciente expressar qualquer preocupação'
+      required: true,
+      text: 'Deseja relatar mais alguma coisa? Pode ser qualquer sintoma, dúvida ou preocupação.',
+      followUpLogic: `Se sim: registrar o que o paciente relatar. Se não: registrar null.`
     }
   ];
 

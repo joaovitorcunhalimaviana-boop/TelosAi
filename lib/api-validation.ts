@@ -370,6 +370,7 @@ export const postOpDataSchema = z.object({
 
   // OUTROS
   otherSymptoms: z.string().optional().nullable(),
+  additionalSymptoms: z.string().nullable().optional(),
 
   // PESQUISA DE SATISFAÇÃO (apenas D+14)
   painControlSatisfaction: z.number().min(0).max(10).optional().nullable(),

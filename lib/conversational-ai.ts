@@ -398,7 +398,7 @@ se o médico já orientou diferente.
    ✅ medications (tomando medicações prescritas) — PERGUNTOU?
    ✅ localCareAdherence (cuidados locais: pomada, banho de assento) — PERGUNTOU?
    ${daysPostOp >= 3 ? '✅ discharge (secreção na ferida) — PERGUNTOU?' : ''}
-   ✅ additionalSymptoms (algo mais a relatar) — PERGUNTOU?
+   ✅ additionalSymptoms (pergunta final acolhedora: "tem mais alguma coisa que gostaria de me contar?") — PERGUNTOU?
 
    Se QUALQUER item acima não foi coletado, NÃO marque isComplete: true.
 
@@ -448,7 +448,10 @@ SATISFAÇÃO (D+14 APENAS):
 - "Nenhuma sugestão, foi ótimo" → "improvementSuggestions": "Nenhuma sugestão"
 - "Gostei muito do atendimento" → "positiveFeedback": "Gostei muito do atendimento"
 
-SINTOMAS ADICIONAIS (TODOS OS DIAS - PERGUNTA FINAL):
+SINTOMAS ADICIONAIS (TODOS OS DIAS - PERGUNTA FINAL OBRIGATÓRIA):
+⚠️ Esta é uma pergunta CRUCIAL e deve ser feita de forma calorosa e acolhedora.
+Pergunte algo como: "Antes de encerrarmos, tem mais alguma coisa que você gostaria de me contar? Qualquer sintoma, dúvida ou preocupação — pode falar livremente! 😊"
+O objetivo é abrir espaço para o paciente relatar QUALQUER coisa que não foi coberta pelas perguntas anteriores.
 - "Não, só isso" → "additionalSymptoms": null
 - "Nada mais" → "additionalSymptoms": null
 - "Era só isso mesmo" → "additionalSymptoms": null
