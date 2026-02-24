@@ -563,6 +563,19 @@ Por favor, me diga um número de 0 a 10, onde:
 
   } catch (error) {
     logger.error('Error processing text message:', error);
+    // GARANTIR resposta ao paciente mesmo em erro catastrófico
+    try {
+      const phone = message?.from;
+      if (phone) {
+        await sendEmpatheticResponse(
+          phone,
+          'Oi! Aqui é a Lia. Tive um probleminha técnico, mas já estou de volta. ' +
+          'Pode repetir o que disse? 😊'
+        );
+      }
+    } catch (sendError) {
+      logger.error('❌ ERRO CRÍTICO: Falha total ao responder paciente:', sendError);
+    }
   }
 }
 
@@ -846,7 +859,22 @@ async function processQuestionnaireAnswer(
 
   } catch (error) {
     logger.error('❌ Erro ao processar resposta com Claude:', error);
-    await sendEmpatheticResponse(phone, 'Tive um erro ao processar. Pode responder novamente?');
+    // GARANTIR que o paciente SEMPRE receba uma resposta, mesmo em caso de erro
+    try {
+      await sendEmpatheticResponse(
+        phone,
+        `Desculpe, ${patient.name.split(' ')[0]}, tive um probleminha técnico. 😅\n\n` +
+        `Pode repetir sua última resposta? Estou pronta para continuar!`
+      );
+    } catch (sendError) {
+      logger.error('❌ ERRO CRÍTICO: Falha ao enviar mensagem de erro para paciente:', sendError);
+      // Última tentativa com mensagem mínima
+      try {
+        await sendEmpatheticResponse(phone, 'Desculpe, tive um erro. Pode repetir sua resposta?');
+      } catch {
+        logger.error('❌ ERRO FATAL: Impossível enviar qualquer mensagem para', phone);
+      }
+    }
   }
 }
 

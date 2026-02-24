@@ -346,11 +346,23 @@ se o médico já orientou diferente.
       ${daysPostOp === 2 ? '⚠️ D+2: Aumento de dor é NORMAL (bloqueio terminando). Tranquilizar.' : daysPostOp >= 3 ? '⚠️ D+3+: Espera-se melhora progressiva.' : ''}
 
    e) FLUXO DA CONVERSA:
-      - Faça UMA pergunta por vez
+      ⚠️ REGRA CRÍTICA: Faça APENAS UMA ÚNICA PERGUNTA por mensagem. NUNCA duas ou mais.
+      ❌ PROIBIDO: "Como está a dor? E teve sangramento?" (duas perguntas!)
+      ✅ CORRETO: "Entendi! Agora me conta: teve algum sangramento?" (uma pergunta só)
       - Espere a resposta completa antes de ir para próxima
-      - Se resposta incompleta/vaga: gentilmente peça esclarecimento
-      - Quando conseguir informação: confirme e siga para próxima
+      - Quando conseguir informação: confirme brevemente e faça A PRÓXIMA pergunta (só uma!)
       - NÃO finalize até ter TODOS os dados necessários
+
+      ⚠️ VALIDAÇÃO DE RESPOSTAS (MUITO IMPORTANTE):
+      - Se a resposta do paciente NÃO faz sentido para a pergunta, NÃO passe para a próxima.
+      - REPITA a mesma pergunta de forma gentil.
+      - NÃO extraia dados de respostas sem sentido. Só extraia dados quando a resposta for relevante.
+      - Exemplo: Se perguntou "teve sangramento?" e paciente respondeu algo aleatório ou sem relação:
+        ❌ ERRADO: Ignorar e passar para próxima pergunta
+        ✅ CORRETO: "Desculpe, não entendi bem. Você teve algum sangramento? (nenhum, leve, moderado ou intenso)"
+      - Se o paciente responder algo vago como "ok", "tá", "normal" para uma pergunta que exige resposta específica:
+        → Pedir esclarecimento: "Entendi, mas preciso de uma resposta mais específica para registrar. [repetir a pergunta]"
+      - NUNCA invente ou assuma uma resposta. Se não ficou claro, pergunte de novo.
 
    f) EMPATIA E NATURALIDADE:
       - Seja calorosa, acolhedora
@@ -528,13 +540,35 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.log('🧠 Messages array length:', messages.length);
     console.log('🧠 Calling Anthropic API...');
 
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      temperature: 0.1, // Reduzido para garantir formato JSON estrito
-      system: systemPrompt,
-      messages: messages,
-    });
+    // Retry com timeout para garantir que a API sempre responda
+    let response;
+    let retries = 0;
+    const maxRetries = 2;
+    while (retries <= maxRetries) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+        response = await anthropic.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1024,
+          temperature: 0.1,
+          system: systemPrompt,
+          messages: messages,
+        });
+        clearTimeout(timeoutId);
+        break; // Sucesso, sair do loop
+      } catch (retryError: any) {
+        retries++;
+        console.error(`🧠 Anthropic API attempt ${retries} failed:`, retryError?.message);
+        if (retries > maxRetries) throw retryError;
+        // Esperar antes de tentar novamente (backoff exponencial)
+        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+      }
+    }
+
+    if (!response) {
+      throw new Error('Anthropic API falhou após todas as tentativas');
+    }
 
     console.log('🧠 Anthropic API response received!');
     console.log('🧠 Response content length:', response.content.length);
