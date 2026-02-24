@@ -380,7 +380,7 @@ export async function processQuestionnaireAnswer(
         await sendImage(
           phoneNumber,
           `${baseUrl}/escala-dor.png`,
-          'Escala Visual Analógica de Dor (0-10)'
+          'Escala Numérica de Dor (0-10)'
         );
         console.log('✅ Pain scale image sent');
       }

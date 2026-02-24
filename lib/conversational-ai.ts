@@ -206,7 +206,8 @@ export async function conductConversation(
   const dailyQuestions = await getDailyQuestions(surgery.id, daysPostOp + 1);
 
   // Definir o que ainda precisa ser coletado
-  const missingInfo = getMissingInformation(currentData, daysPostOp);
+  const hadFirstBowelMovement = surgery.hadFirstBowelMovement || false;
+  const missingInfo = getMissingInformation(currentData, daysPostOp, hadFirstBowelMovement);
 
   // Buscar protocolos: primeiro tenta banco de dados, fallback para hardcoded
   const medicalProtocol = await getProtocolsForAI(
@@ -223,7 +224,8 @@ export async function conductConversation(
   const doctorNotes = (surgery as any).doctorNotes || '';
 
   // Construir prompt para Claude
-  const systemPrompt = `Você é uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
+  const systemPrompt = `Você é a Lia, uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
+Seu nome é Lia (L.IA). Se o paciente perguntar quem é você ou seu nome, diga: "Meu nome é Lia! Sou a assistente virtual de acompanhamento pós-operatório."
 
 ${dailyQuestions.contextForAI}
 
@@ -292,8 +294,7 @@ se o médico já orientou diferente.
       EVACUAÇÃO:
       - Perguntar: "Evacuou desde a última vez que conversamos?" (NUNCA "evacuou hoje")
       - Se SIM: perguntar dor durante evacuação (0-10). NÃO perguntar Bristol.
-      - Se SIM e é primeira evacuação pós-cirurgia: perguntar também "Mais ou menos que horas foi?"
-      - Registrar horário em bowelMovementTime (ex: "de manhã", "14h", "à noite")
+      - Se SIM e é primeira evacuação pós-cirurgia (hadFirstBowelMovement=${hadFirstBowelMovement ? 'true - JÁ teve primeira evacuação, NÃO perguntar horário' : 'false - AINDA NÃO teve primeira evacuação'}): ${hadFirstBowelMovement ? 'NÃO precisa perguntar horário' : 'perguntar também "Mais ou menos que horas foi?" e registrar em bowelMovementTime'}
       - Se NÃO: perguntar quando foi a última vez
 
       SANGRAMENTO:
@@ -584,7 +585,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     let isComplete = result.isComplete || false;
     let aiResponse = result.response;
     if (isComplete) {
-      const stillMissing = getMissingInformation(updatedData, daysPostOp);
+      const stillMissing = getMissingInformation(updatedData, daysPostOp, hadFirstBowelMovement);
       if (stillMissing.length > 0) {
         console.log('⚠️ IA marcou isComplete=true mas ainda faltam dados:', stillMissing);
         isComplete = false;
@@ -709,7 +710,7 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 /**
  * Determina quais informações ainda faltam coletar
  */
-function getMissingInformation(data: QuestionnaireData, daysPostOp: number): string[] {
+function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadFirstBowelMovement: boolean = false): string[] {
   const missing: string[] = [];
 
   // 1. DOR (sempre obrigatório)
@@ -738,9 +739,9 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number): str
     if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
       missing.push('Dor durante a evacuação (0-10 na escala numérica)');
     }
-    // Perguntar horário da primeira evacuação
-    if (!data.bowelMovementTime) {
-      missing.push('Horário aproximado da evacuação (ex: "de manhã", "às 14h", "à noite")');
+    // Perguntar horário APENAS da PRIMEIRA evacuação pós-cirurgia
+    if (!data.bowelMovementTime && !hadFirstBowelMovement) {
+      missing.push('Horário aproximado da evacuação (ex: "de manhã", "às 14h", "à noite") — é a primeira evacuação pós-cirurgia');
     }
   }
 

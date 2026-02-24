@@ -418,8 +418,8 @@ async function processTextMessage(message: any) {
       followUpStatus: pendingFollowUp.status
     });
 
-    // Estado 1: Resposta "sim" ao template inicial - INICIAR COM IA
-    // Broaden check to include 'sim' anywhere or other positive confirmations
+    // Estado 1: Iniciar questionário - aceitar QUALQUER mensagem quando status é 'sent' ou 'pending'
+    // O paciente está respondendo ao template, mesmo que não tenha dito exatamente "sim"
     const isPositiveResponse = textLower.includes('sim') ||
       textLower === 's' ||
       textLower.includes('ok') ||
@@ -428,7 +428,9 @@ async function processTextMessage(message: any) {
       textLower.includes('iniciar') ||
       textLower.includes('começar');
 
-    if (isPositiveResponse && (pendingFollowUp.status === 'sent' || pendingFollowUp.status === 'pending')) {
+    // Aceitar QUALQUER mensagem quando follow-up está como 'sent' ou 'pending'
+    // O paciente pode enviar uma pergunta, relato ou qualquer texto - tudo inicia o questionário
+    if (pendingFollowUp.status === 'sent' || pendingFollowUp.status === 'pending') {
       logger.debug('✅ Iniciando questionário com IA conversacional...', {
         patientName: patient.name,
         followUpId: pendingFollowUp.id
@@ -444,9 +446,10 @@ async function processTextMessage(message: any) {
       const hadFirstBowelMovement = pendingFollowUp.surgery.hadFirstBowelMovement || false;
 
       // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
-      // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
       const initialMessage = `Olá ${firstName}! 👋
-      
+
+Aqui é a *Lia*, assistente virtual de acompanhamento pós-operatório.
+
 Vamos atualizar como você está hoje, no seu *${daysPostOp}º dia* pós-cirurgia.
 
 Para começar: *quanto está doendo agora, quando você está parado(a)?*
@@ -454,6 +457,10 @@ Para começar: *quanto está doendo agora, quando você está parado(a)?*
 Por favor, me diga um número de 0 a 10, onde:
 0️⃣ = **Zero dor** (totalmente sem dor)
 🔟 = **Pior dor da vida** (insuportável)`;
+
+      // Se o paciente enviou algo que NÃO é resposta positiva simples,
+      // vamos processar a mensagem dele com a IA DEPOIS de enviar a saudação
+      const shouldProcessFirstMessage = !isPositiveResponse;
 
       // 1. PRIMEIRO: Enviar mensagem de saudação + pergunta
       logger.debug('📝 Enviando saudação inicial...');
@@ -520,6 +527,20 @@ Por favor, me diga um número de 0 a 10, onde:
       // Invalidate dashboard cache (fora da transação)
       invalidateDashboardStats();
 
+      // Se o paciente enviou uma mensagem que NÃO é "sim" (ex: relatou um sintoma, fez pergunta),
+      // processar essa mensagem com a IA imediatamente ao invés de ignorar
+      if (shouldProcessFirstMessage) {
+        logger.debug('🔄 Processando primeira mensagem não-sim com IA:', text);
+        // Recarregar o follow-up com status atualizado (agora é in_progress)
+        const updatedFollowUp = await prisma.followUp.findUnique({
+          where: { id: pendingFollowUp.id },
+          include: { surgery: true }
+        });
+        if (updatedFollowUp) {
+          await processQuestionnaireAnswer(updatedFollowUp, patient, phone, text);
+        }
+      }
+
       logger.debug('✅ Questionário iniciado - aguardando resposta do paciente sobre dor');
 
       return;
@@ -531,14 +552,13 @@ Por favor, me diga um número de 0 a 10, onde:
       return;
     }
 
-    // Estado 3: Mensagem fora de contexto (NÃO deveria chegar aqui se in_progress)
-    console.log('⚠️ MENSAGEM FORA DE CONTEXTO - Enviando instrução para responder SIM');
-    console.log('Status do follow-up:', pendingFollowUp.status);
+    // Estado 3: Mensagem fora de contexto (status inesperado - responded ou outro)
+    console.log('⚠️ MENSAGEM FORA DE CONTEXTO - Status inesperado:', pendingFollowUp.status);
     await sendEmpatheticResponse(
       phone,
       `Olá ${patient.name.split(' ')[0]}! 👋\n\n` +
-      `Para iniciar o questionário pós-operatório, por favor responda com a palavra *"sim"*.\n\n` +
-      `_(Versão do sistema: 3.0 - ${new Date().toLocaleTimeString('pt-BR')})_`
+      `Aqui é a Lia. No momento não há questionário pendente para responder.\n\n` +
+      `Se tiver alguma dúvida ou preocupação, entre em contato com o consultório.`
     );
 
   } catch (error) {
