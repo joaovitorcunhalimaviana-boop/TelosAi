@@ -33,7 +33,7 @@ handleSuccess(newPatient) {
 
 ## Key Features
 
-- Beautiful Telos.AI branded design
+- Beautiful VigIA branded design
 - Automatic research fetching
 - Smooth animations
 - Toast notifications
@@ -242,4 +242,4 @@ components/
 
 ---
 
-**Ready to use!** The component is fully functional and styled to match your Telos.AI brand.
+**Ready to use!** The component is fully functional and styled to match your VigIA brand.

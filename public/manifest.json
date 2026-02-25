@@ -1,11 +1,11 @@
 {
-  "name": "Telos.AI - Sistema Pós-Operatório",
-  "short_name": "Telos.AI",
-  "description": "Acompanhamento pós-operatório inteligente com IA",
+  "name": "VigIA - Monitoramento Pós-Operatório Inteligente",
+  "short_name": "VigIA",
+  "description": "Vigilância contínua. Decisão sua. Monitoramento pós-operatório inteligente com IA.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e3a8a",
+  "background_color": "#0B0E14",
+  "theme_color": "#0B0E14",
   "orientation": "portrait",
   "icons": [
     {

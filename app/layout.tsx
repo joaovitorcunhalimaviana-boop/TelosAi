@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Syne, DM_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import "./mobile.css";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
@@ -9,24 +9,33 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/components/AuthProvider";
 import { TutorialProvider } from "@/components/tutorial/TutorialProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
   subsets: ["latin"],
+  weight: ["300", "400"],
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
-  title: "Telos.AI - A Inteligência no Cuidado para o Propósito da Recuperação",
-  description: "Sistema de acompanhamento pós-operatório com Inteligência Artificial. A inteligência no cuidado a serviço do propósito da recuperação plena.",
-  applicationName: "Telos.AI",
+  title: "VigIA - Vigilância contínua. Decisão sua.",
+  description: "A cirurgia dura horas. O pós-operatório dura semanas. A VigIA está lá do começo ao fim. Monitoramento pós-operatório inteligente com IA.",
+  applicationName: "VigIA",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Telos.AI",
+    title: "VigIA",
   },
   formatDetection: {
     telephone: false,
@@ -44,7 +53,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A2647", // Telos blue
+  themeColor: "#0B0E14", // VigIA midnight
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -64,7 +73,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${syne.variable} ${dmMono.variable} ${cormorant.variable} antialiased`}
       >
         <AuthProvider>
           <TutorialProvider>

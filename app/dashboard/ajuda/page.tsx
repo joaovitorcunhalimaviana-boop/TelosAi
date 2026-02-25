@@ -168,7 +168,7 @@ export default function HelpCenterPage() {
             <div>
               <h1 className="text-3xl font-bold text-[#0A2647]">Central de Ajuda</h1>
               <p className="text-gray-600">
-                Aprenda a usar todas as funcionalidades do Telos.AI com tutoriais interativos
+                Aprenda a usar todas as funcionalidades do VigIA com tutoriais interativos
               </p>
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function HelpCenterPage() {
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">Precisa de mais ajuda?</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Nossa equipe está pronta para responder suas dúvidas e ajudá-lo a aproveitar ao máximo o Telos.AI
+                  Nossa equipe está pronta para responder suas dúvidas e ajudá-lo a aproveitar ao máximo o VigIA
                 </p>
                 <div className="flex gap-3">
                   <Button variant="outline" size="sm">

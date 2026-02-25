@@ -50,7 +50,7 @@ export function BottomNav() {
                   className={`
                     flex flex-col items-center justify-center gap-1 transition-colors
                     ${isActive
-                      ? 'text-blue-600'
+                      ? 'text-[#0D7377]'
                       : 'text-gray-600 hover:text-gray-900'
                     }
                   `}
@@ -68,7 +68,7 @@ export function BottomNav() {
                 className={`
                   flex flex-col items-center justify-center gap-1 transition-colors
                   ${isActive
-                    ? 'text-blue-600'
+                    ? 'text-[#0D7377]'
                     : 'text-gray-600 hover:text-gray-900'
                   }
                 `}

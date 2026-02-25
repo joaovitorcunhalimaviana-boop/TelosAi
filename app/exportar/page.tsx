@@ -423,7 +423,7 @@ export default function ExportarPage() {
           </CardHeader>
           <CardContent>
             <code className="text-sm text-slate-600 bg-white p-2 rounded border block">
-              Viana, J. V. (2025). <em>Dados Clínicos de Acompanhamento Pós-Operatório</em> [Base de dados]. Telos.AI.
+              Viana, J. V. (2025). <em>Dados Clínicos de Acompanhamento Pós-Operatório</em> [Base de dados]. VigIA.
             </code>
           </CardContent>
         </Card>

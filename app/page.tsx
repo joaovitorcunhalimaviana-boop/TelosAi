@@ -1,13 +1,13 @@
 import Image from "next/image"
 import Link from "next/link"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import { FadeIn, SlideIn, FloatingParticles } from "@/components/animations"
 import { ScrollVideoSection } from "@/components/ScrollVideoSection"
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <TelosHeader />
+      <VigiaHeader />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
@@ -22,14 +22,16 @@ export default function Home() {
             <div className="max-w-2xl">
               <FadeIn delay={0.1} direction="right">
                 <h1 className="text-5xl lg:text-7xl font-black text-telos-blue mb-6 tracking-tight leading-tight">
-                  <span className="text-gradient-blue">Telos</span>
-                  <span className="text-gradient-gold">.AI</span>
+                  VigIA
                 </h1>
               </FadeIn>
 
               <FadeIn delay={0.2} direction="up">
-                <p className="text-xl lg:text-2xl text-gray-600 mb-6 font-light leading-relaxed">
-                  Sistema de acompanhamento pós-operatório com <span className="font-semibold text-telos-blue">Inteligência Artificial</span>.
+                <p className="text-xl lg:text-2xl text-gray-600 mb-2 font-light leading-relaxed italic">
+                  Vigilância contínua. Decisão sua.
+                </p>
+                <p className="text-lg lg:text-xl text-gray-600 mb-6 font-light leading-relaxed">
+                  A cirurgia dura horas. O pós-operatório dura semanas. A VigIA está lá do começo ao fim.
                 </p>
                 <div className="flex items-center gap-3 mb-10 p-4 bg-gradient-to-r from-telos-gold/10 to-transparent border-l-4 border-telos-gold rounded-r-xl">
                   <svg className="w-6 h-6 text-telos-gold flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +85,7 @@ export default function Home() {
                   <div className="absolute inset-0 bg-telos-blue/20 blur-[60px] lg:blur-[100px] rounded-full"></div>
                   <Image
                     src="/icons/icon-original.jpeg"
-                    alt="Telos.AI Logo"
+                    alt="VigIA"
                     fill
                     className="object-contain drop-shadow-2xl relative z-10"
                     priority
@@ -115,7 +117,7 @@ export default function Home() {
                 <span className="text-sm font-bold text-telos-gold uppercase tracking-wider">Vantagens Exclusivas</span>
               </div>
               <h2 className="text-4xl lg:text-5xl font-black text-telos-blue mb-6 tracking-tight">
-                Por que Assinar o <span className="text-gradient-gold">Telos.AI</span>?
+                Por que Assinar o <span className="text-gradient-gold">VigIA</span>?
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                 Benefícios reais para sua prática médica e produção científica
@@ -292,8 +294,9 @@ export default function Home() {
                 <div className="inline-flex items-center gap-3 px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-lg animate-fade-in-left">
                   <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
                   <span className="text-sm font-bold text-telos-gold uppercase tracking-wider">
-                    Exclusivo Telos.AI
+                    Exclusivo VigIA
                   </span>
+
                 </div>
 
                 <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
@@ -556,8 +559,7 @@ export default function Home() {
             {/* Company Info */}
             <div className="space-y-6">
               <div className="flex items-baseline gap-0.5">
-                <span className="telos-brand text-3xl text-white">Telos</span>
-                <span className="telos-ai text-3xl text-telos-gold">.AI</span>
+                <span className="text-3xl font-bold text-white">VigIA</span>
               </div>
               <p className="text-blue-200 leading-relaxed text-justify">
                 A Inteligência no Cuidado para o Propósito da Recuperação.
@@ -612,7 +614,7 @@ export default function Home() {
           <div className="border-t border-white/10 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-blue-200 text-sm text-center md:text-left">
-                © 2025 Telos.AI - Dr. João Vitor Viana. Todos os direitos reservados.
+                © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">Termos de Uso</Link>

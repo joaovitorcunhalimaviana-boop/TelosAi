@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import { FadeIn } from "@/components/animations/FadeIn"
 import { Pricing } from "@/components/ui/pricing"
 
@@ -20,7 +20,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      <TelosHeader />
+      <VigiaHeader />
 
       {/* Background Animated Blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -158,7 +158,7 @@ export default function PricingPage() {
           <FadeIn delay={0.15} direction="up">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-telos-blue mb-4">
-                Por que Investir no Telos.AI?
+                Por que Investir no VigIA?
               </h2>
               <p className="text-xl text-gray-600">
                 O investimento se paga sozinho. Veja como:
@@ -233,7 +233,7 @@ export default function PricingPage() {
                 Comparativo de Investimento
               </h2>
               <p className="text-xl text-gray-600">
-                Veja como o Telos.AI se paga sozinho
+                Veja como o VigIA se paga sozinho
               </p>
             </div>
           </FadeIn>
@@ -340,7 +340,7 @@ export default function PricingPage() {
                     </h4>
                     <p className="text-gray-700 leading-relaxed mb-3">
                       Evitando apenas <span className="font-bold text-red-600">1 complicação por ano</span>, você já recupera
-                      completamente o investimento anual no Telos.AI. Uma complicação custa muito caro ao sistema e ao paciente.
+                      completamente o investimento anual no VigIA. Uma complicação custa muito caro ao sistema e ao paciente.
                     </p>
                     <p className="text-gray-700 leading-relaxed">
                       Além disso, as <span className="font-bold text-blue-600">10 horas/semana economizadas</span> permitem realizar
@@ -558,8 +558,7 @@ export default function PricingPage() {
             {/* Company Info */}
             <div className="space-y-6">
               <div className="flex items-baseline gap-0.5">
-                <span className="telos-brand text-3xl text-white">Telos</span>
-                <span className="telos-ai text-3xl text-telos-gold">.AI</span>
+                <span className="text-3xl font-bold text-white">VigIA</span>
               </div>
               <p className="text-blue-200 leading-relaxed text-justify">
                 A Inteligência no Cuidado para o Propósito da Recuperação.
@@ -703,7 +702,7 @@ export default function PricingPage() {
           <div className="border-t border-white/10 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-blue-200 text-sm text-center md:text-left">
-                © 2025 Telos.AI - Dr. João Vitor Viana. Todos os direitos reservados.
+                © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">

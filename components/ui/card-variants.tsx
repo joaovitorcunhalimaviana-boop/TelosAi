@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Telos.AI Card Variants
+ * VigIA Card Variants
  *
  * Standardized card components with consistent styling, shadows, and interactions.
  * Use these instead of base Card for better visual consistency.
@@ -29,12 +29,12 @@ const cardVariants = cva(
       variant: {
         default: "border-gray-200 shadow-sm",
         elevated: "border-gray-200 shadow-md hover:shadow-lg",
-        bordered: "border-2 border-telos-blue-200 shadow-none",
+        bordered: "border-2 border-vigia-teal-200 shadow-none",
         interactive: "border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 cursor-pointer",
-        success: "border-telos-success-200 bg-telos-success-50 shadow-sm",
-        warning: "border-telos-warning-200 bg-telos-warning-50 shadow-sm",
-        error: "border-telos-error-200 bg-telos-error-50 shadow-sm",
-        gold: "border-telos-gold-300 bg-gradient-to-br from-white to-telos-gold-50 shadow-md",
+        success: "border-vigia-success-200 bg-vigia-success-50 shadow-sm",
+        warning: "border-vigia-warning-200 bg-vigia-warning-50 shadow-sm",
+        error: "border-vigia-error-200 bg-vigia-error-50 shadow-sm",
+        gold: "border-vigia-gold-300 bg-gradient-to-br from-white to-vigia-gold-50 shadow-md",
         glass: "border-gray-200/50 bg-white/80 backdrop-blur-sm shadow-lg",
       },
       padding: {
@@ -94,7 +94,7 @@ export function InteractiveCard({
     <Component
       className={cn(
         cardVariants({ variant: "interactive" }),
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-telos-blue-500 focus-visible:ring-offset-2",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vigia-teal-500 focus-visible:ring-offset-2",
         className
       )}
       onClick={onClick}
@@ -159,8 +159,8 @@ export function StatCard({
   }
 
   const trendColor = {
-    up: "text-telos-success-500",
-    down: "text-telos-error-500",
+    up: "text-vigia-success-500",
+    down: "text-vigia-error-500",
     neutral: "text-gray-500",
   }
 
@@ -173,7 +173,7 @@ export function StatCard({
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-600">{label}</span>
         {icon && (
-          <div className="p-2 bg-telos-blue-50 rounded-lg text-telos-blue-500">
+          <div className="p-2 bg-vigia-teal-50 rounded-lg text-vigia-teal-500">
             {icon}
           </div>
         )}
@@ -218,14 +218,14 @@ export function PatientCard({
   ...props
 }: PatientCardProps) {
   const riskColors = {
-    low: "bg-telos-success-500",
-    medium: "bg-telos-warning-500",
-    high: "bg-telos-error-500",
+    low: "bg-vigia-success-500",
+    medium: "bg-vigia-warning-500",
+    high: "bg-vigia-error-500",
   }
 
   const statusColors = {
-    active: "bg-telos-success-500",
-    pending: "bg-telos-warning-500",
+    active: "bg-vigia-success-500",
+    pending: "bg-vigia-warning-500",
     completed: "bg-gray-500",
   }
 
@@ -254,7 +254,7 @@ export function PatientCard({
             {status === "completed" && "Concluído"}
           </div>
 
-          <div className="px-2 py-1 bg-telos-blue-50 rounded-full text-telos-blue-700 text-xs font-medium">
+          <div className="px-2 py-1 bg-vigia-teal-50 rounded-full text-vigia-teal-700 text-xs font-medium">
             D+{postOpDay}
           </div>
         </div>
@@ -288,8 +288,8 @@ export function FeatureCard({
       className={cn("group space-y-4", className)}
       {...props}
     >
-      <div className="p-3 bg-telos-blue-50 rounded-xl w-fit group-hover:bg-telos-blue-500 transition-colors">
-        <div className="text-telos-blue-500 group-hover:text-white transition-colors">
+      <div className="p-3 bg-vigia-teal-50 rounded-xl w-fit group-hover:bg-vigia-teal-500 transition-colors">
+        <div className="text-vigia-teal-500 group-hover:text-white transition-colors">
           {icon}
         </div>
       </div>
@@ -300,7 +300,7 @@ export function FeatureCard({
       </div>
 
       {highlighted && (
-        <div className="flex items-center gap-2 text-telos-gold-600 font-medium text-sm">
+        <div className="flex items-center gap-2 text-vigia-gold-600 font-medium text-sm">
           <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
           </svg>
@@ -355,7 +355,7 @@ export function EmptyStateCard({
       {action && (
         <button
           onClick={action.onClick}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-telos-blue-500 text-white rounded-lg hover:bg-telos-blue-600 transition-colors font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-vigia-teal-500 text-white rounded-lg hover:bg-vigia-teal-600 transition-colors font-medium"
         >
           {action.label}
         </button>
@@ -398,7 +398,7 @@ export function ResearchCard({
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-lg text-gray-900">{title}</h3>
             {isActive ? (
-              <div className="px-2 py-1 bg-telos-success-500 text-white text-xs font-medium rounded-full">
+              <div className="px-2 py-1 bg-vigia-success-500 text-white text-xs font-medium rounded-full">
                 Ativo
               </div>
             ) : (
@@ -413,14 +413,14 @@ export function ResearchCard({
 
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <svg className="h-5 w-5 text-telos-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 text-vigia-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
           <span className="text-gray-600">{participantCount} participantes</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <svg className="h-5 w-5 text-telos-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 text-vigia-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
           <span className="text-gray-600">{groupCount} grupos</span>

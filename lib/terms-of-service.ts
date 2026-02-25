@@ -1,11 +1,11 @@
 /**
- * Termos de Uso da Plataforma Telos.AI
+ * Termos de Uso da Plataforma VigIA
  * Juridicamente sólidos com cláusula de compartilhamento de dados anonimizados
  */
 
 export const TERMS_OF_SERVICE = `
 # TERMOS DE USO E POLÍTICA DE PRIVACIDADE
-## Plataforma Telos.AI - Sistema de Acompanhamento Pós-Operatório
+## Plataforma VigIA - Sistema de Acompanhamento Pós-Operatório
 
 **Última atualização:** ${new Date().toLocaleDateString("pt-BR")}
 
@@ -13,7 +13,7 @@ export const TERMS_OF_SERVICE = `
 
 ## 1. ACEITAÇÃO DOS TERMOS
 
-Ao criar uma conta e utilizar a plataforma Telos.AI ("Plataforma"), você ("Usuário" ou "Médico") declara ter lido, compreendido e concordado integralmente com estes Termos de Uso.
+Ao criar uma conta e utilizar a plataforma VigIA ("Plataforma"), você ("Usuário" ou "Médico") declara ter lido, compreendido e concordado integralmente com estes Termos de Uso.
 
 **A aceitação destes termos é CONDIÇÃO ESSENCIAL para o uso da Plataforma.**
 
@@ -21,7 +21,7 @@ Ao criar uma conta e utilizar a plataforma Telos.AI ("Plataforma"), você ("Usu�
 
 ## 2. DESCRIÇÃO DO SERVIÇO
 
-A Telos.AI é uma plataforma de acompanhamento pós-operatório que oferece:
+A VigIA é uma plataforma de acompanhamento pós-operatório que oferece:
 
 - Cadastro e gestão de pacientes cirúrgicos
 - Envio automatizado de questionários via WhatsApp
@@ -108,7 +108,7 @@ Você reconhece que:
 - A Plataforma fornece **sugestões baseadas em IA**, não diagnósticos definitivos
 - A **decisão clínica final** é sempre sua
 - Você é o **único responsável** pelo cuidado e tratamento dos seus pacientes
-- A Telos.AI **NÃO se responsabiliza** por decisões clínicas tomadas com base nas informações da Plataforma
+- A VigIA **NÃO se responsabiliza** por decisões clínicas tomadas com base nas informações da Plataforma
 
 ---
 
@@ -157,7 +157,7 @@ A Plataforma integra-se com WhatsApp via Twilio para envio de mensagens. Ao usar
 
 - Você autoriza o envio de mensagens em seu nome
 - Você é responsável por obter consentimento dos pacientes para contato via WhatsApp
-- A Telos.AI não se responsabiliza por políticas de privacidade do WhatsApp/Meta
+- A VigIA não se responsabiliza por políticas de privacidade do WhatsApp/Meta
 
 ### 6.2 Inteligência Artificial (Anthropic Claude)
 
@@ -173,11 +173,11 @@ A Plataforma utiliza IA da Anthropic para análise de respostas. As respostas do
 
 ### 7.1 Propriedade da Plataforma
 
-Todo o código, design, algoritmos e funcionalidades da Plataforma são de **propriedade exclusiva da Telos.AI**.
+Todo o código, design, algoritmos e funcionalidades da Plataforma são de **propriedade exclusiva da VigIA**.
 
 ### 7.2 Propriedade dos Dados Anonimizados
 
-Os **dados agregados e anonimizados** gerados pela Plataforma são de **propriedade da Telos.AI** e podem ser utilizados para:
+Os **dados agregados e anonimizados** gerados pela Plataforma são de **propriedade da VigIA** e podem ser utilizados para:
 
 - Publicações científicas
 - Apresentações em congressos
@@ -225,7 +225,7 @@ A Plataforma é fornecida "no estado em que se encontra" (AS IS). Não garantimo
 
 ### 9.2 Decisões Clínicas
 
-A Telos.AI **NÃO se responsabiliza** por:
+A VigIA **NÃO se responsabiliza** por:
 
 - Decisões clínicas tomadas com base nas informações da Plataforma
 - Outcomes de pacientes
@@ -269,7 +269,7 @@ Caso alguma cláusula seja considerada inválida, as demais permanecem em vigor.
 
 Para dúvidas sobre estes Termos:
 
-**Email:** suporte@telos.ai
+**Email:** suporte@vigia.ai
 **Endereço:** [SEU ENDEREÇO]
 **DPO (Encarregado de Dados):** [NOME E CONTATO]
 
@@ -292,7 +292,7 @@ Ao clicar em "Aceito os Termos de Uso" você declara:
 
 ---
 
-© ${new Date().getFullYear()} Telos.AI - Todos os direitos reservados.
+© ${new Date().getFullYear()} VigIA - Todos os direitos reservados.
 `
 
 export function generateTermsHTML(): string {
@@ -302,7 +302,7 @@ export function generateTermsHTML(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Termos de Uso - Telos.AI</title>
+  <title>Termos de Uso - VigIA</title>
   <style>
     body {
       font-family: 'Georgia', 'Times New Roman', serif;
@@ -397,7 +397,7 @@ export function generateTermsHTML(): string {
   }).join('\n')}
 
   <div class="footer">
-    <p>© ${new Date().getFullYear()} Telos.AI - Sistema de Acompanhamento Pós-Operatório</p>
+    <p>© ${new Date().getFullYear()} VigIA - Sistema de Acompanhamento Pós-Operatório</p>
     <p>Este documento foi gerado eletronicamente e é válido sem assinatura física.</p>
   </div>
 </body>

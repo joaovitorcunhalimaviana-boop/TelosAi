@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Telos.AI Badge Variants
+ * VigIA Badge Variants
  *
  * Semantic badges for status indicators, labels, and tags.
  * All badges meet WCAG AA contrast requirements.
@@ -24,16 +24,16 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-        primary: "bg-telos-blue-500 text-white hover:bg-telos-blue-600",
+        primary: "bg-vigia-teal-500 text-white hover:bg-vigia-teal-600",
         secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
-        success: "bg-telos-success-500 text-white hover:bg-telos-success-600",
-        warning: "bg-telos-warning-500 text-white hover:bg-telos-warning-600",
-        error: "bg-telos-error-500 text-white hover:bg-telos-error-600",
-        info: "bg-telos-info-500 text-white hover:bg-telos-info-600",
-        gold: "bg-telos-gold-500 text-telos-blue-900 hover:bg-telos-gold-600 border-2 border-telos-gold-600",
-        purple: "bg-telos-purple-500 text-white hover:bg-telos-purple-600",
+        success: "bg-vigia-success-500 text-white hover:bg-vigia-success-600",
+        warning: "bg-vigia-warning-500 text-white hover:bg-vigia-warning-600",
+        error: "bg-vigia-error-500 text-white hover:bg-vigia-error-600",
+        info: "bg-vigia-info-500 text-white hover:bg-vigia-info-600",
+        gold: "bg-vigia-gold-500 text-vigia-teal-900 hover:bg-vigia-gold-600 border-2 border-vigia-gold-600",
+        purple: "bg-vigia-purple-500 text-white hover:bg-vigia-purple-600",
         outline: "border-2 border-gray-300 text-gray-700 hover:bg-gray-50",
-        outlinePrimary: "border-2 border-telos-blue-500 text-telos-blue-500 hover:bg-telos-blue-50",
+        outlinePrimary: "border-2 border-vigia-teal-500 text-vigia-teal-500 hover:bg-vigia-teal-50",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",

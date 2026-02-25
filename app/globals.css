@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-syne);
+  --font-mono: var(--font-dm-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,61 +46,84 @@
 :root {
   --radius: 0.625rem;
 
-  /* Telos.AI Brand Colors */
-  --telos-blue-deep: #0A2647;
-  /* Azul profundo - cor primária */
-  --telos-blue-dark: #144272;
-  /* Azul escuro */
-  --telos-blue-medium: #205295;
-  /* Azul médio */
-  --telos-blue-light: #2C74B3;
-  /* Azul claro */
-  --telos-gold: #D4AF37;
-  /* Dourado - excelência */
-  --telos-gold-light: #E8C547;
-  /* Dourado claro */
-  --telos-white: #FFFFFF;
-  /* Branco puro */
-  --telos-gray-light: #F5F7FA;
-  /* Cinza claro para backgrounds */
-  --telos-gray-medium: #E2E8F0;
-  /* Cinza médio para bordas */
+  /* VigIA Brand Colors */
+  --vigia-midnight: #0B0E14;
+  /* Background principal */
+  --vigia-deep: #111520;
+  /* Cards, elementos elevados */
+  --vigia-surface: #161B27;
+  /* Superfícies secundárias */
+  --vigia-border: #1E2535;
+  /* Bordas */
+  --vigia-muted: #2A3147;
+  /* Elementos inativos */
+  --vigia-navy: #1A2544;
+  /* Fundo alternativo */
+  --vigia-teal: #0D7377;
+  /* Acento principal */
+  --vigia-teal-light: #14BDAE;
+  /* Acento ativo, links, IA */
+  --vigia-gold: #C9A84C;
+  /* Acento secundário */
+  --vigia-gold-light: #E8C97A;
+  /* Taglines, itálicos */
+  --vigia-cream: #F0EAD6;
+  /* Texto principal (sobre escuro) */
+  --vigia-text: #D8DEEB;
+  /* Texto corpo */
+  --vigia-text-dim: #7A8299;
+  /* Texto secundário */
+  --vigia-danger: #C0392B;
+  /* Alertas, erros */
+  --vigia-success: #1A8C6A;
+  /* Status ok */
 
-  /* Theme Variables - Telos.AI Style */
-  --background: #FFFFFF;
-  --foreground: #0A2647;
-  --card: #FFFFFF;
-  --card-foreground: #0A2647;
-  --popover: #FFFFFF;
-  --popover-foreground: #0A2647;
-  --primary: #0A2647;
-  /* Azul profundo */
-  --primary-foreground: #FFFFFF;
-  --secondary: #F5F7FA;
-  /* Cinza claro */
-  --secondary-foreground: #0A2647;
-  --muted: #F5F7FA;
-  --muted-foreground: #144272;
-  --accent: #D4AF37;
-  /* Dourado */
-  --accent-foreground: #FFFFFF;
-  --destructive: #DC2626;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #2C74B3;
-  --chart-1: #2C74B3;
-  --chart-2: #D4AF37;
-  --chart-3: #205295;
-  --chart-4: #E8C547;
-  --chart-5: #144272;
-  --sidebar: #F5F7FA;
-  --sidebar-foreground: #0A2647;
-  --sidebar-primary: #0A2647;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #D4AF37;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #2C74B3;
+  /* Backwards compat aliases */
+  --telos-blue-deep: #0B0E14;
+  --telos-blue-dark: #0D7377;
+  --telos-blue-medium: #0D7377;
+  --telos-blue-light: #14BDAE;
+  --telos-gold: #C9A84C;
+  --telos-gold-light: #E8C97A;
+  --telos-white: #F0EAD6;
+  --telos-gray-light: #161B27;
+  --telos-gray-medium: #1E2535;
+
+  /* Theme Variables - VigIA Dark Theme */
+  --background: #0B0E14;
+  --foreground: #D8DEEB;
+  --card: #111520;
+  --card-foreground: #D8DEEB;
+  --popover: #111520;
+  --popover-foreground: #D8DEEB;
+  --primary: #0D7377;
+  /* Teal - acento principal */
+  --primary-foreground: #F0EAD6;
+  --secondary: #161B27;
+  /* Surface */
+  --secondary-foreground: #D8DEEB;
+  --muted: #2A3147;
+  --muted-foreground: #7A8299;
+  --accent: #C9A84C;
+  /* Gold */
+  --accent-foreground: #0B0E14;
+  --destructive: #C0392B;
+  --border: #1E2535;
+  --input: #1E2535;
+  --ring: #14BDAE;
+  --chart-1: #14BDAE;
+  --chart-2: #C9A84C;
+  --chart-3: #0D7377;
+  --chart-4: #E8C97A;
+  --chart-5: #1A2544;
+  --sidebar: #111520;
+  --sidebar-foreground: #D8DEEB;
+  --sidebar-primary: #0D7377;
+  --sidebar-primary-foreground: #F0EAD6;
+  --sidebar-accent: #C9A84C;
+  --sidebar-accent-foreground: #0B0E14;
+  --sidebar-border: #1E2535;
+  --sidebar-ring: #14BDAE;
 }
 
 .dark {
@@ -147,7 +170,7 @@
   }
 }
 
-/* Telos.AI Custom Styles */
+/* VigIA Custom Styles */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -168,15 +191,16 @@
 
   /* Text Gradients */
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#DFC75E] via-[#D4AF37] to-[#B89630];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#E8C97A] via-[#C9A84C] to-[#B89630];
   }
 
-  .text-gradient-blue {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#264E8D] via-[#0A2647] to-[#081E39];
+  .text-gradient-blue,
+  .text-gradient-teal {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#14BDAE] via-[#0D7377] to-[#0A5C5F];
   }
 
   .text-gradient-tech {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#264E8D] via-[#DFC75E] to-[#0A2647];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#14BDAE] via-[#C9A84C] to-[#0D7377];
   }
 
   /* Backgrounds */
@@ -191,7 +215,7 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
   }
 
   .hover-lift-tech {
@@ -201,53 +225,98 @@
   .hover-lift-tech:hover {
     transform: translateY(-4px);
     /* -translate-y-1 is 0.25rem = 4px */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(10, 38, 71, 0.2);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(11, 14, 20, 0.2);
     /* shadow-lg + border-telos-blue-500/20 approx */
   }
 
+  .vigia-gradient,
   .telos-gradient {
-    background: linear-gradient(135deg, #0A2647 0%, #020817 100%);
+    background: linear-gradient(135deg, #0B0E14 0%, #111520 100%);
   }
 
+  .vigia-gradient-teal {
+    background: linear-gradient(135deg, #0D7377 0%, #14BDAE 100%);
+  }
+
+  .vigia-gradient-gold,
   .telos-gradient-gold {
-    background: linear-gradient(135deg, #D4AF37 0%, #E8C547 100%);
+    background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 100%);
   }
 
+  .text-vigia-teal,
   .text-telos-blue {
-    color: #0A2647;
+    color: #0D7377;
   }
 
+  .text-vigia-teal-light {
+    color: #14BDAE;
+  }
+
+  .text-vigia-gold,
   .text-telos-gold {
-    color: #D4AF37;
+    color: #C9A84C;
   }
 
+  .text-vigia-gold-light {
+    color: #E8C97A;
+  }
+
+  .text-vigia-cream {
+    color: #F0EAD6;
+  }
+
+  .bg-vigia-midnight,
   .bg-telos-blue {
-    background-color: #0A2647;
+    background-color: #0B0E14;
   }
 
+  .bg-vigia-deep {
+    background-color: #111520;
+  }
+
+  .bg-vigia-surface {
+    background-color: #161B27;
+  }
+
+  .bg-vigia-teal {
+    background-color: #0D7377;
+  }
+
+  .bg-vigia-gold,
   .bg-telos-gold {
-    background-color: #D4AF37;
+    background-color: #C9A84C;
   }
 
+  .border-vigia-gold,
   .border-telos-gold {
-    border-color: #D4AF37;
+    border-color: #C9A84C;
   }
 
-  /* Telos Logo Typography */
+  .border-vigia-teal {
+    border-color: #0D7377;
+  }
+
+  .border-vigia-border {
+    border-color: #1E2535;
+  }
+
+  /* VigIA Logo Typography */
+  .vigia-brand,
   .telos-brand {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    font-weight: 600;
+    font-family: 'Cormorant Garamond', var(--font-cormorant), 'Georgia', serif;
+    font-weight: 300;
     letter-spacing: 0.02em;
   }
 
+  .vigia-ia,
   .telos-ai {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Syne', var(--font-syne), system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: 0.05em;
   }
 }
 
-/* Telos.AI Animations */
+/* VigIA Animations */
 @layer utilities {
 
   /* Fade In Animations */
@@ -392,11 +461,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
     }
 
     50% {
-      box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+      box-shadow: 0 0 40px rgba(201, 168, 76, 0.6);
     }
   }
 
@@ -465,9 +534,9 @@
   /* Gradient Background Animation */
   .bg-gradient-animated {
     background: linear-gradient(270deg,
-        #0A2647,
-        #2C74B3,
-        #D4AF37);
+        #0B0E14,
+        #0D7377,
+        #C9A84C);
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
   }
@@ -498,7 +567,7 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    box-shadow: 0 0 30px rgba(201, 168, 76, 0.5);
   }
 
   /* Hover Scale Effect */
@@ -641,16 +710,16 @@
     0%,
     100% {
       box-shadow:
-        0 0 20px rgba(212, 175, 55, 0.3),
-        0 0 40px rgba(212, 175, 55, 0.2),
-        0 0 60px rgba(212, 175, 55, 0.1);
+        0 0 20px rgba(201, 168, 76, 0.3),
+        0 0 40px rgba(201, 168, 76, 0.2),
+        0 0 60px rgba(201, 168, 76, 0.1);
     }
 
     50% {
       box-shadow:
-        0 0 40px rgba(212, 175, 55, 0.6),
-        0 0 80px rgba(212, 175, 55, 0.4),
-        0 0 120px rgba(212, 175, 55, 0.2);
+        0 0 40px rgba(201, 168, 76, 0.6),
+        0 0 80px rgba(201, 168, 76, 0.4),
+        0 0 120px rgba(201, 168, 76, 0.2);
     }
   }
 
@@ -779,14 +848,14 @@
     transform: translateY(-15px) scale(1.03);
     box-shadow:
       0 25px 50px rgba(0, 0, 0, 0.2),
-      0 10px 30px rgba(212, 175, 55, 0.3);
+      0 10px 30px rgba(201, 168, 76, 0.3);
   }
 
   .hover-glow-strong:hover {
     box-shadow:
-      0 0 40px rgba(212, 175, 55, 0.6),
-      0 0 80px rgba(212, 175, 55, 0.3),
-      inset 0 0 20px rgba(212, 175, 55, 0.2);
+      0 0 40px rgba(201, 168, 76, 0.6),
+      0 0 80px rgba(201, 168, 76, 0.3),
+      inset 0 0 20px rgba(201, 168, 76, 0.2);
   }
 
   .hover-tilt {
@@ -800,11 +869,11 @@
   /* Gradient Text Animation */
   .text-gradient-animated {
     background: linear-gradient(90deg,
-        #0A2647,
-        #2C74B3,
-        #D4AF37,
-        #2C74B3,
-        #0A2647);
+        #0D7377,
+        #14BDAE,
+        #C9A84C,
+        #14BDAE,
+        #0D7377);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -839,9 +908,9 @@
   /* Neon Glow */
   .neon-gold {
     text-shadow:
-      0 0 10px rgba(212, 175, 55, 0.8),
-      0 0 20px rgba(212, 175, 55, 0.6),
-      0 0 30px rgba(212, 175, 55, 0.4);
+      0 0 10px rgba(201, 168, 76, 0.8),
+      0 0 20px rgba(201, 168, 76, 0.6),
+      0 0 30px rgba(201, 168, 76, 0.4);
   }
 
   /* Interactive Card Shine */
@@ -897,11 +966,11 @@
 
     0%,
     100% {
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+      box-shadow: 0 0 10px rgba(201, 168, 76, 0.2);
     }
 
     50% {
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+      box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
     }
   }
 
@@ -959,11 +1028,11 @@
 
     0%,
     100% {
-      border-color: rgba(212, 175, 55, 0.2);
+      border-color: rgba(201, 168, 76, 0.2);
     }
 
     50% {
-      border-color: rgba(212, 175, 55, 0.5);
+      border-color: rgba(201, 168, 76, 0.5);
     }
   }
 
@@ -1024,8 +1093,9 @@
   transition: all 0.2s ease;
 }
 
+.vigia-tutorial-popover,
 .telos-tutorial-popover {
-  box-shadow: 0 10px 40px rgba(10, 38, 71, 0.2) !important;
+  box-shadow: 0 10px 40px rgba(11, 14, 20, 0.2) !important;
   pointer-events: all !important;
 }
 
@@ -1059,7 +1129,7 @@
 
   /* Visible focus ring for keyboard navigation */
   *:focus-visible {
-    outline: 2px solid #2C74B3;
+    outline: 2px solid #14BDAE;
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -1073,14 +1143,14 @@
   [role="button"]:focus-visible,
   [role="link"]:focus-visible,
   [tabindex]:focus-visible {
-    outline: 3px solid #2C74B3;
+    outline: 3px solid #14BDAE;
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(44, 116, 179, 0.2);
+    box-shadow: 0 0 0 4px rgba(13, 115, 119, 0.2);
   }
 
   /* Focus within for container elements */
   *:focus-within {
-    outline-color: #2C74B3;
+    outline-color: #14BDAE;
   }
 
   /* High contrast focus for critical elements */
@@ -1096,7 +1166,7 @@
   position: absolute;
   top: -40px;
   left: 0;
-  background: #0A2647;
+  background: #0B0E14;
   color: white;
   padding: 8px 16px;
   text-decoration: none;
@@ -1106,7 +1176,7 @@
 
 .skip-link:focus {
   top: 0;
-  outline: 3px solid #D4AF37;
+  outline: 3px solid #C9A84C;
   outline-offset: 2px;
 }
 
@@ -1177,7 +1247,7 @@
 /* Focus indicator for custom checkboxes/radios */
 input[type="checkbox"]:focus-visible+label,
 input[type="radio"]:focus-visible+label {
-  outline: 2px solid #2C74B3;
+  outline: 2px solid #14BDAE;
   outline-offset: 2px;
 }
 
@@ -1191,11 +1261,11 @@ input[type="radio"]:focus-visible+label {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(10, 38, 71, 0.08);
+  box-shadow: 0 8px 32px rgba(11, 14, 20, 0.08);
 }
 
 .glass-premium-dark {
-  background: rgba(10, 38, 71, 0.85);
+  background: rgba(11, 14, 20, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1205,9 +1275,9 @@ input[type="radio"]:focus-visible+label {
 /* Gradient Premium - Sutil e Sofisticado */
 .gradient-premium-bg {
   background: linear-gradient(135deg,
-      rgba(10, 38, 71, 0.02) 0%,
-      rgba(212, 175, 55, 0.04) 50%,
-      rgba(10, 38, 71, 0.02) 100%);
+      rgba(11, 14, 20, 0.02) 0%,
+      rgba(201, 168, 76, 0.04) 50%,
+      rgba(11, 14, 20, 0.02) 100%);
 }
 
 @keyframes gradient-shift-premium {
@@ -1224,11 +1294,11 @@ input[type="radio"]:focus-visible+label {
 
 .gradient-premium-animated {
   background: linear-gradient(135deg,
-      rgba(10, 38, 71, 0.03) 0%,
-      rgba(44, 116, 179, 0.05) 25%,
-      rgba(212, 175, 55, 0.05) 50%,
-      rgba(44, 116, 179, 0.05) 75%,
-      rgba(10, 38, 71, 0.03) 100%);
+      rgba(11, 14, 20, 0.03) 0%,
+      rgba(13, 115, 119, 0.05) 25%,
+      rgba(201, 168, 76, 0.05) 50%,
+      rgba(13, 115, 119, 0.05) 75%,
+      rgba(11, 14, 20, 0.03) 100%);
   background-size: 400% 400%;
   animation: gradient-shift-premium 15s ease infinite;
 }
@@ -1260,14 +1330,14 @@ input[type="radio"]:focus-visible+label {
 
 .btn-glow-premium:hover {
   box-shadow:
-    0 4px 20px rgba(10, 38, 71, 0.2),
-    0 0 40px rgba(212, 175, 55, 0.15);
+    0 4px 20px rgba(11, 14, 20, 0.2),
+    0 0 40px rgba(201, 168, 76, 0.15);
   transform: translateY(-2px);
 }
 
 /* Title Premium - Gradiente Sutil */
 .title-premium {
-  background: linear-gradient(135deg, #0A2647 0%, #1a4a7a 50%, #0A2647 100%);
+  background: linear-gradient(135deg, #0D7377 0%, #14BDAE 50%, #0D7377 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1275,7 +1345,7 @@ input[type="radio"]:focus-visible+label {
 }
 
 .title-premium-gold {
-  background: linear-gradient(135deg, #0A2647 0%, #D4AF37 50%, #0A2647 100%);
+  background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #C9A84C 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1292,9 +1362,9 @@ input[type="radio"]:focus-visible+label {
 .card-premium:hover {
   transform: translateY(-8px);
   box-shadow:
-    0 20px 40px rgba(10, 38, 71, 0.1),
-    0 0 0 1px rgba(212, 175, 55, 0.2);
-  border-color: rgba(212, 175, 55, 0.3);
+    0 20px 40px rgba(11, 14, 20, 0.1),
+    0 0 0 1px rgba(201, 168, 76, 0.2);
+  border-color: rgba(201, 168, 76, 0.3);
 }
 
 /* Shimmer Premium - Mais Sutil */
@@ -1338,7 +1408,7 @@ input[type="radio"]:focus-visible+label {
   inset: -2px;
   background: linear-gradient(45deg,
       transparent 30%,
-      rgba(212, 175, 55, 0.3) 50%,
+      rgba(201, 168, 76, 0.3) 50%,
       transparent 70%);
   border-radius: inherit;
   z-index: -1;
@@ -1372,17 +1442,17 @@ input[type="radio"]:focus-visible+label {
 /* Floating Shadow - Efeito de Profundidade */
 .shadow-floating {
   box-shadow:
-    0 1px 2px rgba(10, 38, 71, 0.04),
-    0 4px 8px rgba(10, 38, 71, 0.04),
-    0 16px 32px rgba(10, 38, 71, 0.04);
+    0 1px 2px rgba(11, 14, 20, 0.04),
+    0 4px 8px rgba(11, 14, 20, 0.04),
+    0 16px 32px rgba(11, 14, 20, 0.04);
   transition: box-shadow 0.4s ease;
 }
 
 .shadow-floating:hover {
   box-shadow:
-    0 2px 4px rgba(10, 38, 71, 0.04),
-    0 8px 16px rgba(10, 38, 71, 0.06),
-    0 24px 48px rgba(10, 38, 71, 0.08);
+    0 2px 4px rgba(11, 14, 20, 0.04),
+    0 8px 16px rgba(11, 14, 20, 0.06),
+    0 24px 48px rgba(11, 14, 20, 0.08);
 }
 
 /* Subtle Pulse para Elementos de Destaque */
@@ -1390,11 +1460,11 @@ input[type="radio"]:focus-visible+label {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4);
   }
 
   50% {
-    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+    box-shadow: 0 0 0 8px rgba(201, 168, 76, 0);
   }
 }
 
@@ -1408,7 +1478,7 @@ input[type="radio"]:focus-visible+label {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 1px 3px rgba(10, 38, 71, 0.04);
+  box-shadow: 0 1px 3px rgba(11, 14, 20, 0.04);
 }
 
 /* Spotlight Animation for Spline CTA */
@@ -1431,8 +1501,8 @@ input[type="radio"]:focus-visible+label {
 .loader {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(212, 175, 55, 0.2);
-  border-top: 4px solid #D4AF37;
+  border: 4px solid rgba(201, 168, 76, 0.2);
+  border-top: 4px solid #C9A84C;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

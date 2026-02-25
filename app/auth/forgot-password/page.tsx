@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-        <TelosHeader />
+        <VigiaHeader />
         <div className="container mx-auto px-6 py-16 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-      <TelosHeader />
+      <VigiaHeader />
       <div className="container mx-auto px-6 py-16 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>

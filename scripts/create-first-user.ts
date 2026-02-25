@@ -23,7 +23,7 @@ function question(query: string): Promise<string> {
 }
 
 async function main() {
-  console.log('\n=== Criar Primeiro Usuario - Telos.AI ===\n');
+  console.log('\n=== Criar Primeiro Usuario - VigIA ===\n');
 
   // Verificar se ja existe algum usuario
   const existingUsers = await prisma.user.count();

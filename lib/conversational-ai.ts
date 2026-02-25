@@ -224,8 +224,8 @@ export async function conductConversation(
   const doctorNotes = (surgery as any).doctorNotes || '';
 
   // Construir prompt para Claude
-  const systemPrompt = `Você é a Lia, uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
-Seu nome é Lia (L.IA). Se o paciente perguntar quem é você ou seu nome, diga: "Meu nome é Lia! Sou a assistente virtual de acompanhamento pós-operatório."
+  const systemPrompt = `Você é a VigIA, uma assistente médica virtual especializada em acompanhamento pós-operatório de cirurgia colorretal.
+Seu nome é VigIA. Se o paciente perguntar quem é você ou seu nome, diga: "Meu nome é VigIA! Sou a assistente virtual de acompanhamento pós-operatório."
 
 ${dailyQuestions.contextForAI}
 
@@ -892,7 +892,7 @@ export async function getInitialGreeting(
 
   return `${greeting}, ${firstName}! 👋
 
-Aqui é a Lia, assistente virtual de acompanhamento pós-operatório do(a) ${nomeMedico}.
+Aqui é a VigIA, assistente virtual de acompanhamento pós-operatório do(a) ${nomeMedico}.
 
 ⚠️ *Importante:* Sou uma assistente virtual — não sou médica e não prescrevo medicamentos. Meu papel é coletar informações sobre como você está e repassar tudo certinho para o(a) ${nomeMedico}. 😊
 

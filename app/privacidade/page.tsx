@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Política de Privacidade | Telos.AI',
-  description: 'Política de Privacidade do Sistema de Acompanhamento Pós-Operatório Telos.AI',
+  title: 'Política de Privacidade | VigIA',
+  description: 'Política de Privacidade do Sistema de Acompanhamento Pós-Operatório VigIA',
 };
 
 export default function PrivacidadePage() {
@@ -21,7 +21,7 @@ export default function PrivacidadePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introdução</h2>
             <p className="text-gray-700 mb-4">
-              A Telos.AI (&quot;nós&quot;, &quot;nosso&quot; ou &quot;nossa&quot;) opera o sistema de acompanhamento
+              A VigIA (&quot;nós&quot;, &quot;nosso&quot; ou &quot;nossa&quot;) opera o sistema de acompanhamento
               pós-operatório que utiliza inteligência artificial para monitorar pacientes
               após procedimentos cirúrgicos.
             </p>

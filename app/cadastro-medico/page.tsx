@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -161,7 +161,7 @@ function CadastroMedicoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F5F7FA]/30 to-white">
-      <TelosHeader />
+      <VigiaHeader />
 
       <div className="container mx-auto px-6 py-12">
         <div className="max-w-2xl mx-auto">
@@ -176,7 +176,7 @@ function CadastroMedicoPage() {
               Cadastro de Médico
             </h1>
             <p className="text-gray-600">
-              Preencha seus dados para começar a usar o Telos.AI
+              Preencha seus dados para começar a usar o VigIA
             </p>
           </div>
 
@@ -341,7 +341,7 @@ function CadastroMedicoPage() {
                     <Link href="/termos" className="text-telos-blue font-semibold underline" target="_blank">
                       política de privacidade
                     </Link>{" "}
-                    do Telos.AI *
+                    do VigIA *
                   </Label>
                 </div>
                 {errors.aceitoTermos && (

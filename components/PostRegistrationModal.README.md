@@ -152,7 +152,7 @@ Expected response:
 
 ## Design System
 
-### Colors (Telos.AI Brand)
+### Colors (VigIA Brand)
 - **Primary Blue**: `#0A2647` - Deep blue
 - **Medium Blue**: `#2C74B3` - Hover states
 - **Dark Blue**: `#144272` - Gradients

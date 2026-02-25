@@ -7,7 +7,7 @@ export async function GET() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Política de Privacidade | Telos.AI</title>
+  <title>Política de Privacidade | VigIA</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
@@ -26,7 +26,7 @@ export async function GET() {
     <p><strong>Última atualização:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
 
     <h2>1. Introdução</h2>
-    <p>A Telos.AI opera o sistema de acompanhamento pós-operatório que utiliza inteligência artificial para monitorar pacientes após procedimentos cirúrgicos.</p>
+    <p>A VigIA opera o sistema de acompanhamento pós-operatório que utiliza inteligência artificial para monitorar pacientes após procedimentos cirúrgicos.</p>
     <p>Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais e dados de saúde em conformidade com a LGPD (Lei 13.709/2018) e regulamentações do CFM.</p>
 
     <h2>2. Dados Coletados</h2>
@@ -77,7 +77,7 @@ export async function GET() {
     <h2>7. Contato</h2>
     <div class="contact">
       <p><strong>Encarregado de Proteção de Dados (DPO):</strong></p>
-      <p>E-mail: privacidade@telos.ai</p>
+      <p>E-mail: privacidade@vigia.ai</p>
       <p>Telefone: +55 83 9166-4904</p>
     </div>
 

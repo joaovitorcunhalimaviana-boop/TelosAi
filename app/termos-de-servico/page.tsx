@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Termos de Serviço | Telos.AI',
-  description: 'Termos de Serviço do Sistema de Acompanhamento Pós-Operatório Telos.AI',
+  title: 'Termos de Serviço | VigIA',
+  description: 'Termos de Serviço do Sistema de Acompanhamento Pós-Operatório VigIA',
 };
 
 export default function TermosPage() {
@@ -21,21 +21,21 @@ export default function TermosPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Aceitação dos Termos</h2>
             <p className="text-gray-700 mb-4">
-              Ao utilizar o sistema Telos.AI de acompanhamento pós-operatório (&quot;Serviço&quot;),
+              Ao utilizar o sistema VigIA de acompanhamento pós-operatório (&quot;Serviço&quot;),
               você concorda com estes Termos de Serviço (&quot;Termos&quot;). Se você não concorda
               com estes termos, não utilize o Serviço.
             </p>
             <p className="text-gray-700">
               Estes Termos constituem um contrato juridicamente vinculante entre você
               (&quot;Paciente&quot; ou &quot;Usuário&quot;) e os profissionais de saúde que utilizam o
-              sistema Telos.AI.
+              sistema VigIA.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Descrição do Serviço</h2>
             <p className="text-gray-700 mb-4">
-              O Telos.AI é um sistema de acompanhamento pós-operatório que:
+              O VigIA é um sistema de acompanhamento pós-operatório que:
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li>Envia questionários automatizados via WhatsApp após procedimentos cirúrgicos</li>
@@ -67,7 +67,7 @@ export default function TermosPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Contato</h2>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <p className="text-gray-700 mb-2">
-                <strong>Suporte Telos.AI:</strong>
+                <strong>Suporte VigIA:</strong>
               </p>
               <p className="text-gray-700 mb-1">E-mail: contato@telos.ai</p>
               <p className="text-gray-700">Telefone: +55 83 9166-4904</p>
@@ -77,7 +77,7 @@ export default function TermosPage() {
           <div className="mt-12 pt-8 border-t border-gray-200">
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <p className="text-gray-800 font-semibold mb-2">
-                Ao utilizar o sistema Telos.AI, você declara ter lido, compreendido e
+                Ao utilizar o sistema VigIA, você declara ter lido, compreendido e
                 concordado com estes Termos de Serviço.
               </p>
             </div>

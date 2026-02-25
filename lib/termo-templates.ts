@@ -139,7 +139,7 @@ export const termoTemplates = {
 
       <h3>1. Identificação do Controlador de Dados:</h3>
       <p><strong>Controlador:</strong> Dr. João Vitor Viana - CRM-PB 12831<br/>
-      <strong>Plataforma:</strong> Telos.AI - Sistema de Acompanhamento Pós-Operatório<br/>
+      <strong>Plataforma:</strong> VigIA - Sistema de Acompanhamento Pós-Operatório<br/>
       <strong>Endereço:</strong> João Pessoa, Paraíba<br/>
       <strong>E-mail para contato:</strong> telos.ia@gmail.com</p>
 
@@ -180,7 +180,7 @@ export const termoTemplates = {
         <li><strong>Hospitais e clínicas:</strong> Onde o procedimento será realizado</li>
         <li><strong>Instituições de pesquisa:</strong> Somente dados anonimizados para fins científicos</li>
         <li><strong>Autoridades competentes:</strong> Quando exigido por lei ou ordem judicial</li>
-        <li><strong>Prestadores de serviço:</strong> Empresas de tecnologia que auxiliam na plataforma Telos.AI (sob contrato de confidencialidade)</li>
+        <li><strong>Prestadores de serviço:</strong> Empresas de tecnologia que auxiliam na plataforma VigIA (sob contrato de confidencialidade)</li>
       </ul>
       <p>Em nenhuma hipótese seus dados identificáveis serão vendidos ou comercializados.</p>
 
@@ -223,7 +223,7 @@ export const termoTemplates = {
       <p><strong>Como exercer seus direitos:</strong> Entre em contato através do e-mail telos.ia@gmail.com ou durante consulta médica presencial.</p>
 
       <h3>8. Tratamento Automatizado e Inteligência Artificial:</h3>
-      <p>A plataforma Telos.AI utiliza Inteligência Artificial para:</p>
+      <p>A plataforma VigIA utiliza Inteligência Artificial para:</p>
       <ul>
         <li>Análise automatizada de respostas aos questionários pós-operatórios</li>
         <li>Detecção de sinais de alerta e complicações (red flags)</li>
@@ -275,13 +275,13 @@ export const termoTemplates = {
 
   whatsapp: {
     titulo: "TERMO DE CONSENTIMENTO E ADESÃO",
-    subtitulo: "Acompanhamento Pós-Operatório via WhatsApp e Plataforma Telos.AI",
+    subtitulo: "Acompanhamento Pós-Operatório via WhatsApp e Plataforma VigIA",
     conteudo: (data: TermoData) => `
-      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, autorizo expressamente o acompanhamento do meu pós-operatório através do aplicativo WhatsApp integrado à plataforma Telos.AI.</p>
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, autorizo expressamente o acompanhamento do meu pós-operatório através do aplicativo WhatsApp integrado à plataforma VigIA.</p>
 
       <h3>1. Identificação do Serviço:</h3>
       <p><strong>Responsável Técnico:</strong> Dr. João Vitor Viana - CRM-PB 12831<br/>
-      <strong>Plataforma:</strong> Telos.AI - Sistema de Acompanhamento Pós-Operatório com Inteligência Artificial<br/>
+      <strong>Plataforma:</strong> VigIA - Sistema de Acompanhamento Pós-Operatório com Inteligência Artificial<br/>
       <strong>Endereço:</strong> João Pessoa, Paraíba<br/>
       <strong>E-mail de contato:</strong> telos.ia@gmail.com</p>
 
@@ -298,7 +298,7 @@ export const termoTemplates = {
         <li><strong>Contato em urgências:</strong> Possibilidade de contato rápido para dúvidas urgentes relacionadas à recuperação</li>
       </ul>
 
-      <h3>3. Funcionamento da Plataforma Telos.AI:</h3>
+      <h3>3. Funcionamento da Plataforma VigIA:</h3>
       <p>A plataforma funciona da seguinte forma:</p>
       <ul>
         <li>Envio automatizado de mensagens pelo sistema nos horários programados</li>
@@ -327,10 +327,10 @@ export const termoTemplates = {
         <li><strong>Dados coletados:</strong> Mensagens de texto, fotos clínicas (quando enviadas), respostas aos questionários, horários de interação</li>
         <li><strong>Base legal LGPD:</strong> Consentimento expresso (Art. 7º, I) e tutela da saúde (Art. 11, II, f)</li>
         <li><strong>Finalidade:</strong> Acompanhamento pós-operatório, monitoramento de recuperação, detecção precoce de complicações, pesquisa científica (dados anonimizados)</li>
-        <li><strong>Armazenamento:</strong> As conversas são armazenadas de forma segura na plataforma Telos.AI e podem fazer parte do prontuário médico</li>
+        <li><strong>Armazenamento:</strong> As conversas são armazenadas de forma segura na plataforma VigIA e podem fazer parte do prontuário médico</li>
         <li><strong>Período de retenção:</strong> Mínimo de 20 anos conforme Resolução CFM nº 1.821/2007</li>
         <li><strong>Compartilhamento:</strong> Dados anonimizados podem ser usados para pesquisa científica e melhoria da plataforma</li>
-        <li><strong>Segurança:</strong> Criptografia de ponta a ponta do WhatsApp + segurança adicional da plataforma Telos.AI</li>
+        <li><strong>Segurança:</strong> Criptografia de ponta a ponta do WhatsApp + segurança adicional da plataforma VigIA</li>
         <li><strong>Direitos:</strong> Acesso, correção, eliminação (ressalvadas hipóteses de guarda obrigatória), portabilidade e revogação do consentimento</li>
       </ul>
 
@@ -359,7 +359,7 @@ export const termoTemplates = {
       </ul>
 
       <h3>8. Responsabilidades do Médico e da Plataforma:</h3>
-      <p>O Dr. João Vitor Viana e a plataforma Telos.AI comprometem-se a:</p>
+      <p>O Dr. João Vitor Viana e a plataforma VigIA comprometem-se a:</p>
       <ul>
         <li>Utilizar o sistema exclusivamente para fins de acompanhamento clínico</li>
         <li>Manter sigilo médico sobre todas as informações compartilhadas</li>
@@ -372,10 +372,10 @@ export const termoTemplates = {
       <h3>9. Isenção de Responsabilidade - WhatsApp:</h3>
       <p>Compreendo que:</p>
       <ul>
-        <li>O WhatsApp é um aplicativo de terceiros (Meta/Facebook) não controlado pelo médico ou pela Telos.AI</li>
+        <li>O WhatsApp é um aplicativo de terceiros (Meta/Facebook) não controlado pelo médico ou pela VigIA</li>
         <li>Problemas técnicos do WhatsApp (instabilidade, bloqueios, alterações de política) estão fora do controle do serviço</li>
         <li>Em caso de indisponibilidade do WhatsApp, outros meios de contato devem ser utilizados</li>
-        <li>A plataforma Telos.AI fará o melhor esforço para garantir disponibilidade, mas não pode garantir 100% de uptime</li>
+        <li>A plataforma VigIA fará o melhor esforço para garantir disponibilidade, mas não pode garantir 100% de uptime</li>
       </ul>
 
       <h3>10. Situações de Emergência - IMPORTANTE:</h3>
@@ -395,7 +395,7 @@ export const termoTemplates = {
       <h3>11. Custos e Faturamento:</h3>
       <p>Fui informado(a) que:</p>
       <ul>
-        <li>O acompanhamento via WhatsApp/Telos.AI está incluso no valor da consulta pós-operatória</li>
+        <li>O acompanhamento via WhatsApp/VigIA está incluso no valor da consulta pós-operatória</li>
         <li>Não há custos adicionais para utilizar este serviço</li>
         <li>Custos de dados móveis ou internet são de responsabilidade do paciente</li>
         <li>Consultas presenciais adicionais podem ser cobradas conforme tabela do médico</li>
@@ -421,7 +421,7 @@ export const termoTemplates = {
       <ul>
         <li>Estudos sobre eficácia do acompanhamento pós-operatório remoto</li>
         <li>Pesquisas sobre Inteligência Artificial aplicada à medicina</li>
-        <li>Melhoria contínua da plataforma Telos.AI</li>
+        <li>Melhoria contínua da plataforma VigIA</li>
         <li>Publicações científicas (sempre de forma anonimizada)</li>
       </ul>
       <p>Compreendo que em nenhuma hipótese minha identidade será revelada.</p>
@@ -453,7 +453,7 @@ export const termoTemplates = {
         <li>Tive oportunidade de esclarecer todas as minhas dúvidas</li>
         <li>Compreendo os limites e alcance do acompanhamento via WhatsApp</li>
         <li>Estou ciente de que devo procurar atendimento presencial em emergências</li>
-        <li>Autorizo expressamente o acompanhamento pós-operatório via WhatsApp integrado à plataforma Telos.AI</li>
+        <li>Autorizo expressamente o acompanhamento pós-operatório via WhatsApp integrado à plataforma VigIA</li>
         <li>Autorizo o tratamento dos meus dados conforme descrito neste termo</li>
         <li>Autorizo o uso de dados anonimizados para pesquisa científica</li>
         <li>Recebi uma cópia deste termo para meus registros</li>

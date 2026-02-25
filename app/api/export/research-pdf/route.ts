@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const generator = await ResearchPDFGenerator.create({
       title: research.title,
       subtitle: research.description.substring(0, 200),
-      author: session.user.name || "Telos.AI User",
+      author: session.user.name || "VigIA User",
       date: new Date(),
       includeTableOfContents: true,
       includeCoverPage: true,

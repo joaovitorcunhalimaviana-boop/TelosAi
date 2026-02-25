@@ -82,7 +82,7 @@ export function InteractiveScatterChart({
     showGridLines: true,
     showDataLabels: false,
     showLegend: true,
-    colorScheme: 'telos',
+    colorScheme: 'vigia',
     axisScaleX: 'linear',
     axisScaleY: 'linear',
     opacity: 100,

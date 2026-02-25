@@ -121,7 +121,7 @@ export default function PatientRegistrationExample() {
  * - Responsive design for mobile and desktop
  *
  * NOTES:
- * - The modal uses Telos.AI brand colors (#0A2647, #D4AF37)
+ * - The modal uses VigIA brand colors (#0A2647, #D4AF37)
  * - Toast notifications use 'sonner' library
  * - All UI components are from shadcn/ui
  * - Icons from lucide-react

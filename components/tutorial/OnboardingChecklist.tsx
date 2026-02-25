@@ -105,7 +105,7 @@ export function OnboardingChecklist() {
               Parabéns! Você completou o onboarding! 🎉
             </h3>
             <p className="text-sm text-green-700">
-              Agora você domina todas as funcionalidades principais do Telos.AI
+              Agora você domina todas as funcionalidades principais do VigIA
             </p>
             <Button
               variant="outline"
@@ -217,7 +217,7 @@ export function OnboardingChecklist() {
           {/* Encouragement Message */}
           <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-3 border border-blue-200">
             <p className="text-sm text-blue-800 text-center font-medium">
-              {completedCount === 0 && '🚀 Comece sua jornada no Telos.AI!'}
+              {completedCount === 0 && '🚀 Comece sua jornada no VigIA!'}
               {completedCount > 0 && completedCount < 3 && '💪 Continue! Você está indo muito bem!'}
               {completedCount >= 3 && completedCount < totalCount && '⭐ Quase lá! Falta pouco!'}
             </p>

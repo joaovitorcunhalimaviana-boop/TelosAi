@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import { FadeIn } from "@/components/animations"
 
 interface FAQItem {
@@ -15,7 +15,7 @@ const faqData: FAQItem[] = [
   // CATEGORIA: INTELIGÊNCIA ARTIFICIAL
   {
     category: "ia",
-    question: "Como funciona o Machine Learning no Telos.AI?",
+    question: "Como funciona o Machine Learning no VigIA?",
     answer: "O sistema usa um modelo de ML que analisa 15+ variáveis clínicas (idade, comorbidades, tipo de cirurgia, dor, sangramento, etc.) para calcular o risco de complicações. O modelo foi treinado com Random Forest e Gradient Boosting, técnicas consolidadas em medicina preditiva."
   },
   {
@@ -42,8 +42,8 @@ const faqData: FAQItem[] = [
   // CATEGORIA: GERAL
   {
     category: "geral",
-    question: "O que é o Telos.AI?",
-    answer: "Telos.AI é um sistema completo de acompanhamento pós-operatório com IA. Envia questionários automatizados via WhatsApp, analisa respostas com Machine Learning, detecta complicações precocemente e organiza dados para pesquisa científica."
+    question: "O que é o VigIA?",
+    answer: "VigIA é um sistema completo de acompanhamento pós-operatório com IA. Envia questionários automatizados via WhatsApp, analisa respostas com Machine Learning, detecta complicações precocemente e organiza dados para pesquisa científica."
   },
   {
     category: "geral",
@@ -73,7 +73,7 @@ const faqData: FAQItem[] = [
   {
     category: "geral",
     question: "O sistema substitui o médico?",
-    answer: "Não. O Telos.AI é uma ferramenta de suporte à decisão. Você continua sendo o responsável por todas as decisões clínicas. O sistema apenas te ajuda a identificar problemas mais cedo e organizar informações."
+    answer: "Não. O VigIA é uma ferramenta de suporte à decisão. Você continua sendo o responsável por todas as decisões clínicas. O sistema apenas te ajuda a identificar problemas mais cedo e organizar informações."
   },
 
   // CATEGORIA: PREÇOS
@@ -163,7 +163,7 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <TelosHeader />
+      <VigiaHeader />
 
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-white via-blue-50/30 to-white">
@@ -178,7 +178,7 @@ export default function FAQPage() {
               </div>
 
               <h1 className="text-4xl lg:text-5xl font-bold text-telos-blue mb-6">
-                Dúvidas sobre o Telos.AI?
+                Dúvidas sobre o VigIA?
               </h1>
               <p className="text-lg text-gray-600">
                 Respostas honestas e diretas sobre IA, Machine Learning, preços e funcionalidades
@@ -313,8 +313,7 @@ export default function FAQPage() {
         <div className="container mx-auto px-6">
           <div className="text-center space-y-4">
             <div className="flex items-baseline justify-center gap-0.5">
-              <span className="telos-brand text-3xl text-white">Telos</span>
-              <span className="telos-ai text-3xl text-telos-gold">.AI</span>
+              <span className="text-3xl font-bold text-white">VigIA</span>
             </div>
             <p className="text-blue-200">
               A Inteligência no Cuidado para o Propósito da Recuperação
@@ -334,7 +333,7 @@ export default function FAQPage() {
               </Link>
             </div>
             <p className="text-blue-200 text-sm">
-              © 2025 Telos.AI - Dr. João Vitor Viana. Todos os direitos reservados.
+              © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
             </p>
           </div>
         </div>

@@ -10,71 +10,114 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Telos.AI Brand Colors
-        telos: {
-          // Primary Blue Scale
-          blue: {
-            50: '#E6EBF2',
-            100: '#B3C5DB',
-            200: '#8099C4',
-            300: '#4D6CAD',
-            400: '#264E8D',
-            500: '#0A2647', // Main brand color
-            600: '#081E39',
-            700: '#06162B',
-            800: '#040E1D',
-            900: '#02070E',
+        // VigIA Brand Colors
+        vigia: {
+          // Core Dark Scale
+          midnight: '#0B0E14',   // Background principal
+          deep: '#111520',       // Cards, elementos elevados
+          surface: '#161B27',    // Superfícies secundárias
+          border: '#1E2535',     // Bordas
+          muted: '#2A3147',      // Elementos inativos
+          navy: '#1A2544',       // Fundo alternativo
+          // Accent Teal Scale
+          teal: {
+            DEFAULT: '#0D7377', // Acento principal
+            50: '#E6F5F5',
+            100: '#B3E0E0',
+            200: '#80CCCC',
+            300: '#4DB8B8',
+            400: '#1AA3A3',
+            500: '#0D7377',
+            600: '#0A5C5F',
+            700: '#084547',
+            800: '#052E30',
+            900: '#031718',
+            light: '#14BDAE',  // Acento ativo, links, IA
           },
           // Accent Gold Scale
+          gold: {
+            DEFAULT: '#C9A84C', // Acento secundário
+            50: '#FBF8EF',
+            100: '#F5ECCC',
+            200: '#EFE0A9',
+            300: '#E8C97A',     // gold-light - taglines, itálicos
+            400: '#D9B85E',
+            500: '#C9A84C',
+            600: '#B89630',
+            700: '#8B7124',
+            800: '#5E4C18',
+            900: '#31260C',
+            light: '#E8C97A',  // Taglines, itálicos
+          },
+          // Text Colors
+          cream: '#F0EAD6',    // Texto principal (sobre escuro)
+          text: '#D8DEEB',     // Texto corpo
+          'text-dim': '#7A8299', // Texto secundário
+          // Semantic Colors
+          danger: '#C0392B',   // Alertas, erros
+          success: '#1A8C6A',  // Status ok
+        },
+        // Backwards-compatible aliases (telos → vigia mapping)
+        telos: {
+          blue: {
+            50: '#E6F5F5',
+            100: '#B3E0E0',
+            200: '#80CCCC',
+            300: '#4DB8B8',
+            400: '#1AA3A3',
+            500: '#0D7377',
+            600: '#0A5C5F',
+            700: '#084547',
+            800: '#052E30',
+            900: '#031718',
+          },
           gold: {
             50: '#FBF8EF',
             100: '#F5ECCC',
             200: '#EFE0A9',
-            300: '#E9D486',
-            400: '#DFC75E',
-            500: '#D4AF37', // Main gold
+            300: '#E8C97A',
+            400: '#D9B85E',
+            500: '#C9A84C',
             600: '#B89630',
             700: '#8B7124',
             800: '#5E4C18',
             900: '#31260C',
           },
-          // Research Purple Scale
           purple: {
-            50: '#F3EEFB',
-            100: '#DCC9F3',
-            200: '#C5A4EB',
-            300: '#AE7FE3',
-            400: '#9760DB',
-            500: '#7C3AED', // Research accent
-            600: '#6930CA',
-            700: '#5626A7',
-            800: '#431C84',
-            900: '#301261',
+            50: '#E6F5F5',
+            100: '#B3E0E0',
+            200: '#80CCCC',
+            300: '#4DB8B8',
+            400: '#1AA3A3',
+            500: '#0D7377',
+            600: '#0A5C5F',
+            700: '#084547',
+            800: '#052E30',
+            900: '#031718',
           },
-          // Semantic Colors
           success: {
             50: '#ECFDF5',
-            500: '#10B981',
-            600: '#059669',
-            700: '#047857',
+            500: '#1A8C6A',
+            600: '#158A63',
+            700: '#10785A',
           },
           warning: {
             50: '#FFFBEB',
-            500: '#F59E0B',
-            600: '#D97706',
-            700: '#B45309',
+            500: '#C9A84C',
+            600: '#B89630',
+            700: '#8B7124',
           },
           error: {
             50: '#FEF2F2',
-            500: '#EF4444',
-            600: '#DC2626',
-            700: '#B91C1C',
+            500: '#C0392B',
+            600: '#A93226',
+            700: '#922B21',
           },
           info: {
-            50: '#EFF6FF',
-            500: '#3B82F6',
-            600: '#2563EB',
-            700: '#1D4ED8',
+            50: '#E6F5F5',
+            500: '#14BDAE',
+            600: '#0D7377',
+            700: '#0A5C5F',
           },
         },
 
@@ -136,9 +179,10 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['Inter', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'var(--font-geist-mono)', 'monospace'],
-        brand: ['Georgia', 'Times New Roman', 'serif'],
+        sans: ['Syne', 'var(--font-syne)', 'system-ui', 'sans-serif'],
+        mono: ['DM Mono', 'var(--font-dm-mono)', 'monospace'],
+        brand: ['Cormorant Garamond', 'var(--font-cormorant)', 'Georgia', 'serif'],
+        display: ['Cormorant Garamond', 'var(--font-cormorant)', 'Georgia', 'serif'],
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1rem' }],        // 12px
@@ -161,9 +205,10 @@ const config: Config = {
       },
       boxShadow: {
         xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        'gold-glow': '0 0 30px rgba(212, 175, 55, 0.5)',
-        'blue-glow': '0 0 30px rgba(10, 38, 71, 0.3)',
-        'purple-glow': '0 0 30px rgba(124, 58, 237, 0.4)',
+        'gold-glow': '0 0 30px rgba(201, 168, 76, 0.5)',
+        'teal-glow': '0 0 30px rgba(13, 115, 119, 0.4)',
+        'blue-glow': '0 0 30px rgba(13, 115, 119, 0.3)',
+        'purple-glow': '0 0 30px rgba(13, 115, 119, 0.4)',
         'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card-hover': '0 10px 20px -5px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
       },

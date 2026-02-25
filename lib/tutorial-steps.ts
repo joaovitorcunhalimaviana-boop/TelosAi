@@ -1,6 +1,6 @@
 /**
  * Tutorial Steps Configuration
- * Defines all interactive tutorials for the Telos.AI platform
+ * Defines all interactive tutorials for the VigIA platform
  */
 
 import { DriveStep } from 'driver.js';
@@ -93,7 +93,7 @@ export const dashboardTourSteps: DriveStep[] = [
   {
     element: '#dashboard-header',
     popover: {
-      title: '👋 Bem-vindo ao Telos.AI',
+      title: '👋 Bem-vindo ao VigIA',
       description: 'Este é seu painel de controle médico. Aqui você acompanha todos os seus pacientes em tempo real e gerencia pesquisas clínicas.',
       side: 'bottom',
       align: 'start',
@@ -604,7 +604,7 @@ export const dataExportSteps: DriveStep[] = [
     element: '[data-tutorial="apa-citation"]',
     popover: {
       title: '📚 Citação Automática',
-      description: 'Gera citação formatada APA 7th: "Viana, J. V. (2025). Título da Pesquisa. Sistema Telos.AI, v1.0."',
+      description: 'Gera citação formatada APA 7th: "Viana, J. V. (2025). Título da Pesquisa. Sistema VigIA, v1.0."',
       side: 'bottom',
       align: 'center',
     },

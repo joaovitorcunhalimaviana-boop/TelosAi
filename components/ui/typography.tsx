@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Typography Components for Telos.AI Design System
+ * Typography Components for VigIA Design System
  *
  * Consistent, semantic typography components with proper hierarchy
  * and accessibility built-in.
@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 // HEADING COMPONENT
 // ============================================================================
 
-const headingVariants = cva("font-semibold text-telos-blue-500", {
+const headingVariants = cva("font-semibold text-vigia-teal-500", {
   variants: {
     level: {
       1: "text-4xl lg:text-5xl leading-tight tracking-tight",
@@ -210,7 +210,7 @@ const labelVariants = cva("font-medium text-gray-700", {
       base: "text-base",
     },
     required: {
-      true: "after:content-['*'] after:ml-1 after:text-telos-error-500",
+      true: "after:content-['*'] after:ml-1 after:text-vigia-error-500",
     },
   },
   defaultVariants: {
@@ -247,14 +247,14 @@ export function LabelText({
 // ============================================================================
 
 const linkVariants = cva(
-  "transition-colors duration-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-telos-blue-500 focus-visible:ring-offset-2 rounded-sm",
+  "transition-colors duration-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vigia-teal-500 focus-visible:ring-offset-2 rounded-sm",
   {
     variants: {
       variant: {
-        default: "text-telos-blue-500 hover:text-telos-blue-600 underline",
-        subtle: "text-gray-600 hover:text-telos-blue-500 hover:underline",
-        gold: "text-telos-gold-500 hover:text-telos-gold-600 underline",
-        destructive: "text-telos-error-500 hover:text-telos-error-600 underline",
+        default: "text-vigia-teal-500 hover:text-vigia-teal-600 underline",
+        subtle: "text-gray-600 hover:text-vigia-teal-500 hover:underline",
+        gold: "text-vigia-gold-500 hover:text-vigia-gold-600 underline",
+        destructive: "text-vigia-error-500 hover:text-vigia-error-600 underline",
       },
       size: {
         sm: "text-sm",
@@ -322,10 +322,10 @@ const codeVariants = cva(
     variants: {
       variant: {
         default: "bg-gray-100 text-gray-800 border border-gray-200",
-        primary: "bg-telos-blue-50 text-telos-blue-700 border border-telos-blue-200",
-        success: "bg-telos-success-50 text-telos-success-700 border border-telos-success-200",
-        warning: "bg-telos-warning-50 text-telos-warning-700 border border-telos-warning-200",
-        error: "bg-telos-error-50 text-telos-error-700 border border-telos-error-200",
+        primary: "bg-vigia-teal-50 text-vigia-teal-700 border border-vigia-teal-200",
+        success: "bg-vigia-success-50 text-vigia-success-700 border border-vigia-success-200",
+        warning: "bg-vigia-warning-50 text-vigia-warning-700 border border-vigia-warning-200",
+        error: "bg-vigia-error-50 text-vigia-error-700 border border-vigia-error-200",
       },
       size: {
         xs: "text-xs",
@@ -379,7 +379,7 @@ export function Blockquote({
   return (
     <blockquote
       className={cn(
-        "border-l-4 border-telos-gold-500 pl-6 py-2 italic text-gray-700 bg-gray-50 rounded-r",
+        "border-l-4 border-vigia-gold-500 pl-6 py-2 italic text-gray-700 bg-gray-50 rounded-r",
         className
       )}
       cite={cite}
@@ -434,7 +434,7 @@ export function List({
         ? React.Children.map(children, (child) => (
             <li className="flex items-start gap-2">
               <svg
-                className="h-5 w-5 text-telos-success-500 mt-0.5 shrink-0"
+                className="h-5 w-5 text-vigia-success-500 mt-0.5 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -463,11 +463,11 @@ const textVariants = cva("", {
     variant: {
       default: "text-gray-700",
       muted: "text-gray-500",
-      primary: "text-telos-blue-500",
-      gold: "text-telos-gold-500",
-      success: "text-telos-success-500",
-      warning: "text-telos-warning-500",
-      error: "text-telos-error-500",
+      primary: "text-vigia-teal-500",
+      gold: "text-vigia-gold-500",
+      success: "text-vigia-success-500",
+      warning: "text-vigia-warning-500",
+      error: "text-vigia-error-500",
       white: "text-white",
     },
     size: {

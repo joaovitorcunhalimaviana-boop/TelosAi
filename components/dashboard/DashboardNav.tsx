@@ -45,7 +45,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
       {/* Admin link para admins */}
       {userRole === "admin" && (
         <Link href="/admin">
-          <Button size="sm" variant="outline" className="gap-2 border-blue-600 text-blue-600 hover:bg-blue-50">
+          <Button size="sm" variant="outline" className="gap-2 border-[#0D7377] text-[#0D7377] hover:bg-teal-50">
             <Shield className="h-4 w-4" />
             Admin Dashboard
           </Button>

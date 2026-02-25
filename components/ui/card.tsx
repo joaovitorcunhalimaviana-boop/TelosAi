@@ -10,7 +10,7 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: "bg-card text-card-foreground",
-        glass: "glass-card text-telos-blue",
+        glass: "glass-card text-vigia-teal",
         "glass-dark": "glass-card-dark text-white",
         outline: "bg-transparent border-2",
         ghost: "border-none shadow-none bg-transparent",

@@ -73,7 +73,7 @@ export default function OnboardingPage() {
 
               <div>
                 <h1 className="text-4xl font-bold text-telos-blue mb-4">
-                  Bem-vindo ao Telos.AI, {doctorName}!
+                  Bem-vindo ao VigIA, {doctorName}!
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                   Estamos felizes em tê-lo conosco. Vamos fazer um tour rápido
@@ -260,7 +260,7 @@ export default function OnboardingPage() {
                   Tudo Pronto!
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-                  Você está pronto para começar a usar o Telos.AI.
+                  Você está pronto para começar a usar o VigIA.
                   Que tal cadastrar seu primeiro paciente?
                 </p>
               </div>

@@ -56,7 +56,7 @@ export default function StyleGuidePage() {
             </div>
             <div>
               <h1 className="text-4xl font-bold" style={{ color: COLORS.primary }}>
-                Telos.AI Design System
+                VigIA Design System
               </h1>
               <p className="text-lg text-gray-600 mt-1">
                 Style Guide & Component Library
@@ -107,13 +107,13 @@ export default function StyleGuidePage() {
               <CardHeader>
                 <CardTitle>Primary Colors</CardTitle>
                 <CardDescription>
-                  Telos Blue, Gold, and Purple - The foundation of our brand identity
+                  VigIA Blue, Gold, and Purple - The foundation of our brand identity
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                {/* Telos Blue */}
+                {/* VigIA Blue */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Telos Blue</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Blue</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#E6EBF2' },
@@ -140,9 +140,9 @@ export default function StyleGuidePage() {
                   </div>
                 </div>
 
-                {/* Telos Gold */}
+                {/* VigIA Gold */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Telos Gold</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Gold</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#FBF8EF' },
@@ -169,9 +169,9 @@ export default function StyleGuidePage() {
                   </div>
                 </div>
 
-                {/* Telos Purple */}
+                {/* VigIA Purple */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Telos Purple (Research)</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Purple (Research)</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#F3EEFB' },
@@ -738,7 +738,7 @@ export default function StyleGuidePage() {
         <div className="mt-16 pt-8 border-t border-gray-200">
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              Telos.AI Design System v1.0.0 &quot; Last Updated: November 11, 2025
+              VigIA Design System v1.0.0 &quot; Last Updated: November 11, 2025
             </p>
             <div className="flex justify-center gap-6 text-sm">
               <a href="/dashboard" className="text-telos-blue-500 hover:underline">Dashboard</a>

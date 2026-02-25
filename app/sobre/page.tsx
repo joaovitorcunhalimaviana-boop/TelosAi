@@ -2,13 +2,13 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import { FadeIn } from "@/components/animations/FadeIn"
 
 export default function SobrePage() {
   return (
     <div className="min-h-screen bg-white">
-      <TelosHeader />
+      <VigiaHeader />
 
       {/* Hero Section */}
       <section className="py-20 bg-white relative overflow-hidden">
@@ -16,9 +16,8 @@ export default function SobrePage() {
           <FadeIn delay={0.1} direction="up">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <h1 className="text-5xl lg:text-6xl font-bold">
-                Sobre o{" "}
-                <span className="telos-brand text-telos-blue">Telos</span>
-                <span className="telos-ai text-telos-gold">.AI</span>
+                Sobre a{" "}
+                <span className="font-bold text-telos-blue">VigIA</span>
               </h1>
               <p className="text-2xl text-gray-700 font-light">
                 A{" "}
@@ -46,14 +45,13 @@ export default function SobrePage() {
                   <h2 className="text-3xl font-bold text-telos-blue">O Projeto</h2>
                   <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                     <p className="text-justify">
-                      <span className="telos-brand font-semibold text-telos-blue">Telos</span>
-                      <span className="telos-ai font-semibold text-telos-gold">.AI</span> nasceu da
+                      <span className="font-semibold text-telos-blue">VigIA</span> nasceu da
                       intersecção entre medicina e tecnologia, com um propósito claro: transformar o
                       acompanhamento pós-operatório através da Inteligência Artificial.
                     </p>
                     <p className="text-justify">
-                      <em>Telos</em>, na filosofia aristotélica, significa <strong>&quot;propósito final&quot;</strong> ou <strong>&quot;fim último&quot;</strong> —
-                      a razão pela qual algo existe. Para nós, esse propósito é a recuperação plena do paciente,
+                      <em>VigIA</em> une <strong>&quot;Vigilância&quot;</strong> e <strong>&quot;IA&quot;</strong> (Inteligência Artificial) —
+                      olhos atentos 24 horas por dia sobre a recuperação do seu paciente,
                       o objetivo que guia cada decisão clínica e cada funcionalidade da plataforma.
                     </p>
                     <p className="text-justify">
@@ -93,7 +91,7 @@ export default function SobrePage() {
                   <div className="relative w-full h-[400px] flex items-center justify-center">
                     <Image
                       src="/icons/icon-512.png"
-                      alt="Telos.AI"
+                      alt="VigIA Logo"
                       width={350}
                       height={350}
                       className="drop-shadow-2xl hover-scale"
@@ -157,7 +155,7 @@ export default function SobrePage() {
                     <blockquote className="border-l-4 border-telos-gold pl-6 py-4 bg-blue-50/50 rounded-r-lg">
                       <p className="text-gray-700 italic text-lg leading-relaxed text-justify">
                         &quot;A tecnologia não substitui o médico, mas potencializa sua capacidade de
-                        cuidar. Com Telos.AI, cada médico pode acompanhar pacientes com mais
+                        cuidar. Com VigIA, cada médico pode acompanhar pacientes com mais
                         qualidade, identificando problemas antes que se tornem complicações.&quot;
                       </p>
                       <footer className="mt-4 text-telos-blue font-semibold">
@@ -257,7 +255,7 @@ export default function SobrePage() {
 
                 <p className="text-justify">
                   Mais do que isso, estamos construindo uma <strong className="text-telos-gold">inteligência coletiva</strong>: cada médico
-                  que usa Telos.AI contribui para um sistema que aprende com a experiência de centenas
+                  que usa VigIA contribui para um sistema que aprende com a experiência de centenas
                   de profissionais. Isso significa que decisões clínicas se tornam mais precisas, guidelines
                   se adaptam à realidade brasileira, e o conhecimento médico se multiplica exponencialmente.
                 </p>
@@ -274,12 +272,12 @@ export default function SobrePage() {
         </div>
       </section>
 
-      {/* Por que Telos.AI é Diferente */}
+      {/* Por que VigIA é Diferente */}
       <section className="py-20 bg-white relative overflow-hidden">
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto space-y-12">
             <FadeIn delay={0.1} direction="up">
-              <h2 className="text-3xl font-bold text-telos-blue text-center">Por que Telos.AI é Diferente</h2>
+              <h2 className="text-3xl font-bold text-telos-blue text-center">Por que a VigIA é Diferente</h2>
             </FadeIn>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -314,7 +312,7 @@ export default function SobrePage() {
                     <div className="space-y-3">
                       <h3 className="text-xl font-bold text-telos-blue">Inteligência Coletiva</h3>
                       <p className="text-gray-700 leading-relaxed text-justify">
-                        Cada médico que usa Telos.AI contribui para um sistema que <strong>aprende
+                        Cada médico que usa VigIA contribui para um sistema que <strong>aprende
                           com múltiplos profissionais</strong>. Sua experiência clínica ajuda a melhorar
                         os alertas para toda a comunidade médica. Juntos, somos mais fortes.
                       </p>
@@ -404,8 +402,7 @@ export default function SobrePage() {
             {/* Company Info */}
             <div className="space-y-6">
               <div className="flex items-baseline gap-0.5">
-                <span className="telos-brand text-3xl text-white">Telos</span>
-                <span className="telos-ai text-3xl text-telos-gold">.AI</span>
+                <span className="text-3xl font-bold text-white">VigIA</span>
               </div>
               <p className="text-blue-200 leading-relaxed text-justify">
                 A Inteligência no Cuidado para o Propósito da Recuperação.
@@ -549,7 +546,7 @@ export default function SobrePage() {
           <div className="border-t border-white/10 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-blue-200 text-sm text-center md:text-left">
-                © 2025 Telos.AI - Dr. João Vitor Viana. Todos os direitos reservados.
+                © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">

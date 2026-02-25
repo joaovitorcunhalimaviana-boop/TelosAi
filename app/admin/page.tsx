@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-[#0A2647]">
-                Admin Dashboard - Telos.AI
+                Admin Dashboard - VigIA
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Sistema de Acompanhamento Pós-Operatório

@@ -76,7 +76,7 @@ export function ScrollVideoSection() {
                                 Clique para assistir
                             </p>
                             <p className="text-white/40 text-sm font-medium tracking-widest uppercase">
-                                Apresentação Telos.AI
+                                Apresentação VigIA
                             </p>
                         </div>
                     </div>

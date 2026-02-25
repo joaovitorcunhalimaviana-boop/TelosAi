@@ -41,9 +41,9 @@ export function FloatingParticles({ count = 60 }: FloatingParticlesProps) {
 
     // Cores mais visíveis mas ainda sutis
     const colors = [
-      'rgba(10, 38, 71, 0.5)',   // telos-blue mais visível
-      'rgba(212, 175, 55, 0.4)', // telos-gold
-      'rgba(44, 116, 179, 0.4)'  // telos-blue-light
+      'rgba(13, 115, 119, 0.5)',  // vigia-teal
+      'rgba(201, 168, 76, 0.4)',  // vigia-gold
+      'rgba(20, 189, 174, 0.4)'   // vigia-teal-light
     ]
 
     for (let i = 0; i < particleCount; i++) {
@@ -109,7 +109,7 @@ export function FloatingParticles({ count = 60 }: FloatingParticlesProps) {
             ctx.beginPath()
             ctx.moveTo(particle.x, particle.y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `rgba(10, 38, 71, ${opacity})`
+            ctx.strokeStyle = `rgba(13, 115, 119, ${opacity})`
             ctx.lineWidth = 0.8
             ctx.stroke()
           }

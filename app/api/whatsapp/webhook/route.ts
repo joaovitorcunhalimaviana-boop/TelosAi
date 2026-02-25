@@ -448,7 +448,7 @@ async function processTextMessage(message: any) {
       // Mensagem inicial de saudação + pergunta sobre dor EM REPOUSO
       const initialMessage = `Olá ${firstName}! 👋
 
-Aqui é a *Lia*, assistente virtual de acompanhamento pós-operatório.
+Aqui é a *VigIA*, assistente virtual de acompanhamento pós-operatório.
 
 Vamos atualizar como você está hoje, no seu *${daysPostOp}º dia* pós-cirurgia.
 
@@ -557,7 +557,7 @@ Por favor, me diga um número de 0 a 10, onde:
     await sendEmpatheticResponse(
       phone,
       `Olá ${patient.name.split(' ')[0]}! 👋\n\n` +
-      `Aqui é a Lia. No momento não há questionário pendente para responder.\n\n` +
+      `Aqui é a VigIA. No momento não há questionário pendente para responder.\n\n` +
       `Se tiver alguma dúvida ou preocupação, entre em contato com o consultório.`
     );
 
@@ -569,7 +569,7 @@ Por favor, me diga um número de 0 a 10, onde:
       if (phone) {
         await sendEmpatheticResponse(
           phone,
-          'Oi! Aqui é a Lia. Tive um probleminha técnico, mas já estou de volta. ' +
+          'Oi! Aqui é a VigIA. Tive um probleminha técnico, mas já estou de volta. ' +
           'Pode repetir o que disse? 😊'
         );
       }

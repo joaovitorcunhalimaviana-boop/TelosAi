@@ -31,7 +31,7 @@ export interface ChartSettings {
   showGridLines: boolean;
   showDataLabels: boolean;
   showLegend: boolean;
-  colorScheme: 'telos' | 'viridis' | 'categorical' | 'monochrome';
+  colorScheme: 'vigia' | 'viridis' | 'categorical' | 'monochrome';
   axisScaleX: 'linear' | 'log';
   axisScaleY: 'linear' | 'log';
   opacity: number;
@@ -88,7 +88,7 @@ export function ChartControls({
       showGridLines: true,
       showDataLabels: false,
       showLegend: true,
-      colorScheme: 'telos',
+      colorScheme: 'vigia',
       axisScaleX: 'linear',
       axisScaleY: 'linear',
       opacity: 100,
@@ -183,14 +183,14 @@ export function ChartControls({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="telos">
+                  <SelectItem value="vigia">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-0.5">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#0A2647' }} />
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#144272' }} />
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#205295' }} />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#0D7377' }} />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#14BDAE' }} />
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#C9A84C' }} />
                       </div>
-                      Telos.AI (Azul)
+                      VigIA (Teal)
                     </div>
                   </SelectItem>
                   <SelectItem value="viridis">
@@ -321,8 +321,8 @@ export function ChartControls({
 
 export function getColorPalette(scheme: ChartSettings['colorScheme']): string[] {
   switch (scheme) {
-    case 'telos':
-      return ['#0A2647', '#144272', '#205295', '#2C74B3', '#3A8BC9', '#4EA5D9'];
+    case 'vigia':
+      return ['#0D7377', '#14BDAE', '#C9A84C', '#E8C97A', '#1A2544'];
     case 'viridis':
       return ['#440154', '#31688e', '#35b779', '#fde724'];
     case 'categorical':
@@ -330,6 +330,6 @@ export function getColorPalette(scheme: ChartSettings['colorScheme']): string[] 
     case 'monochrome':
       return ['#1f2937', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'];
     default:
-      return ['#0A2647', '#144272', '#205295', '#2C74B3'];
+      return ['#0D7377', '#14BDAE', '#C9A84C', '#1A2544'];
   }
 }

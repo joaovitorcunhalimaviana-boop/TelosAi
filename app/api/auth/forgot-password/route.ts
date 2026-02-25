@@ -62,9 +62,9 @@ export async function POST(request: NextRequest) {
     if (resend) {
       try {
         await resend.emails.send({
-          from: "Telos.AI <noreply@telos.ai>",
+          from: "VigIA <noreply@vigia.med.br>",
           to: email,
-          subject: "Recuperação de Senha - Telos.AI",
+          subject: "Recuperação de Senha - VigIA",
           html: `
             <!DOCTYPE html>
             <html>
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
               </head>
               <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #0A2647 0%, #144272 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                  <h1 style="color: white; margin: 0; font-size: 28px;">Telos.AI</h1>
+                  <h1 style="color: white; margin: 0; font-size: 28px;">VigIA</h1>
                   <p style="color: #D4AF37; margin: 10px 0 0 0; font-size: 14px;">Acompanhamento Pós-Operatório Inteligente</p>
                 </div>
 
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
                   <p>Olá <strong>${user.nomeCompleto}</strong>,</p>
 
-                  <p>Recebemos uma solicitação para redefinir a senha da sua conta Telos.AI.</p>
+                  <p>Recebemos uma solicitação para redefinir a senha da sua conta VigIA.</p>
 
                   <p>Clique no botão abaixo para criar uma nova senha:</p>
 
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
                 <div style="background: #f5f5f5; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;">
                   <p style="margin: 0; font-size: 12px; color: #666;">
-                    © ${new Date().getFullYear()} Telos.AI - Sistema de Acompanhamento Pós-Operatório
+                    © ${new Date().getFullYear()} VigIA - Sistema de Acompanhamento Pós-Operatório
                   </p>
                   <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">
                     Este é um email automático. Por favor, não responda.

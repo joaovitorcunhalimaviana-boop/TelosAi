@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { TelosHeader } from "@/components/TelosHeader";
+import { VigiaHeader } from "@/components/VigiaHeader";
 import { Button } from "@/components/ui/button";
 
 function AuthErrorPage() {
@@ -21,14 +21,14 @@ function AuthErrorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-      <TelosHeader />
+      <VigiaHeader />
 
       <div className="container mx-auto px-6 py-16">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <div className="inline-flex items-baseline gap-0.5 mb-6">
-              <span className="telos-brand text-5xl text-white">Telos</span>
-              <span className="telos-ai text-5xl text-telos-gold">.AI</span>
+              <span className="telos-brand text-5xl font-bold text-white">Vig</span>
+              <span className="telos-ai text-5xl text-telos-gold">IA</span>
             </div>
           </div>
 

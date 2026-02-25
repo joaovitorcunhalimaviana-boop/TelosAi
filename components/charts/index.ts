@@ -1,4 +1,4 @@
-// Interactive Chart Components for Telos.AI
+// Interactive Chart Components for VigIA
 // Publication-quality, interactive visualizations with advanced features
 
 export { CustomTooltip } from './CustomTooltip';

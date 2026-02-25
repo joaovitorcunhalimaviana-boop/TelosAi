@@ -23,7 +23,7 @@ export function DashboardHeader() {
           <div className="relative w-14 h-14">
             <Image
               src="/icons/icon-192.png"
-              alt="Telos.AI Logo"
+              alt="VigIA Logo"
               width={56}
               height={56}
               className="transition-transform group-hover:scale-110"
@@ -31,8 +31,10 @@ export function DashboardHeader() {
             />
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-xl font-bold" style={{ color: '#0A2647' }}>Telos.AI</h1>
-            <p className="text-xs text-gray-600">Inteligência no Cuidado</p>
+            <h1 className="text-xl font-brand font-bold" style={{ color: '#0D7377' }}>
+              Vig<span style={{ color: '#14BDAE' }}>IA</span>
+            </h1>
+            <p className="text-xs text-gray-600">Vigilância contínua</p>
           </div>
         </Link>
 
@@ -40,7 +42,7 @@ export function DashboardHeader() {
         <nav className="hidden md:flex items-center gap-6 mx-6">
           <Link
             href="/dashboard"
-            className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+            className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
               }`}
           >
             Dashboard
@@ -49,7 +51,7 @@ export function DashboardHeader() {
           {(isMedico || isAdmin) && (
             <Link
               href="/dashboard/protocolos"
-              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/protocolos' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/protocolos' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
                 }`}
             >
               Protocolos
@@ -59,7 +61,7 @@ export function DashboardHeader() {
           <Link
             href="/dashboard/pesquisas"
             data-tutorial="research-btn"
-            className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/pesquisas' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+            className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/pesquisas' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
               }`}
           >
             Pesquisas
@@ -68,7 +70,7 @@ export function DashboardHeader() {
           {(isMedico || isAdmin) && (
             <Link
               href="/dashboard/dados-agregados"
-              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/dados-agregados' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/dados-agregados' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
                 }`}
             >
               Dados Agregados
@@ -78,7 +80,7 @@ export function DashboardHeader() {
           {isMedico && (
             <Link
               href="/dashboard/billing"
-              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/dashboard/billing' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/billing' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
                 }`}
             >
               Meu Plano
@@ -88,7 +90,7 @@ export function DashboardHeader() {
           {isAdmin && (
             <Link
               href="/admin"
-              className={`text-sm font-medium transition-colors hover:text-[#0A2647] ${pathname === '/admin' ? 'text-[#0A2647] font-bold' : 'text-gray-500'
+              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/admin' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
                 }`}
             >
               Admin
@@ -102,10 +104,10 @@ export function DashboardHeader() {
           <NotificationBell />
 
           {session?.user && (
-            <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-lg">
-              <User className="w-5 h-5 text-telos-blue" />
+            <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-teal-50 rounded-lg">
+              <User className="w-5 h-5 text-vigia-teal" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-telos-blue">
+                <span className="text-sm font-semibold text-vigia-teal">
                   {session.user.name}
                 </span>
                 <span className="text-xs text-gray-600 capitalize">
@@ -126,7 +128,7 @@ export function DashboardHeader() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 text-telos-blue">
+        <button className="md:hidden p-2 text-vigia-teal">
           <svg
             className="w-6 h-6"
             fill="none"

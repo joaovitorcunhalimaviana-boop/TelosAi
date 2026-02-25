@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **PostRegistrationModal** is a fully-featured React component that displays after successful patient registration, allowing doctors to optionally assign patients to active research studies. Built with Telos.AI branding, it provides a beautiful, interactive interface with smooth animations and comprehensive error handling.
+The **PostRegistrationModal** is a fully-featured React component that displays after successful patient registration, allowing doctors to optionally assign patients to active research studies. Built with VigIA branding, it provides a beautiful, interactive interface with smooth animations and comprehensive error handling.
 
 ## Files Created
 
@@ -71,7 +71,7 @@ View: **[VISUAL.md](./PostRegistrationModal.VISUAL.md)**
 7. Provides skip option
 
 ### Key Features
-- Beautiful Telos.AI branded design (#0A2647 blue, #D4AF37 gold)
+- Beautiful VigIA branded design (#0A2647 blue, #D4AF37 gold)
 - Animated success celebration with sparkles
 - Interactive research and group selection
 - Real-time validation
@@ -393,12 +393,12 @@ Click  - Instant feedback on selection
 - Initial release
 - Full feature implementation
 - Complete documentation
-- Telos.AI branding
+- VigIA branding
 - All requirements met
 
 ## License
 
-Part of the Telos.AI Sistema Pós-Operatório
+Part of the VigIA Sistema Pós-Operatório
 All rights reserved.
 
 ---

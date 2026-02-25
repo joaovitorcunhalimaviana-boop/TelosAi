@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { CadastroPacienteSimplificado } from "@/components/CadastroPacienteSimplificado"
 import { createSimplifiedPatient } from "./actions"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 import {
   Card,
   CardContent,
@@ -60,7 +60,7 @@ export default function CadastroPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <TelosHeader />
+      <VigiaHeader />
 
       <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Header Section with Animation */}

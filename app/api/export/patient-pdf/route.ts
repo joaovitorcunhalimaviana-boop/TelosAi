@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(28)
     doc.setFont("helvetica", "bold")
-    doc.text("Telos.AI", pageWidth / 2, 25, { align: "center" })
+    doc.text("VigIA", pageWidth / 2, 25, { align: "center" })
 
     doc.setFontSize(14)
     doc.setFont("helvetica", "normal")
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
       })
 
       doc.setFontSize(8)
-      doc.text("Telos.AI - Sistema de Acompanhamento Pós-Operatório", margin, pageHeight - 10)
+      doc.text("VigIA - Sistema de Acompanhamento Pós-Operatório", margin, pageHeight - 10)
     }
 
     // Gera o PDF como buffer

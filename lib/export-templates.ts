@@ -531,7 +531,7 @@ export function generateMethodsText(data: {
   text += `Statistical Analysis\n\n`;
   text += `Data were analyzed using ${statisticalTests.join(', ')}. `;
   text += `Statistical significance was set at p < .05. `;
-  text += `All analyses were performed using Telos.AI Research Platform (version 1.0). `;
+  text += `All analyses were performed using VigIA Research Platform (version 1.0). `;
   text += `Effect sizes are reported using Cohen's d for t-tests, eta-squared (η²) for ANOVA, `;
   text += `and Cramér's V for chi-square tests.\n\n`;
 
@@ -649,7 +649,7 @@ export function generateStatisticalReferences(): string[] {
     'Field, A. (2018). Discovering statistics using IBM SPSS statistics (5th ed.). SAGE Publications.',
     'Tabachnick, B. G., & Fidell, L. S. (2019). Using multivariate statistics (7th ed.). Pearson.',
     'American Psychological Association. (2020). Publication manual of the American Psychological Association (7th ed.).',
-    'Telos.AI Research Platform. (2025). Version 1.0 [Software]. https://telos.ai',
+    'VigIA Research Platform. (2025). Version 1.0 [Software]. https://vigia.med.br',
   ];
 }
 

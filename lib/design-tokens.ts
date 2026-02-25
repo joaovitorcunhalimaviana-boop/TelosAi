@@ -1,5 +1,5 @@
 /**
- * Telos.AI Design Tokens
+ * VigIA Design Tokens
  *
  * Centralized design constants for consistent styling across the application.
  * Import and use these tokens instead of hardcoding values.
@@ -15,21 +15,21 @@
 // ============================================================================
 
 export const COLORS = {
-  // Primary - Telos Blue
+  // Primary - VigIA Blue
   primary: '#0A2647',
   primaryHover: '#081E39',
   primaryActive: '#06162B',
   primaryLight: '#B3C5DB',
   primaryLighter: '#E6EBF2',
 
-  // Accent - Telos Gold
+  // Accent - VigIA Gold
   accent: '#D4AF37',
   accentHover: '#B89630',
   accentActive: '#8B7124',
   accentLight: '#F5ECCC',
   accentLighter: '#FBF8EF',
 
-  // Research - Telos Purple
+  // Research - VigIA Purple
   research: '#7C3AED',
   researchHover: '#6930CA',
   researchActive: '#5626A7',

@@ -53,7 +53,7 @@ export function InteractiveBoxPlot({
     showGridLines: true,
     showDataLabels: true,
     showLegend: false,
-    colorScheme: 'telos',
+    colorScheme: 'vigia',
     axisScaleX: 'linear',
     axisScaleY: 'linear',
     opacity: 100,

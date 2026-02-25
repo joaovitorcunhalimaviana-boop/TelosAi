@@ -188,7 +188,7 @@ API: /api/paciente/[id]/pesquisa
 ## Styling Architecture
 
 ```
-Color System (Telos.AI)
+Color System (VigIA)
 │
 ├── Primary Blues
 │   ├── Deep: #0A2647 (main brand)

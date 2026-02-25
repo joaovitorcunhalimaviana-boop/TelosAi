@@ -40,7 +40,7 @@ async function main() {
       data: {
         email: adminEmail,
         senha: hashedPassword,
-        nomeCompleto: "Telos Admin",
+        nomeCompleto: "VigIA Admin",
         role: "admin",
         plan: "founding",
         basePrice: 0,

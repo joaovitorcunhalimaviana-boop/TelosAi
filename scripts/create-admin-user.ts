@@ -8,7 +8,7 @@ async function createAdminUser() {
 
   // Dados do admin (MODIFIQUE AQUI)
   const adminData = {
-    email: 'joaovitor@telos.com', // SUBSTITUA pelo seu email
+    email: 'joaovitor@vigia.ai', // SUBSTITUA pelo seu email
     senha: 'Admin@123', // SUBSTITUA por uma senha forte
     nomeCompleto: 'Dr. João Vitor Viana',
     crm: 'CRM-SP 123456', // SUBSTITUA pelo seu CRM

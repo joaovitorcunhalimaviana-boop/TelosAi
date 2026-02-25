@@ -1,6 +1,6 @@
 /**
  * Template profissional do Termo de Consentimento Livre e Esclarecido (TCLE)
- * Para uso na plataforma Telos.AI
+ * Para uso na plataforma VigIA
  *
  * Cobre:
  * 1. Acompanhamento por WhatsApp
@@ -33,7 +33,7 @@ export function generateConsentTermHTML(data: TermData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Termo de Consentimento - Telos.AI</title>
+  <title>Termo de Consentimento - VigIA</title>
   <style>
     @page {
       size: A4;
@@ -168,9 +168,9 @@ export function generateConsentTermHTML(data: TermData): string {
 </head>
 <body>
   <div class="header-info">
-    <strong>TELOS.AI</strong><br>
+    <strong>VigIA</strong><br>
     Sistema Inteligente de Acompanhamento Pós-Operatório<br>
-    www.telos.ai
+    www.vigia.med.br
   </div>
 
   <h1>Termo de Consentimento Livre e Esclarecido</h1>
@@ -187,7 +187,7 @@ export function generateConsentTermHTML(data: TermData): string {
 
   <p>
     Este documento tem por objetivo esclarecer e registrar o seu consentimento livre e esclarecido para
-    utilização da plataforma digital <strong>Telos.AI</strong>, um sistema desenvolvido para
+    utilização da plataforma digital <strong>VigIA</strong>, um sistema desenvolvido para
     <strong>acompanhamento pós-operatório inteligente</strong>, que utiliza tecnologia de comunicação
     via WhatsApp, análise de dados e inteligência artificial para promover melhor assistência à sua
     recuperação cirúrgica.
@@ -202,7 +202,7 @@ export function generateConsentTermHTML(data: TermData): string {
   <h2>1. OBJETIVO E FUNCIONAMENTO DA PLATAFORMA</h2>
 
   <p>
-    A plataforma <strong>Telos.AI</strong> tem como objetivo facilitar e aprimorar o acompanhamento
+    A plataforma <strong>VigIA</strong> tem como objetivo facilitar e aprimorar o acompanhamento
     pós-operatório através de:
   </p>
 
@@ -413,7 +413,7 @@ export function generateConsentTermHTML(data: TermData): string {
 
   <p>
     Para exercer qualquer destes direitos, entre em contato através do email:
-    <strong>lgpd@telos.ai</strong> ou diretamente com seu médico responsável.
+    <strong>lgpd@vigia.med.br</strong> ou diretamente com seu médico responsável.
   </p>
 
   <h2>6. BENEFÍCIOS E RISCOS</h2>
@@ -472,10 +472,10 @@ export function generateConsentTermHTML(data: TermData): string {
   </p>
 
   <p class="no-indent" style="margin-top: 0.5cm;">
-    <strong>Plataforma Telos.AI:</strong><br>
-    Website: www.telos.ai<br>
-    Email LGPD: lgpd@telos.ai<br>
-    Suporte: suporte@telos.ai
+    <strong>Plataforma VigIA:</strong><br>
+    Website: www.vigia.med.br<br>
+    Email LGPD: lgpd@vigia.med.br<br>
+    Suporte: suporte@vigia.med.br
   </p>
 
   ${data.isResearch ? `
@@ -538,7 +538,7 @@ export function generateConsentTermHTML(data: TermData): string {
 
   <div class="footer">
     <p class="no-indent">
-      Este documento foi gerado pela plataforma Telos.AI em ${currentDate}.<br>
+      Este documento foi gerado pela plataforma VigIA em ${currentDate}.<br>
       Imprima este termo em 2 (duas) vias: uma para o paciente e outra para arquivo médico.<br>
       Protocolo: ${Math.random().toString(36).substring(2, 10).toUpperCase()}
     </p>

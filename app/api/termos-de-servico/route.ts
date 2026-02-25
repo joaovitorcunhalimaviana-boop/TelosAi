@@ -7,7 +7,7 @@ export async function GET() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Termos de Serviço | Telos.AI</title>
+  <title>Termos de Serviço | VigIA</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
@@ -26,10 +26,10 @@ export async function GET() {
     <p><strong>Última atualização:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
 
     <h2>1. Aceitação dos Termos</h2>
-    <p>Ao utilizar o sistema Telos.AI de acompanhamento pós-operatório ("Serviço"), você concorda com estes Termos de Serviço. Se não concorda, não utilize o Serviço.</p>
+    <p>Ao utilizar o sistema VigIA de acompanhamento pós-operatório ("Serviço"), você concorda com estes Termos de Serviço. Se não concorda, não utilize o Serviço.</p>
 
     <h2>2. Descrição do Serviço</h2>
-    <p>O Telos.AI é um sistema que:</p>
+    <p>O VigIA é um sistema que:</p>
     <ul>
       <li>Envia questionários automatizados via WhatsApp após procedimentos cirúrgicos</li>
       <li>Monitora sintomas e evolução pós-operatória</li>
@@ -50,7 +50,7 @@ export async function GET() {
 
     <h2>4. Elegibilidade</h2>
     <ul>
-      <li>Ser paciente submetido a procedimento cirúrgico por médico que utiliza Telos.AI</li>
+      <li>Ser paciente submetido a procedimento cirúrgico por médico que utiliza VigIA</li>
       <li>Ter 18 anos ou mais, ou consentimento de responsável legal</li>
       <li>Possuir WhatsApp ativo</li>
       <li>Concordar com a Política de Privacidade</li>
@@ -70,8 +70,8 @@ export async function GET() {
 
     <h2>7. Contato</h2>
     <div class="contact">
-      <p><strong>Suporte Telos.AI:</strong></p>
-      <p>E-mail: contato@telos.ai</p>
+      <p><strong>Suporte VigIA:</strong></p>
+      <p>E-mail: contato@vigia.ai</p>
       <p>Telefone: +55 83 9166-4904</p>
     </div>
 

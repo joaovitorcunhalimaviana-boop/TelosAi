@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { TelosHeader } from "@/components/TelosHeader"
+import { VigiaHeader } from "@/components/VigiaHeader"
 
 function ResetPasswordForm() {
   const router = useRouter()
@@ -101,7 +101,7 @@ function ResetPasswordForm() {
   if (isValidatingToken) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-        <TelosHeader />
+        <VigiaHeader />
         <div className="container mx-auto px-6 py-16 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardContent className="py-12 text-center">
@@ -117,7 +117,7 @@ function ResetPasswordForm() {
   if (!tokenValid) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-        <TelosHeader />
+        <VigiaHeader />
         <div className="container mx-auto px-6 py-16 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
@@ -153,7 +153,7 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-        <TelosHeader />
+        <VigiaHeader />
         <div className="container mx-auto px-6 py-16 flex items-center justify-center">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
@@ -178,7 +178,7 @@ function ResetPasswordForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-telos-blue to-[#144272]">
-      <TelosHeader />
+      <VigiaHeader />
       <div className="container mx-auto px-6 py-16 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
