@@ -42,51 +42,51 @@ export default function OnboardingPage() {
   const progressPercentage = (currentStep / totalSteps) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-telos-blue to-blue-900 flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#0B0E14' }}>
       <div className="max-w-4xl w-full">
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-200">
+            <span className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Passo {currentStep} de {totalSteps}
             </span>
             <button
               onClick={skipTour}
-              className="text-sm text-blue-200 hover:text-white underline"
+              className="text-sm underline" style={{ color: '#7A8299' }}
             >
               Pular tour
             </button>
           </div>
-          <Progress value={progressPercentage} className="h-2 bg-blue-800" />
+          <Progress value={progressPercentage} className="h-2" style={{ backgroundColor: '#1E2535' }} />
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="rounded-3xl shadow-2xl overflow-hidden" style={{ backgroundColor: '#161B27' }}>
           {/* Step 1: Welcome */}
           {currentStep === 1 && (
             <div className="p-12 text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-telos-blue rounded-full mb-4">
-                <svg className="w-12 h-12 text-telos-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4" style={{ backgroundColor: '#0D7377' }}>
+                <svg className="w-12 h-12" style={{ color: '#E8C97A' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                 </svg>
               </div>
 
               <div>
-                <h1 className="text-4xl font-bold text-telos-blue mb-4">
+                <h1 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
                   Bem-vindo ao VigIA, {doctorName}!
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p className="text-xl max-w-2xl mx-auto" style={{ color: '#D8DEEB' }}>
                   Estamos felizes em tê-lo conosco. Vamos fazer um tour rápido
                   para você começar a usar a plataforma.
                 </p>
               </div>
 
               <div className="flex items-center justify-center gap-4 pt-4">
-                <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
-                  <svg className="w-5 h-5 text-telos-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{ backgroundColor: '#1E2535' }}>
+                  <svg className="w-5 h-5" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm font-medium text-telos-blue">
+                  <span className="text-sm font-medium" style={{ color: '#14BDAE' }}>
                     Apenas 2 minutos
                   </span>
                 </div>
@@ -95,7 +95,7 @@ export default function OnboardingPage() {
               <div className="pt-8">
                 <Button
                   onClick={nextStep}
-                  className="px-10 py-6 bg-telos-blue hover:bg-blue-900 text-white text-lg font-bold rounded-xl"
+                  className="px-10 py-6 text-white text-lg font-bold rounded-xl" style={{ backgroundColor: '#0D7377' }}
                 >
                   Começar Tour
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,24 +111,24 @@ export default function OnboardingPage() {
             <div className="p-12">
               <div className="max-w-2xl mx-auto space-y-8">
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-                    <svg className="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style={{ backgroundColor: '#1E2535' }}>
+                    <svg className="w-10 h-10" style={{ color: '#14BDAE' }} fill="currentColor" viewBox="0 0 24 24">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                     </svg>
                   </div>
-                  <h2 className="text-3xl font-bold text-telos-blue mb-4">
+                  <h2 className="text-3xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
                     Conecte seu WhatsApp
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg" style={{ color: '#D8DEEB' }}>
                     Para enviar questionários automáticos aos seus pacientes,
                     conecte seu número de WhatsApp
                   </p>
                 </div>
 
                 {/* Twilio Embedded Signup Placeholder */}
-                <div className="bg-gradient-to-br from-green-50 to-white border-2 border-green-200 rounded-2xl p-8">
+                <div className="rounded-2xl p-8 border-2" style={{ backgroundColor: '#1E2535', borderColor: '#0D7377' }}>
                   <div className="text-center space-y-6">
-                    <div className="inline-flex items-center gap-3 px-6 py-3 bg-green-600 text-white rounded-full font-semibold">
+                    <div className="inline-flex items-center gap-3 px-6 py-3 text-white rounded-full font-semibold" style={{ backgroundColor: '#0D7377' }}>
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                       </svg>
@@ -137,36 +137,36 @@ export default function OnboardingPage() {
 
                     <div className="space-y-4">
                       <div className="flex items-start gap-3 text-left">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-gray-700">Configuração em 1 clique</span>
+                        <span style={{ color: '#D8DEEB' }}>Configuração em 1 clique</span>
                       </div>
                       <div className="flex items-start gap-3 text-left">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-gray-700">100% seguro e conforme LGPD</span>
+                        <span style={{ color: '#D8DEEB' }}>100% seguro e conforme LGPD</span>
                       </div>
                       <div className="flex items-start gap-3 text-left">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-gray-700">Seu número permanece privado</span>
+                        <span style={{ color: '#D8DEEB' }}>Seu número permanece privado</span>
                       </div>
                     </div>
 
                     {/* Placeholder for Twilio Embedded Signup */}
-                    <div className="p-6 bg-white border-2 border-dashed border-green-300 rounded-xl">
-                      <p className="text-sm text-gray-500 mb-4">
+                    <div className="p-6 border-2 border-dashed rounded-xl" style={{ backgroundColor: '#111520', borderColor: '#0D7377' }}>
+                      <p className="text-sm mb-4" style={{ color: '#7A8299' }}>
                         [Twilio Embedded Signup será integrado aqui]
                       </p>
-                      <Button className="bg-green-600 hover:bg-green-700 text-white">
+                      <Button className="text-white" style={{ backgroundColor: '#0D7377' }}>
                         Conectar WhatsApp
                       </Button>
                     </div>
 
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs" style={{ color: '#7A8299' }}>
                       Você pode configurar isso mais tarde nas configurações
                     </p>
                   </div>
@@ -180,15 +180,15 @@ export default function OnboardingPage() {
             <div className="p-12">
               <div className="max-w-2xl mx-auto space-y-8">
                 <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6">
-                    <svg className="w-10 h-10 text-telos-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6" style={{ backgroundColor: '#1E2535' }}>
+                    <svg className="w-10 h-10" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <h2 className="text-3xl font-bold text-telos-blue mb-4">
+                  <h2 className="text-3xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
                     Tour Rápido do Dashboard
                   </h2>
-                  <p className="text-lg text-gray-600">
+                  <p className="text-lg" style={{ color: '#D8DEEB' }}>
                     Conheça as principais funcionalidades da plataforma
                   </p>
                 </div>
@@ -216,26 +216,26 @@ export default function OnboardingPage() {
                       description: "Dados para pesquisa (LGPD)"
                     }
                   ].map((feature, idx) => (
-                    <div key={idx} className="p-6 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-xl hover:border-telos-blue transition-colors">
-                      <div className="w-12 h-12 bg-telos-blue rounded-lg flex items-center justify-center mb-4">
+                    <div key={idx} className="p-6 rounded-xl border-2 transition-colors hover:border-[#14BDAE]" style={{ backgroundColor: '#1E2535', borderColor: '#1E2535' }}>
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#0D7377' }}>
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={feature.icon} />
                         </svg>
                       </div>
-                      <h3 className="font-bold text-telos-blue mb-2">{feature.title}</h3>
-                      <p className="text-sm text-gray-600">{feature.description}</p>
+                      <h3 className="font-bold mb-2" style={{ color: '#F0EAD6' }}>{feature.title}</h3>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>{feature.description}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="p-6 bg-gradient-to-r from-telos-blue to-blue-900 text-white rounded-xl">
+                <div className="p-6 text-white rounded-xl" style={{ backgroundColor: '#0D7377' }}>
                   <div className="flex items-start gap-4">
                     <svg className="w-8 h-8 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     <div>
                       <h3 className="font-bold text-lg mb-2">Análise com IA</h3>
-                      <p className="text-blue-100 text-sm">
+                      <p className="text-sm" style={{ color: '#D8DEEB' }}>
                         Nossa Inteligência Artificial analisa todas as respostas dos pacientes em tempo real,
                         detectando red flags e fornecendo insights valiosos
                       </p>
@@ -249,24 +249,24 @@ export default function OnboardingPage() {
           {/* Step 4: First Patient CTA */}
           {currentStep === 4 && (
             <div className="p-12 text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-telos-gold rounded-full mb-4">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4" style={{ backgroundColor: '#C9A84C' }}>
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
               </div>
 
               <div>
-                <h1 className="text-4xl font-bold text-telos-blue mb-4">
+                <h1 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
                   Tudo Pronto!
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                <p className="text-xl max-w-2xl mx-auto mb-8" style={{ color: '#D8DEEB' }}>
                   Você está pronto para começar a usar o VigIA.
                   Que tal cadastrar seu primeiro paciente?
                 </p>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-2xl p-8 max-w-md mx-auto">
-                <h3 className="font-bold text-telos-blue text-lg mb-4">
+              <div className="rounded-2xl p-8 max-w-md mx-auto border-2" style={{ backgroundColor: '#1E2535', borderColor: '#1E2535' }}>
+                <h3 className="font-bold text-lg mb-4" style={{ color: '#F0EAD6' }}>
                   Próximos passos:
                 </h3>
                 <div className="space-y-3 text-left">
@@ -277,10 +277,10 @@ export default function OnboardingPage() {
                     "Você receberá alertas se necessário"
                   ].map((step, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-telos-blue text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                      <div className="w-6 h-6 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold" style={{ backgroundColor: '#0D7377' }}>
                         {idx + 1}
                       </div>
-                      <span className="text-gray-700">{step}</span>
+                      <span style={{ color: '#D8DEEB' }}>{step}</span>
                     </div>
                   ))}
                 </div>
@@ -288,7 +288,7 @@ export default function OnboardingPage() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
                 <Link href="/cadastro">
-                  <Button className="px-10 py-6 bg-telos-blue hover:bg-blue-900 text-white text-lg font-bold rounded-xl">
+                  <Button className="px-10 py-6 text-white text-lg font-bold rounded-xl" style={{ backgroundColor: '#0D7377' }}>
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
                   </Button>
                 </Link>
                 <Link href="/dashboard">
-                  <Button variant="outline" className="px-10 py-6 text-lg font-bold rounded-xl border-2 border-telos-blue text-telos-blue hover:bg-blue-50">
+                  <Button variant="outline" className="px-10 py-6 text-lg font-bold rounded-xl border-2 border-[#0D7377]" style={{ color: '#14BDAE' }}>
                     Ir para Dashboard
                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
 
           {/* Navigation Buttons */}
           {currentStep !== 4 && (
-            <div className="border-t border-gray-200 p-6 flex items-center justify-between">
+            <div className="border-t border-[#1E2535] p-6 flex items-center justify-between">
               <Button
                 onClick={prevStep}
                 variant="outline"
@@ -328,10 +328,10 @@ export default function OnboardingPage() {
                     key={idx}
                     className={`w-2 h-2 rounded-full transition-all ${
                       idx + 1 === currentStep
-                        ? "bg-telos-blue w-8"
+                        ? "bg-[#14BDAE] w-8"
                         : idx + 1 < currentStep
-                        ? "bg-telos-gold"
-                        : "bg-gray-300"
+                        ? "bg-[#C9A84C]"
+                        : "bg-[#1E2535]"
                     }`}
                   />
                 ))}
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
 
               <Button
                 onClick={nextStep}
-                className="px-6 py-3 bg-telos-blue hover:bg-blue-900 text-white"
+                className="px-6 py-3 text-white" style={{ backgroundColor: '#0D7377' }}
               >
                 {currentStep === totalSteps - 1 ? "Finalizar" : "Próximo"}
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

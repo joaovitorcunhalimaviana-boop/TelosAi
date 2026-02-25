@@ -162,25 +162,25 @@ export default function FAQPage() {
     : faqData
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0B0E14]">
       <VigiaHeader />
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-white via-blue-50/30 to-white">
+      <section className="py-20 bg-gradient-to-br from-[#0B0E14] via-[#111520] to-[#0B0E14]">
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-6">
-                <div className="w-2 h-2 bg-telos-gold rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-telos-blue">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#161B27] border border-[#1E2535] rounded-full mb-6">
+                <div className="w-2 h-2 bg-[#C9A84C] rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-[#14BDAE]">
                   Perguntas Frequentes
                 </span>
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-telos-blue mb-6">
+              <h1 className="text-4xl lg:text-5xl font-bold text-[#F0EAD6] mb-6">
                 Dúvidas sobre o VigIA?
               </h1>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-[#7A8299]">
                 Respostas honestas e diretas sobre IA, Machine Learning, preços e funcionalidades
               </p>
             </div>
@@ -189,15 +189,15 @@ export default function FAQPage() {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 bg-white border-b border-gray-100">
+      <section className="py-8 bg-[#111520] border-b border-[#1E2535]">
         <div className="container mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                 selectedCategory === null
-                  ? "bg-telos-blue text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-[#0D7377] text-[#F0EAD6] shadow-lg shadow-[#0D7377]/20"
+                  : "bg-[#161B27] text-[#7A8299] hover:bg-[#1E2535]"
               }`}
             >
               Todas
@@ -208,8 +208,8 @@ export default function FAQPage() {
                 onClick={() => setSelectedCategory(key)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                   selectedCategory === key
-                    ? "bg-telos-blue text-white shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-[#0D7377] text-[#F0EAD6] shadow-lg shadow-[#0D7377]/20"
+                    : "bg-[#161B27] text-[#7A8299] hover:bg-[#1E2535]"
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,31 +223,31 @@ export default function FAQPage() {
       </section>
 
       {/* FAQ Items */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-[#0B0E14]">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto space-y-4">
             {filteredFAQ.map((item, idx) => (
               <FadeIn key={idx} delay={idx * 0.05} direction="up">
-                <div className="border-2 border-gray-100 rounded-xl overflow-hidden hover:border-telos-gold transition-all">
+                <div className="border-2 border-[#1E2535] rounded-xl overflow-hidden hover:border-[#C9A84C] transition-all">
                   <button
                     onClick={() => setOpenItem(openItem === idx ? null : idx)}
-                    className="w-full px-6 py-5 flex items-start justify-between gap-4 text-left hover:bg-blue-50/50 transition-colors"
+                    className="w-full px-6 py-5 flex items-start justify-between gap-4 text-left hover:bg-[#161B27] transition-colors"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-telos-blue text-xs font-semibold rounded-full">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#161B27] text-[#14BDAE] text-xs font-semibold rounded-full border border-[#1E2535]">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={categories[item.category as keyof typeof categories].icon} />
                           </svg>
                           {categories[item.category as keyof typeof categories].name}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-telos-blue">
+                      <h3 className="text-lg font-bold text-[#F0EAD6]">
                         {item.question}
                       </h3>
                     </div>
                     <svg
-                      className={`w-6 h-6 text-telos-gold flex-shrink-0 transition-transform ${
+                      className={`w-6 h-6 text-[#C9A84C] flex-shrink-0 transition-transform ${
                         openItem === idx ? "rotate-180" : ""
                       }`}
                       fill="none"
@@ -260,8 +260,8 @@ export default function FAQPage() {
 
                   {openItem === idx && (
                     <div className="px-6 pb-6">
-                      <div className="pl-4 border-l-4 border-telos-gold">
-                        <p className="text-gray-700 leading-relaxed text-justify">
+                      <div className="pl-4 border-l-4 border-[#C9A84C]">
+                        <p className="text-[#D8DEEB] leading-relaxed text-justify">
                           {item.answer}
                         </p>
                       </div>
@@ -275,19 +275,19 @@ export default function FAQPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-telos-blue to-blue-900">
+      <section className="py-16 bg-gradient-to-br from-[#111520] via-[#0D7377]/10 to-[#111520] border-t border-[#1E2535]">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-3xl lg:text-4xl font-bold text-white">
+            <h2 className="text-3xl lg:text-4xl font-bold text-[#F0EAD6]">
               Ainda tem dúvidas?
             </h2>
-            <p className="text-xl text-blue-200">
+            <p className="text-xl text-[#7A8299]">
               Entre em contato conosco ou agende uma demonstração gratuita
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/cadastro-medico?plan=founding"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-telos-gold text-white rounded-xl font-bold text-lg hover-lift shadow-2xl"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#C9A84C] text-[#0B0E14] rounded-xl font-bold text-lg hover-lift shadow-2xl hover:bg-[#E8C97A] transition-colors"
               >
                 Começar Agora
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +296,7 @@ export default function FAQPage() {
               </Link>
               <a
                 href="mailto:telos.ia@gmail.com"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-telos-blue rounded-xl font-bold text-lg hover-lift shadow-2xl"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#161B27] text-[#F0EAD6] border border-[#1E2535] rounded-xl font-bold text-lg hover-lift shadow-2xl hover:bg-[#1E2535] transition-colors"
               >
                 Falar com Equipe
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,30 +309,30 @@ export default function FAQPage() {
       </section>
 
       {/* Footer */}
-      <footer className="telos-gradient text-white py-12">
+      <footer className="bg-[#0B0E14] border-t border-[#1E2535] text-white py-12">
         <div className="container mx-auto px-6">
           <div className="text-center space-y-4">
             <div className="flex items-baseline justify-center gap-0.5">
-              <span className="text-3xl font-bold text-white">VigIA</span>
+              <span className="text-3xl font-bold text-[#F0EAD6]">VigIA</span>
             </div>
-            <p className="text-blue-200">
+            <p className="text-[#7A8299]">
               A Inteligência no Cuidado para o Propósito da Recuperação
             </p>
             <div className="flex justify-center gap-6 text-sm">
-              <Link href="/" className="text-blue-200 hover:text-telos-gold transition-colors">
+              <Link href="/" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
                 Início
               </Link>
-              <Link href="/sobre" className="text-blue-200 hover:text-telos-gold transition-colors">
+              <Link href="/sobre" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
                 Sobre
               </Link>
-              <Link href="/pricing" className="text-blue-200 hover:text-telos-gold transition-colors">
+              <Link href="/pricing" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
                 Planos
               </Link>
-              <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">
+              <Link href="/termos" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
                 Termos
               </Link>
             </div>
-            <p className="text-blue-200 text-sm">
+            <p className="text-[#7A8299] text-sm">
               © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
             </p>
           </div>

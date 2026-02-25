@@ -148,7 +148,7 @@ function CadastroMedicoPage() {
     professional: {
       name: "Profissional",
       price: "R$ 500",
-      color: "text-telos-blue",
+      color: "text-[#14BDAE]",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -160,32 +160,32 @@ function CadastroMedicoPage() {
   const selectedPlan = planInfo[plan as keyof typeof planInfo] || planInfo.professional
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5F7FA]/30 to-white">
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
       <VigiaHeader />
 
       <div className="container mx-auto px-6 py-12">
         <div className="max-w-2xl mx-auto">
           {/* Plan Badge */}
           <div className="text-center mb-8">
-            <div className={`inline-flex items-center gap-2 px-6 py-3 ${plan === 'founding' ? 'bg-telos-gold' : 'bg-telos-blue'} text-white rounded-full shadow-lg mb-4`}>
+            <div className={`inline-flex items-center gap-2 px-6 py-3 ${plan === 'founding' ? 'bg-[#C9A84C]' : 'bg-[#0D7377]'} text-white rounded-full shadow-lg mb-4`}>
               {selectedPlan.icon}
               <span className="font-bold text-lg">{selectedPlan.name}</span>
               <span className="text-lg">{selectedPlan.price}/mês</span>
             </div>
-            <h1 className="text-3xl font-bold text-telos-blue mb-2">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#F0EAD6' }}>
               Cadastro de Médico
             </h1>
-            <p className="text-gray-600">
+            <p style={{ color: '#7A8299' }}>
               Preencha seus dados para começar a usar o VigIA
             </p>
           </div>
 
           {/* Registration Form */}
-          <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8">
+          <div className="rounded-2xl shadow-xl border p-8" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Nome Completo */}
               <div>
-                <Label htmlFor="nomeCompleto" className="text-telos-blue font-semibold">
+                <Label htmlFor="nomeCompleto" style={{ color: '#F0EAD6' }} className="font-semibold">
                   Nome Completo *
                 </Label>
                 <Input
@@ -201,7 +201,7 @@ function CadastroMedicoPage() {
 
               {/* Email */}
               <div>
-                <Label htmlFor="email" className="text-telos-blue font-semibold">
+                <Label htmlFor="email" style={{ color: '#F0EAD6' }} className="font-semibold">
                   Email *
                 </Label>
                 <Input
@@ -218,7 +218,7 @@ function CadastroMedicoPage() {
 
               {/* WhatsApp */}
               <div>
-                <Label htmlFor="whatsapp" className="text-telos-blue font-semibold">
+                <Label htmlFor="whatsapp" style={{ color: '#F0EAD6' }} className="font-semibold">
                   WhatsApp *
                 </Label>
                 <Input
@@ -234,7 +234,7 @@ function CadastroMedicoPage() {
                 {errors.whatsapp && (
                   <p className="text-red-500 text-sm mt-1">{errors.whatsapp.message}</p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                   Usaremos este número para enviar questionários aos seus pacientes
                 </p>
               </div>
@@ -242,7 +242,7 @@ function CadastroMedicoPage() {
               {/* CRM + Estado */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="crm" className="text-telos-blue font-semibold">
+                  <Label htmlFor="crm" style={{ color: '#F0EAD6' }} className="font-semibold">
                     CRM *
                   </Label>
                   <Input
@@ -256,7 +256,7 @@ function CadastroMedicoPage() {
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="estado" className="text-telos-blue font-semibold">
+                  <Label htmlFor="estado" style={{ color: '#F0EAD6' }} className="font-semibold">
                     Estado *
                   </Label>
                   <Select value={watchEstado} onValueChange={(value) => setValue("estado", value)}>
@@ -279,7 +279,7 @@ function CadastroMedicoPage() {
 
               {/* Senha */}
               <div>
-                <Label htmlFor="senha" className="text-telos-blue font-semibold">
+                <Label htmlFor="senha" style={{ color: '#F0EAD6' }} className="font-semibold">
                   Senha *
                 </Label>
                 <Input
@@ -292,7 +292,7 @@ function CadastroMedicoPage() {
                 {senha && (
                   <div className="mt-2">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-[#1E2535] overflow-hidden">
                         <div
                           className={`h-full ${passwordStrength.color} transition-all`}
                           style={{ width: `${(passwordStrength.strength / 6) * 100}%` }}
@@ -309,7 +309,7 @@ function CadastroMedicoPage() {
 
               {/* Confirmar Senha */}
               <div>
-                <Label htmlFor="confirmarSenha" className="text-telos-blue font-semibold">
+                <Label htmlFor="confirmarSenha" style={{ color: '#F0EAD6' }} className="font-semibold">
                   Confirmar Senha *
                 </Label>
                 <Input
@@ -325,7 +325,7 @@ function CadastroMedicoPage() {
               </div>
 
               {/* Checkboxes */}
-              <div className="space-y-4 pt-4 border-t border-gray-200">
+              <div className="space-y-4 pt-4 border-t border-[#1E2535]">
                 <div className="flex items-start gap-3">
                   <Checkbox
                     id="aceitoTermos"
@@ -334,11 +334,11 @@ function CadastroMedicoPage() {
                   />
                   <Label htmlFor="aceitoTermos" className="text-sm cursor-pointer leading-relaxed">
                     Aceito os{" "}
-                    <Link href="/termos" className="text-telos-blue font-semibold underline" target="_blank">
+                    <Link href="/termos" className="font-semibold underline" style={{ color: '#14BDAE' }} target="_blank">
                       termos de uso
                     </Link>{" "}
                     e a{" "}
-                    <Link href="/termos" className="text-telos-blue font-semibold underline" target="_blank">
+                    <Link href="/termos" className="font-semibold underline" style={{ color: '#14BDAE' }} target="_blank">
                       política de privacidade
                     </Link>{" "}
                     do VigIA *
@@ -349,7 +349,7 @@ function CadastroMedicoPage() {
                 )}
 
                 {/* NOVO: Termos de Uso e Compartilhamento de Dados */}
-                <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+                <div className="p-4 rounded-lg border-2" style={{ backgroundColor: '#1E2535', borderColor: '#C9A84C' }}>
                   <div className="flex items-start gap-3">
                     <Checkbox
                       id="acceptedTermsOfService"
@@ -357,8 +357,8 @@ function CadastroMedicoPage() {
                       onCheckedChange={(checked) => setValue("acceptedTermsOfService", checked as boolean)}
                     />
                     <Label htmlFor="acceptedTermsOfService" className="text-sm cursor-pointer leading-relaxed">
-                      <strong className="text-red-600">OBRIGATÓRIO:</strong> Li e aceito os{" "}
-                      <Link href="/terms-of-service" className="text-telos-blue font-bold underline" target="_blank">
+                      <strong style={{ color: '#E8C97A' }}>OBRIGATÓRIO:</strong> Li e aceito os{" "}
+                      <Link href="/terms-of-service" className="font-bold underline" style={{ color: '#14BDAE' }} target="_blank">
                         Termos de Uso e Política de Privacidade
                       </Link>{" "}
                       incluindo a <strong>autorização irrevogável</strong> para uso de <strong>dados totalmente anonimizados</strong> dos meus pacientes para:
@@ -368,7 +368,7 @@ function CadastroMedicoPage() {
                         <li>Melhoria contínua dos algoritmos da plataforma</li>
                         <li>Publicações científicas com dados agregados</li>
                       </ul>
-                      <p className="mt-2 text-xs text-gray-700">
+                      <p className="mt-2 text-xs" style={{ color: '#D8DEEB' }}>
                         <strong>Garantia:</strong> Os dados são irreversivelmente anonimizados (SHA-256) e não permitem identificação dos pacientes. Conforme LGPD Art. 12, dados anonimizados não são considerados dados pessoais. *
                       </p>
                     </Label>
@@ -392,8 +392,8 @@ function CadastroMedicoPage() {
 
               {/* Error Message */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 text-sm">{error}</p>
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: '#1E2535', borderColor: '#ef4444' }}>
+                  <p className="text-sm" style={{ color: '#ef4444' }}>{error}</p>
                 </div>
               )}
 
@@ -401,7 +401,7 @@ function CadastroMedicoPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-telos-blue hover:bg-blue-900 text-white py-6 text-lg font-bold"
+                className="w-full text-white py-6 text-lg font-bold" style={{ backgroundColor: '#0D7377' }}
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
@@ -417,9 +417,9 @@ function CadastroMedicoPage() {
               </Button>
 
               {/* Login Link */}
-              <p className="text-center text-sm text-gray-600">
+              <p className="text-center text-sm" style={{ color: '#7A8299' }}>
                 Já tem uma conta?{" "}
-                <Link href="/auth/login" className="text-telos-blue font-semibold hover:underline">
+                <Link href="/auth/login" className="font-semibold hover:underline" style={{ color: '#14BDAE' }}>
                   Fazer login
                 </Link>
               </p>
@@ -430,7 +430,7 @@ function CadastroMedicoPage() {
           <div className="mt-6 text-center">
             <Link
               href="/pricing"
-              className="text-sm text-gray-600 hover:text-telos-blue underline"
+              className="text-sm underline" style={{ color: '#7A8299' }}
             >
               Quer mudar de plano? Ver todos os planos
             </Link>
@@ -444,10 +444,10 @@ function CadastroMedicoPage() {
 export default function CadastroMedicoPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-[#F5F7FA]/30 to-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-telos-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#14BDAE] mx-auto mb-4"></div>
+          <p style={{ color: '#7A8299' }}>Carregando...</p>
         </div>
       </div>
     }>

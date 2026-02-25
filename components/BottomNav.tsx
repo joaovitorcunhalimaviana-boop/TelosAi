@@ -36,7 +36,7 @@ export function BottomNav() {
   return (
     <>
       {/* Bottom Navigation - Only on mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-inset-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t z-40 safe-area-inset-bottom" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
         <div className="grid grid-cols-4 h-16">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -50,8 +50,8 @@ export function BottomNav() {
                   className={`
                     flex flex-col items-center justify-center gap-1 transition-colors
                     ${isActive
-                      ? 'text-[#0D7377]'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'text-[#14BDAE]'
+                      : 'text-[#7A8299] hover:text-[#F0EAD6]'
                     }
                   `}
                 >
@@ -68,8 +68,8 @@ export function BottomNav() {
                 className={`
                   flex flex-col items-center justify-center gap-1 transition-colors
                   ${isActive
-                    ? 'text-[#0D7377]'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-[#14BDAE]'
+                    : 'text-[#7A8299] hover:text-[#F0EAD6]'
                   }
                 `}
               >
@@ -84,99 +84,101 @@ export function BottomNav() {
       {/* Menu Modal */}
       {showMenu && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200"
+          className="md:hidden fixed inset-0 bg-black/60 z-50 animate-in fade-in duration-200"
           onClick={() => setShowMenu(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-6 animate-in slide-in-from-bottom duration-300"
+            className="absolute bottom-0 left-0 right-0 rounded-t-2xl p-6 animate-in slide-in-from-bottom duration-300"
+            style={{ backgroundColor: '#111520' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6" />
+            <div className="w-12 h-1 rounded-full mx-auto mb-6" style={{ backgroundColor: '#2A3147' }} />
 
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Menu</h2>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: '#F0EAD6' }}>Menu</h2>
 
             <div className="space-y-1">
               <Link
                 href="/dashboard"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <Home className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Dashboard</span>
+                  <Home className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Dashboard</span>
                 </div>
               </Link>
 
               <Link
                 href="/cadastro"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <UserPlus className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Cadastro Express</span>
+                  <UserPlus className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Cadastro Express</span>
                 </div>
               </Link>
 
               <Link
                 href="/termos"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Termos e Templates</span>
+                  <FileText className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Termos e Templates</span>
                 </div>
               </Link>
 
               <Link
                 href="/exportar"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <Download className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Exportar Dados</span>
+                  <Download className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Exportar Dados</span>
                 </div>
               </Link>
 
               <Link
                 href="/dashboard/protocolos"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Protocolos</span>
+                  <FileText className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Protocolos</span>
                 </div>
               </Link>
 
               <Link
                 href="/dashboard/pesquisas"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <FlaskConical className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Pesquisas</span>
+                  <FlaskConical className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Pesquisas</span>
                 </div>
               </Link>
 
               <Link
                 href="/dashboard/dados-agregados"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="block px-4 py-3 rounded-lg hover:bg-[#1E2535] transition-colors"
                 onClick={() => setShowMenu(false)}
               >
                 <div className="flex items-center gap-3">
-                  <BarChart3 className="w-5 h-5 text-gray-600" />
-                  <span className="text-gray-900 font-medium">Dados Agregados</span>
+                  <BarChart3 className="w-5 h-5 text-[#7A8299]" />
+                  <span className="font-medium" style={{ color: '#F0EAD6' }}>Dados Agregados</span>
                 </div>
               </Link>
             </div>
 
             <button
               onClick={() => setShowMenu(false)}
-              className="w-full mt-6 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors"
+              className="w-full mt-6 px-4 py-3 font-medium rounded-lg transition-colors hover:bg-[#1E2535]"
+              style={{ backgroundColor: '#161B27', color: '#F0EAD6' }}
             >
               Fechar
             </button>
