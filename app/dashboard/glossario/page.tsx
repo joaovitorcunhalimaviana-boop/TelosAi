@@ -77,9 +77,9 @@ export default function GlossarioPage() {
     text += '='.repeat(80) + '\n\n';
 
     const categories = [
-      { id: 'statistical', name: 'TERMOS ESTATÍSTICOS', icon: '📊' },
-      { id: 'medical', name: 'TERMOS MÉDICOS', icon: '⚕️' },
-      { id: 'clinical', name: 'TERMOS DE PESQUISA CLÍNICA', icon: '🔬' },
+      { id: 'statistical', name: 'TERMOS ESTATÍSTICOS', icon: '' },
+      { id: 'medical', name: 'TERMOS MÉDICOS', icon: '' },
+      { id: 'clinical', name: 'TERMOS DE PESQUISA CLÍNICA', icon: '' },
     ];
 
     categories.forEach(cat => {
@@ -88,7 +88,7 @@ export default function GlossarioPage() {
         .sort((a, b) => a.term.localeCompare(b.term, 'pt-BR'));
 
       if (terms.length > 0) {
-        text += `\n${cat.icon} ${cat.name}\n`;
+        text += `\n${cat.name}\n`;
         text += '-'.repeat(80) + '\n\n';
 
         terms.forEach(term => {
@@ -124,25 +124,25 @@ export default function GlossarioPage() {
     const isExpanded = expandedTerms.has(termId);
 
     const categoryConfig = {
-      statistical: { color: 'bg-blue-100 text-blue-800', icon: <Activity className="h-4 w-4" /> },
-      medical: { color: 'bg-green-100 text-green-800', icon: <Stethoscope className="h-4 w-4" /> },
-      clinical: { color: 'bg-purple-100 text-purple-800', icon: <FileText className="h-4 w-4" /> },
+      statistical: { color: 'bg-[#0D7377]/20 text-[#14BDAE]', icon: <Activity className="h-4 w-4" /> },
+      medical: { color: 'bg-green-500/20 text-green-400', icon: <Stethoscope className="h-4 w-4" /> },
+      clinical: { color: 'bg-purple-500/20 text-purple-400', icon: <FileText className="h-4 w-4" /> },
     };
 
     const config = categoryConfig[term.category];
 
     return (
-      <Card key={termId} className="mb-3 print:break-inside-avoid">
+      <Card key={termId} className="mb-3 print:break-inside-avoid" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <CardTitle className="text-lg">{term.term}</CardTitle>
+                <CardTitle className="text-lg" style={{ color: '#F0EAD6' }}>{term.term}</CardTitle>
                 <Badge className={config.color} variant="secondary">
                   {config.icon}
                 </Badge>
               </div>
-              <CardDescription className="text-sm leading-relaxed">
+              <CardDescription className="text-sm leading-relaxed" style={{ color: '#D8DEEB' }}>
                 {term.definition}
               </CardDescription>
             </div>
@@ -150,7 +150,8 @@ export default function GlossarioPage() {
               variant="ghost"
               size="sm"
               onClick={() => toggleTerm(termId)}
-              className="ml-2 print:hidden"
+              className="ml-2 print:hidden hover:bg-[#1E2535]"
+              style={{ color: '#7A8299' }}
             >
               {isExpanded ? (
                 <ChevronUp className="h-4 w-4" />
@@ -164,16 +165,16 @@ export default function GlossarioPage() {
         {(isExpanded || (typeof window !== 'undefined' && window.matchMedia('print').matches)) && (
           <CardContent className="pt-0 space-y-3">
             {term.example && (
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="text-xs font-semibold text-gray-600 mb-1">Exemplo:</div>
-                <div className="text-sm text-gray-700">{term.example}</div>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#161B27' }}>
+                <div className="text-xs font-semibold mb-1" style={{ color: '#7A8299' }}>Exemplo:</div>
+                <div className="text-sm" style={{ color: '#D8DEEB' }}>{term.example}</div>
               </div>
             )}
 
             {term.interpretation && (
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <div className="text-xs font-semibold text-blue-600 mb-1">Interpretação:</div>
-                <div className="text-sm text-blue-900">{term.interpretation}</div>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#0D7377/10', border: '1px solid #0D7377' }}>
+                <div className="text-xs font-semibold mb-1" style={{ color: '#14BDAE' }}>Interpretação:</div>
+                <div className="text-sm" style={{ color: '#D8DEEB' }}>{term.interpretation}</div>
               </div>
             )}
           </CardContent>
@@ -183,50 +184,50 @@ export default function GlossarioPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-6xl" style={{ backgroundColor: '#0B0E14' }}>
       {/* Header */}
       <div className="mb-8 print:mb-4">
         <div className="flex items-center gap-3 mb-2">
-          <BookOpen className="h-10 w-10" style={{ color: '#0A2647' }} />
-          <h1 className="text-4xl font-bold" style={{ color: '#0A2647' }}>
+          <BookOpen className="h-10 w-10" style={{ color: '#14BDAE' }} />
+          <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
             Glossário de Termos
           </h1>
         </div>
-        <p className="text-gray-600 text-lg">
+        <p className="text-lg" style={{ color: '#7A8299' }}>
           Guia completo de termos estatísticos, médicos e de pesquisa clínica
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 print:hidden">
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardDescription className="text-xs">Total de Termos</CardDescription>
-            <CardTitle className="text-3xl" style={{ color: '#0A2647' }}>
+            <CardDescription className="text-xs" style={{ color: '#7A8299' }}>Total de Termos</CardDescription>
+            <CardTitle className="text-3xl" style={{ color: '#14BDAE' }}>
               {Object.keys(tooltipDatabase).length}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardDescription className="text-xs">Estatísticos</CardDescription>
-            <CardTitle className="text-3xl text-blue-600">
+            <CardDescription className="text-xs" style={{ color: '#7A8299' }}>Estatísticos</CardDescription>
+            <CardTitle className="text-3xl" style={{ color: '#14BDAE' }}>
               {termsByCategory.statistical.length}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardDescription className="text-xs">Médicos</CardDescription>
-            <CardTitle className="text-3xl text-green-600">
+            <CardDescription className="text-xs" style={{ color: '#7A8299' }}>Médicos</CardDescription>
+            <CardTitle className="text-3xl text-green-400">
               {termsByCategory.medical.length}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardDescription className="text-xs">Pesquisa Clínica</CardDescription>
-            <CardTitle className="text-3xl text-purple-600">
+            <CardDescription className="text-xs" style={{ color: '#7A8299' }}>Pesquisa Clínica</CardDescription>
+            <CardTitle className="text-3xl text-purple-400">
               {termsByCategory.clinical.length}
             </CardTitle>
           </CardHeader>
@@ -237,20 +238,21 @@ export default function GlossarioPage() {
       <div className="mb-6 print:hidden">
         <div className="flex gap-4 items-center">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#7A8299' }} />
             <Input
               type="text"
               placeholder="Buscar termos, definições, exemplos..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="pl-10"
+              style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
             />
           </div>
-          <Button variant="outline" onClick={exportAsText}>
+          <Button variant="outline" onClick={exportAsText} style={{ borderColor: '#1E2535', color: '#D8DEEB', backgroundColor: '#1E2535' }}>
             <Download className="mr-2 h-4 w-4" />
             Exportar
           </Button>
-          <Button variant="outline" onClick={printGlossary}>
+          <Button variant="outline" onClick={printGlossary} style={{ borderColor: '#1E2535', color: '#D8DEEB', backgroundColor: '#1E2535' }}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir
           </Button>
@@ -259,7 +261,7 @@ export default function GlossarioPage() {
 
       {/* Results Count */}
       {searchQuery && (
-        <div className="mb-4 text-sm text-gray-600 print:hidden">
+        <div className="mb-4 text-sm print:hidden" style={{ color: '#7A8299' }}>
           {filteredTerms.length} termo{filteredTerms.length !== 1 ? 's' : ''} encontrado
           {filteredTerms.length !== 1 ? 's' : ''}
         </div>
@@ -272,19 +274,19 @@ export default function GlossarioPage() {
         onValueChange={(v: any) => setSelectedCategory(v)}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-4 print:hidden">
-          <TabsTrigger value="all">
+        <TabsList className="grid w-full grid-cols-4 print:hidden" style={{ backgroundColor: '#161B27' }}>
+          <TabsTrigger value="all" className="data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
             Todos ({Object.keys(tooltipDatabase).length})
           </TabsTrigger>
-          <TabsTrigger value="statistical">
+          <TabsTrigger value="statistical" className="data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
             <Activity className="mr-2 h-4 w-4" />
             Estatísticos ({termsByCategory.statistical.length})
           </TabsTrigger>
-          <TabsTrigger value="medical">
+          <TabsTrigger value="medical" className="data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
             <Stethoscope className="mr-2 h-4 w-4" />
             Médicos ({termsByCategory.medical.length})
           </TabsTrigger>
-          <TabsTrigger value="clinical">
+          <TabsTrigger value="clinical" className="data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
             <FileText className="mr-2 h-4 w-4" />
             Pesquisa ({termsByCategory.clinical.length})
           </TabsTrigger>
@@ -301,7 +303,7 @@ export default function GlossarioPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12" style={{ color: '#7A8299' }}>
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p className="text-lg">Nenhum termo encontrado</p>
               <p className="text-sm">Tente ajustar sua busca ou filtros</p>
@@ -311,7 +313,7 @@ export default function GlossarioPage() {
       </Tabs>
 
       {/* Print Footer */}
-      <div className="hidden print:block mt-8 pt-4 border-t text-sm text-gray-500">
+      <div className="hidden print:block mt-8 pt-4 border-t text-sm" style={{ color: '#7A8299' }}>
         <p>
           Glossário de Termos - Sistema de Pesquisa Pós-Operatória | Gerado em:{' '}
           {new Date().toLocaleDateString('pt-BR')}

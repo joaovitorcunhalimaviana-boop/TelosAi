@@ -161,13 +161,14 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
       <Card
         className={`
           border-l-4 transition-all duration-200 hover:shadow-md cursor-pointer
-          ${response.riskLevel === 'critical' ? 'border-l-red-500 bg-red-50/50' : ''}
-          ${response.riskLevel === 'high' ? 'border-l-orange-500 bg-orange-50/50' : ''}
-          ${response.riskLevel === 'medium' ? 'border-l-yellow-500 bg-yellow-50/30' : ''}
+          ${response.riskLevel === 'critical' ? 'border-l-red-500' : ''}
+          ${response.riskLevel === 'high' ? 'border-l-orange-500' : ''}
+          ${response.riskLevel === 'medium' ? 'border-l-yellow-500' : ''}
           ${response.riskLevel === 'low' ? 'border-l-green-500' : ''}
-          ${isLatest ? 'ring-2 ring-blue-200' : ''}
+          ${isLatest ? 'ring-2 ring-[#0D7377]' : ''}
         `}
         onClick={() => setExpanded(!expanded)}
+        style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}
       >
         <CardContent className="p-4">
           {/* Header sempre visível */}
@@ -192,7 +193,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm" style={{ color: '#7A8299' }}>
               <Clock className="h-4 w-4" />
               <span title={format(responseDate, "dd/MM/yyyy HH:mm", { locale: ptBR })}>
                 {formatDistanceToNow(responseDate, { locale: ptBR, addSuffix: true })}
@@ -241,12 +242,12 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+                <div className="mt-4 pt-4 border-t space-y-4" style={{ borderColor: '#1E2535' }}>
                   {/* Dados de Dor */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {/* Dor em repouso */}
-                    <div className="bg-white rounded-lg p-3 border shadow-sm">
-                      <div className="flex items-center gap-2 text-gray-600 mb-1">
+                    <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <div className="flex items-center gap-2 mb-1" style={{ color: '#7A8299' }}>
                         <Activity className="h-4 w-4" />
                         <span className="text-xs font-medium">Dor em repouso</span>
                       </div>
@@ -257,8 +258,8 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                     {/* Dor durante evacuação */}
                     {data.hadBowelMovement && (
-                      <div className="bg-white rounded-lg p-3 border shadow-sm">
-                        <div className="flex items-center gap-2 text-gray-600 mb-1">
+                      <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                        <div className="flex items-center gap-2 mb-1" style={{ color: '#7A8299' }}>
                           <Activity className="h-4 w-4" />
                           <span className="text-xs font-medium">Dor evacuação</span>
                         </div>
@@ -269,8 +270,8 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                     )}
 
                     {/* Temperatura */}
-                    <div className="bg-white rounded-lg p-3 border shadow-sm">
-                      <div className="flex items-center gap-2 text-gray-600 mb-1">
+                    <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <div className="flex items-center gap-2 mb-1" style={{ color: '#7A8299' }}>
                         <Thermometer className="h-4 w-4" />
                         <span className="text-xs font-medium">Temperatura</span>
                       </div>
@@ -288,7 +289,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                   </div>
 
                   {/* Evacuação */}
-                  <div className="bg-white rounded-lg p-3 border shadow-sm">
+                  <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                     <div className="flex items-center gap-2 mb-2">
                       {data.hadBowelMovement ? (
                         <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -316,7 +317,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                   </div>
 
                   {/* Medicações */}
-                  <div className="bg-white rounded-lg p-3 border shadow-sm">
+                  <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                     <div className="flex items-center gap-2 mb-2">
                       <Pill className="h-5 w-5 text-purple-500" />
                       <span className="font-medium">Medicações</span>
@@ -339,7 +340,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                       )}
                     </div>
                     {data.extraMedsDetails && (
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm mt-2" style={{ color: '#7A8299' }}>
                         Detalhes: {data.extraMedsDetails}
                       </p>
                     )}
@@ -347,7 +348,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                   {/* Secreção */}
                   {(data.discharge === true || data.hasPurulentDischarge) && (
-                    <div className="bg-white rounded-lg p-3 border shadow-sm">
+                    <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                       <div className="flex items-center gap-2 mb-2">
                         <AlertTriangle className="h-5 w-5 text-yellow-500" />
                         <span className="font-medium">Secreção pela ferida</span>
@@ -369,7 +370,7 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                   {/* Cuidados Locais */}
                   {data.localCareAdherence !== undefined && (
-                    <div className="bg-white rounded-lg p-3 border shadow-sm">
+                    <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                       <div className="flex items-center gap-2">
                         {data.localCareAdherence ? (
                           <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -385,41 +386,41 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                   {/* Sintomas Adicionais */}
                   {data.additionalSymptoms && (
-                    <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                    <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #2A3147' }}>
                       <div className="flex items-center gap-2 mb-1">
-                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                        <span className="font-medium text-yellow-900">Sintomas Adicionais</span>
+                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                        <span className="font-medium" style={{ color: '#D4AF37' }}>Sintomas Adicionais</span>
                       </div>
-                      <p className="text-sm text-yellow-800">{data.additionalSymptoms}</p>
+                      <p className="text-sm" style={{ color: '#D8DEEB' }}>{data.additionalSymptoms}</p>
                     </div>
                   )}
 
                   {/* Preocupações */}
                   {data.concerns && (
-                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                    <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #2A3147' }}>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-purple-900">Preocupações do Paciente</span>
+                        <span className="font-medium" style={{ color: '#D8DEEB' }}>Preocupações do Paciente</span>
                       </div>
-                      <p className="text-sm text-purple-800">{data.concerns}</p>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>{data.concerns}</p>
                     </div>
                   )}
 
                   {/* Pesquisa de Satisfação */}
                   {data.satisfactionRating !== undefined && (
-                    <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+                    <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #2A3147' }}>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-indigo-900">Pesquisa de Satisfação (D+14)</span>
+                        <span className="font-medium" style={{ color: '#F0EAD6' }}>Pesquisa de Satisfação (D+14)</span>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <span className="text-xs text-indigo-600">Nota</span>
+                          <span className="text-xs" style={{ color: '#14BDAE' }}>Nota</span>
                           <div className={`text-2xl font-bold ${(data.satisfactionRating ?? 0) >= 9 ? 'text-green-600' : (data.satisfactionRating ?? 0) >= 7 ? 'text-yellow-600' : 'text-red-600'}`}>
                             {data.satisfactionRating}/10
                           </div>
                         </div>
                         {data.wouldRecommend !== undefined && (
                           <div>
-                            <span className="text-xs text-indigo-600">Recomendaria?</span>
+                            <span className="text-xs" style={{ color: '#14BDAE' }}>Recomendaria?</span>
                             <div className={`text-lg font-bold ${data.wouldRecommend ? 'text-green-600' : 'text-red-600'}`}>
                               {data.wouldRecommend ? 'Sim' : 'Não'}
                             </div>
@@ -427,12 +428,12 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                         )}
                       </div>
                       {data.positiveFeedback && (
-                        <p className="text-sm text-indigo-800 mt-2">
+                        <p className="text-sm mt-2">
                           <strong>Elogios:</strong> {data.positiveFeedback}
                         </p>
                       )}
                       {data.improvementSuggestions && (
-                        <p className="text-sm text-indigo-800 mt-1">
+                        <p className="text-sm mt-1">
                           <strong>Sugestões:</strong> {data.improvementSuggestions}
                         </p>
                       )}
@@ -441,10 +442,10 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                   {/* Red Flags */}
                   {response.redFlags.length > 0 && (
-                    <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                    <div className="rounded-lg p-3" style={{ backgroundColor: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)' }}>
                       <div className="flex items-center gap-2 mb-2">
                         <AlertTriangle className="h-5 w-5 text-red-500" />
-                        <span className="font-medium text-red-900">Alertas Detectados</span>
+                        <span className="font-medium text-red-400">Alertas Detectados</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {response.redFlags.map((flag, idx) => (
@@ -458,11 +459,11 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
 
                   {/* Análise da IA */}
                   {response.aiAnalysis && (
-                    <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                    <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #0D7377' }}>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-blue-900">Análise da IA</span>
+                        <span className="font-medium" style={{ color: '#14BDAE' }}>Análise da IA</span>
                       </div>
-                      <p className="text-sm text-blue-800 whitespace-pre-wrap">
+                      <p className="text-sm whitespace-pre-wrap" style={{ color: '#D8DEEB' }}>
                         {response.aiAnalysis}
                       </p>
                     </div>

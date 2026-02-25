@@ -142,24 +142,25 @@ export default function TemplatesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando templates...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#14BDAE' }}></div>
+          <p style={{ color: '#7A8299' }}>Carregando templates...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] to-[#E2E8F0] p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: '#0B0E14' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
-            className="mb-4"
+            className="mb-4 hover:bg-[#1E2535]"
+            style={{ color: '#D8DEEB' }}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar ao Dashboard
@@ -167,15 +168,18 @@ export default function TemplatesPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold mb-2" style={{ color: '#F0EAD6' }}>
                 Templates de Procedimentos
               </h1>
-              <p className="text-gray-600">
+              <p style={{ color: '#7A8299' }}>
                 Salve e aplique suas configurações padrão de cirurgias
               </p>
             </div>
 
-            <Button onClick={() => router.push("/templates/novo")}>
+            <Button
+              onClick={() => router.push("/templates/novo")}
+              style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Novo Template
             </Button>
@@ -183,15 +187,19 @@ export default function TemplatesPage() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
+        <Card className="mb-6 border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
           <CardContent className="pt-6">
             <div className="flex gap-2 flex-wrap">
               {surgeryTypes.map(type => (
                 <Button
                   key={type.value}
-                  variant={selectedType === type.value ? "default" : "outline"}
+                  variant="outline"
                   onClick={() => setSelectedType(type.value)}
                   size="sm"
+                  style={selectedType === type.value
+                    ? { backgroundColor: '#0D7377', borderColor: '#0D7377', color: '#F0EAD6' }
+                    : { backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }
+                  }
                 >
                   {type.label}
                 </Button>
@@ -202,18 +210,21 @@ export default function TemplatesPage() {
 
         {/* Templates List */}
         {templates.length === 0 ? (
-          <Card>
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="py-12 text-center">
-              <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <FileText className="mx-auto h-12 w-12 mb-4" style={{ color: '#7A8299' }} />
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#F0EAD6' }}>
                 Nenhum template encontrado
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="mb-4" style={{ color: '#7A8299' }}>
                 {selectedType === "all"
                   ? "Crie seu primeiro template para agilizar cadastros"
                   : `Nenhum template para ${SURGERY_TYPE_LABELS[selectedType]}`}
               </p>
-              <Button onClick={() => router.push("/templates/novo")}>
+              <Button
+                onClick={() => router.push("/templates/novo")}
+                style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Criar Template
               </Button>
@@ -227,18 +238,18 @@ export default function TemplatesPage() {
                 : []
 
               return (
-                <Card key={template.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
+                <Card key={template.id} className="border-0 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+                  <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg flex items-center gap-2">
+                        <CardTitle className="text-lg flex items-center gap-2" style={{ color: '#F0EAD6' }}>
                           {template.name}
                           {template.isDefault && (
                             <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                           )}
                         </CardTitle>
                         <CardDescription className="mt-1">
-                          <Badge variant="outline" className="mt-1">
+                          <Badge variant="outline" className="mt-1" style={{ borderColor: '#2A3147', color: '#D8DEEB' }}>
                             <Stethoscope className="h-3 w-3 mr-1" />
                             {SURGERY_TYPE_LABELS[template.surgeryType] || template.surgeryType}
                           </Badge>
@@ -247,17 +258,17 @@ export default function TemplatesPage() {
                     </div>
                   </CardHeader>
 
-                  <CardContent>
+                  <CardContent className="pt-4">
                     {/* Summary */}
                     {summary.length > 0 && (
                       <div className="mb-4 space-y-1">
                         {summary.slice(0, 3).map((item, index) => (
-                          <p key={index} className="text-sm text-gray-600">
-                            • {item}
+                          <p key={index} className="text-sm" style={{ color: '#7A8299' }}>
+                            {item}
                           </p>
                         ))}
                         {summary.length > 3 && (
-                          <p className="text-sm text-gray-500 italic">
+                          <p className="text-sm italic" style={{ color: '#7A8299' }}>
                             +{summary.length - 3} mais...
                           </p>
                         )}
@@ -265,7 +276,7 @@ export default function TemplatesPage() {
                     )}
 
                     {/* Metadata */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                    <div className="flex items-center gap-2 text-xs mb-4" style={{ color: '#7A8299' }}>
                       <Calendar className="h-3 w-3" />
                       Criado em {new Date(template.createdAt).toLocaleDateString("pt-BR")}
                     </div>
@@ -277,6 +288,7 @@ export default function TemplatesPage() {
                         size="sm"
                         className="flex-1"
                         onClick={() => setPreviewTemplate(template)}
+                        style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         Ver
@@ -287,6 +299,7 @@ export default function TemplatesPage() {
                         size="sm"
                         onClick={() => toggleDefault(template)}
                         title={template.isDefault ? "Remover como padrão" : "Definir como padrão"}
+                        style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}
                       >
                         {template.isDefault ? (
                           <StarOff className="h-4 w-4" />
@@ -302,8 +315,9 @@ export default function TemplatesPage() {
                           setTemplateToDelete(template.id)
                           setDeleteDialogOpen(true)
                         }}
+                        style={{ backgroundColor: '#1E2535', borderColor: '#2A3147' }}
                       >
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-red-400" />
                       </Button>
                     </div>
                   </CardContent>
@@ -315,15 +329,15 @@ export default function TemplatesPage() {
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <AlertDialogHeader>
-              <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogTitle style={{ color: '#F0EAD6' }}>Confirmar Exclusão</AlertDialogTitle>
+              <AlertDialogDescription style={{ color: '#7A8299' }}>
                 Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogCancel style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}>Cancelar</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => templateToDelete && handleDelete(templateToDelete)}
                 className="bg-red-600 hover:bg-red-700"
@@ -337,15 +351,15 @@ export default function TemplatesPage() {
         {/* Preview Dialog */}
         {previewTemplate && (
           <AlertDialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
-            <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <AlertDialogHeader>
-                <AlertDialogTitle>{previewTemplate.name}</AlertDialogTitle>
+                <AlertDialogTitle style={{ color: '#F0EAD6' }}>{previewTemplate.name}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  <Badge variant="outline">
+                  <Badge variant="outline" style={{ borderColor: '#2A3147', color: '#D8DEEB' }}>
                     {SURGERY_TYPE_LABELS[previewTemplate.surgeryType]}
                   </Badge>
                   {previewTemplate.isDefault && (
-                    <Badge variant="default" className="ml-2">
+                    <Badge variant="default" className="ml-2" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>
                       Template Padrão
                     </Badge>
                   )}
@@ -358,13 +372,13 @@ export default function TemplatesPage() {
                     {/* Anestesia */}
                     {previewTemplate.templateDataParsed.anesthesia && (
                       <div>
-                        <h4 className="font-semibold mb-2">Anestesia</h4>
-                        <div className="bg-gray-50 p-3 rounded space-y-1">
+                        <h4 className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Anestesia</h4>
+                        <div className="p-3 rounded space-y-1" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                           {previewTemplate.templateDataParsed.anesthesia.type && (
-                            <p>Tipo: {previewTemplate.templateDataParsed.anesthesia.type}</p>
+                            <p style={{ color: '#D8DEEB' }}>Tipo: {previewTemplate.templateDataParsed.anesthesia.type}</p>
                           )}
                           {previewTemplate.templateDataParsed.anesthesia.pudendoBlock && (
-                            <p>Bloqueio Pudendo: Sim ({previewTemplate.templateDataParsed.anesthesia.pudendoTechnique})</p>
+                            <p style={{ color: '#D8DEEB' }}>Bloqueio Pudendo: Sim ({previewTemplate.templateDataParsed.anesthesia.pudendoTechnique})</p>
                           )}
                         </div>
                       </div>
@@ -373,24 +387,24 @@ export default function TemplatesPage() {
                     {/* Prescrição */}
                     {previewTemplate.templateDataParsed.prescription && (
                       <div>
-                        <h4 className="font-semibold mb-2">Prescrição</h4>
-                        <div className="bg-gray-50 p-3 rounded space-y-2">
+                        <h4 className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Prescrição</h4>
+                        <div className="p-3 rounded space-y-2" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                           {previewTemplate.templateDataParsed.prescription.ointments && (
                             <div>
-                              <p className="font-medium">Pomadas:</p>
+                              <p className="font-medium" style={{ color: '#D8DEEB' }}>Pomadas:</p>
                               {previewTemplate.templateDataParsed.prescription.ointments.map((o, i) => (
-                                <p key={i} className="text-sm ml-2">
-                                  • {o.name} - {o.frequency} por {o.durationDays} dias
+                                <p key={i} className="text-sm ml-2" style={{ color: '#7A8299' }}>
+                                  {o.name} - {o.frequency} por {o.durationDays} dias
                                 </p>
                               ))}
                             </div>
                           )}
                           {previewTemplate.templateDataParsed.prescription.medications && (
                             <div>
-                              <p className="font-medium">Medicações:</p>
+                              <p className="font-medium" style={{ color: '#D8DEEB' }}>Medicações:</p>
                               {previewTemplate.templateDataParsed.prescription.medications.map((m, i) => (
-                                <p key={i} className="text-sm ml-2">
-                                  • {m.name} {m.dose} - {m.frequency} por {m.durationDays} dias
+                                <p key={i} className="text-sm ml-2" style={{ color: '#7A8299' }}>
+                                  {m.name} {m.dose} - {m.frequency} por {m.durationDays} dias
                                 </p>
                               ))}
                             </div>
@@ -403,7 +417,7 @@ export default function TemplatesPage() {
               </div>
 
               <AlertDialogFooter>
-                <AlertDialogCancel>Fechar</AlertDialogCancel>
+                <AlertDialogCancel style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}>Fechar</AlertDialogCancel>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

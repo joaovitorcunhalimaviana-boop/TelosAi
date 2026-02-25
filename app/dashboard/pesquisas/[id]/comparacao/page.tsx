@@ -320,7 +320,7 @@ export default function ComparacaoPage() {
     try {
       const canvas = await html2canvas(ref.current, {
         scale: 2,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#111520',
       } as any);
 
       const link = document.createElement('a');
@@ -410,17 +410,17 @@ export default function ComparacaoPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando análise comparativa...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#14BDAE' }}></div>
+          <p className="mt-4" style={{ color: '#7A8299' }}>Carregando análise comparativa...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-6 max-w-7xl" style={{ backgroundColor: '#0B0E14', minHeight: '100vh' }}>
       {/* Header */}
       <FadeIn>
         <div className="mb-8">
@@ -428,6 +428,7 @@ export default function ComparacaoPage() {
             variant="ghost"
             onClick={() => router.back()}
             className="mb-4"
+            style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar
@@ -435,12 +436,12 @@ export default function ComparacaoPage() {
 
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2" style={{ color: '#0A2647' }}>
-                <BarChart3 className="inline-block mr-3 h-10 w-10" />
+              <h1 className="text-4xl font-bold mb-2" style={{ color: '#F0EAD6' }}>
+                <BarChart3 className="inline-block mr-3 h-10 w-10" style={{ color: '#14BDAE' }} />
                 Análise Comparativa de Grupos
               </h1>
-              <p className="text-gray-600 text-lg">{research?.title}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-lg" style={{ color: '#7A8299' }}>{research?.title}</p>
+              <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                 Comparando {groups.length} grupos com {research?.totalPatients} pacientes no total
               </p>
             </div>
@@ -452,7 +453,7 @@ export default function ComparacaoPage() {
                 trigger={
                   <Button
                     variant="default"
-                    style={{ backgroundColor: '#0A2647', color: 'white' }}
+                    style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Exportar Relatório
@@ -482,13 +483,13 @@ export default function ComparacaoPage() {
       <AnimatePresence>
         {showAiInsights && aiInsights.length > 0 && (
           <SlideIn direction="down" duration={0.4}>
-            <Card className="mb-6 border-purple-200 bg-purple-50">
+            <Card className="mb-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-purple-900">
+                <CardTitle className="flex items-center gap-2" style={{ color: '#C9A84C' }}>
                   <Sparkles className="h-5 w-5" />
                   Insights Automatizados da IA
                 </CardTitle>
-                <CardDescription>
+                <CardDescription style={{ color: '#7A8299' }}>
                   Padrões e observações detectados automaticamente nos dados
                 </CardDescription>
               </CardHeader>
@@ -496,9 +497,9 @@ export default function ComparacaoPage() {
                 <StaggerChildren staggerDelay={0.1}>
                   {aiInsights.map((insight, index) => (
                     <StaggerItem key={index}>
-                      <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-purple-200 mb-3">
-                        <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-700">{insight}</p>
+                      <div className="flex items-start gap-3 p-3 rounded-lg mb-3" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#C9A84C' }} />
+                        <p className="text-sm" style={{ color: '#D8DEEB' }}>{insight}</p>
                       </div>
                     </StaggerItem>
                   ))}
@@ -510,10 +511,10 @@ export default function ComparacaoPage() {
       </AnimatePresence>
 
       {/* Group Toggle Controls */}
-      <Card className="mb-6">
+      <Card className="mb-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
-          <CardTitle>Controles de Visualização</CardTitle>
-          <CardDescription>
+          <CardTitle style={{ color: '#F0EAD6' }}>Controles de Visualização</CardTitle>
+          <CardDescription style={{ color: '#7A8299' }}>
             Selecione quais grupos deseja incluir na comparação
           </CardDescription>
         </CardHeader>
@@ -526,7 +527,7 @@ export default function ComparacaoPage() {
                 onClick={() => toggleGroupVisibility(group.id)}
                 style={
                   visibleGroups.has(group.id)
-                    ? { backgroundColor: '#0A2647', color: 'white' }
+                    ? { backgroundColor: '#14BDAE', color: '#0B0E14' }
                     : {}
                 }
               >
@@ -546,12 +547,12 @@ export default function ComparacaoPage() {
       </Card>
 
       {/* Comparison Matrix */}
-      <Card className="mb-6" ref={comparisonMatrixRef}>
+      <Card className="mb-6" ref={comparisonMatrixRef} style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Matriz de Comparação de Grupos</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: '#F0EAD6' }}>Matriz de Comparação de Grupos</CardTitle>
+              <CardDescription style={{ color: '#7A8299' }}>
                 Características basais e dados cirúrgicos por grupo
               </CardDescription>
             </div>
@@ -569,28 +570,28 @@ export default function ComparacaoPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b-2 border-gray-300">
-                  <th className="text-left p-3 font-semibold">Característica</th>
+                <tr style={{ borderBottom: '2px solid #1E2535' }}>
+                  <th className="text-left p-3 font-semibold" style={{ color: '#F0EAD6' }}>Característica</th>
                   {getVisibleGroups().map(group => (
-                    <th key={group.id} className="text-center p-3 font-semibold">
+                    <th key={group.id} className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>
                       Grupo {group.groupCode}
                       <br />
-                      <span className="text-sm font-normal text-gray-500">
+                      <span className="text-sm font-normal" style={{ color: '#7A8299' }}>
                         (n={group.patientCount})
                       </span>
                     </th>
                   ))}
-                  <th className="text-center p-3 font-semibold">p-valor</th>
+                  <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>p-valor</th>
                 </tr>
               </thead>
               <tbody>
                 {/* Demographics */}
-                <tr className="bg-gray-50">
-                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold">
+                <tr style={{ backgroundColor: '#0B0E14' }}>
+                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold" style={{ color: '#14BDAE' }}>
                     Demografia
                   </td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Idade (anos), M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -599,7 +600,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3">0.156</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Sexo Masculino, n (%)</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -608,7 +609,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3">0.423</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">IMC, M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -619,12 +620,12 @@ export default function ComparacaoPage() {
                 </tr>
 
                 {/* Surgical Data */}
-                <tr className="bg-gray-50">
-                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold">
+                <tr style={{ backgroundColor: '#0B0E14' }}>
+                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold" style={{ color: '#14BDAE' }}>
                     Dados Cirúrgicos
                   </td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Duração (min), M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -633,7 +634,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3">0.072</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Complicações, n (%)</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -644,12 +645,12 @@ export default function ComparacaoPage() {
                 </tr>
 
                 {/* Outcomes */}
-                <tr className="bg-gray-50">
-                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold">
+                <tr style={{ backgroundColor: '#0B0E14' }}>
+                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold" style={{ color: '#14BDAE' }}>
                     Desfechos
                   </td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Dor Dia 1, M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -658,7 +659,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3">0.234</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Dor Dia 7, M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -667,7 +668,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3 font-semibold text-green-600">{'<0.001***'}</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Dor Dia 30, M ± DP</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -676,7 +677,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3 font-semibold text-green-600">{'<0.001***'}</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Tempo de Recuperação (dias)</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -685,7 +686,7 @@ export default function ComparacaoPage() {
                   ))}
                   <td className="text-center p-3 font-semibold text-green-600">0.002**</td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Satisfação (0-10)</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -696,12 +697,12 @@ export default function ComparacaoPage() {
                 </tr>
 
                 {/* Follow-up */}
-                <tr className="bg-gray-50">
-                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold">
+                <tr style={{ backgroundColor: '#0B0E14' }}>
+                  <td colSpan={getVisibleGroups().length + 2} className="p-2 font-semibold" style={{ color: '#14BDAE' }}>
                     Acompanhamento
                   </td>
                 </tr>
-                <tr className="border-b">
+                <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                   <td className="p-3">Taxa de Completude (%)</td>
                   {getVisibleGroups().map(group => (
                     <td key={group.id} className="text-center p-3">
@@ -713,7 +714,7 @@ export default function ComparacaoPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-sm text-gray-500 mt-4">
+          <p className="text-sm mt-4" style={{ color: '#7A8299' }}>
             Nota: M = Média; DP = Desvio Padrão; * p {'<'} 0.05, ** p {'<'} 0.01, *** p {'<'} 0.001
           </p>
         </CardContent>
@@ -721,12 +722,12 @@ export default function ComparacaoPage() {
 
       {/* ANOVA Results (if 3+ groups) */}
       {anovaResults && groups.length >= 3 && (
-        <Card className="mb-6" ref={anovaResultsRef}>
+        <Card className="mb-6" ref={anovaResultsRef} style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Análise ANOVA - Comparação de Múltiplos Grupos</CardTitle>
-                <CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Análise ANOVA - Comparação de Múltiplos Grupos</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>
                   Análise de variância para detectar diferenças significativas entre {groups.length} grupos
                 </CardDescription>
               </div>
@@ -756,11 +757,11 @@ export default function ComparacaoPage() {
                     <StaggerChildren className="grid grid-cols-3 gap-4" staggerDelay={0.15}>
                       <StaggerItem>
                         <ScaleOnHover>
-                          <div className="p-4 border rounded-lg bg-blue-50">
-                            <p className="text-sm text-gray-600 mb-1">
+                          <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                            <p className="text-sm mb-1" style={{ color: '#7A8299' }}>
                               Estatística F <StatisticalTooltipIcon termId="f-statistic" />
                             </p>
-                            <p className="text-3xl font-bold text-blue-700">
+                            <p className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                               {prefersReducedMotion ? (
                                 anovaResults.painANOVA.anova.fStatistic.toFixed(3)
                               ) : (
@@ -771,7 +772,7 @@ export default function ComparacaoPage() {
                                 />
                               )}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                               F({anovaResults.painANOVA.anova.dfBetween}, {anovaResults.painANOVA.anova.dfWithin})
                             </p>
                           </div>
@@ -780,8 +781,8 @@ export default function ComparacaoPage() {
 
                       <StaggerItem>
                         <ScaleOnHover>
-                          <div className="p-4 border rounded-lg bg-purple-50">
-                            <p className="text-sm text-gray-600 mb-1">
+                          <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                            <p className="text-sm mb-1" style={{ color: '#7A8299' }}>
                               Valor-p <StatisticalTooltipIcon termId="p-valor" />
                             </p>
                             <p className="text-3xl font-bold" style={{ color: '#7C3AED' }}>
@@ -816,8 +817,8 @@ export default function ComparacaoPage() {
 
                       <StaggerItem>
                         <ScaleOnHover>
-                          <div className="p-4 border rounded-lg" style={{ backgroundColor: '#FFF9E6' }}>
-                            <p className="text-sm text-gray-600 mb-1">Eta-squared (η²)</p>
+                          <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                            <p className="text-sm mb-1" style={{ color: '#7A8299' }}>Eta-squared (η²)</p>
                             <p className="text-3xl font-bold" style={{ color: '#D4AF37' }}>
                               {prefersReducedMotion ? (
                                 anovaResults.painANOVA.anova.etaSquared.toFixed(3)
@@ -830,7 +831,7 @@ export default function ComparacaoPage() {
                                 />
                               )}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                               {anovaResults.painANOVA.anova.etaSquared >= 0.14
                                 ? 'Efeito Grande'
                                 : anovaResults.painANOVA.anova.etaSquared >= 0.06
@@ -846,17 +847,17 @@ export default function ComparacaoPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full border-collapse">
                         <thead>
-                          <tr className="border-b-2 border-gray-300 bg-gray-50">
-                            <th className="text-left p-3 font-semibold">Fonte de Variação</th>
-                            <th className="text-center p-3 font-semibold">Soma dos Quadrados</th>
-                            <th className="text-center p-3 font-semibold">GL</th>
-                            <th className="text-center p-3 font-semibold">Quadrado Médio</th>
-                            <th className="text-center p-3 font-semibold">F</th>
-                            <th className="text-center p-3 font-semibold">p-valor</th>
+                          <tr style={{ borderBottom: '2px solid #1E2535', backgroundColor: '#0B0E14' }}>
+                            <th className="text-left p-3 font-semibold" style={{ color: '#F0EAD6' }}>Fonte de Variação</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>Soma dos Quadrados</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>GL</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>Quadrado Médio</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>F</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>p-valor</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="border-b">
+                          <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                             <td className="p-3 font-medium">Entre Grupos</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.ssBetween.toFixed(2)}</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.dfBetween}</td>
@@ -866,7 +867,7 @@ export default function ComparacaoPage() {
                               {anovaResults.painANOVA.anova.pValue < 0.001 ? '< 0.001***' : anovaResults.painANOVA.anova.pValue.toFixed(4)}
                             </td>
                           </tr>
-                          <tr className="border-b">
+                          <tr style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }}>
                             <td className="p-3 font-medium">Dentro dos Grupos</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.ssWithin.toFixed(2)}</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.dfWithin}</td>
@@ -874,7 +875,7 @@ export default function ComparacaoPage() {
                             <td className="text-center p-3">-</td>
                             <td className="text-center p-3">-</td>
                           </tr>
-                          <tr className="bg-gray-50 font-semibold">
+                          <tr className="font-semibold" style={{ backgroundColor: '#0B0E14', color: '#F0EAD6' }}>
                             <td className="p-3">Total</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.ssTotal.toFixed(2)}</td>
                             <td className="text-center p-3">{anovaResults.painANOVA.anova.dfTotal}</td>
@@ -884,17 +885,17 @@ export default function ComparacaoPage() {
                           </tr>
                         </tbody>
                       </table>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs mt-2" style={{ color: '#7A8299' }}>
                         GL = Graus de Liberdade; * p {'<'} 0.05, ** p {'<'} 0.01, *** p {'<'} 0.001
                       </p>
                     </div>
 
                     {/* Box Plot Visualization */}
                     <div>
-                      <h4 className="font-semibold mb-3">Distribuição de Dor por Grupo (Dia 7)</h4>
-                      <div className="flex items-center justify-around gap-4 p-6 bg-gray-50 rounded-lg" style={{ minHeight: '350px' }}>
+                      <h4 className="font-semibold mb-3" style={{ color: '#F0EAD6' }}>Distribuição de Dor por Grupo (Dia 7)</h4>
+                      <div className="flex items-center justify-around gap-4 p-6 rounded-lg" style={{ minHeight: '350px', backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
                         {anovaResults.painANOVA.anova.groupMeans.map((mean: number, index: number) => {
-                          const colors = ['#0A2647', '#144272', '#205295', '#2C74B3', '#3A8BC9', '#4EA5D9'];
+                          const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37', '#5AB2FF', '#7AC5FF'];
                           const group = groups[index];
                           const boxHeight = (mean / 10) * 200;
 
@@ -925,25 +926,25 @@ export default function ComparacaoPage() {
                                 </div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xs font-medium">{group?.groupCode || `G${index + 1}`}</div>
-                                <div className="text-xs text-gray-500">n={anovaResults.painANOVA.anova.groupSizes[index]}</div>
+                                <div className="text-xs font-medium" style={{ color: '#D8DEEB' }}>{group?.groupCode || `G${index + 1}`}</div>
+                                <div className="text-xs" style={{ color: '#7A8299' }}>n={anovaResults.painANOVA.anova.groupSizes[index]}</div>
                               </div>
                             </div>
                           );
                         })}
                       </div>
-                      <p className="text-center text-sm text-gray-500 mt-2">
+                      <p className="text-center text-sm mt-2" style={{ color: '#7A8299' }}>
                         Escala de dor 0-10. Média geral: {anovaResults.painANOVA.anova.grandMean.toFixed(1)}
                       </p>
                     </div>
 
                     {/* Interpretation */}
-                    <div className="p-4 border rounded-lg bg-green-50">
+                    <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                       <div className="flex items-start gap-3">
                         <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-semibold text-green-900 mb-2">Interpretação Clínica</p>
-                          <p className="text-sm text-green-800">
+                          <p className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Interpretação Clínica</p>
+                          <p className="text-sm" style={{ color: '#D8DEEB' }}>
                             {anovaResults.painANOVA.anova.interpretation}
                           </p>
                         </div>
@@ -957,12 +958,12 @@ export default function ComparacaoPage() {
               {anovaResults.painANOVA?.postHoc && (
                 <TabsContent value="posthoc" className="mt-4">
                   <div className="space-y-4">
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #C9A84C' }}>
                       <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                        <AlertCircle className="h-5 w-5 mt-0.5" style={{ color: '#C9A84C' }} />
                         <div>
-                          <p className="font-semibold text-yellow-900">Teste de Tukey HSD (Post-Hoc)</p>
-                          <p className="text-sm text-yellow-800 mt-1">
+                          <p className="font-semibold" style={{ color: '#C9A84C' }}>Teste de Tukey HSD (Post-Hoc)</p>
+                          <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                             Comparações pareadas entre todos os grupos para identificar quais grupos diferem significativamente.
                           </p>
                         </div>
@@ -972,18 +973,18 @@ export default function ComparacaoPage() {
                     <div className="overflow-x-auto">
                       <table className="w-full border-collapse">
                         <thead>
-                          <tr className="border-b-2 border-gray-300 bg-gray-50">
-                            <th className="text-left p-3 font-semibold">Comparação</th>
-                            <th className="text-center p-3 font-semibold">Diferença de Médias</th>
-                            <th className="text-center p-3 font-semibold">Estatística q</th>
-                            <th className="text-center p-3 font-semibold">p-valor</th>
-                            <th className="text-center p-3 font-semibold">IC 95%</th>
-                            <th className="text-center p-3 font-semibold">Significativo</th>
+                          <tr style={{ borderBottom: '2px solid #1E2535', backgroundColor: '#0B0E14' }}>
+                            <th className="text-left p-3 font-semibold" style={{ color: '#F0EAD6' }}>Comparação</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>Diferença de Médias</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>Estatística q</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>p-valor</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>IC 95%</th>
+                            <th className="text-center p-3 font-semibold" style={{ color: '#F0EAD6' }}>Significativo</th>
                           </tr>
                         </thead>
                         <tbody>
                           {anovaResults.painANOVA.postHoc.map((result: any, index: number) => (
-                            <tr key={index} className="border-b hover:bg-gray-50">
+                            <tr key={index} style={{ borderBottom: '1px solid #1E2535', color: '#D8DEEB' }} className="hover:opacity-80">
                               <td className="p-3 font-medium">
                                 {result.group1Name} vs {result.group2Name}
                               </td>
@@ -1012,8 +1013,8 @@ export default function ComparacaoPage() {
                       </table>
                     </div>
 
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-3">Resumo das Diferenças Significativas</h4>
+                    <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                      <h4 className="font-semibold mb-3" style={{ color: '#F0EAD6' }}>Resumo das Diferenças Significativas</h4>
                       <div className="space-y-2">
                         {anovaResults.painANOVA.postHoc
                           .filter((result: any) => result.significant)
@@ -1028,7 +1029,7 @@ export default function ComparacaoPage() {
                             </div>
                           ))}
                         {anovaResults.painANOVA.postHoc.filter((result: any) => result.significant).length === 0 && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm" style={{ color: '#7A8299' }}>
                             Nenhuma diferença significativa foi detectada nas comparações pareadas.
                           </p>
                         )}
@@ -1043,18 +1044,18 @@ export default function ComparacaoPage() {
                 {anovaResults.ageANOVA && (
                   <div className="space-y-6">
                     <div className="grid grid-cols-3 gap-4">
-                      <div className="p-4 border rounded-lg bg-blue-50">
-                        <p className="text-sm text-gray-600 mb-1">Estatística F</p>
-                        <p className="text-3xl font-bold text-blue-700">
+                      <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                        <p className="text-sm mb-1" style={{ color: '#7A8299' }}>Estatística F</p>
+                        <p className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                           {anovaResults.ageANOVA.anova.fStatistic.toFixed(3)}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                           F({anovaResults.ageANOVA.anova.dfBetween}, {anovaResults.ageANOVA.anova.dfWithin})
                         </p>
                       </div>
 
-                      <div className="p-4 border rounded-lg bg-purple-50">
-                        <p className="text-sm text-gray-600 mb-1">Valor-p</p>
+                      <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                        <p className="text-sm mb-1" style={{ color: '#7A8299' }}>Valor-p</p>
                         <p className="text-3xl font-bold" style={{ color: '#7C3AED' }}>
                           {anovaResults.ageANOVA.anova.pValue < 0.001
                             ? '< 0.001'
@@ -1068,12 +1069,12 @@ export default function ComparacaoPage() {
                         </Badge>
                       </div>
 
-                      <div className="p-4 border rounded-lg" style={{ backgroundColor: '#FFF9E6' }}>
-                        <p className="text-sm text-gray-600 mb-1">Eta-squared (η²)</p>
+                      <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                        <p className="text-sm mb-1" style={{ color: '#7A8299' }}>Eta-squared (η²)</p>
                         <p className="text-3xl font-bold" style={{ color: '#D4AF37' }}>
                           {anovaResults.ageANOVA.anova.etaSquared.toFixed(3)}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                           {anovaResults.ageANOVA.anova.etaSquared >= 0.14
                             ? 'Efeito Grande'
                             : anovaResults.ageANOVA.anova.etaSquared >= 0.06
@@ -1083,12 +1084,12 @@ export default function ComparacaoPage() {
                       </div>
                     </div>
 
-                    <div className="p-4 border rounded-lg bg-blue-50">
+                    <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                       <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#14BDAE' }} />
                         <div>
-                          <p className="font-semibold text-blue-900 mb-2">Interpretação</p>
-                          <p className="text-sm text-blue-800">
+                          <p className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Interpretação</p>
+                          <p className="text-sm" style={{ color: '#D8DEEB' }}>
                             {anovaResults.ageANOVA.anova.interpretation}
                           </p>
                         </div>
@@ -1103,12 +1104,12 @@ export default function ComparacaoPage() {
       )}
 
       {/* Statistical Analysis */}
-      <Card className="mb-6" ref={statisticalAnalysisRef}>
+      <Card className="mb-6" ref={statisticalAnalysisRef} style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Análise Estatística Detalhada</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: '#F0EAD6' }}>Análise Estatística Detalhada</CardTitle>
+              <CardDescription style={{ color: '#7A8299' }}>
                 Intervalos de confiança, tamanho de efeito e poder estatístico
               </CardDescription>
             </div>
@@ -1142,13 +1143,13 @@ export default function ComparacaoPage() {
                       );
 
                       return (
-                        <div key={group.id} className="p-4 border rounded-lg">
-                          <h4 className="font-semibold mb-2">
+                        <div key={group.id} className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                          <h4 className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>
                             {group1.groupName} vs {group.groupName}
                           </h4>
                           <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <p className="text-sm text-gray-600">Cohen&apos;s d</p>
+                              <p className="text-sm" style={{ color: '#7A8299' }}>Cohen&apos;s d</p>
                               <p className="text-2xl font-bold">
                                 {Math.abs(cohenD).toFixed(3)}
                               </p>
@@ -1169,14 +1170,14 @@ export default function ComparacaoPage() {
                               </Badge>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Diferença na Dor Dia 7</p>
+                              <p className="text-sm" style={{ color: '#7A8299' }}>Diferença na Dor Dia 7</p>
                               <p className="text-2xl font-bold">
                                 {Math.abs(group1.outcomes.avgPainDay7 - group.outcomes.avgPainDay7).toFixed(1)}
                               </p>
-                              <p className="text-xs text-gray-500">pontos na escala</p>
+                              <p className="text-xs" style={{ color: '#7A8299' }}>pontos na escala</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Significância Clínica</p>
+                              <p className="text-sm" style={{ color: '#7A8299' }}>Significância Clínica</p>
                               <p className="text-2xl font-bold">
                                 {Math.abs(group1.outcomes.avgPainDay7 - group.outcomes.avgPainDay7) > 2
                                   ? 'Sim'
@@ -1211,18 +1212,18 @@ export default function ComparacaoPage() {
                   ]);
 
                   return (
-                    <div key={group.id} className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-3">
+                    <div key={group.id} className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                      <h4 className="font-semibold mb-3" style={{ color: '#F0EAD6' }}>
                         Grupo {group.groupCode}: {group.groupName}
                       </h4>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-sm">Dor Média (IC 95%)</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs" style={{ color: '#7A8299' }}>
                               [{painCI.lower.toFixed(2)}, {painCI.upper.toFixed(2)}]
                             </span>
-                            <div className="w-48 h-2 bg-gray-200 rounded-full relative">
+                            <div className="w-48 h-2 rounded-full relative" style={{ backgroundColor: '#1E2535' }}>
                               <div
                                 className="absolute h-full bg-blue-500 rounded-full"
                                 style={{
@@ -1236,19 +1237,19 @@ export default function ComparacaoPage() {
 
                         <div className="grid grid-cols-3 gap-3 text-sm">
                           <div>
-                            <p className="text-gray-600">Dia 1</p>
+                            <p style={{ color: '#7A8299' }}>Dia 1</p>
                             <p className="font-semibold">
                               {group.outcomes.avgPainDay1.toFixed(1)} ± 0.5
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-600">Dia 7</p>
+                            <p style={{ color: '#7A8299' }}>Dia 7</p>
                             <p className="font-semibold">
                               {group.outcomes.avgPainDay7.toFixed(1)} ± 0.4
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-600">Dia 30</p>
+                            <p style={{ color: '#7A8299' }}>Dia 30</p>
                             <p className="font-semibold">
                               {group.outcomes.avgPainDay30.toFixed(1)} ± 0.3
                             </p>
@@ -1263,57 +1264,57 @@ export default function ComparacaoPage() {
 
             <TabsContent value="power" className="mt-4">
               <div className="space-y-4">
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Activity className="h-5 w-5" />
+                <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+                    <Activity className="h-5 w-5" style={{ color: '#14BDAE' }} />
                     Análise de Poder Estatístico
                   </h4>
                   <div className="grid grid-cols-2 gap-4 mt-3">
                     <div>
-                      <p className="text-sm text-gray-600">Poder Atual (1-β)</p>
-                      <p className="text-3xl font-bold text-blue-700">0.85</p>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Poder Atual (1-β)</p>
+                      <p className="text-3xl font-bold" style={{ color: '#14BDAE' }}>0.85</p>
                       <Badge variant="default" className="mt-1">
                         Adequado ({'>'} 0.80)
                       </Badge>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Tamanho Amostral Recomendado</p>
-                      <p className="text-3xl font-bold text-blue-700">
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Tamanho Amostral Recomendado</p>
+                      <p className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                         {Math.ceil(research?.totalPatients || 0 / groups.length) * groups.length}
                       </p>
-                      <p className="text-xs text-gray-500">para poder de 0.90</p>
+                      <p className="text-xs" style={{ color: '#7A8299' }}>para poder de 0.90</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-3">Parâmetros da Análise</h4>
+                <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                  <h4 className="font-semibold mb-3" style={{ color: '#F0EAD6' }}>Parâmetros da Análise</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Nível de significância (α)</span>
+                      <span style={{ color: '#7A8299' }}>Nível de significância (α)</span>
                       <span className="font-semibold">0.05</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Teste utilizado</span>
+                      <span style={{ color: '#7A8299' }}>Teste utilizado</span>
                       <span className="font-semibold">ANOVA/t-test</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Tipo de teste</span>
+                      <span style={{ color: '#7A8299' }}>Tipo de teste</span>
                       <span className="font-semibold">Bicaudal</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Tamanho do efeito esperado</span>
+                      <span style={{ color: '#7A8299' }}>Tamanho do efeito esperado</span>
                       <span className="font-semibold">Médio (d = 0.5)</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 border rounded-lg bg-yellow-50">
+                <div className="p-4 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#C9A84C' }}>
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 mt-0.5" style={{ color: '#C9A84C' }} />
                     <div>
-                      <p className="font-semibold text-yellow-900">Recomendação</p>
-                      <p className="text-sm text-yellow-800 mt-1">
+                      <p className="font-semibold" style={{ color: '#C9A84C' }}>Recomendação</p>
+                      <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                         O estudo atual possui poder estatístico adequado (0.85) para detectar
                         diferenças de tamanho médio entre os grupos. Para aumentar o poder para
                         0.90, considere recrutar aproximadamente{' '}
@@ -1329,12 +1330,12 @@ export default function ComparacaoPage() {
       </Card>
 
       {/* Outcome Comparisons */}
-      <Card className="mb-6" ref={outcomesChartRef}>
+      <Card className="mb-6" ref={outcomesChartRef} style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Comparação de Desfechos</CardTitle>
-              <CardDescription>
+              <CardTitle style={{ color: '#F0EAD6' }}>Comparação de Desfechos</CardTitle>
+              <CardDescription style={{ color: '#7A8299' }}>
                 Visualizações interativas de resultados por grupo
               </CardDescription>
             </div>
@@ -1364,10 +1365,10 @@ export default function ComparacaoPage() {
         <CardContent>
           {selectedOutcome === 'pain' && (
             <div className="space-y-4">
-              <h4 className="font-semibold">Trajetória da Dor ao Longo do Tempo</h4>
+              <h4 className="font-semibold" style={{ color: '#F0EAD6' }}>Trajetória da Dor ao Longo do Tempo</h4>
 
               {/* Pain trajectory chart */}
-              <div className="h-80 flex items-end justify-around gap-8 p-6 bg-gray-50 rounded-lg">
+              <div className="h-80 flex items-end justify-around gap-8 p-6 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
                 {['Dia 1', 'Dia 7', 'Dia 30'].map((timepoint, tIndex) => (
                   <div key={timepoint} className="flex-1 flex flex-col items-center gap-2">
                     <div className="w-full flex justify-around items-end h-64">
@@ -1380,7 +1381,7 @@ export default function ComparacaoPage() {
                               : group.outcomes.avgPainDay30;
 
                         const height = (painValue / 10) * 100;
-                        const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];
+                        const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37'];
 
                         return (
                           <div key={group.id} className="flex flex-col items-center gap-1">
@@ -1392,7 +1393,7 @@ export default function ComparacaoPage() {
                                 backgroundColor: colors[gIndex % colors.length],
                               }}
                             />
-                            <div className="text-xs text-gray-600">
+                            <div className="text-xs" style={{ color: '#7A8299' }}>
                               Grupo {group.groupCode}
                             </div>
                           </div>
@@ -1407,7 +1408,7 @@ export default function ComparacaoPage() {
               {/* Legend */}
               <div className="flex justify-center gap-4 mt-4">
                 {getVisibleGroups().map((group, index) => {
-                  const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];
+                  const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37'];
                   return (
                     <div key={group.id} className="flex items-center gap-2">
                       <div
@@ -1422,7 +1423,7 @@ export default function ComparacaoPage() {
                 })}
               </div>
 
-              <p className="text-sm text-gray-500 mt-4">
+              <p className="text-sm mt-4" style={{ color: '#7A8299' }}>
                 Escala de dor: 0 = sem dor, 10 = dor máxima. Barras representam médias por grupo.
               </p>
             </div>
@@ -1430,13 +1431,13 @@ export default function ComparacaoPage() {
 
           {selectedOutcome === 'complications' && (
             <div className="space-y-4">
-              <h4 className="font-semibold">Taxa de Complicações com Intervalos de Confiança</h4>
+              <h4 className="font-semibold" style={{ color: '#F0EAD6' }}>Taxa de Complicações com Intervalos de Confiança</h4>
 
               <div className="space-y-3">
                 {getVisibleGroups().map((group, index) => {
                   const rate = group.surgical.complicationRate * 100;
                   const ci = calculateCI([rate, rate - 5, rate + 5]);
-                  const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];
+                  const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37'];
 
                   return (
                     <div key={group.id} className="space-y-2">
@@ -1444,12 +1445,12 @@ export default function ComparacaoPage() {
                         <span className="font-medium">
                           Grupo {group.groupCode}: {group.groupName}
                         </span>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm" style={{ color: '#7A8299' }}>
                           {group.surgical.complications}/{group.patientCount} pacientes
                         </span>
                       </div>
                       <div className="relative">
-                        <div className="h-12 bg-gray-100 rounded-lg overflow-hidden">
+                        <div className="h-12 rounded-lg overflow-hidden" style={{ backgroundColor: '#0B0E14' }}>
                           <div
                             className="h-full flex items-center justify-center text-white font-semibold transition-all"
                             style={{
@@ -1460,7 +1461,7 @@ export default function ComparacaoPage() {
                             {rate.toFixed(1)}%
                           </div>
                         </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <div className="flex justify-between text-xs mt-1" style={{ color: '#7A8299' }}>
                           <span>IC 95%: [{ci.lower.toFixed(1)}%, {ci.upper.toFixed(1)}%]</span>
                         </div>
                       </div>
@@ -1469,12 +1470,12 @@ export default function ComparacaoPage() {
                 })}
               </div>
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 mt-0.5" style={{ color: '#14BDAE' }} />
                   <div>
-                    <p className="font-semibold text-blue-900">Interpretação</p>
-                    <p className="text-sm text-blue-800 mt-1">
+                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Interpretação</p>
+                    <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                       As taxas de complicação variam entre{' '}
                       {Math.min(...getVisibleGroups().map(g => g.surgical.complicationRate * 100)).toFixed(1)}% e{' '}
                       {Math.max(...getVisibleGroups().map(g => g.surgical.complicationRate * 100)).toFixed(1)}%.
@@ -1488,16 +1489,16 @@ export default function ComparacaoPage() {
 
           {selectedOutcome === 'recovery' && (
             <div className="space-y-4">
-              <h4 className="font-semibold">Tempo de Recuperação (Box Plot)</h4>
+              <h4 className="font-semibold" style={{ color: '#F0EAD6' }}>Tempo de Recuperação (Box Plot)</h4>
 
-              <div className="h-80 flex items-end justify-around gap-4 p-6 bg-gray-50 rounded-lg">
+              <div className="h-80 flex items-end justify-around gap-4 p-6 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
                 {getVisibleGroups().map((group, index) => {
                   const mean = group.outcomes.avgRecoveryDays;
                   const min = mean - 5;
                   const max = mean + 8;
                   const q1 = mean - 2;
                   const q3 = mean + 3;
-                  const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];
+                  const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37'];
 
                   return (
                     <div key={group.id} className="flex flex-col items-center gap-2 flex-1">
@@ -1538,7 +1539,7 @@ export default function ComparacaoPage() {
 
                       <div className="text-center">
                         <div className="font-medium text-sm">Grupo {group.groupCode}</div>
-                        <div className="text-xs text-gray-600">M = {mean.toFixed(1)} dias</div>
+                        <div className="text-xs" style={{ color: '#7A8299' }}>M = {mean.toFixed(1)} dias</div>
                       </div>
                     </div>
                   );
@@ -1547,11 +1548,11 @@ export default function ComparacaoPage() {
 
               <div className="grid grid-cols-4 gap-4 mt-4">
                 {getVisibleGroups().map(group => (
-                  <div key={group.id} className="text-center p-3 border rounded-lg">
-                    <div className="text-2xl font-bold" style={{ color: '#0A2647' }}>
+                  <div key={group.id} className="text-center p-3 border rounded-lg" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                    <div className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                       {group.outcomes.avgRecoveryDays.toFixed(1)}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs" style={{ color: '#7A8299' }}>
                       Grupo {group.groupCode} (média)
                     </div>
                   </div>
@@ -1562,12 +1563,12 @@ export default function ComparacaoPage() {
 
           {selectedOutcome === 'satisfaction' && (
             <div className="space-y-4">
-              <h4 className="font-semibold">Satisfação do Paciente (Violin Plot)</h4>
+              <h4 className="font-semibold" style={{ color: '#F0EAD6' }}>Satisfação do Paciente (Violin Plot)</h4>
 
-              <div className="h-80 flex items-center justify-around gap-8 p-6 bg-gray-50 rounded-lg">
+              <div className="h-80 flex items-center justify-around gap-8 p-6 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
                 {getVisibleGroups().map((group, index) => {
                   const score = group.outcomes.satisfactionScore;
-                  const colors = ['#0A2647', '#144272', '#205295', '#2C74B3'];
+                  const colors = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37'];
 
                   return (
                     <div key={group.id} className="flex flex-col items-center gap-3">
@@ -1612,19 +1613,19 @@ export default function ComparacaoPage() {
 
                       <div className="text-center">
                         <div className="font-medium">Grupo {group.groupCode}</div>
-                        <div className="text-xs text-gray-600">{group.groupName}</div>
+                        <div className="text-xs" style={{ color: '#7A8299' }}>{group.groupName}</div>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="p-4 bg-green-50 rounded-lg">
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-green-900">Satisfação Geral</p>
-                    <p className="text-sm text-green-800 mt-1">
+                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Satisfação Geral</p>
+                    <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                       Média geral de satisfação:{' '}
                       {(
                         getVisibleGroups().reduce((sum, g) => sum + g.outcomes.satisfactionScore, 0) /
@@ -1641,10 +1642,10 @@ export default function ComparacaoPage() {
       </Card>
 
       {/* Survival Analysis */}
-      <Card className="mb-6">
+      <Card className="mb-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
-          <CardTitle>Análise de Sobrevivência (Kaplan-Meier)</CardTitle>
-          <CardDescription>
+          <CardTitle style={{ color: '#F0EAD6' }}>Análise de Sobrevivência (Kaplan-Meier)</CardTitle>
+          <CardDescription style={{ color: '#7A8299' }}>
             Análise tempo-até-evento para desfechos clínicos
           </CardDescription>
         </CardHeader>
@@ -1654,10 +1655,10 @@ export default function ComparacaoPage() {
       </Card>
 
       {/* Publication Tools */}
-      <Card>
+      <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535', border: '2px solid #1E2535' }}>
         <CardHeader>
-          <CardTitle>Ferramentas para Publicação</CardTitle>
-          <CardDescription>
+          <CardTitle style={{ color: '#F0EAD6' }}>Ferramentas para Publicação</CardTitle>
+          <CardDescription style={{ color: '#7A8299' }}>
             Exporte dados e visualizações prontas para publicação acadêmica
           </CardDescription>
         </CardHeader>
@@ -1671,7 +1672,7 @@ export default function ComparacaoPage() {
               <FileText className="h-6 w-6 mb-2" />
               <div className="text-left">
                 <div className="font-semibold">Tabela Formatada APA</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs" style={{ color: '#7A8299' }}>
                   Exportar tabela em formato APA 7ª edição
                 </div>
               </div>
@@ -1685,7 +1686,7 @@ export default function ComparacaoPage() {
               <Activity className="h-6 w-6 mb-2" />
               <div className="text-left">
                 <div className="font-semibold">Diagrama CONSORT</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs" style={{ color: '#7A8299' }}>
                   Gerar fluxograma de participantes
                 </div>
               </div>
@@ -1699,7 +1700,7 @@ export default function ComparacaoPage() {
               <Download className="h-6 w-6 mb-2" />
               <div className="text-left">
                 <div className="font-semibold">Figura 1 (Alta Resolução)</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs" style={{ color: '#7A8299' }}>
                   Matriz de comparação em 300 DPI
                 </div>
               </div>
@@ -1713,7 +1714,7 @@ export default function ComparacaoPage() {
               <Download className="h-6 w-6 mb-2" />
               <div className="text-left">
                 <div className="font-semibold">Figura 2 (Alta Resolução)</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs" style={{ color: '#7A8299' }}>
                   Gráficos de desfechos em 300 DPI
                 </div>
               </div>
@@ -1722,9 +1723,9 @@ export default function ComparacaoPage() {
 
           <Separator className="my-6" />
 
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-semibold mb-2">Citação Sugerida</h4>
-            <p className="text-sm text-gray-700 font-mono bg-white p-3 rounded border">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
+            <h4 className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Citação Sugerida</h4>
+            <p className="text-sm font-mono p-3 rounded" style={{ color: '#D8DEEB', backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
               {getCitationText()}
             </p>
             <Button

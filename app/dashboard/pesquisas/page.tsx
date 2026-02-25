@@ -238,24 +238,25 @@ export default function PesquisasPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#14BDAE' }}></div>
+          <p className="mt-4" style={{ color: '#7A8299' }}>Carregando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-8">
+    <div className="min-h-screen p-6 lg:p-8" style={{ backgroundColor: '#0B0E14' }}>
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="mb-8">
           <Button
             variant="ghost"
             onClick={() => router.push('/dashboard')}
-            className="mb-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2"
+            className="mb-4 -ml-2"
+            style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar ao Dashboard
@@ -263,14 +264,14 @@ export default function PesquisasPage() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg shadow-blue-900/20">
-                <FlaskConical className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#0D7377' }}>
+                <FlaskConical className="w-8 h-8" style={{ color: '#F0EAD6' }} />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-[#0A2647]">
+                <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
                   Minhas Pesquisas
                 </h1>
-                <p className="text-gray-500 mt-2 text-lg">
+                <p className="mt-2 text-lg" style={{ color: '#7A8299' }}>
                   Gerencie seus estudos clínicos e monitore o progresso dos pacientes.
                 </p>
               </div>
@@ -279,15 +280,15 @@ export default function PesquisasPage() {
         </div>
 
         {/* Card informativo - Igual a Protocolos */}
-        <Card className="mt-8 border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm">
+        <Card className="mt-8 border-2 shadow-sm" style={{ backgroundColor: '#161B27', borderColor: '#C9A84C' }}>
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <Shield className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#C9A84C' }} />
               <div>
-                <p className="text-sm text-amber-800 font-medium">
+                <p className="text-sm font-medium" style={{ color: '#F0EAD6' }}>
                   Importante: As pesquisas permitem agrupar pacientes e comparar resultados clínicos.
                 </p>
-                <p className="text-xs text-amber-700 mt-1">
+                <p className="text-xs mt-1" style={{ color: '#D8DEEB' }}>
                   Crie grupos (ex: Controle vs Intervenção) para análise detalhada no dashboard.
                 </p>
               </div>
@@ -299,7 +300,8 @@ export default function PesquisasPage() {
           <Button
             size="lg"
             onClick={() => setIsDialogOpen(true)}
-            className="shadow-xl shadow-blue-900/10 bg-[#0A2647] hover:bg-[#08203d] text-white transition-all hover:scale-105 active:scale-95"
+            className="shadow-xl transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
           >
             <Plus className="mr-2 h-5 w-5" />
             Nova Pesquisa
@@ -307,10 +309,10 @@ export default function PesquisasPage() {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <DialogHeader>
-              <DialogTitle>Criar Nova Pesquisa</DialogTitle>
-              <DialogDescription>
+              <DialogTitle style={{ color: '#F0EAD6' }}>Criar Nova Pesquisa</DialogTitle>
+              <DialogDescription style={{ color: '#7A8299' }}>
                 Configure sua pesquisa e defina os grupos de estudo
               </DialogDescription>
             </DialogHeader>
@@ -423,14 +425,14 @@ export default function PesquisasPage() {
               </div>
 
               {/* Protocols Section */}
-              <div className="space-y-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-lg border-2 border-amber-300">
+              <div className="space-y-4 p-6 rounded-lg border-2" style={{ backgroundColor: '#161B27', borderColor: '#C9A84C' }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-lg font-semibold flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-amber-700" />
+                    <Label className="text-lg font-semibold flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+                      <FileText className="h-5 w-5" style={{ color: '#C9A84C' }} />
                       Protocolos da Pesquisa (Opcional)
                     </Label>
-                    <p className="text-sm text-amber-800 mt-1">
+                    <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                       Configure protocolos específicos que serão usados apenas para pacientes nesta pesquisa
                     </p>
                   </div>
@@ -439,7 +441,7 @@ export default function PesquisasPage() {
                     variant="outline"
                     size="sm"
                     onClick={handleAddProtocol}
-                    className="bg-white hover:bg-amber-50"
+                    style={{ borderColor: '#1E2535', color: '#D8DEEB' }}
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Adicionar Protocolo
@@ -447,19 +449,19 @@ export default function PesquisasPage() {
                 </div>
 
                 {protocols.length === 0 ? (
-                  <div className="bg-white/80 rounded-lg p-6 text-center border-2 border-dashed border-amber-300">
-                    <FileText className="h-12 w-12 mx-auto text-amber-400 mb-2" />
-                    <p className="text-sm text-gray-600">
+                  <div className="rounded-lg p-6 text-center border-2 border-dashed" style={{ backgroundColor: '#0B0E14', borderColor: '#1E2535' }}>
+                    <FileText className="h-12 w-12 mx-auto mb-2" style={{ color: '#C9A84C' }} />
+                    <p className="text-sm" style={{ color: '#D8DEEB' }}>
                       Nenhum protocolo adicionado. Clique em &quot;Adicionar Protocolo&quot; para criar.
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                       Protocolos de pesquisa garantem orientações uniformes para todos os pacientes do estudo
                     </p>
                   </div>
                 ) : (
                   protocols.map((protocol, index) => (
-                    <Card key={index} className="border-2 border-amber-200 bg-white">
-                      <CardHeader className="pb-3 bg-amber-50/50">
+                    <Card key={index} className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+                      <CardHeader className="pb-3" style={{ backgroundColor: '#0B0E14' }}>
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-base flex items-center gap-2">
                             <FileText className="h-4 w-4" />
@@ -516,7 +518,7 @@ export default function PesquisasPage() {
                           <div>
                             <Label className="text-xs flex items-center gap-1">
                               Grupo Específico
-                              <span className="text-[10px] text-gray-500">(opcional)</span>
+                              <span className="text-[10px]" style={{ color: '#7A8299' }}>(opcional)</span>
                             </Label>
                             <Select
                               value={protocol.researchGroupCode || 'all'}
@@ -596,7 +598,7 @@ export default function PesquisasPage() {
                 </Button>
                 <Button
                   onClick={handleCreateResearch}
-                  style={{ backgroundColor: '#0A2647', color: 'white' }}
+                  style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
                 >
                   Criar Pesquisa
                 </Button>
@@ -608,18 +610,18 @@ export default function PesquisasPage() {
         {/* Research List */}
         {
           researches.length === 0 ? (
-            <Card className="border-2 border-dashed">
+            <Card className="border-2 border-dashed" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardContent className="flex flex-col items-center justify-center py-16">
-                <FlaskConical className="h-16 w-16 text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                <FlaskConical className="h-16 w-16 mb-4" style={{ color: '#7A8299' }} />
+                <h3 className="text-xl font-semibold mb-2" style={{ color: '#F0EAD6' }}>
                   Nenhuma pesquisa criada
                 </h3>
-                <p className="text-gray-500 mb-6">
+                <p className="mb-6" style={{ color: '#7A8299' }}>
                   Comece criando sua primeira pesquisa clínica
                 </p>
                 <Button
                   onClick={() => setIsDialogOpen(true)}
-                  style={{ backgroundColor: '#0A2647', color: 'white' }}
+                  style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Nova Pesquisa
@@ -631,20 +633,21 @@ export default function PesquisasPage() {
               {researches.map((research) => (
                 <Card
                   key={research.id}
-                  className={`transition-all duration-300 hover:shadow-xl border-0 bg-white/70 backdrop-blur-md shadow-sm ring-1 ring-gray-200/50 ${!research.isActive ? 'opacity-75 grayscale-[0.8]' : 'hover:-translate-y-1'}`}
+                  className={`transition-all duration-300 hover:shadow-xl border-0 backdrop-blur-md shadow-sm ${!research.isActive ? 'opacity-75 grayscale-[0.8]' : 'hover:-translate-y-1'}`}
+                  style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between gap-6">
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-3">
-                          <CardTitle className="text-2xl font-bold text-gray-900">
+                          <CardTitle className="text-2xl font-bold" style={{ color: '#F0EAD6' }}>
                             {research.title}
                           </CardTitle>
-                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${research.isActive ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider" style={research.isActive ? { backgroundColor: '#0D7377', color: '#F0EAD6', border: '1px solid #14BDAE' } : { backgroundColor: '#1E2535', color: '#7A8299', border: '1px solid #1E2535' }}>
                             {research.isActive ? 'Ativa' : 'Pausada'}
                           </span>
                         </div>
-                        <CardDescription className="text-base text-gray-600 leading-relaxed max-w-2xl">
+                        <CardDescription className="text-base leading-relaxed max-w-2xl" style={{ color: '#7A8299' }}>
                           {research.description}
                         </CardDescription>
                       </div>
@@ -654,7 +657,8 @@ export default function PesquisasPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleToggleStatus(research.id, research.isActive)}
-                          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                          className="hover:opacity-80"
+                          style={{ color: '#7A8299' }}
                           title={research.isActive ? "Pausar" : "Ativar"}
                         >
                           {research.isActive ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
@@ -667,7 +671,8 @@ export default function PesquisasPage() {
                               expandedResearch === research.id ? null : research.id
                             )
                           }
-                          className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                          className="hover:opacity-80"
+                          style={{ color: '#7A8299' }}
                         >
                           {expandedResearch === research.id ? (
                             <ChevronUp className="h-5 w-5" />
@@ -680,11 +685,11 @@ export default function PesquisasPage() {
 
                     <div className="flex flex-wrap gap-2 mt-4">
                       {research.surgeryType && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                        <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: '#0D7377', color: '#F0EAD6', border: '1px solid #14BDAE' }}>
                           🔪 {getSurgeryTypeLabel(research.surgeryType)}
                         </span>
                       )}
-                      <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                      <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: '#1E2535', color: '#D8DEEB', border: '1px solid #1E2535' }}>
                         📊 {research.groups.length} Grupos
                       </span>
                     </div>
@@ -692,31 +697,32 @@ export default function PesquisasPage() {
 
                   <CardContent>
                     <div className="grid grid-cols-3 gap-4 mb-2">
-                      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 transition-colors group-hover:border-blue-200">
+                      <div className="p-4 rounded-xl transition-colors" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Pacientes</span>
-                          <Users className="h-5 w-5 text-blue-500 opacity-60" />
+                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#14BDAE' }}>Pacientes</span>
+                          <Users className="h-5 w-5 opacity-60" style={{ color: '#14BDAE' }} />
                         </div>
-                        <p className="text-3xl font-bold text-gray-900">{research.totalPatients}</p>
-                        <p className="text-xs text-gray-500 mt-1">Total recrutados</p>
+                        <p className="text-3xl font-bold" style={{ color: '#F0EAD6' }}>{research.totalPatients}</p>
+                        <p className="text-xs mt-1" style={{ color: '#7A8299' }}>Total recrutados</p>
                       </div>
 
-                      <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100 transition-colors group-hover:border-amber-200">
+                      <div className="p-4 rounded-xl transition-colors" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider">Duração</span>
-                          <BarChart3 className="h-5 w-5 text-amber-500 opacity-60" />
+                          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#C9A84C' }}>Duração</span>
+                          <BarChart3 className="h-5 w-5 opacity-60" style={{ color: '#C9A84C' }} />
                         </div>
-                        <p className="text-xl font-bold text-gray-900 truncate">
+                        <p className="text-xl font-bold truncate" style={{ color: '#F0EAD6' }}>
                           {new Date(research.startDate).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                           {research.endDate ? `Até ${new Date(research.endDate).toLocaleDateString('pt-BR')}` : 'Em andamento'}
                         </p>
                       </div>
 
                       <div className="flex items-center justify-center">
                         <Button
-                          className="w-full h-full min-h-[100px] bg-white border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-all flex flex-col gap-2 shadow-none"
+                          className="w-full h-full min-h-[100px] border-2 border-dashed transition-all flex flex-col gap-2 shadow-none hover:opacity-90"
+                          style={{ backgroundColor: '#0B0E14', borderColor: '#1E2535', color: '#7A8299' }}
                           onClick={() => router.push(`/dashboard/pesquisas/${research.id}`)}
                         >
                           <BarChart3 className="h-8 w-8" />
@@ -727,23 +733,23 @@ export default function PesquisasPage() {
 
                     {/* Groups Details Expanded */}
                     {expandedResearch === research.id && (
-                      <div className="mt-6 pt-6 border-t border-gray-100 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                      <div className="mt-6 pt-6 animate-in fade-in slide-in-from-top-2 duration-300" style={{ borderTop: '1px solid #1E2535' }}>
+                        <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2" style={{ color: '#F0EAD6' }}>
                           <Users className="w-4 h-4" /> Grupos do Estudo
                         </h4>
                         <div className="grid gap-3">
                           {research.groups.map((group) => (
-                            <div key={group.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
+                            <div key={group.id} className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">
+                                  <span className="w-8 h-8 rounded-full font-bold flex items-center justify-center text-sm" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>
                                     {group.groupCode}
                                   </span>
-                                  <span className="font-semibold text-gray-900">{group.groupName}</span>
+                                  <span className="font-semibold" style={{ color: '#F0EAD6' }}>{group.groupName}</span>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1 ml-10">{group.description}</p>
+                                <p className="text-sm mt-1 ml-10" style={{ color: '#7A8299' }}>{group.description}</p>
                               </div>
-                              <Badge variant="secondary" className="bg-white border border-gray-200">
+                              <Badge variant="secondary" style={{ backgroundColor: '#0B0E14', color: '#D8DEEB', border: '1px solid #1E2535' }}>
                                 {group.patientCount} participantes
                               </Badge>
                             </div>

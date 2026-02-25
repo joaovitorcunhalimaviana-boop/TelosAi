@@ -54,8 +54,8 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
   }, [botoxUsed, botoxDate, botoxDose, botoxLocation, botoxObservations, intestinalPrepUsed, intestinalPrepType, otherPreparations, onUpdate]);
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Preparo Pré-Operatório</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Preparo Pré-Operatório</h2>
 
       {/* Botox Section */}
       <div className="space-y-4 mb-6">
@@ -65,16 +65,16 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
             checked={botoxUsed}
             onCheckedChange={(checked) => setBotoxUsed(checked as boolean)}
           />
-          <Label htmlFor="botoxUsed" className="text-base font-medium text-gray-700 cursor-pointer">
+          <Label htmlFor="botoxUsed" className="text-base font-medium cursor-pointer" style={{ color: '#D8DEEB' }}>
             Uso de Toxina Botulínica (Botox) Pré-Operatória
           </Label>
         </div>
 
         {botoxUsed && (
-          <div className="ml-6 space-y-4 p-4 border rounded-lg bg-gray-50">
+          <div className="ml-6 space-y-4 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="botoxDate" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="botoxDate" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Data da Aplicação
                 </Label>
                 <Input
@@ -83,11 +83,12 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
                   value={botoxDate}
                   onChange={(e) => setBotoxDate(e.target.value)}
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               <div>
-                <Label htmlFor="botoxDose" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="botoxDose" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Dose (unidades)
                 </Label>
                 <Input
@@ -98,12 +99,13 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
                   placeholder="Ex: 100"
                   min="0"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="botoxLocation" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="botoxLocation" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Local da Aplicação
               </Label>
               <Input
@@ -113,11 +115,12 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
                 onChange={(e) => setBotoxLocation(e.target.value)}
                 placeholder="Ex: Esfíncter anal interno"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             <div>
-              <Label htmlFor="botoxObservations" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="botoxObservations" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Observações
               </Label>
               <Textarea
@@ -126,6 +129,7 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
                 onChange={(e) => setBotoxObservations(e.target.value)}
                 placeholder="Observações adicionais sobre a aplicação de botox"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 rows={3}
               />
             </div>
@@ -134,21 +138,21 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
       </div>
 
       {/* Intestinal Prep Section */}
-      <div className="space-y-4 mb-6 border-t pt-4">
+      <div className="space-y-4 mb-6 border-t pt-4" style={{ borderColor: '#1E2535' }}>
         <div className="flex items-center space-x-2">
           <Checkbox
             id="intestinalPrepUsed"
             checked={intestinalPrepUsed}
             onCheckedChange={(checked) => setIntestinalPrepUsed(checked as boolean)}
           />
-          <Label htmlFor="intestinalPrepUsed" className="text-base font-medium text-gray-700 cursor-pointer">
+          <Label htmlFor="intestinalPrepUsed" className="text-base font-medium cursor-pointer" style={{ color: '#D8DEEB' }}>
             Preparo Intestinal Pré-Operatório
           </Label>
         </div>
 
         {intestinalPrepUsed && (
-          <div className="ml-6 p-4 border rounded-lg bg-gray-50">
-            <Label htmlFor="intestinalPrepType" className="text-sm font-medium text-gray-700">
+          <div className="ml-6 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
+            <Label htmlFor="intestinalPrepType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Tipo de Preparo
             </Label>
             <Textarea
@@ -157,6 +161,7 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
               onChange={(e) => setIntestinalPrepType(e.target.value)}
               placeholder="Ex: Manitol 10%, Fleet enema, etc."
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               rows={3}
             />
           </div>
@@ -164,8 +169,8 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
       </div>
 
       {/* Other Preparations */}
-      <div className="border-t pt-4">
-        <Label htmlFor="otherPreparations" className="text-sm font-medium text-gray-700">
+      <div className="border-t pt-4" style={{ borderColor: '#1E2535' }}>
+        <Label htmlFor="otherPreparations" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Outros Preparos Pré-Operatórios
         </Label>
         <Textarea
@@ -174,11 +179,12 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
           onChange={(e) => setOtherPreparations(e.target.value)}
           placeholder="Descreva quaisquer outros preparos realizados antes da cirurgia (jejum, medicações, profilaxia antibiótica, etc.)"
           className="mt-1"
+          style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           rows={4}
         />
       </div>
 
-      <div className="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded">
+      <div className="mt-4 text-sm p-3 rounded" style={{ backgroundColor: '#1E2535', color: '#7A8299' }}>
         <p>
           <strong>Nota:</strong> Documente todos os procedimentos e preparos realizados antes da
           cirurgia que possam influenciar o período pós-operatório.

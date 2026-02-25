@@ -232,7 +232,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0B0E14, #111520, #0B0E14)' }}>
       {/* CSS for pulse animation */}
       <style jsx>{`
         @keyframes badge-pulse {
@@ -259,19 +259,19 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
-                <h1 className="text-2xl md:text-4xl font-bold title-premium">
+                <h1 className="text-2xl md:text-4xl font-bold title-premium" style={{ color: '#F0EAD6' }}>
                   Central Médica
                 </h1>
                 {/* Live Badge */}
-                <span className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 badge-pulse">
-                  <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="inline-flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold badge-pulse" style={{ backgroundColor: 'rgba(26, 140, 106, 0.2)', color: '#1A8C6A', borderColor: '#1A8C6A', borderWidth: '1px', borderStyle: 'solid' }}>
+                  <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full animate-pulse" style={{ backgroundColor: '#1A8C6A' }} />
                   LIVE
                 </span>
               </div>
-              <div className="flex flex-wrap items-center gap-1 md:gap-2 text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-1 md:gap-2" style={{ color: '#7A8299' }}>
                 <span className="text-sm md:text-base">Bem-vindo,</span>
-                <span className="text-sm md:text-base font-semibold text-[#0A2647]">{userName}</span>
-                <span className="hidden sm:inline-flex items-center gap-1.5 ml-2 text-xs text-emerald-600">
+                <span className="text-sm md:text-base font-semibold" style={{ color: '#14BDAE' }}>{userName}</span>
+                <span className="hidden sm:inline-flex items-center gap-1.5 ml-2 text-xs" style={{ color: '#1A8C6A' }}>
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   Sistema operacional
                 </span>
@@ -317,7 +317,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
         {/* Compact Filter Toolbar */}
         <SlideIn direction="down" delay={0.7}>
-          <div className="bg-white rounded-xl border shadow-sm p-4 mb-6 flex flex-col gap-4" data-tutorial="search-filters">
+          <div className="rounded-xl shadow-sm p-4 mb-6 flex flex-col gap-4" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', borderWidth: '1px', borderStyle: 'solid' }} data-tutorial="search-filters">
             <div className="flex items-center gap-3">
               {/* Search Bar */}
               <div className="relative flex-1">
@@ -326,18 +326,19 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                   placeholder="Buscar por nome ou telefone..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-9 h-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                  className="pl-9 h-10 transition-colors"
+                  style={{ backgroundColor: '#0B0E14', borderColor: '#1E2535', color: '#F0EAD6' }}
                 />
               </div>
 
               {/* Filter Popover */}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="gap-2 border-dashed text-gray-600 hover:text-gray-900">
+                  <Button variant="outline" className="gap-2 border-dashed" style={{ color: '#D8DEEB', borderColor: '#2A3147' }}>
                     <Filter className="h-4 w-4" />
                     Filtros
                     {(filters.surgeryType !== "all" || filters.dataStatus !== "all" || filters.period !== "all" || filters.researchFilter !== "all") && (
-                      <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] bg-gray-100 text-gray-900">
+                      <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem]" style={{ backgroundColor: '#2A3147', color: '#F0EAD6' }}>
                         {[
                           filters.surgeryType !== "all",
                           filters.dataStatus !== "all",
@@ -348,10 +349,10 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80 p-4" align="end">
+                <PopoverContent className="w-80 p-4" align="end" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium leading-none">Filtros Avançados</h4>
+                      <h4 className="font-medium leading-none" style={{ color: '#F0EAD6' }}>Filtros Avançados</h4>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -418,14 +419,14 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-purple-600 flex items-center gap-1">
+                      <label className="text-xs font-medium flex items-center gap-1" style={{ color: '#A78BFA' }}>
                         <FlaskConical className="h-3 w-3" /> Pesquisas
                       </label>
                       <Select
                         value={filters.researchFilter || "all"}
                         onValueChange={(value) => handleFilterChange("researchFilter", value)}
                       >
-                        <SelectTrigger className="h-9 border-purple-200 focus:border-purple-400">
+                        <SelectTrigger className="h-9" style={{ borderColor: '#7C3AED' }}>
                           <SelectValue placeholder="Todas as pesquisas" />
                         </SelectTrigger>
                         <SelectContent>
@@ -446,32 +447,32 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
             {/* Active Filters Summary */}
             {(filters.surgeryType !== "all" || filters.dataStatus !== "all" || filters.period !== "all" || filters.researchFilter !== "all" || searchInput) && (
-              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-dashed">
-                <span className="text-xs text-muted-foreground mr-1">Filtros ativos:</span>
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-dashed" style={{ borderColor: '#2A3147' }}>
+                <span className="text-xs mr-1" style={{ color: '#7A8299' }}>Filtros ativos:</span>
 
                 {filters.surgeryType !== "all" && (
-                  <Badge variant="secondary" className="gap-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                  <Badge variant="secondary" className="gap-1" style={{ backgroundColor: 'rgba(13, 115, 119, 0.2)', color: '#14BDAE', borderColor: '#0D7377', borderWidth: '1px', borderStyle: 'solid' }}>
                     {getSurgeryTypeLabel(filters.surgeryType as SurgeryType)}
                     <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("surgeryType", "all")} />
                   </Badge>
                 )}
 
                 {filters.dataStatus !== "all" && (
-                  <Badge variant="secondary" className="gap-1 bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200">
+                  <Badge variant="secondary" className="gap-1" style={{ backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#D4AF37', borderColor: '#D4AF37', borderWidth: '1px', borderStyle: 'solid' }}>
                     {filters.dataStatus === "incomplete" ? "Incompleto" : filters.dataStatus === "complete" ? "Completo" : "Pesquisa Incompleta"}
                     <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("dataStatus", "all")} />
                   </Badge>
                 )}
 
                 {filters.period !== "all" && (
-                  <Badge variant="secondary" className="gap-1 bg-green-50 text-green-700 hover:bg-green-100 border-green-200">
+                  <Badge variant="secondary" className="gap-1" style={{ backgroundColor: 'rgba(26, 140, 106, 0.2)', color: '#1A8C6A', borderColor: '#1A8C6A', borderWidth: '1px', borderStyle: 'solid' }}>
                     {filters.period === "today" ? "Hoje" : filters.period === "7days" ? "7 dias" : "30 dias"}
                     <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("period", "all")} />
                   </Badge>
                 )}
 
                 {filters.researchFilter !== "all" && (
-                  <Badge variant="secondary" className="gap-1 bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200">
+                  <Badge variant="secondary" className="gap-1" style={{ backgroundColor: 'rgba(124, 58, 237, 0.2)', color: '#A78BFA', borderColor: '#7C3AED', borderWidth: '1px', borderStyle: 'solid' }}>
                     <FlaskConical className="h-3 w-3" />
                     {filters.researchFilter === "non-participants" ? "Não participantes" : researchStats?.researches.find(r => r.researchId === filters.researchFilter)?.researchTitle || "Pesquisa"}
                     <X className="h-3 w-3 cursor-pointer" onClick={() => handleFilterChange("researchFilter", "all")} />
@@ -479,7 +480,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                 )}
 
                 {searchInput && (
-                  <Badge variant="secondary" className="gap-1 bg-gray-100 text-gray-700">
+                  <Badge variant="secondary" className="gap-1" style={{ backgroundColor: '#2A3147', color: '#D8DEEB' }}>
                     &quot;{searchInput}&quot;
                     <X className="h-3 w-3 cursor-pointer" onClick={() => setSearchInput("")} />
                   </Badge>
@@ -520,9 +521,13 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                 onClick={() => setFilters(prev => ({ ...prev, followUpStatus: "active" as const }))}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                   filters.followUpStatus !== "completed"
-                    ? "bg-[#0A2647] text-white shadow-sm"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                    ? "shadow-sm"
+                    : ""
                 }`}
+                style={filters.followUpStatus !== "completed"
+                  ? { backgroundColor: '#0D7377', color: '#F0EAD6' }
+                  : { backgroundColor: '#1E2535', color: '#7A8299' }
+                }
               >
                 Em Acompanhamento
               </button>
@@ -530,9 +535,13 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                 onClick={() => setFilters(prev => ({ ...prev, followUpStatus: "completed" as const }))}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                   filters.followUpStatus === "completed"
-                    ? "bg-[#0A2647] text-white shadow-sm"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                    ? "shadow-sm"
+                    : ""
                 }`}
+                style={filters.followUpStatus === "completed"
+                  ? { backgroundColor: '#0D7377', color: '#F0EAD6' }
+                  : { backgroundColor: '#1E2535', color: '#7A8299' }
+                }
               >
                 Concluídos
               </button>
@@ -544,10 +553,10 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
           {patients.length === 0 ? (
             <FadeIn delay={0.2}>
-              <Card className="border-2 border-dashed">
+              <Card className="border-2 border-dashed" style={{ backgroundColor: '#161B27', borderColor: '#2A3147' }}>
                 <CardContent className="py-12 text-center">
-                  <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  <Users className="h-16 w-16 mx-auto mb-4 opacity-50" style={{ color: '#7A8299' }} />
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: '#F0EAD6' }}>
                     {filters.followUpStatus === "completed"
                       ? "Nenhum paciente com acompanhamento concluído"
                       : "Nenhum paciente em acompanhamento"}
@@ -592,7 +601,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
         {/* Research Assignment Modal */}
         <Dialog open={isResearchModalOpen} onOpenChange={setIsResearchModalOpen}>
-          <DialogContent className="max-w-2xl" aria-labelledby="research-dialog-title" aria-describedby="research-dialog-description">
+          <DialogContent className="max-w-2xl" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }} aria-labelledby="research-dialog-title" aria-describedby="research-dialog-description">
             <DialogHeader>
               <DialogTitle id="research-dialog-title">Adicionar Paciente à Pesquisa</DialogTitle>
               <DialogDescription id="research-dialog-description">
@@ -626,11 +635,11 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
               {/* Show research description */}
               {selectedResearch && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">
+                <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(13, 115, 119, 0.15)', borderColor: '#0D7377', borderWidth: '1px', borderStyle: 'solid' }}>
+                  <h4 className="font-semibold mb-2" style={{ color: '#14BDAE' }}>
                     Sobre esta pesquisa
                   </h4>
-                  <p className="text-sm text-blue-800">{selectedResearch.description}</p>
+                  <p className="text-sm" style={{ color: '#D8DEEB' }}>{selectedResearch.description}</p>
                 </div>
               )}
 
@@ -658,12 +667,12 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
 
               {/* Show group description */}
               {selectedGroupCode && selectedResearch && (
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-900 mb-2">
+                <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(124, 58, 237, 0.15)', borderColor: '#7C3AED', borderWidth: '1px', borderStyle: 'solid' }}>
+                  <h4 className="font-semibold mb-2" style={{ color: '#A78BFA' }}>
                     Grupo {selectedGroupCode}:{" "}
                     {selectedResearch.groups.find((g) => g.groupCode === selectedGroupCode)?.groupName}
                   </h4>
-                  <p className="text-sm text-purple-800">
+                  <p className="text-sm" style={{ color: '#D8DEEB' }}>
                     {selectedResearch.groups.find((g) => g.groupCode === selectedGroupCode)?.description}
                   </p>
                 </div>

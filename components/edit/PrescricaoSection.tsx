@@ -100,13 +100,13 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Prescrição Pós-Operatória</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Prescrição Pós-Operatória</h2>
 
       {/* Ointments/Creams Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-700">Pomadas/Cremes</h3>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Pomadas/Cremes</h3>
           <Button onClick={addOintment} variant="outline" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Pomada
@@ -117,18 +117,18 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
           {ointments.map((ointment, index) => (
             <div
               key={ointment.id}
-              className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50"
+              className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}
             >
               {/* Ointment Name */}
               <div className="md:col-span-5">
-                <Label htmlFor={`oint-name-${ointment.id}`} className="text-sm font-medium text-gray-700">
-                  Pomada {index > 0 && <span className="text-gray-500 text-xs">(#{index + 1})</span>}
+                <Label htmlFor={`oint-name-${ointment.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
+                  Pomada {index > 0 && <span className="text-xs" style={{ color: '#7A8299' }}>(#{index + 1})</span>}
                 </Label>
                 <Select
                   value={ointment.name}
                   onValueChange={(value) => handleOintmentChange(ointment.id, 'name', value)}
                 >
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione a pomada" />
                   </SelectTrigger>
                   <SelectContent>
@@ -145,7 +145,7 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
 
               {/* Frequency */}
               <div className="md:col-span-3">
-                <Label htmlFor={`oint-frequency-${ointment.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`oint-frequency-${ointment.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Frequência
                 </Label>
                 <Input
@@ -155,12 +155,13 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   onChange={(e) => handleOintmentChange(ointment.id, 'frequency', e.target.value)}
                   placeholder="Ex: 3x/dia"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Duration */}
               <div className="md:col-span-3">
-                <Label htmlFor={`oint-duration-${ointment.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`oint-duration-${ointment.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Duração (dias)
                 </Label>
                 <Input
@@ -171,6 +172,7 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   placeholder="Ex: 30"
                   min="1"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
@@ -192,9 +194,9 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
       </div>
 
       {/* Systemic Medications Section */}
-      <div className="border-t pt-6">
+      <div className="border-t pt-6" style={{ borderColor: '#1E2535' }}>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-700">Medicações Sistêmicas</h3>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Medicações Sistêmicas</h3>
           <Button onClick={addSystemicMed} variant="outline" size="sm">
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Medicação
@@ -205,12 +207,12 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
           {systemicMeds.map((med, index) => (
             <div
               key={med.id}
-              className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50"
+              className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}
             >
               {/* Medication Name */}
               <div className="md:col-span-3">
-                <Label htmlFor={`sysmed-name-${med.id}`} className="text-sm font-medium text-gray-700">
-                  Medicação {index > 0 && <span className="text-gray-500 text-xs">(#{index + 1})</span>}
+                <Label htmlFor={`sysmed-name-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
+                  Medicação {index > 0 && <span className="text-xs" style={{ color: '#7A8299' }}>(#{index + 1})</span>}
                 </Label>
                 <Input
                   id={`sysmed-name-${med.id}`}
@@ -219,12 +221,13 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   onChange={(e) => handleSystemicMedChange(med.id, 'name', e.target.value)}
                   placeholder="Nome da medicação"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Dose */}
               <div className="md:col-span-2">
-                <Label htmlFor={`sysmed-dose-${med.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`sysmed-dose-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Dose
                 </Label>
                 <Input
@@ -234,19 +237,20 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   onChange={(e) => handleSystemicMedChange(med.id, 'dose', e.target.value)}
                   placeholder="Ex: 500mg"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Route */}
               <div className="md:col-span-2">
-                <Label htmlFor={`sysmed-route-${med.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`sysmed-route-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Via
                 </Label>
                 <Select
                   value={med.route}
                   onValueChange={(value) => handleSystemicMedChange(med.id, 'route', value)}
                 >
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Via" />
                   </SelectTrigger>
                   <SelectContent>
@@ -260,7 +264,7 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
 
               {/* Frequency */}
               <div className="md:col-span-2">
-                <Label htmlFor={`sysmed-frequency-${med.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`sysmed-frequency-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Frequência
                 </Label>
                 <Input
@@ -270,12 +274,13 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   onChange={(e) => handleSystemicMedChange(med.id, 'frequency', e.target.value)}
                   placeholder="Ex: 8/8h"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Duration */}
               <div className="md:col-span-1">
-                <Label htmlFor={`sysmed-duration-${med.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`sysmed-duration-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Dias
                 </Label>
                 <Input
@@ -286,19 +291,20 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
                   placeholder="7"
                   min="1"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Category */}
               <div className="md:col-span-2">
-                <Label htmlFor={`sysmed-category-${med.id}`} className="text-sm font-medium text-gray-700">
+                <Label htmlFor={`sysmed-category-${med.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Categoria
                 </Label>
                 <Select
                   value={med.category}
                   onValueChange={(value) => handleSystemicMedChange(med.id, 'category', value)}
                 >
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Categoria" />
                   </SelectTrigger>
                   <SelectContent>
@@ -330,7 +336,7 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
         </div>
       </div>
 
-      <div className="mt-6 text-sm text-gray-600 bg-blue-50 p-4 rounded">
+      <div className="mt-6 text-sm p-4 rounded" style={{ backgroundColor: '#1E2535', color: '#7A8299' }}>
         <p>
           <strong>Nota:</strong> Esta prescrição refere-se às medicações indicadas para o período
           pós-operatório imediato. Inclua todas as medicações necessárias para controle da dor,

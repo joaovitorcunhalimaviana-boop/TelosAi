@@ -248,47 +248,48 @@ export default function ProtocolsPage() {
   }
 
   if (loading) {
-    return <div className="p-8">Carregando...</div>
+    return <div className="p-8" style={{ color: '#7A8299' }}>Carregando...</div>
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
       <div className="p-8 max-w-7xl mx-auto space-y-8">
         {/* Header com botão voltar */}
         <div className="mb-8">
           <Button
             variant="ghost"
             onClick={() => router.push('/dashboard')}
-            className="mb-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2"
+            className="mb-4 hover:bg-[#1E2535] -ml-2"
+            style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar ao Dashboard
           </Button>
 
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A2647] to-[#144272] flex items-center justify-center shadow-lg shadow-blue-900/20">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0D7377] to-[#0A5A5E] flex items-center justify-center shadow-lg">
               <FileText className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-[#0A2647]">
+              <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
                 Protocolos Pós-Operatórios
               </h1>
-              <p className="text-gray-500 mt-2 text-lg">
+              <p className="mt-2 text-lg" style={{ color: '#7A8299' }}>
                 Configure as orientações que a IA usará para cuidar dos seus pacientes.
               </p>
             </div>
           </div>
 
           {/* Card informativo */}
-          <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 shadow-sm">
+          <Card style={{ backgroundColor: '#1A1A0E', borderColor: '#3A3A1E', borderWidth: '2px' }}>
             <CardContent className="py-4">
               <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <Shield className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm text-amber-800 font-medium">
+                  <p className="text-sm font-medium text-yellow-400">
                     Importante: Os protocolos configurados aqui serão usados pela IA para orientar todos os pacientes.
                   </p>
-                  <p className="text-xs text-amber-700 mt-1">
+                  <p className="text-xs text-yellow-500/70 mt-1">
                     Certifique-se de que as orientações estejam corretas e atualizadas.
                   </p>
                 </div>
@@ -302,7 +303,8 @@ export default function ProtocolsPage() {
           <div className="relative">
             <button
               onClick={() => setShowTemplates(!showTemplates)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition"
+              style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -314,24 +316,25 @@ export default function ProtocolsPage() {
             </button>
 
             {showTemplates && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50 max-h-96 overflow-y-auto">
-                <div className="p-2 border-b bg-gray-50">
-                  <p className="text-sm font-medium text-gray-700">Templates Disponiveis</p>
-                  <p className="text-xs text-gray-500">Clique para usar como base</p>
+              <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto" style={{ backgroundColor: '#111520', border: '1px solid #1E2535' }}>
+                <div className="p-2" style={{ borderBottom: '1px solid #1E2535', backgroundColor: '#161B27' }}>
+                  <p className="text-sm font-medium" style={{ color: '#D8DEEB' }}>Templates Disponiveis</p>
+                  <p className="text-xs" style={{ color: '#7A8299' }}>Clique para usar como base</p>
                 </div>
                 {PROTOCOL_TEMPLATES.map((template) => (
                   <button
                     key={template.id}
                     onClick={() => applyTemplate(template)}
-                    className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b last:border-b-0 transition"
+                    className="w-full text-left px-4 py-3 hover:bg-[#1E2535] transition"
+                    style={{ borderBottom: '1px solid #1E2535' }}
                   >
-                    <p className="font-medium text-gray-800">{template.name}</p>
-                    <p className="text-sm text-gray-500">{template.description}</p>
+                    <p className="font-medium" style={{ color: '#F0EAD6' }}>{template.name}</p>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>{template.description}</p>
                     <div className="flex gap-2 mt-1">
-                      <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
+                      <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>
                         {template.category}
                       </span>
-                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                      <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>
                         D+{template.dayRangeStart}{template.dayRangeEnd ? `-${template.dayRangeEnd}` : '+'}
                       </span>
                     </div>
@@ -345,7 +348,8 @@ export default function ProtocolsPage() {
             onClick={handleCreate}
             disabled={isCreating}
             size="lg"
-            className="shadow-xl shadow-blue-900/10 bg-[#0A2647] hover:bg-[#08203d] text-white transition-all hover:scale-105 active:scale-95"
+            className="shadow-xl transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
           >
             <Plus className="w-5 h-5 mr-2" />
             Novo Protocolo
@@ -354,115 +358,117 @@ export default function ProtocolsPage() {
 
         {/* Formulário de criação/edição */}
         {(isCreating || editingId) && (
-          <Card className="mb-8 border-2 border-blue-300 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50">
-            <CardHeader className="border-b border-blue-200 bg-white/50">
-              <CardTitle className="text-2xl flex items-center gap-2">
-                {editingId ? '✏️ Editar Protocolo' : '✨ Novo Protocolo'}
+          <Card className="mb-8 border-2 shadow-xl" style={{ backgroundColor: '#111520', borderColor: '#0D7377' }}>
+            <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+              <CardTitle className="text-2xl flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+                {editingId ? 'Editar Protocolo' : 'Novo Protocolo'}
               </CardTitle>
-              <CardDescription className="text-base mt-2">
+              <CardDescription className="text-base mt-2" style={{ color: '#7A8299' }}>
                 Configure as orientações que serão usadas automaticamente pela IA para todos os pacientes deste tipo de cirurgia
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label className="text-base font-semibold">🔪 Tipo de Cirurgia</Label>
+                  <Label className="text-base font-semibold" style={{ color: '#D8DEEB' }}>Tipo de Cirurgia</Label>
                   <Select
                     value={formData.surgeryType}
                     onValueChange={(value) => setFormData({ ...formData, surgeryType: value })}
                   >
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                       {surgeryTypes.map(type => (
-                        <SelectItem key={type.value} value={type.value}>
+                        <SelectItem key={type.value} value={type.value} style={{ color: '#D8DEEB' }}>
                           {type.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Para qual cirurgia este protocolo se aplica</p>
+                  <p className="text-xs" style={{ color: '#7A8299' }}>Para qual cirurgia este protocolo se aplica</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-base font-semibold">📌 Categoria</Label>
+                  <Label className="text-base font-semibold" style={{ color: '#D8DEEB' }}>Categoria</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                   >
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-12" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                       {categories.map(cat => (
-                        <SelectItem key={cat.value} value={cat.value}>
+                        <SelectItem key={cat.value} value={cat.value} style={{ color: '#D8DEEB' }}>
                           {cat.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Tipo de orientação</p>
+                  <p className="text-xs" style={{ color: '#7A8299' }}>Tipo de orientação</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-base font-semibold">📝 Título do Protocolo</Label>
+                <Label className="text-base font-semibold" style={{ color: '#D8DEEB' }}>Título do Protocolo</Label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Ex: Banho de assento - Primeiros 3 dias"
                   className="h-12 text-base"
+                  style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
                 />
-                <p className="text-xs text-muted-foreground">Nome descritivo para identificar facilmente</p>
+                <p className="text-xs" style={{ color: '#7A8299' }}>Nome descritivo para identificar facilmente</p>
               </div>
 
               {/* Campo de Pesquisa */}
-              <div className="space-y-2 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg border-2 border-amber-300">
-                <Label className="text-base font-semibold">🔬 Protocolo de Pesquisa (Opcional)</Label>
+              <div className="space-y-2 p-4 rounded-lg" style={{ backgroundColor: '#1A1A0E', border: '2px solid #3A3A1E' }}>
+                <Label className="text-base font-semibold" style={{ color: '#D8DEEB' }}>Protocolo de Pesquisa (Opcional)</Label>
                 <Select
                   value={formData.researchId || 'none'}
                   onValueChange={(value) => setFormData({ ...formData, researchId: value === 'none' ? null : value })}
                 >
-                  <SelectTrigger className="h-12 bg-white">
+                  <SelectTrigger className="h-12" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
+                  <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                    <SelectItem value="none" style={{ color: '#D8DEEB' }}>
                       Protocolo Normal (Prática Diária)
                     </SelectItem>
                     {researches.filter(r => r.isActive).map(research => (
-                      <SelectItem key={research.id} value={research.id}>
-                        🔬 Pesquisa: {research.title}
+                      <SelectItem key={research.id} value={research.id} style={{ color: '#D8DEEB' }}>
+                        Pesquisa: {research.title}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="bg-amber-100 border border-amber-300 rounded p-3 mt-2">
-                  <p className="text-sm text-amber-900">
-                    <strong>⚠️ Importante:</strong> Protocolos de pesquisa são usados APENAS para pacientes vinculados àquela pesquisa específica.
+                <div className="rounded p-3 mt-2" style={{ backgroundColor: '#2A2A1E', border: '1px solid #3A3A1E' }}>
+                  <p className="text-sm text-yellow-400">
+                    <strong>Importante:</strong> Protocolos de pesquisa são usados APENAS para pacientes vinculados àquela pesquisa específica.
                     Use quando o protocolo da pesquisa diferir da sua prática normal (ex: medicação diferente para evitar fator confundidor).
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white/80 p-4 rounded-lg border border-blue-200">
-                <Label className="text-base font-semibold mb-3 block">📅 Período Pós-Operatório</Label>
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                <Label className="text-base font-semibold mb-3 block" style={{ color: '#D8DEEB' }}>Período Pós-Operatório</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Dia Inicial (D+)</Label>
+                    <Label style={{ color: '#D8DEEB' }}>Dia Inicial (D+)</Label>
                     <Input
                       type="number"
                       min="1"
                       value={formData.dayRangeStart}
                       onChange={(e) => setFormData({ ...formData, dayRangeStart: parseInt(e.target.value) })}
                       className="h-11"
+                      style={{ backgroundColor: '#111520', borderColor: '#1E2535', color: '#D8DEEB' }}
                     />
-                    <p className="text-xs text-muted-foreground">A partir de qual dia se aplica</p>
+                    <p className="text-xs" style={{ color: '#7A8299' }}>A partir de qual dia se aplica</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Dia Final (D+) <span className="text-muted-foreground">(opcional)</span></Label>
+                    <Label style={{ color: '#D8DEEB' }}>Dia Final (D+) <span style={{ color: '#7A8299' }}>(opcional)</span></Label>
                     <Input
                       type="number"
                       min="1"
@@ -470,35 +476,37 @@ export default function ProtocolsPage() {
                       onChange={(e) => setFormData({ ...formData, dayRangeEnd: e.target.value ? parseInt(e.target.value) : null })}
                       placeholder="Deixe vazio para sempre"
                       className="h-11"
+                      style={{ backgroundColor: '#111520', borderColor: '#1E2535', color: '#D8DEEB' }}
                     />
-                    <p className="text-xs text-muted-foreground">Até qual dia (vazio = sempre após dia inicial)</p>
+                    <p className="text-xs" style={{ color: '#7A8299' }}>Até qual dia (vazio = sempre após dia inicial)</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-base font-semibold">💬 Orientação para o Paciente</Label>
+                <Label className="text-base font-semibold" style={{ color: '#D8DEEB' }}>Orientação para o Paciente</Label>
                 <Textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Ex: Banho de assento com água morna 2-3x ao dia por 10-15 minutos."
                   rows={5}
                   className="text-base resize-none"
+                  style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
                 />
-                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
-                  <p className="text-sm text-yellow-800">
-                    <strong>⚠️ Importante:</strong> Este texto será enviado EXATAMENTE como está para o paciente pela IA.
+                <div className="rounded p-3 mt-2" style={{ backgroundColor: '#1A1A0E', border: '1px solid #3A3A1E' }}>
+                  <p className="text-sm text-yellow-400">
+                    <strong>Importante:</strong> Este texto será enviado EXATAMENTE como está para o paciente pela IA.
                     Seja claro, objetivo e use apenas informações corretas baseadas no seu protocolo.
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-blue-200">
-                <Button variant="outline" onClick={handleCancel} size="lg" className="min-w-32">
+              <div className="flex gap-3 justify-end pt-4" style={{ borderTop: '1px solid #1E2535' }}>
+                <Button variant="outline" onClick={handleCancel} size="lg" className="min-w-32" style={{ borderColor: '#1E2535', color: '#D8DEEB', backgroundColor: '#1E2535' }}>
                   <X className="w-4 h-4 mr-2" />
                   Cancelar
                 </Button>
-                <Button onClick={handleSave} size="lg" className="min-w-32 bg-[#0A2647] hover:bg-[#061a33] text-white shadow-md transition-all hover:scale-105 active:scale-95">
+                <Button onClick={handleSave} size="lg" className="min-w-32 shadow-md transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>
                   <Save className="w-4 h-4 mr-2" />
                   Salvar Protocolo
                 </Button>
@@ -510,13 +518,13 @@ export default function ProtocolsPage() {
         {/* Lista de protocolos */}
         <div className="space-y-4">
           {protocols.length === 0 ? (
-            <Card className="border-2 border-dashed border-gray-300">
+            <Card className="border-2 border-dashed" style={{ borderColor: '#2A3147', backgroundColor: '#111520' }}>
               <CardContent className="py-16 text-center">
                 <div className="text-6xl mb-4">📋</div>
-                <p className="text-xl text-muted-foreground font-medium">
+                <p className="text-xl font-medium" style={{ color: '#D8DEEB' }}>
                   Nenhum protocolo cadastrado ainda
                 </p>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm mt-2" style={{ color: '#7A8299' }}>
                   Clique em &quot;Novo Protocolo&quot; para configurar suas orientações personalizadas
                 </p>
               </CardContent>
@@ -525,17 +533,18 @@ export default function ProtocolsPage() {
             protocols.map(protocol => (
               <Card
                 key={protocol.id}
-                className={`group transition-all duration-300 hover:shadow-xl border-0 bg-white/70 backdrop-blur-md shadow-sm ring-1 ring-gray-200/50 ${!protocol.isActive ? 'opacity-60 grayscale' : 'hover:-translate-y-1'}`}
+                className={`group transition-all duration-300 border-0 backdrop-blur-md shadow-sm ${!protocol.isActive ? 'opacity-60 grayscale' : 'hover:-translate-y-1 hover:shadow-xl'}`}
+                style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}
               >
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <CardTitle className="text-xl font-bold text-gray-900">
+                        <CardTitle className="text-xl font-bold" style={{ color: '#F0EAD6' }}>
                           {protocol.title}
                         </CardTitle>
                         {!protocol.isActive && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 uppercase tracking-wide border border-gray-200">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide" style={{ backgroundColor: '#1E2535', color: '#7A8299', border: '1px solid #2A3147' }}>
                             Inativo
                           </span>
                         )}
@@ -543,18 +552,18 @@ export default function ProtocolsPage() {
 
                       <div className="flex flex-wrap gap-2">
                         {protocol.researchId && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
-                            🔬 {protocol.research?.title || 'Pesquisa'}
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold" style={{ backgroundColor: '#1A1A0E', color: '#FFD700', border: '1px solid #3A3A1E' }}>
+                            {protocol.research?.title || 'Pesquisa'}
                           </span>
                         )}
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                          🔪 {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: '#0D7377/20', color: '#14BDAE', border: '1px solid #0D7377' }}>
+                          {surgeryTypes.find(t => t.value === protocol.surgeryType)?.label}
                         </span>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
-                          📌 {categories.find(c => c.value === protocol.category)?.label}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: '#1E2535', color: '#D8DEEB', border: '1px solid #2A3147' }}>
+                          {categories.find(c => c.value === protocol.category)?.label}
                         </span>
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                          📅 {getDayRangeText(protocol.dayRangeStart, protocol.dayRangeEnd)}
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: '#1E2535', color: '#14BDAE', border: '1px solid #2A3147' }}>
+                          {getDayRangeText(protocol.dayRangeStart, protocol.dayRangeEnd)}
                         </span>
                       </div>
                     </div>
@@ -563,7 +572,8 @@ export default function ProtocolsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(protocol)}
-                        className="hover:bg-blue-50 text-gray-500 hover:text-blue-600"
+                        className="hover:bg-[#1E2535]"
+                        style={{ color: '#7A8299' }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -571,7 +581,7 @@ export default function ProtocolsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(protocol.id)}
-                        className="hover:bg-red-50 text-gray-500 hover:text-red-600"
+                        className="hover:bg-red-500/10 text-red-400"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -579,9 +589,9 @@ export default function ProtocolsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-50/80 rounded-lg p-5 border border-gray-100/50">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Orientação ao Paciente</p>
-                    <p className="text-base leading-relaxed text-gray-700 font-serif italic">
+                  <div className="rounded-lg p-5" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#7A8299' }}>Orientação ao Paciente</p>
+                    <p className="text-base leading-relaxed font-serif italic" style={{ color: '#D8DEEB' }}>
                       &ldquo;{protocol.content}&rdquo;
                     </p>
                   </div>

@@ -59,9 +59,9 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Medicações em Uso</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: '#F0EAD6' }}>Medicações em Uso</h2>
         <Button onClick={addMedication} variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Adicionar Medicação
@@ -72,12 +72,12 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
         {medications.map((medication, index) => (
           <div
             key={medication.id}
-            className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-lg bg-gray-50"
+            className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', borderColor: '#1E2535', border: '1px solid #1E2535' }}
           >
             {/* Medication Name */}
             <div className="md:col-span-4">
-              <Label htmlFor={`med-name-${medication.id}`} className="text-sm font-medium text-gray-700">
-                Medicação {index > 0 && <span className="text-gray-500 text-xs">(#{index + 1})</span>}
+              <Label htmlFor={`med-name-${medication.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
+                Medicação {index > 0 && <span className="text-xs" style={{ color: '#7A8299' }}>(#{index + 1})</span>}
               </Label>
               <Input
                 id={`med-name-${medication.id}`}
@@ -86,12 +86,13 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
                 onChange={(e) => handleMedicationChange(medication.id, 'name', e.target.value)}
                 placeholder="Nome da medicação"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             {/* Dose */}
             <div className="md:col-span-2">
-              <Label htmlFor={`med-dose-${medication.id}`} className="text-sm font-medium text-gray-700">
+              <Label htmlFor={`med-dose-${medication.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Dose
               </Label>
               <Input
@@ -101,12 +102,13 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
                 onChange={(e) => handleMedicationChange(medication.id, 'dose', e.target.value)}
                 placeholder="Ex: 10mg"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             {/* Frequency */}
             <div className="md:col-span-2">
-              <Label htmlFor={`med-frequency-${medication.id}`} className="text-sm font-medium text-gray-700">
+              <Label htmlFor={`med-frequency-${medication.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Frequência
               </Label>
               <Input
@@ -116,19 +118,20 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
                 onChange={(e) => handleMedicationChange(medication.id, 'frequency', e.target.value)}
                 placeholder="Ex: 2x/dia"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             {/* Route */}
             <div className="md:col-span-3">
-              <Label htmlFor={`med-route-${medication.id}`} className="text-sm font-medium text-gray-700">
+              <Label htmlFor={`med-route-${medication.id}`} className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Via
               </Label>
               <Select
                 value={medication.route}
                 onValueChange={(value) => handleMedicationChange(medication.id, 'route', value)}
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
@@ -161,7 +164,7 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
       </div>
 
       {medications.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8" style={{ color: '#7A8299' }}>
           <p>Nenhuma medicação adicionada.</p>
           <Button onClick={addMedication} variant="outline" className="mt-4">
             <Plus className="h-4 w-4 mr-2" />
@@ -170,7 +173,7 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
         </div>
       )}
 
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm" style={{ color: '#7A8299' }}>
         <p>
           <strong>Nota:</strong> Liste apenas as medicações em uso contínuo pelo paciente antes da
           cirurgia. As prescrições pós-operatórias serão registradas em outra seção.

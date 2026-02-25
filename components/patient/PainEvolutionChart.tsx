@@ -190,7 +190,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
         cy={cy}
         r={radius}
         fill={fill}
-        stroke={isRedFlag ? '#DC2626' : dataKey === 'painAtRest' ? '#0A2647' : '#D4AF37'}
+        stroke={isRedFlag ? '#DC2626' : dataKey === 'painAtRest' ? '#14BDAE' : '#D4AF37'}
         strokeWidth={isRedFlag ? 3 : 2}
       />
     )
@@ -214,11 +214,11 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
 
   if (error) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card style={{ backgroundColor: '#111520', borderColor: 'rgba(220,38,38,0.3)' }}>
         <CardContent className="py-8 text-center">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-700 font-medium">{error}</p>
-          <Button onClick={fetchPainData} variant="outline" className="mt-4">
+          <p className="text-red-400 font-medium">{error}</p>
+          <Button onClick={fetchPainData} variant="outline" className="mt-4" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Tentar novamente
           </Button>
@@ -230,14 +230,14 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
   const hasData = data.some(d => d.painAtRest !== null)
 
   return (
-    <Card>
+    <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
           <div className="flex items-center gap-2 md:gap-3">
-            <Activity className="h-4 w-4 md:h-5 md:w-5 text-[#0A2647]" />
+            <Activity className="h-4 w-4 md:h-5 md:w-5" style={{ color: '#14BDAE' }} />
             <div>
-              <CardTitle className="text-base md:text-lg text-[#0A2647]">Evolução da Dor</CardTitle>
-              <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">
+              <CardTitle className="text-base md:text-lg" style={{ color: '#F0EAD6' }}>Evolução da Dor</CardTitle>
+              <p className="text-xs md:text-sm mt-0.5 md:mt-1" style={{ color: '#7A8299' }}>
                 Escala Visual Analógica (0-10)
               </p>
             </div>
@@ -311,11 +311,11 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
       <CardContent className="p-3 md:p-4">
         {!hasData ? (
           <div className="text-center py-8 md:py-12">
-            <Activity className="h-12 w-12 md:h-16 md:w-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-            <h3 className="text-base md:text-lg font-medium text-gray-700 mb-2">
+            <Activity className="h-12 w-12 md:h-16 md:w-16 mx-auto mb-3 md:mb-4" style={{ color: '#2A3147' }} />
+            <h3 className="text-base md:text-lg font-medium mb-2" style={{ color: '#D8DEEB' }}>
               Sem dados de dor ainda
             </h3>
-            <p className="text-gray-500 text-xs md:text-sm">
+            <p className="text-xs md:text-sm" style={{ color: '#7A8299' }}>
               Os dados aparecerão quando o paciente responder.
             </p>
           </div>
@@ -323,20 +323,20 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
           <div className="h-56 md:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontFamily: 'Inter, sans-serif', fontSize: 12 }}
+                  tick={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fill: '#7A8299' }}
                 />
                 <YAxis
                   domain={[0, 10]}
                   ticks={[0, 2, 4, 6, 8, 10]}
-                  tick={{ fontFamily: 'Inter, sans-serif', fontSize: 12 }}
+                  tick={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fill: '#7A8299' }}
                   label={{
                     value: 'Nível de dor (EVA)',
                     angle: -90,
                     position: 'insideLeft',
-                    style: { fontFamily: 'Inter, sans-serif', fontSize: 12 },
+                    style: { fontFamily: 'Inter, sans-serif', fontSize: 12, fill: '#7A8299' },
                   }}
                 />
                 <Tooltip
@@ -365,6 +365,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                 />
                 <Legend
                   verticalAlign="bottom"
+                  wrapperStyle={{ color: '#D8DEEB' }}
                   formatter={(value: string) =>
                     value === 'painAtRest' ? 'Dor em repouso' : 'Dor durante evacuação'
                   }
@@ -372,7 +373,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                 <Line
                   type="monotone"
                   dataKey="painAtRest"
-                  stroke="#0A2647"
+                  stroke="#14BDAE"
                   strokeWidth={3}
                   dot={(props: any) => renderDot({ ...props, dataKey: 'painAtRest' })}
                   connectNulls
@@ -399,43 +400,43 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
         {hasData && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mt-3 md:mt-4">
             {/* Pico de dor */}
-            <div className="bg-red-50 rounded-lg p-2 md:p-3 border border-red-100">
-              <p className="text-[10px] md:text-xs text-red-600 font-medium">Pico de dor</p>
-              <p className="text-lg md:text-2xl font-bold text-red-700">
+            <div className="rounded-lg p-2 md:p-3" style={{ backgroundColor: '#1E2535', border: '1px solid rgba(220,38,38,0.3)' }}>
+              <p className="text-[10px] md:text-xs text-red-400 font-medium">Pico de dor</p>
+              <p className="text-lg md:text-2xl font-bold text-red-400">
                 {Math.max(...data.filter(d => d.painAtRest !== null).map(d => d.painAtRest || 0))}/10
               </p>
-              <p className="text-[10px] md:text-xs text-red-500">
+              <p className="text-[10px] md:text-xs text-red-400/70">
                 D+{data.find(d => d.painAtRest === Math.max(...data.filter(d => d.painAtRest !== null).map(d => d.painAtRest || 0)))?.day || '-'}
               </p>
             </div>
 
             {/* Última dor */}
-            <div className="bg-blue-50 rounded-lg p-2 md:p-3 border border-blue-100">
-              <p className="text-[10px] md:text-xs text-blue-600 font-medium">Última</p>
-              <p className="text-lg md:text-2xl font-bold text-blue-700">
+            <div className="rounded-lg p-2 md:p-3" style={{ backgroundColor: '#1E2535', border: '1px solid rgba(13,115,119,0.3)' }}>
+              <p className="text-[10px] md:text-xs font-medium" style={{ color: '#14BDAE' }}>Última</p>
+              <p className="text-lg md:text-2xl font-bold" style={{ color: '#14BDAE' }}>
                 {data.filter(d => d.painAtRest !== null).slice(-1)[0]?.painAtRest ?? '-'}/10
               </p>
-              <p className="text-[10px] md:text-xs text-blue-500">
+              <p className="text-[10px] md:text-xs" style={{ color: '#0D7377' }}>
                 D+{data.filter(d => d.painAtRest !== null).slice(-1)[0]?.day || '-'}
               </p>
             </div>
 
             {/* Medições */}
-            <div className="bg-gray-50 rounded-lg p-2 md:p-3 border border-gray-100">
-              <p className="text-[10px] md:text-xs text-gray-600 font-medium">Medições</p>
-              <p className="text-lg md:text-2xl font-bold text-gray-700">
+            <div className="rounded-lg p-2 md:p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #2A3147' }}>
+              <p className="text-[10px] md:text-xs font-medium" style={{ color: '#7A8299' }}>Medições</p>
+              <p className="text-lg md:text-2xl font-bold" style={{ color: '#D8DEEB' }}>
                 {data.filter(d => d.painAtRest !== null).length}
               </p>
-              <p className="text-[10px] md:text-xs text-gray-500">de {data.length} dias</p>
+              <p className="text-[10px] md:text-xs" style={{ color: '#7A8299' }}>de {data.length} dias</p>
             </div>
 
             {/* Alertas */}
-            <div className="bg-orange-50 rounded-lg p-2 md:p-3 border border-orange-100">
-              <p className="text-[10px] md:text-xs text-orange-600 font-medium">Alertas</p>
-              <p className="text-lg md:text-2xl font-bold text-orange-700">
+            <div className="rounded-lg p-2 md:p-3" style={{ backgroundColor: '#1E2535', border: '1px solid rgba(249,115,22,0.3)' }}>
+              <p className="text-[10px] md:text-xs text-orange-400 font-medium">Alertas</p>
+              <p className="text-lg md:text-2xl font-bold text-orange-400">
                 {data.filter(d => d.hasRedFlag).length}
               </p>
-              <p className="text-[10px] md:text-xs text-orange-500">dias</p>
+              <p className="text-[10px] md:text-xs text-orange-400/70">dias</p>
             </div>
           </div>
         )}

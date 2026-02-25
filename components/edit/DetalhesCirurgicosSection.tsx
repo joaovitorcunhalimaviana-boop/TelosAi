@@ -126,16 +126,16 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Detalhes Cirúrgicos</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Detalhes Cirúrgicos</h2>
 
       {/* Surgery Type */}
       <div className="mb-6">
-        <Label htmlFor="surgeryType" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="surgeryType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Tipo de Cirurgia <span className="text-red-500">*</span>
         </Label>
         <Select value={surgeryType} onValueChange={setSurgeryType}>
-          <SelectTrigger className="mt-1">
+          <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
             <SelectValue placeholder="Selecione o tipo de cirurgia" />
           </SelectTrigger>
           <SelectContent>
@@ -149,12 +149,12 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
       {/* Hemorrhoidectomy Details */}
       {surgeryType === 'hemorroidectomia' && (
-        <div className="space-y-4 border-t pt-4">
-          <h3 className="text-lg font-semibold text-gray-700">Detalhes da Hemorroidectomia</h3>
+        <div className="space-y-4 border-t pt-4" style={{ borderColor: '#1E2535' }}>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Detalhes da Hemorroidectomia</h3>
 
           {/* Technique (multi-select) */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">
+            <Label className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Técnica Cirúrgica <span className="text-red-500">*</span>
             </Label>
             <div className="mt-2 space-y-2">
@@ -183,11 +183,11 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
           {/* Energy Type */}
           <div>
-            <Label htmlFor="energyType" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="energyType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Tipo de Energia <span className="text-red-500">*</span>
             </Label>
             <Select value={energyType} onValueChange={setEnergyType}>
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                 <SelectValue placeholder="Selecione o tipo de energia" />
               </SelectTrigger>
               <SelectContent>
@@ -205,7 +205,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
           {/* Number of Mamillae Resected */}
           <div>
-            <Label htmlFor="mamillaeResected" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="mamillaeResected" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Número de Mamilos Ressecados <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -217,12 +217,13 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
               min="1"
               max="10"
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             />
           </div>
 
           {/* Mamillae Positions (FREE TEXT) */}
           <div>
-            <Label htmlFor="mamillaePositions" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="mamillaePositions" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Posições dos Mamilos
             </Label>
             <Input
@@ -232,19 +233,20 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
               onChange={(e) => setMamillaePositions(e.target.value)}
               placeholder="Ex: anterior esquerda, posterior direita, lateral direita"
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
               Descreva livremente as posições dos mamilos ressecados
             </p>
           </div>
 
           {/* Hemorrhoid Type */}
           <div>
-            <Label htmlFor="hemorrhoidType" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="hemorrhoidType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Tipo de Hemorroida
             </Label>
             <Select value={hemorrhoidType} onValueChange={setHemorrhoidType}>
-              <SelectTrigger className="mt-1">
+              <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -258,11 +260,11 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
           {/* Internal Grade (if internal or mixed) */}
           {(hemorrhoidType === 'interna' || hemorrhoidType === 'mista') && (
             <div>
-              <Label htmlFor="internalGrade" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="internalGrade" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Grau da Hemorroida Interna
               </Label>
               <Select value={internalGrade} onValueChange={setInternalGrade}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                   <SelectValue placeholder="Selecione o grau" />
                 </SelectTrigger>
                 <SelectContent>
@@ -278,7 +280,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
           {/* External Details */}
           {(hemorrhoidType === 'externa' || hemorrhoidType === 'mista') && (
             <div>
-              <Label htmlFor="externalDetails" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="externalDetails" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Detalhes da Hemorroida Externa
               </Label>
               <Textarea
@@ -287,6 +289,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 onChange={(e) => setExternalDetails(e.target.value)}
                 placeholder="Descreva características da hemorroida externa (tamanho, trombose, etc.)"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 rows={3}
               />
             </div>
@@ -296,12 +299,12 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
       {/* Fistula Details */}
       {surgeryType === 'fistula' && (
-        <div className="space-y-4 border-t pt-4">
-          <h3 className="text-lg font-semibold text-gray-700">Detalhes da Fístula Anorretal</h3>
+        <div className="space-y-4 border-t pt-4" style={{ borderColor: '#1E2535' }}>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Detalhes da Fístula Anorretal</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="fistulaType" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="fistulaType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Tipo de Fístula <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -311,11 +314,12 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 onChange={(e) => setFistulaType(e.target.value)}
                 placeholder="Ex: Interesfincteriana"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             <div>
-              <Label htmlFor="fistulaTechnique" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="fistulaTechnique" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Técnica <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -325,11 +329,12 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 onChange={(e) => setFistulaTechnique(e.target.value)}
                 placeholder="Ex: Fistulotomia"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
             <div>
-              <Label htmlFor="fistulaTracts" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="fistulaTracts" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Número de Trajetos
               </Label>
               <Input
@@ -340,6 +345,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 placeholder="Ex: 1"
                 min="1"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
 
@@ -359,7 +365,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
           {setonUsed && (
             <div>
-              <Label htmlFor="setonMaterial" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="setonMaterial" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Material do Seton
               </Label>
               <Input
@@ -369,6 +375,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 onChange={(e) => setSetonMaterial(e.target.value)}
                 placeholder="Ex: Fio de algodão, silicone"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
           )}
@@ -377,16 +384,16 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
       {/* Fissure Details */}
       {surgeryType === 'fissura' && (
-        <div className="space-y-4 border-t pt-4">
-          <h3 className="text-lg font-semibold text-gray-700">Detalhes da Fissura Anal</h3>
+        <div className="space-y-4 border-t pt-4" style={{ borderColor: '#1E2535' }}>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Detalhes da Fissura Anal</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="fissureType" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="fissureType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Tipo de Fissura <span className="text-red-500">*</span>
               </Label>
               <Select value={fissureType} onValueChange={setFissureType}>
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
                 <SelectContent>
@@ -397,7 +404,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
             </div>
 
             <div>
-              <Label htmlFor="fissureLocation" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="fissureLocation" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Localização <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -407,12 +414,13 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
                 onChange={(e) => setFissureLocation(e.target.value)}
                 placeholder="Ex: Posterior, Anterior"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="fissureTechniques" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="fissureTechniques" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Técnicas Realizadas
             </Label>
             <Textarea
@@ -429,11 +437,11 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
       {/* Pilonidal Details */}
       {surgeryType === 'cisto_pilonidal' && (
-        <div className="space-y-4 border-t pt-4">
-          <h3 className="text-lg font-semibold text-gray-700">Detalhes do Cisto Pilonidal</h3>
+        <div className="space-y-4 border-t pt-4" style={{ borderColor: '#1E2535' }}>
+          <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Detalhes do Cisto Pilonidal</h3>
 
           <div>
-            <Label htmlFor="pilonidalTechnique" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="pilonidalTechnique" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Técnica Cirúrgica <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -443,17 +451,18 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
               onChange={(e) => setPilonidalTechnique(e.target.value)}
               placeholder="Ex: Excisão com fechamento primário"
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             />
           </div>
         </div>
       )}
 
       {/* Common Fields */}
-      <div className="space-y-4 border-t pt-4 mt-6">
-        <h3 className="text-lg font-semibold text-gray-700">Informações Gerais</h3>
+      <div className="space-y-4 border-t pt-4 mt-6" style={{ borderColor: '#1E2535' }}>
+        <h3 className="text-lg font-semibold" style={{ color: '#D8DEEB' }}>Informações Gerais</h3>
 
         <div>
-          <Label htmlFor="complications" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="complications" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Complicações Intraoperatórias
           </Label>
           <Textarea
@@ -462,13 +471,14 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
             onChange={(e) => setComplications(e.target.value)}
             placeholder="Descreva quaisquer complicações ocorridas durante a cirurgia"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             rows={3}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="recoveryMinutes" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="recoveryMinutes" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Tempo na Sala de Recuperação (minutos)
             </Label>
             <Input
@@ -479,6 +489,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
               placeholder="Ex: 60"
               min="0"
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             />
           </div>
 
@@ -498,7 +509,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
 
         {!sameDayDischarge && (
           <div>
-            <Label htmlFor="hospitalizationDays" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="hospitalizationDays" className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Dias de Internação
             </Label>
             <Input
@@ -509,6 +520,7 @@ export function DetalhesCirurgicosSection({ patient, onUpdate, onComplete }: Det
               placeholder="Ex: 2"
               min="1"
               className="mt-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             />
           </div>
         )}

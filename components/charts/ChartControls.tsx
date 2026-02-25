@@ -108,7 +108,7 @@ export function ChartControls({
           Controles do Gráfico
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-80" align="end" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
         <div className="space-y-4">
           <div>
             <h4 className="font-semibold mb-3 flex items-center gap-2">

@@ -121,16 +121,16 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
   const categories = ['cardiovascular', 'metabolica', 'pulmonar', 'renal', 'hepatica', 'imunologica', 'outras'];
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Comorbidades</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Comorbidades</h2>
 
       {/* Severity Selection */}
       <div className="mb-6">
-        <Label htmlFor="severity" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="severity" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Gravidade Geral das Comorbidades
         </Label>
         <Select value={severity} onValueChange={setSeverity}>
-          <SelectTrigger className="mt-1 w-full md:w-64">
+          <SelectTrigger className="mt-1 w-full md:w-64" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
             <SelectValue placeholder="Selecione a gravidade" />
           </SelectTrigger>
           <SelectContent>
@@ -147,8 +147,8 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
           const categoryComorbidades = comorbidades.filter(c => c.category === category);
 
           return (
-            <div key={category} className="border-t pt-4">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3">
+            <div key={category} className="border-t pt-4" style={{ borderColor: '#1E2535' }}>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: '#D8DEEB' }}>
                 {getCategoryTitle(category)}
               </h3>
 
@@ -169,7 +169,7 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
                         />
                         <Label
                           htmlFor={`comorbidade-${globalIndex}`}
-                          className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                          className="text-sm font-medium cursor-pointer flex-1" style={{ color: '#D8DEEB' }}
                         >
                           {comorbidade.name}
                         </Label>
@@ -184,6 +184,7 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
                             onChange={(e) => handleDetailsChange(globalIndex, e.target.value)}
                             placeholder="Detalhes (ex: medicações em uso, tempo de doença, etc.)"
                             className="w-full"
+                            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                           />
                         </div>
                       )}
@@ -197,8 +198,8 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
       </div>
 
       {/* Other Comorbidities */}
-      <div className="mt-6 border-t pt-4">
-        <Label htmlFor="otherComorbidities" className="text-sm font-medium text-gray-700">
+      <div className="mt-6 border-t pt-4" style={{ borderColor: '#1E2535' }}>
+        <Label htmlFor="otherComorbidities" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Outras Comorbidades (não listadas acima)
         </Label>
         <Textarea
@@ -207,6 +208,7 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
           onChange={(e) => setOtherComorbidities(e.target.value)}
           placeholder="Descreva outras comorbidades relevantes..."
           className="mt-1"
+          style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           rows={3}
         />
       </div>

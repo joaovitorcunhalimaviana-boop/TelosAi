@@ -227,17 +227,18 @@ export function InteractiveLineChart({
 
       {/* Interactive Legend */}
       {settings.showLegend && (
-        <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: '#0B0E14' }}>
           <Button
             variant="ghost"
             size="sm"
             onClick={toggleAllSeries}
             className="h-8 text-xs"
+            style={{ color: '#D8DEEB' }}
           >
             {visibleSeries.size === series.length ? 'Ocultar Todos' : 'Mostrar Todos'}
           </Button>
 
-          <div className="h-4 w-px bg-gray-300" />
+          <div className="h-4 w-px" style={{ backgroundColor: '#1E2535' }} />
 
           {series.map((s, index) => {
             const color = s.color || colors[index % colors.length];
@@ -247,7 +248,7 @@ export function InteractiveLineChart({
               <button
                 key={s.dataKey}
                 onClick={() => toggleSeries(s.dataKey)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:bg-white ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:opacity-80 ${
                   isVisible ? 'opacity-100' : 'opacity-40'
                 }`}
               >
@@ -255,7 +256,7 @@ export function InteractiveLineChart({
                   className="w-4 h-1 rounded-full"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-sm font-medium">{s.name}</span>
+                <span className="text-sm font-medium" style={{ color: '#D8DEEB' }}>{s.name}</span>
                 {isVisible ? (
                   <Eye className="h-3.5 w-3.5 text-gray-500" />
                 ) : (
@@ -280,30 +281,32 @@ export function InteractiveLineChart({
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           {settings.showGridLines && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
           )}
 
           <XAxis
             dataKey={xAxisKey}
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               xAxisLabel
-                ? { value: xAxisLabel, position: 'insideBottom', offset: -10 }
+                ? { value: xAxisLabel, position: 'insideBottom', offset: -10, fill: '#7A8299' }
                 : undefined
             }
             scale={settings.axisScaleX}
             domain={settings.axisScaleX === 'log' ? [0.1, 'auto'] : ['auto', 'auto']}
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <YAxis
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               yAxisLabel
-                ? { value: yAxisLabel, angle: -90, position: 'insideLeft' }
+                ? { value: yAxisLabel, angle: -90, position: 'insideLeft', fill: '#7A8299' }
                 : undefined
             }
             scale={settings.axisScaleY}
             domain={settings.axisScaleY === 'log' ? [0.1, 'auto'] : [0, 'auto']}
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <Tooltip
@@ -373,7 +376,7 @@ export function InteractiveLineChart({
               dataKey={xAxisKey}
               height={30}
               stroke="#0A2647"
-              fill="#f3f4f6"
+              fill="#0B0E14"
             />
           )}
         </LineChart>
@@ -381,7 +384,7 @@ export function InteractiveLineChart({
 
       {/* Status Info */}
       {displayData.length < data.length && (
-        <div className="text-xs text-center text-gray-500">
+        <div className="text-xs text-center" style={{ color: '#7A8299' }}>
           Mostrando {displayData.length} de {data.length} pontos de dados
         </div>
       )}

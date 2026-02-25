@@ -23,16 +23,16 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+        default: "bg-[#0B0E14] text-[#F0EAD6] hover:bg-[#1E2535]",
         primary: "bg-vigia-teal-500 text-white hover:bg-vigia-teal-600",
-        secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
+        secondary: "bg-[#2A3147] text-[#D8DEEB] hover:bg-[#1E2535]",
         success: "bg-vigia-success-500 text-white hover:bg-vigia-success-600",
         warning: "bg-vigia-warning-500 text-white hover:bg-vigia-warning-600",
         error: "bg-vigia-error-500 text-white hover:bg-vigia-error-600",
         info: "bg-vigia-info-500 text-white hover:bg-vigia-info-600",
         gold: "bg-vigia-gold-500 text-vigia-teal-900 hover:bg-vigia-gold-600 border-2 border-vigia-gold-600",
         purple: "bg-vigia-purple-500 text-white hover:bg-vigia-purple-600",
-        outline: "border-2 border-gray-300 text-gray-700 hover:bg-gray-50",
+        outline: "border-2 border-[#1E2535] text-[#D8DEEB] hover:bg-[#1E2535]",
         outlinePrimary: "border-2 border-vigia-teal-500 text-vigia-teal-500 hover:bg-vigia-teal-50",
       },
       size: {

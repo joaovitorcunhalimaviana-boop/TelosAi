@@ -73,7 +73,7 @@ export function Heading({
 // SUBHEADING COMPONENT
 // ============================================================================
 
-const subheadingVariants = cva("text-gray-600 leading-relaxed", {
+const subheadingVariants = cva("text-[#D8DEEB] leading-relaxed", {
   variants: {
     size: {
       sm: "text-sm",
@@ -112,7 +112,7 @@ export function Subheading({
 // BODY COMPONENT
 // ============================================================================
 
-const bodyVariants = cva("text-gray-700 leading-relaxed", {
+const bodyVariants = cva("text-[#D8DEEB] leading-relaxed", {
   variants: {
     size: {
       xs: "text-xs",
@@ -159,7 +159,7 @@ export function Body({
 // CAPTION COMPONENT
 // ============================================================================
 
-const captionVariants = cva("text-gray-500", {
+const captionVariants = cva("text-[#7A8299]", {
   variants: {
     size: {
       xs: "text-xs",
@@ -203,7 +203,7 @@ export function Caption({
 // LABEL COMPONENT
 // ============================================================================
 
-const labelVariants = cva("font-medium text-gray-700", {
+const labelVariants = cva("font-medium text-[#D8DEEB]", {
   variants: {
     size: {
       sm: "text-sm",
@@ -252,7 +252,7 @@ const linkVariants = cva(
     variants: {
       variant: {
         default: "text-vigia-teal-500 hover:text-vigia-teal-600 underline",
-        subtle: "text-gray-600 hover:text-vigia-teal-500 hover:underline",
+        subtle: "text-[#D8DEEB] hover:text-vigia-teal-500 hover:underline",
         gold: "text-vigia-gold-500 hover:text-vigia-gold-600 underline",
         destructive: "text-vigia-error-500 hover:text-vigia-error-600 underline",
       },
@@ -321,7 +321,7 @@ const codeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-100 text-gray-800 border border-gray-200",
+        default: "bg-[#0B0E14] text-[#F0EAD6] border border-[#1E2535]",
         primary: "bg-vigia-teal-50 text-vigia-teal-700 border border-vigia-teal-200",
         success: "bg-vigia-success-50 text-vigia-success-700 border border-vigia-success-200",
         warning: "bg-vigia-warning-50 text-vigia-warning-700 border border-vigia-warning-200",
@@ -379,7 +379,7 @@ export function Blockquote({
   return (
     <blockquote
       className={cn(
-        "border-l-4 border-vigia-gold-500 pl-6 py-2 italic text-gray-700 bg-gray-50 rounded-r",
+        "border-l-4 border-vigia-gold-500 pl-6 py-2 italic text-[#D8DEEB] bg-[#0B0E14] rounded-r",
         className
       )}
       cite={cite}
@@ -387,7 +387,7 @@ export function Blockquote({
     >
       {children}
       {author && (
-        <footer className="mt-2 text-sm text-gray-600 not-italic">
+        <footer className="mt-2 text-sm text-[#D8DEEB] not-italic">
           — {author}
         </footer>
       )}
@@ -423,7 +423,7 @@ export function List({
   return (
     <Component
       className={cn(
-        "space-y-2 pl-6 text-gray-700",
+        "space-y-2 pl-6 text-[#D8DEEB]",
         variantClasses[variant],
         variant === "checkmarks" && "list-none pl-0",
         className
@@ -461,8 +461,8 @@ export function List({
 const textVariants = cva("", {
   variants: {
     variant: {
-      default: "text-gray-700",
-      muted: "text-gray-500",
+      default: "text-[#D8DEEB]",
+      muted: "text-[#7A8299]",
       primary: "text-vigia-teal-500",
       gold: "text-vigia-gold-500",
       success: "text-vigia-success-500",

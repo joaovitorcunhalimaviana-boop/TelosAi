@@ -140,31 +140,33 @@ export function InteractiveBarChart({
           onMouseLeave={() => setHoveredIndex(null)}
         >
           {settings.showGridLines && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
           )}
 
           <XAxis
             dataKey="name"
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               xAxisLabel
-                ? { value: xAxisLabel, position: 'insideBottom', offset: -10 }
+                ? { value: xAxisLabel, position: 'insideBottom', offset: -10, fill: '#7A8299' }
                 : undefined
             }
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <YAxis
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               yAxisLabel
-                ? { value: yAxisLabel, angle: -90, position: 'insideLeft' }
+                ? { value: yAxisLabel, angle: -90, position: 'insideLeft', fill: '#7A8299' }
                 : undefined
             }
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <Tooltip
             content={<CustomTooltip type="comparison" />}
-            cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+            cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
           />
 
           {/* Reference Line */}
@@ -275,7 +277,7 @@ export function InteractiveBarChart({
 
       {/* Drill-down hint */}
       {enableDrillDown && (
-        <div className="text-xs text-center text-gray-500">
+        <div className="text-xs text-center" style={{ color: '#7A8299' }}>
           Clique nas barras para ver dados individuais dos pacientes
         </div>
       )}
@@ -300,27 +302,27 @@ export function InteractiveBarChart({
                 <CardHeader>
                   <CardTitle className="text-sm">Estatísticas do Grupo</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-4 gap-4 text-sm">
+                <CardContent className="grid grid-cols-4 gap-4 text-sm" style={{ color: '#D8DEEB' }}>
                   <div>
-                    <div className="text-gray-600">Média</div>
+                    <div style={{ color: '#7A8299' }}>Média</div>
                     <div className="text-2xl font-bold">{selectedBar.value.toFixed(1)}</div>
                   </div>
                   {selectedBar.sd && (
                     <div>
-                      <div className="text-gray-600">Desvio Padrão</div>
+                      <div style={{ color: '#7A8299' }}>Desvio Padrão</div>
                       <div className="text-2xl font-bold">{selectedBar.sd.toFixed(1)}</div>
                     </div>
                   )}
                   {selectedBar.ci && (
                     <div>
-                      <div className="text-gray-600">IC 95%</div>
+                      <div style={{ color: '#7A8299' }}>IC 95%</div>
                       <div className="text-sm font-semibold">
                         [{selectedBar.ci.lower.toFixed(1)}, {selectedBar.ci.upper.toFixed(1)}]
                       </div>
                     </div>
                   )}
                   <div>
-                    <div className="text-gray-600">N</div>
+                    <div style={{ color: '#7A8299' }}>N</div>
                     <div className="text-2xl font-bold">{selectedBar.patients.length}</div>
                   </div>
                 </CardContent>
@@ -329,7 +331,7 @@ export function InteractiveBarChart({
               {/* Individual Patient Data */}
               <div className="border rounded-lg overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead style={{ backgroundColor: '#0B0E14' }}>
                     <tr>
                       <th className="text-left p-3 text-sm font-semibold">Paciente</th>
                       <th className="text-center p-3 text-sm font-semibold">Valor</th>
@@ -383,8 +385,8 @@ export function InteractiveBarChart({
               </div>
 
               {/* Distribution Visualization */}
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="text-sm font-semibold mb-3">Distribuição dos Valores</h4>
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#0B0E14' }}>
+                <h4 className="text-sm font-semibold mb-3" style={{ color: '#F0EAD6' }}>Distribuição dos Valores</h4>
                 <div className="flex items-end gap-1 h-32">
                   {selectedBar.patients.map((patient, index) => {
                     const maxPatientValue = Math.max(

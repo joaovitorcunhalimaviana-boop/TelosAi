@@ -181,11 +181,11 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
 
   if (error) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card style={{ backgroundColor: '#111520', borderColor: 'rgba(220,38,38,0.3)' }}>
         <CardContent className="py-8 text-center">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-700 font-medium">{error}</p>
-          <Button onClick={handleRefresh} variant="outline" className="mt-4">
+          <p className="text-red-400 font-medium">{error}</p>
+          <Button onClick={handleRefresh} variant="outline" className="mt-4" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Tentar novamente
           </Button>
@@ -195,14 +195,14 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
   }
 
   return (
-    <Card>
+    <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2 md:gap-3">
-            <MessageCircle className="h-4 w-4 md:h-5 md:w-5 text-[#0A2647] shrink-0" />
+            <MessageCircle className="h-4 w-4 md:h-5 md:w-5 shrink-0" style={{ color: '#14BDAE' }} />
             <div className="min-w-0">
-              <CardTitle className="text-base md:text-lg text-[#0A2647]">WhatsApp</CardTitle>
-              <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">
+              <CardTitle className="text-base md:text-lg" style={{ color: '#F0EAD6' }}>WhatsApp</CardTitle>
+              <p className="text-xs md:text-sm mt-0.5 md:mt-1" style={{ color: '#7A8299' }}>
                 {data?.stats.completedFollowUps || 0}/{data?.stats.totalFollowUps || 0} respondidos
               </p>
             </div>
@@ -274,7 +274,7 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
         {/* Pendentes */}
         {pendingFollowUps.length > 0 && filter !== 'alerts' && (
           <div className="mb-6">
-            <h4 className="text-sm font-semibold text-gray-500 mb-3 flex items-center gap-2">
+            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#7A8299' }}>
               <Clock className="h-4 w-4" />
               Aguardando resposta
             </h4>
@@ -300,11 +300,11 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
         {/* Lista de respostas */}
         {filteredResponses.length === 0 ? (
           <div className="text-center py-12">
-            <MessageCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">
+            <MessageCircle className="h-16 w-16 mx-auto mb-4" style={{ color: '#2A3147' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: '#D8DEEB' }}>
               {filter === 'alerts' ? 'Nenhum alerta encontrado' : 'Nenhuma resposta ainda'}
             </h3>
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm" style={{ color: '#7A8299' }}>
               {filter === 'alerts'
                 ? 'Não há respostas com alertas de alto risco.'
                 : 'As respostas dos follow-ups aparecerão aqui quando o paciente responder.'}
@@ -312,7 +312,7 @@ export function ConversationTimeline({ patientId }: ConversationTimelineProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-500 mb-3">
+            <h4 className="text-sm font-semibold mb-3" style={{ color: '#7A8299' }}>
               {filter === 'alerts' ? 'Respostas com alertas' : 'Histórico de respostas'}
             </h4>
             <AnimatePresence mode="popLayout">

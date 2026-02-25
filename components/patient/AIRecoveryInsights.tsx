@@ -51,14 +51,14 @@ export function AIRecoveryInsights({ surgeryId }: AIRecoveryInsightsProps) {
     }
 
     return (
-        <Card className="bg-gradient-to-br from-indigo-50 to-white border-indigo-100 shadow-sm relative overflow-hidden">
+        <Card className="shadow-sm relative overflow-hidden" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <div className="absolute top-0 right-0 p-4 opacity-10">
-                <BrainCircuit className="h-24 w-24 text-indigo-600" />
+                <BrainCircuit className="h-24 w-24" style={{ color: '#14BDAE' }} />
             </div>
 
             <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-indigo-100 text-indigo-700 border-indigo-200">
+                    <Badge variant="outline" style={{ backgroundColor: '#1E2535', color: '#14BDAE', borderColor: '#0D7377' }}>
                         <Sparkles className="h-3 w-3 mr-1" />
                         Análise Claude AI
                     </Badge>
@@ -72,18 +72,18 @@ export function AIRecoveryInsights({ surgeryId }: AIRecoveryInsightsProps) {
                         </Badge>
                     )}
                 </div>
-                <CardTitle className="text-lg text-[#0A2647] mt-2">
+                <CardTitle className="text-lg mt-2" style={{ color: '#F0EAD6' }}>
                     Insights de Recuperação
                 </CardTitle>
             </CardHeader>
 
             <CardContent>
                 <div className="relative z-10">
-                    <p className="text-gray-700 leading-relaxed text-sm lg:text-base">
+                    <p className="leading-relaxed text-sm lg:text-base" style={{ color: '#D8DEEB' }}>
                         {analysis}
                     </p>
 
-                    <div className="mt-4 flex items-center text-xs text-indigo-600 font-medium">
+                    <div className="mt-4 flex items-center text-xs font-medium" style={{ color: '#0D7377' }}>
                         <BrainCircuit className="h-3 w-3 mr-1" />
                         Análise baseada nos relatos do paciente via WhatsApp
                     </div>

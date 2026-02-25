@@ -8,13 +8,16 @@ import { Loader2 } from 'lucide-react';
  */
 export default function DashboardLoading() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div
+      className="flex items-center justify-center min-h-screen"
+      style={{ background: 'linear-gradient(135deg, #0B0E14, #111520, #0B0E14)' }}
+    >
       <div className="text-center">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
+        <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4" style={{ color: '#14BDAE' }} />
+        <h2 className="text-xl font-semibold mb-2" style={{ color: '#D8DEEB' }}>
           Carregando dashboard...
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm" style={{ color: '#7A8299' }}>
           Aguarde enquanto carregamos seus dados
         </p>
       </div>

@@ -108,7 +108,7 @@ export function InteractiveBoxPlot({
 
         <div className="flex items-center gap-2">
           {/* Toggle controls */}
-          <div className="flex items-center gap-4 px-3 py-2 border rounded-lg bg-gray-50">
+          <div className="flex items-center gap-4 px-3 py-2 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
             <div className="flex items-center gap-2">
               <Switch
                 id="outliers"
@@ -147,11 +147,11 @@ export function InteractiveBoxPlot({
 
       {/* Chart */}
       <div
-        className="relative bg-white border rounded-lg p-6"
-        style={{ height: `${height}px` }}
+        className="relative rounded-lg p-6"
+        style={{ height: `${height}px`, backgroundColor: '#111520', border: '1px solid #1E2535' }}
       >
         {/* Y-axis */}
-        <div className="absolute left-0 top-0 h-full flex flex-col justify-between py-6 pr-12 text-xs text-gray-600">
+        <div className="absolute left-0 top-0 h-full flex flex-col justify-between py-6 pr-12 text-xs" style={{ color: '#7A8299' }}>
           {Array.from({ length: 6 }, (_, i) => {
             const value = maxY + paddingY - (i * (rangeY + paddingY * 2)) / 5;
             return (
@@ -164,7 +164,7 @@ export function InteractiveBoxPlot({
 
         {/* Y-axis label */}
         {yAxisLabel && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-semibold text-gray-700 whitespace-nowrap">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-semibold whitespace-nowrap" style={{ color: '#D8DEEB' }}>
             {yAxisLabel}
           </div>
         )}
@@ -175,8 +175,8 @@ export function InteractiveBoxPlot({
             {Array.from({ length: 6 }, (_, i) => (
               <div
                 key={i}
-                className="absolute w-full border-t border-gray-200"
-                style={{ top: `${(i * 100) / 5}%` }}
+                className="absolute w-full border-t"
+                style={{ borderColor: '#1E2535', top: `${(i * 100) / 5}%` }}
               />
             ))}
           </div>
@@ -324,8 +324,8 @@ export function InteractiveBoxPlot({
 
                 {/* Group name */}
                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center">
-                  <div className="text-sm font-medium whitespace-nowrap">{box.name}</div>
-                  <div className="text-xs text-gray-500">n={box.n}</div>
+                  <div className="text-sm font-medium whitespace-nowrap" style={{ color: '#D8DEEB' }}>{box.name}</div>
+                  <div className="text-xs" style={{ color: '#7A8299' }}>n={box.n}</div>
                 </div>
               </div>
             );
@@ -334,7 +334,7 @@ export function InteractiveBoxPlot({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 text-xs text-gray-600">
+      <div className="flex items-center justify-center gap-6 text-xs" style={{ color: '#7A8299' }}>
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 bg-gray-700" />
           <span>Min/Max</span>
@@ -360,7 +360,7 @@ export function InteractiveBoxPlot({
       </div>
 
       {/* Hint */}
-      <div className="text-xs text-center text-gray-500">
+      <div className="text-xs text-center" style={{ color: '#7A8299' }}>
         Clique nas caixas para ver estatísticas detalhadas
       </div>
 

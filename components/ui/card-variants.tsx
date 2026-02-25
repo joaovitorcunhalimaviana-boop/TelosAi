@@ -23,19 +23,19 @@ import { cn } from "@/lib/utils"
 // ============================================================================
 
 const cardVariants = cva(
-  "rounded-xl border bg-white text-gray-900 transition-all duration-300",
+  "rounded-xl border bg-[#111520] text-[#F0EAD6] transition-all duration-300",
   {
     variants: {
       variant: {
-        default: "border-gray-200 shadow-sm",
-        elevated: "border-gray-200 shadow-md hover:shadow-lg",
+        default: "border-[#1E2535] shadow-sm",
+        elevated: "border-[#1E2535] shadow-md hover:shadow-lg",
         bordered: "border-2 border-vigia-teal-200 shadow-none",
-        interactive: "border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-1 cursor-pointer",
-        success: "border-vigia-success-200 bg-vigia-success-50 shadow-sm",
-        warning: "border-vigia-warning-200 bg-vigia-warning-50 shadow-sm",
-        error: "border-vigia-error-200 bg-vigia-error-50 shadow-sm",
-        gold: "border-vigia-gold-300 bg-gradient-to-br from-white to-vigia-gold-50 shadow-md",
-        glass: "border-gray-200/50 bg-white/80 backdrop-blur-sm shadow-lg",
+        interactive: "border-[#1E2535] shadow-sm hover:shadow-md hover:-translate-y-1 cursor-pointer",
+        success: "border-vigia-success-200 bg-vigia-success-950 shadow-sm",
+        warning: "border-vigia-warning-200 bg-vigia-warning-950 shadow-sm",
+        error: "border-vigia-error-200 bg-vigia-error-950 shadow-sm",
+        gold: "border-vigia-gold-300 bg-gradient-to-br from-[#111520] to-vigia-gold-950 shadow-md",
+        glass: "border-[#1E2535]/50 bg-[#111520]/80 backdrop-blur-sm shadow-lg",
       },
       padding: {
         none: "p-0",
@@ -161,7 +161,7 @@ export function StatCard({
   const trendColor = {
     up: "text-vigia-success-500",
     down: "text-vigia-error-500",
-    neutral: "text-gray-500",
+    neutral: "text-[#7A8299]",
   }
 
   return (
@@ -171,7 +171,7 @@ export function StatCard({
       {...props}
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <span className="text-sm font-medium text-[#D8DEEB]">{label}</span>
         {icon && (
           <div className="p-2 bg-vigia-teal-50 rounded-lg text-vigia-teal-500">
             {icon}
@@ -180,13 +180,13 @@ export function StatCard({
       </div>
 
       <div className="space-y-1">
-        <div className="text-3xl font-bold text-gray-900">{value}</div>
+        <div className="text-3xl font-bold text-[#F0EAD6]">{value}</div>
 
         {change && (
           <div className={cn("flex items-center gap-1 text-sm font-medium", trendColor[change.trend])}>
             {trendIcon[change.trend]}
             <span>{Math.abs(change.value)}%</span>
-            <span className="text-gray-500 font-normal">vs último período</span>
+            <span className="text-[#7A8299] font-normal">vs último período</span>
           </div>
         )}
       </div>
@@ -226,7 +226,7 @@ export function PatientCard({
   const statusColors = {
     active: "bg-vigia-success-500",
     pending: "bg-vigia-warning-500",
-    completed: "bg-gray-500",
+    completed: "bg-[#7A8299]",
   }
 
   return (
@@ -237,8 +237,8 @@ export function PatientCard({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <h3 className="font-semibold text-lg text-gray-900">{patientName}</h3>
-          <p className="text-sm text-gray-600">{surgeryType}</p>
+          <h3 className="font-semibold text-lg text-[#F0EAD6]">{patientName}</h3>
+          <p className="text-sm text-[#D8DEEB]">{surgeryType}</p>
         </div>
 
         {riskLevel && (
@@ -295,8 +295,8 @@ export function FeatureCard({
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-        <p className="text-gray-600 leading-relaxed">{description}</p>
+        <h3 className="text-xl font-semibold text-[#F0EAD6]">{title}</h3>
+        <p className="text-[#D8DEEB] leading-relaxed">{description}</p>
       </div>
 
       {highlighted && (
@@ -341,15 +341,15 @@ export function EmptyStateCard({
     >
       {icon && (
         <div className="flex justify-center">
-          <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+          <div className="p-4 bg-[#0B0E14] rounded-full text-[#7A8299]">
             {icon}
           </div>
         </div>
       )}
 
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <p className="text-gray-600 max-w-md mx-auto">{description}</p>
+        <h3 className="text-lg font-semibold text-[#F0EAD6]">{title}</h3>
+        <p className="text-[#D8DEEB] max-w-md mx-auto">{description}</p>
       </div>
 
       {action && (
@@ -396,18 +396,18 @@ export function ResearchCard({
       <div className="flex items-start justify-between">
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-lg text-gray-900">{title}</h3>
+            <h3 className="font-semibold text-lg text-[#F0EAD6]">{title}</h3>
             {isActive ? (
               <div className="px-2 py-1 bg-vigia-success-500 text-white text-xs font-medium rounded-full">
                 Ativo
               </div>
             ) : (
-              <div className="px-2 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
+              <div className="px-2 py-1 bg-[#7A8299] text-white text-xs font-medium rounded-full">
                 Inativo
               </div>
             )}
           </div>
-          <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
+          <p className="text-sm text-[#D8DEEB] line-clamp-2">{description}</p>
         </div>
       </div>
 
@@ -416,14 +416,14 @@ export function ResearchCard({
           <svg className="h-5 w-5 text-vigia-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <span className="text-gray-600">{participantCount} participantes</span>
+          <span className="text-[#D8DEEB]">{participantCount} participantes</span>
         </div>
 
         <div className="flex items-center gap-2">
           <svg className="h-5 w-5 text-vigia-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          <span className="text-gray-600">{groupCount} grupos</span>
+          <span className="text-[#D8DEEB]">{groupCount} grupos</span>
         </div>
       </div>
     </InteractiveCard>

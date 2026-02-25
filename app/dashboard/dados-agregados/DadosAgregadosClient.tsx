@@ -128,7 +128,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
     });
   };
 
-  const chartColors = ["#2563EB", "#DC2626", "#16A34A", "#F59E0B", "#8B5CF6", "#EC4899"];
+  const chartColors = ["#14BDAE", "#0D7377", "#C9A84C", "#E8C97A", "#1A2544", "#7A8299"];
 
   const exportCSV = () => {
     if (!data) return;
@@ -188,10 +188,10 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando dados agregados...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 mx-auto mb-4" style={{ borderColor: '#14BDAE' }}></div>
+          <p style={{ color: '#7A8299' }}>Carregando dados agregados...</p>
         </div>
       </div>
     );
@@ -199,12 +199,12 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <Card className="border-2 border-dashed max-w-md">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
+        <Card className="border-2 border-dashed max-w-md" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardContent className="py-12 text-center">
-            <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum dado encontrado</h3>
-            <p className="text-muted-foreground">Ainda não há dados suficientes para gerar estatísticas.</p>
+            <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" style={{ color: '#7A8299' }} />
+            <h3 className="text-xl font-semibold mb-2" style={{ color: '#F0EAD6' }}>Nenhum dado encontrado</h3>
+            <p style={{ color: '#7A8299' }}>Ainda não há dados suficientes para gerar estatísticas.</p>
           </CardContent>
         </Card>
       </div>
@@ -215,12 +215,12 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
   const chartTypes = [...new Set(filterByType(data.painAtRest).map((d) => d.surgeryType))];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2" style={{ color: "#0A2647" }}>
+            <h1 className="text-4xl font-bold mb-2" style={{ color: "#F0EAD6" }}>
               Dados Agregados
             </h1>
             <p className="text-lg text-muted-foreground">
@@ -242,7 +242,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         </div>
 
         {/* Filter */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <label className="text-sm font-medium">Filtrar por tipo de cirurgia:</label>
@@ -265,7 +265,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+          <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Users className="h-4 w-4" />
@@ -273,13 +273,13 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold" style={{ color: "#0A2647" }}>
+              <div className="text-3xl font-bold" style={{ color: "#14BDAE" }}>
                 {data.overview.totalPatients}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+          <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <Activity className="h-4 w-4" />
@@ -287,7 +287,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold" style={{ color: "#0A2647" }}>
+              <div className="text-3xl font-bold" style={{ color: "#14BDAE" }}>
                 {data.overview.totalSurgeries}
               </div>
               <div className="text-xs text-muted-foreground mt-1">
@@ -296,7 +296,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:shadow-lg transition-shadow">
+          <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -312,7 +312,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
           {/* Satisfaction Card */}
           {filterByType(data.satisfaction).length > 0 && (
-            <Card className="border-2 hover:shadow-lg transition-shadow">
+            <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <ThumbsUp className="h-4 w-4" />
@@ -337,7 +337,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
         {/* Pain Evolution Chart */}
         {chartData.length > 0 && (
-          <Card className="mb-6 border-2">
+          <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-red-500" />
@@ -350,11 +350,11 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis domain={[0, 10]} />
-                  <Tooltip />
-                  <Legend />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
+                  <XAxis dataKey="day" stroke="#1E2535" tick={{ fill: '#7A8299' }} />
+                  <YAxis domain={[0, 10]} stroke="#1E2535" tick={{ fill: '#7A8299' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
+                  <Legend wrapperStyle={{ color: '#D8DEEB' }} />
                   {chartTypes.map((type, i) => (
                     <Line
                       key={type}
@@ -373,7 +373,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         )}
 
         {/* Pain at Rest Table */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <CardTitle>Dor em Repouso por Dia (EN 0-10)</CardTitle>
             <CardDescription>Formato publicável: Média ± DP</CardDescription>
@@ -382,7 +382,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
+                  <tr className="border-b-2">
                     <th className="text-left py-2 px-3 font-semibold">Tipo</th>
                     <th className="text-left py-2 px-3 font-semibold">Dia</th>
                     <th className="text-center py-2 px-3 font-semibold">N</th>
@@ -393,7 +393,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
                 </thead>
                 <tbody>
                   {filterByType(data.painAtRest).map((row, i) => (
-                    <tr key={i} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={i} className="border-b hover:opacity-80">
                       <td className="py-2 px-3">{row.surgeryType}</td>
                       <td className="py-2 px-3">D+{row.day}</td>
                       <td className="text-center py-2 px-3">{row.n}</td>
@@ -420,7 +420,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         </Card>
 
         {/* Pain During Bowel Movement Table */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <CardTitle>Dor ao Evacuar por Dia (EN 0-10)</CardTitle>
             <CardDescription>Formato publicável: Média ± DP</CardDescription>
@@ -429,7 +429,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
+                  <tr className="border-b-2">
                     <th className="text-left py-2 px-3 font-semibold">Tipo</th>
                     <th className="text-left py-2 px-3 font-semibold">Dia</th>
                     <th className="text-center py-2 px-3 font-semibold">N</th>
@@ -440,7 +440,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
                 </thead>
                 <tbody>
                   {filterByType(data.painDuringBowel).map((row, i) => (
-                    <tr key={i} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={i} className="border-b hover:opacity-80">
                       <td className="py-2 px-3">{row.surgeryType}</td>
                       <td className="py-2 px-3">D+{row.day}</td>
                       <td className="text-center py-2 px-3">{row.n}</td>
@@ -469,7 +469,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         {/* First Bowel Movement + Satisfaction Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* First Bowel Movement */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-orange-500" />
@@ -480,19 +480,19 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               {filterByType(data.firstBowelMovement).length > 0 ? (
                 <div className="space-y-4">
                   {filterByType(data.firstBowelMovement).map((row, i) => (
-                    <div key={i} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div key={i} className="p-4 rounded-lg" style={{ backgroundColor: '#161B27' }}>
                       <div className="font-semibold text-sm text-muted-foreground mb-2">
                         {row.surgeryType}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <div className="text-2xl font-bold" style={{ color: "#0A2647" }}>
+                          <div className="text-2xl font-bold" style={{ color: "#14BDAE" }}>
                             D+{row.meanDay} ± {row.sd}
                           </div>
                           <div className="text-xs text-muted-foreground">Dia médio ± DP</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold" style={{ color: "#0A2647" }}>
+                          <div className="text-2xl font-bold" style={{ color: "#14BDAE" }}>
                             D+{row.medianDay}
                           </div>
                           <div className="text-xs text-muted-foreground">Mediana</div>
@@ -511,7 +511,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
           </Card>
 
           {/* Satisfaction Detail */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ThumbsUp className="h-5 w-5 text-blue-500" />
@@ -522,7 +522,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
               {filterByType(data.satisfaction).length > 0 ? (
                 <div className="space-y-4">
                   {filterByType(data.satisfaction).map((row, i) => (
-                    <div key={i} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div key={i} className="p-4 rounded-lg" style={{ backgroundColor: '#161B27' }}>
                       <div className="font-semibold text-sm text-muted-foreground mb-2">
                         {row.surgeryType}
                       </div>
@@ -554,7 +554,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         </div>
 
         {/* Extra Medication Table */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Pill className="h-5 w-5 text-purple-500" />
@@ -568,7 +568,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
+                  <tr className="border-b-2">
                     <th className="text-left py-2 px-3 font-semibold">Tipo</th>
                     <th className="text-left py-2 px-3 font-semibold">Dia</th>
                     <th className="text-center py-2 px-3 font-semibold">N</th>
@@ -577,7 +577,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
                 </thead>
                 <tbody>
                   {filterByType(data.extraMedication).map((row, i) => (
-                    <tr key={i} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={i} className="border-b hover:opacity-80">
                       <td className="py-2 px-3">{row.surgeryType}</td>
                       <td className="py-2 px-3">D+{row.day}</td>
                       <td className="text-center py-2 px-3">{row.n}</td>
@@ -600,7 +600,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         </Card>
 
         {/* Complications Table */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <CardTitle>Complicações por Dia</CardTitle>
             <CardDescription>Taxas de febre, sangramento e retenção urinária</CardDescription>
@@ -609,7 +609,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b-2 border-gray-300">
+                  <tr className="border-b-2">
                     <th className="text-left py-2 px-3 font-semibold">Tipo</th>
                     <th className="text-left py-2 px-3 font-semibold">Dia</th>
                     <th className="text-center py-2 px-3 font-semibold">N</th>
@@ -620,7 +620,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
                 </thead>
                 <tbody>
                   {filterByType(data.complications).map((row, i) => (
-                    <tr key={i} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={i} className="border-b hover:opacity-80">
                       <td className="py-2 px-3">{row.surgeryType}</td>
                       <td className="py-2 px-3">D+{row.day}</td>
                       <td className="text-center py-2 px-3">{row.n}</td>
@@ -643,7 +643,7 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
         </Card>
 
         {/* Footer */}
-        <Card className="border-2">
+        <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <CardTitle className="text-lg">Sobre os Dados</CardTitle>
           </CardHeader>

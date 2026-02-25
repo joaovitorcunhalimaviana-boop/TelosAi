@@ -70,17 +70,17 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Anestesia</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Anestesia</h2>
 
       {/* Anesthesia Type */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
-          <Label htmlFor="anesthesiaType" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="anesthesiaType" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Tipo de Anestesia <span className="text-red-500">*</span>
           </Label>
           <Select value={anesthesiaType} onValueChange={setAnesthesiaType}>
-            <SelectTrigger className="mt-1">
+            <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
               <SelectValue placeholder="Selecione o tipo de anestesia" />
             </SelectTrigger>
             <SelectContent>
@@ -97,7 +97,7 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
         </div>
 
         <div>
-          <Label htmlFor="anesthesiologist" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="anesthesiologist" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Nome do Anestesiologista
           </Label>
           <Input
@@ -107,33 +107,34 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
             onChange={(e) => setAnesthesiologist(e.target.value)}
             placeholder="Nome completo"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           />
         </div>
       </div>
 
       {/* Pudendal Block Section */}
-      <div className="border-t pt-6">
+      <div className="border-t pt-6" style={{ borderColor: '#1E2535' }}>
         <div className="flex items-center space-x-2 mb-4">
           <Checkbox
             id="pudendalUsed"
             checked={pudendalUsed}
             onCheckedChange={(checked) => setPudendalUsed(checked as boolean)}
           />
-          <Label htmlFor="pudendalUsed" className="text-base font-semibold text-gray-700 cursor-pointer">
+          <Label htmlFor="pudendalUsed" className="text-base font-semibold cursor-pointer" style={{ color: '#D8DEEB' }}>
             Bloqueio do Nervo Pudendo
           </Label>
         </div>
 
         {pudendalUsed && (
-          <div className="ml-6 space-y-4 p-4 border rounded-lg bg-blue-50">
+          <div className="ml-6 space-y-4 p-4 rounded-lg" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Technique */}
               <div>
-                <Label htmlFor="pudendalTechnique" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalTechnique" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Técnica
                 </Label>
                 <Select value={pudendalTechnique} onValueChange={setPudendalTechnique}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione a técnica" />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,11 +148,11 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
               {/* Access */}
               <div>
-                <Label htmlFor="pudendalAccess" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalAccess" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Via de Acesso
                 </Label>
                 <Select value={pudendalAccess} onValueChange={setPudendalAccess}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione a via" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,11 +166,11 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
               {/* Anesthetic */}
               <div>
-                <Label htmlFor="pudendalAnesthetic" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalAnesthetic" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Anestésico Utilizado
                 </Label>
                 <Select value={pudendalAnesthetic} onValueChange={setPudendalAnesthetic}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione o anestésico" />
                   </SelectTrigger>
                   <SelectContent>
@@ -184,11 +185,11 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
               {/* Concentration */}
               <div>
-                <Label htmlFor="pudendalConcentration" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalConcentration" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Concentração
                 </Label>
                 <Select value={pudendalConcentration} onValueChange={setPudendalConcentration}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione a concentração" />
                   </SelectTrigger>
                   <SelectContent>
@@ -203,7 +204,7 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
               {/* Volume */}
               <div>
-                <Label htmlFor="pudendalVolume" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalVolume" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Volume (mL)
                 </Label>
                 <Input
@@ -215,16 +216,17 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
                   min="0"
                   step="0.5"
                   className="mt-1"
+                  style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 />
               </div>
 
               {/* Laterality */}
               <div>
-                <Label htmlFor="pudendalLaterality" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="pudendalLaterality" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Lateralidade
                 </Label>
                 <Select value={pudendalLaterality} onValueChange={setPudendalLaterality}>
-                  <SelectTrigger className="mt-1">
+                  <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
                     <SelectValue placeholder="Selecione a lateralidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -238,7 +240,7 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
             {/* Adjuvants */}
             <div>
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Adjuvantes
               </Label>
               <div className="mt-2 space-y-2">
@@ -277,7 +279,7 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
 
             {/* Pudendal Details */}
             <div>
-              <Label htmlFor="pudendalDetails" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="pudendalDetails" className="text-sm font-medium" style={{ color: '#7A8299' }}>
                 Detalhes Adicionais do Bloqueio
               </Label>
               <Textarea
@@ -286,11 +288,12 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
                 onChange={(e) => setPudendalDetails(e.target.value)}
                 placeholder="Observações sobre o bloqueio do nervo pudendo (intercorrências, dificuldades, etc.)"
                 className="mt-1"
+                style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
                 rows={3}
               />
             </div>
 
-            <div className="mt-3 text-sm text-blue-800 bg-blue-100 p-3 rounded">
+            <div className="mt-3 text-sm p-3 rounded" style={{ backgroundColor: '#1E2535', color: '#14BDAE' }}>
               <p>
                 <strong>Nota:</strong> O bloqueio do nervo pudendo é uma técnica anestésica
                 importante para controle da dor pós-operatória em cirurgias anorretais.
@@ -301,8 +304,8 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
       </div>
 
       {/* General Observations */}
-      <div className="border-t pt-4 mt-6">
-        <Label htmlFor="generalObservations" className="text-sm font-medium text-gray-700">
+      <div className="border-t pt-4 mt-6" style={{ borderColor: '#1E2535' }}>
+        <Label htmlFor="generalObservations" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Observações Gerais sobre a Anestesia
         </Label>
         <Textarea
@@ -311,6 +314,7 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
           onChange={(e) => setGeneralObservations(e.target.value)}
           placeholder="Outras informações relevantes sobre a anestesia (intercorrências, medicações adicionais, etc.)"
           className="mt-1"
+          style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           rows={4}
         />
       </div>

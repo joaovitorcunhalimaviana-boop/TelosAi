@@ -55,38 +55,38 @@ export function NotificationPanel() {
 
   const getPriorityColor = (priority: string) => {
     const colorMap: Record<string, string> = {
-      critical: 'bg-red-100 text-red-800 border-red-300',
-      high: 'bg-orange-100 text-orange-800 border-orange-300',
-      medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      low: 'bg-blue-100 text-blue-800 border-blue-300',
+      critical: 'bg-red-900/40 text-red-400 border-red-700',
+      high: 'bg-orange-900/40 text-orange-400 border-orange-700',
+      medium: 'bg-yellow-900/40 text-yellow-400 border-yellow-700',
+      low: 'bg-teal-900/40 text-teal-400 border-teal-700',
     };
-    return colorMap[priority] || 'bg-gray-100 text-gray-800 border-gray-300';
+    return colorMap[priority] || 'bg-[#1E2535] text-[#7A8299] border-[#2A3147]';
   };
 
   const getTypeColor = (type: string) => {
     if (type.startsWith('red_flag')) {
-      return 'bg-red-100 text-red-800';
+      return 'bg-red-900/40 text-red-400';
     }
     if (type.startsWith('followup')) {
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-teal-900/40 text-teal-400';
     }
     if (type.includes('created')) {
-      return 'bg-green-100 text-green-800';
+      return 'bg-emerald-900/40 text-emerald-400';
     }
-    return 'bg-gray-100 text-gray-800';
+    return 'bg-[#1E2535] text-[#7A8299]';
   };
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <Card>
-        <CardHeader>
+      <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+        <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                <Bell className="h-6 w-6" />
+              <CardTitle className="text-2xl flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+                <Bell className="h-6 w-6" style={{ color: '#14BDAE' }} />
                 Notificações
               </CardTitle>
-              <CardDescription>
+              <CardDescription style={{ color: '#7A8299' }}>
                 {unreadCount > 0
                   ? `${unreadCount} ${unreadCount === 1 ? 'notificação não lida' : 'notificações não lidas'}`
                   : 'Todas as notificações foram lidas'}
@@ -94,7 +94,12 @@ export function NotificationPanel() {
             </div>
 
             {unreadCount > 0 && (
-              <Button onClick={() => markAllAsRead()} variant="outline" size="sm">
+              <Button
+                onClick={() => markAllAsRead()}
+                variant="outline"
+                size="sm"
+                style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}
+              >
                 <CheckCheck className="h-4 w-4 mr-2" />
                 Marcar todas como lidas
               </Button>
@@ -102,19 +107,19 @@ export function NotificationPanel() {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-6">
           {/* Filtros */}
           <div className="flex gap-4 mb-6 flex-wrap">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Filtros:</span>
+              <Filter className="h-4 w-4" style={{ color: '#7A8299' }} />
+              <span className="text-sm font-medium" style={{ color: '#D8DEEB' }}>Filtros:</span>
             </div>
 
             <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as NotificationType | 'all')}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px]" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                 <SelectItem value="all">Todos os tipos</SelectItem>
                 <SelectItem value="red_flag_critical">Alerta Crítico</SelectItem>
                 <SelectItem value="red_flag_high">Alerta Alto</SelectItem>
@@ -126,10 +131,10 @@ export function NotificationPanel() {
             </Select>
 
             <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value as NotificationPriority | 'all')}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px]" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                 <SelectValue placeholder="Prioridade" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                 <SelectItem value="all">Todas as prioridades</SelectItem>
                 <SelectItem value="critical">Crítica</SelectItem>
                 <SelectItem value="high">Alta</SelectItem>
@@ -139,10 +144,10 @@ export function NotificationPanel() {
             </Select>
 
             <Select value={readFilter} onValueChange={(value) => setReadFilter(value as 'all' | 'read' | 'unread')}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px]" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                 <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="unread">Não lidas</SelectItem>
                 <SelectItem value="read">Lidas</SelectItem>
@@ -153,7 +158,7 @@ export function NotificationPanel() {
           {/* Lista de notificações */}
           <div className="space-y-3">
             {filteredNotifications.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
+              <div className="text-center py-12" style={{ color: '#7A8299' }}>
                 <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Nenhuma notificação encontrada</p>
               </div>
@@ -162,9 +167,13 @@ export function NotificationPanel() {
                 <Card
                   key={notification.id}
                   className={cn(
-                    'transition-colors hover:bg-accent/50',
-                    !notification.read && 'border-l-4 border-l-blue-600 bg-blue-50/30'
+                    'transition-colors border-0 hover:bg-[#1E2535]',
+                    !notification.read && 'border-l-4 border-l-[#14BDAE]'
                   )}
+                  style={{
+                    backgroundColor: !notification.read ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                    boxShadow: '0 0 0 1px #1E2535',
+                  }}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
@@ -182,7 +191,7 @@ export function NotificationPanel() {
                             {NOTIFICATION_TYPE_LABELS[notification.type] || notification.type}
                           </Badge>
 
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs" style={{ color: '#7A8299' }}>
                             {formatNotificationTime(notification.timestamp)}
                           </span>
                         </div>
@@ -193,12 +202,13 @@ export function NotificationPanel() {
                             'text-sm font-medium mb-1',
                             !notification.read && 'font-semibold'
                           )}
+                          style={{ color: '#F0EAD6' }}
                         >
                           {notification.title}
                         </h3>
 
                         {/* Mensagem */}
-                        <p className="text-sm text-muted-foreground">{notification.message}</p>
+                        <p className="text-sm" style={{ color: '#7A8299' }}>{notification.message}</p>
 
                         {/* Ações */}
                         <div className="flex items-center gap-2 mt-3">
@@ -212,6 +222,7 @@ export function NotificationPanel() {
                                   markAsRead(notification.id);
                                 }
                               }}
+                              style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#14BDAE' }}
                             >
                               <Link href={notification.actionUrl}>Ver detalhes</Link>
                             </Button>
@@ -222,6 +233,8 @@ export function NotificationPanel() {
                               variant="ghost"
                               size="sm"
                               onClick={() => markAsRead(notification.id)}
+                              style={{ color: '#D8DEEB' }}
+                              className="hover:bg-[#1E2535]"
                             >
                               <Check className="h-4 w-4 mr-2" />
                               Marcar como lida
@@ -232,7 +245,7 @@ export function NotificationPanel() {
 
                       {/* Indicador de não lida */}
                       {!notification.read && (
-                        <div className="w-3 h-3 bg-blue-600 rounded-full flex-shrink-0 mt-1" />
+                        <div className="w-3 h-3 rounded-full flex-shrink-0 mt-1" style={{ backgroundColor: '#14BDAE' }} />
                       )}
                     </div>
                   </CardContent>

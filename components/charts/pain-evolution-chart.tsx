@@ -34,8 +34,8 @@ export function PainEvolutionChart({ data }: PainEvolutionChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="font-semibold mb-2">{label}</p>
+        <div style={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} className="p-3 shadow-lg">
+          <p className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {SURGERY_LABELS[entry.dataKey] || entry.dataKey}: {entry.value?.toFixed(1)} / 10
@@ -48,13 +48,13 @@ export function PainEvolutionChart({ data }: PainEvolutionChartProps) {
   };
 
   return (
-    <Card className="border-2 hover:shadow-lg transition-shadow">
+    <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2" style={{ color: '#F0EAD6' }}>
           <span className="text-2xl">📊</span>
           Evolução da Dor Média
         </CardTitle>
-        <CardDescription>
+        <CardDescription style={{ color: '#7A8299' }}>
           Nível médio de dor reportado pelos pacientes ao longo dos dias pós-operatórios (escala 0-10)
         </CardDescription>
       </CardHeader>
@@ -64,22 +64,24 @@ export function PainEvolutionChart({ data }: PainEvolutionChartProps) {
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
             <XAxis
               dataKey="day"
-              stroke="#6b7280"
+              stroke="#1E2535"
+              tick={{ fill: '#7A8299' }}
               style={{ fontSize: '14px', fontWeight: 600 }}
             />
             <YAxis
               domain={[0, 10]}
               ticks={[0, 2, 4, 6, 8, 10]}
-              stroke="#6b7280"
+              stroke="#1E2535"
+              tick={{ fill: '#7A8299' }}
               style={{ fontSize: '14px', fontWeight: 600 }}
-              label={{ value: 'Dor (0-10)', angle: -90, position: 'insideLeft' }}
+              label={{ value: 'Dor (0-10)', angle: -90, position: 'insideLeft', fill: '#7A8299' }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
-              wrapperStyle={{ paddingTop: '20px' }}
+              wrapperStyle={{ paddingTop: '20px', color: '#D8DEEB' }}
               formatter={(value) => SURGERY_LABELS[value] || value}
             />
             {surgeryTypes.map((type) => (
@@ -98,8 +100,8 @@ export function PainEvolutionChart({ data }: PainEvolutionChartProps) {
         </ResponsiveContainer>
 
         {/* Legenda adicional */}
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-4 pt-4" style={{ borderTopColor: '#1E2535', borderTopWidth: '1px', borderTopStyle: 'solid' }}>
+          <p className="text-sm" style={{ color: '#7A8299' }}>
             <strong>Interpretação:</strong> Valores mais altos indicam maior intensidade de dor.
             Uma diminuição gradual é esperada ao longo dos dias.
           </p>

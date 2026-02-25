@@ -263,7 +263,7 @@ export function InteractiveScatterChart({
 
       {/* Interactive Legend */}
       {settings.showLegend && (
-        <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: '#0B0E14' }}>
           {series.map((s, index) => {
             const color = s.color || colors[index % colors.length];
             const isVisible = visibleSeries.has(s.name);
@@ -272,7 +272,7 @@ export function InteractiveScatterChart({
               <button
                 key={s.name}
                 onClick={() => toggleSeries(s.name)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:bg-white ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:opacity-80 ${
                   isVisible ? 'opacity-100' : 'opacity-40'
                 }`}
               >
@@ -280,8 +280,8 @@ export function InteractiveScatterChart({
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-sm font-medium">{s.name}</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-sm font-medium" style={{ color: '#D8DEEB' }}>{s.name}</span>
+                <span className="text-xs" style={{ color: '#7A8299' }}>
                   (n={s.data.length})
                 </span>
                 {isVisible ? (
@@ -306,35 +306,37 @@ export function InteractiveScatterChart({
       <ResponsiveContainer width="100%" height={height}>
         <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           {settings.showGridLines && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
           )}
 
           <XAxis
             type="number"
             dataKey={xAxisKey}
             name={xAxisLabel}
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               xAxisLabel
-                ? { value: xAxisLabel, position: 'insideBottom', offset: -10 }
+                ? { value: xAxisLabel, position: 'insideBottom', offset: -10, fill: '#7A8299' }
                 : undefined
             }
             domain={zoomDomain?.x || ['auto', 'auto']}
             scale={settings.axisScaleX}
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <YAxis
             type="number"
             dataKey={yAxisKey}
             name={yAxisLabel}
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               yAxisLabel
-                ? { value: yAxisLabel, angle: -90, position: 'insideLeft' }
+                ? { value: yAxisLabel, angle: -90, position: 'insideLeft', fill: '#7A8299' }
                 : undefined
             }
             domain={zoomDomain?.y || ['auto', 'auto']}
             scale={settings.axisScaleY}
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <ZAxis type="number" dataKey="z" range={[50, 400]} />
@@ -413,13 +415,13 @@ export function InteractiveScatterChart({
 
       {/* Status Info */}
       {zoomDomain && (
-        <div className="text-xs text-center text-gray-500">
+        <div className="text-xs text-center" style={{ color: '#7A8299' }}>
           Visualização com zoom ativo. Clique no botão de maximizar para resetar.
         </div>
       )}
 
       {showOutliers && (
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center justify-center gap-2 text-xs" style={{ color: '#7A8299' }}>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-red-500" />
             <span>Outliers identificados</span>

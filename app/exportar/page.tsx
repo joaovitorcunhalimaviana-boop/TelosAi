@@ -129,42 +129,44 @@ export default function ExportarPage() {
   return (
     <div id="export-page" className="container mx-auto p-6 max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <Database className="h-8 w-8" />
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+          <Database className="h-8 w-8" style={{ color: '#14BDAE' }} />
           Exportação de Dados para Pesquisa
         </h1>
-        <p className="text-muted-foreground">
+        <p style={{ color: '#7A8299' }}>
           Configure os filtros e campos desejados para exportar dados em formato Excel ou CSV
         </p>
       </div>
 
       <div className="grid gap-6">
         {/* Filtros de Período */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Período</CardTitle>
-            <CardDescription>
+        <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Período</CardTitle>
+            <CardDescription style={{ color: '#7A8299' }}>
               Filtrar cirurgias por intervalo de datas
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Data Início</Label>
+                <Label htmlFor="startDate" style={{ color: '#D8DEEB' }}>Data Início</Label>
                 <Input
                   id="startDate"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
+                  style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">Data Fim</Label>
+                <Label htmlFor="endDate" style={{ color: '#D8DEEB' }}>Data Fim</Label>
                 <Input
                   id="endDate"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
+                  style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
                 />
               </div>
             </div>
@@ -172,14 +174,14 @@ export default function ExportarPage() {
         </Card>
 
         {/* Tipo de Cirurgia */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tipo de Cirurgia</CardTitle>
-            <CardDescription>
+        <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Tipo de Cirurgia</CardTitle>
+            <CardDescription style={{ color: '#7A8299' }}>
               Selecione os tipos de cirurgia a incluir (deixe vazio para incluir todos)
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {surgeryTypeOptions.map((option) => (
                 <div key={option.value} className="flex items-center space-x-2">
@@ -191,6 +193,7 @@ export default function ExportarPage() {
                   <Label
                     htmlFor={`surgery-${option.value}`}
                     className="text-sm font-normal cursor-pointer"
+                    style={{ color: '#D8DEEB' }}
                   >
                     {option.label}
                   </Label>
@@ -201,14 +204,14 @@ export default function ExportarPage() {
         </Card>
 
         {/* Opções de Exportação */}
-        <Card data-tutorial="export-options">
-          <CardHeader>
-            <CardTitle>Opções de Exportação</CardTitle>
-            <CardDescription>
+        <Card className="border-0" data-tutorial="export-options" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Opções de Exportação</CardTitle>
+            <CardDescription style={{ color: '#7A8299' }}>
               Configure as opções de privacidade e formato
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-4">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="onlyComplete"
@@ -218,6 +221,7 @@ export default function ExportarPage() {
               <Label
                 htmlFor="onlyComplete"
                 className="text-sm font-normal cursor-pointer"
+                style={{ color: '#D8DEEB' }}
               >
                 Apenas dados completos (80% ou mais de preenchimento)
               </Label>
@@ -239,33 +243,34 @@ export default function ExportarPage() {
               <Label
                 htmlFor="anonymize"
                 className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                style={{ color: '#D8DEEB' }}
               >
-                <ShieldCheck className="h-4 w-4" />
+                <ShieldCheck className="h-4 w-4" style={{ color: '#14BDAE' }} />
                 Anonimizar dados (recomendado para pesquisa)
               </Label>
             </div>
 
-            <Separator />
+            <Separator style={{ backgroundColor: '#1E2535' }} />
 
             <div className="space-y-2" data-tutorial="export-format">
-              <Label htmlFor="format">Formato de Exportação</Label>
+              <Label htmlFor="format" style={{ color: '#D8DEEB' }}>Formato de Exportação</Label>
               <div className="flex items-center gap-2">
                 <Select
                   value={format}
                   onValueChange={(value) => setFormat(value as 'xlsx' | 'csv')}
                 >
-                  <SelectTrigger id="format" className="w-full md:w-64">
+                  <SelectTrigger id="format" className="w-full md:w-64" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                     <SelectValue placeholder="Selecione o formato" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                     <SelectItem value="xlsx">Excel (.xlsx)</SelectItem>
                     <SelectItem value="csv">CSV (.csv)</SelectItem>
                   </SelectContent>
                 </Select>
                 {format === 'xlsx' ? (
-                  <FileSpreadsheet className="h-5 w-5 text-muted-foreground" />
+                  <FileSpreadsheet className="h-5 w-5" style={{ color: '#7A8299' }} />
                 ) : (
-                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <FileText className="h-5 w-5" style={{ color: '#7A8299' }} />
                 )}
               </div>
             </div>
@@ -273,14 +278,14 @@ export default function ExportarPage() {
         </Card>
 
         {/* Campos a Exportar */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Campos a Exportar</CardTitle>
-            <CardDescription>
+        <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Campos a Exportar</CardTitle>
+            <CardDescription style={{ color: '#7A8299' }}>
               Selecione quais categorias de dados deseja incluir na exportação
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -291,6 +296,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-demographic"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Dados demográficos (idade, sexo)
                 </Label>
@@ -305,6 +311,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-comorbidities"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Comorbidades
                 </Label>
@@ -319,6 +326,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-surgeryDetails"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Detalhes cirúrgicos
                 </Label>
@@ -333,6 +341,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-painTrajectory"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Trajetória de dor (D+1 a D+14)
                 </Label>
@@ -347,6 +356,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-complications"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Complicações
                 </Label>
@@ -361,6 +371,7 @@ export default function ExportarPage() {
                 <Label
                   htmlFor="field-nps"
                   className="text-sm font-normal cursor-pointer"
+                  style={{ color: '#D8DEEB' }}
                 >
                   Net Promoter Score (NPS)
                 </Label>
@@ -377,6 +388,7 @@ export default function ExportarPage() {
                   htmlFor="field-identifiable"
                   className={`text-sm font-normal cursor-pointer ${anonymize ? 'opacity-50' : ''
                     }`}
+                  style={{ color: '#D8DEEB' }}
                 >
                   Dados identificáveis (nome, CPF, telefone)
                   {anonymize && ' - Desabilitado quando anonimizado'}
@@ -388,24 +400,24 @@ export default function ExportarPage() {
 
         {/* Informações sobre o formato Excel */}
         {format === 'xlsx' && (
-          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <Card className="border-0" style={{ backgroundColor: 'rgba(13, 115, 119, 0.08)', boxShadow: '0 0 0 1px rgba(13, 115, 119, 0.2)' }}>
             <CardHeader>
-              <CardTitle className="text-blue-900 dark:text-blue-100">
+              <CardTitle style={{ color: '#14BDAE' }}>
                 Estrutura do Arquivo Excel
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-blue-800 dark:text-blue-200 space-y-2">
+            <CardContent className="space-y-2" style={{ color: '#D8DEEB' }}>
               <p className="font-medium">O arquivo Excel terá as seguintes abas:</p>
-              <ul className="list-disc list-inside space-y-1 text-sm">
+              <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: '#7A8299' }}>
                 <li>
-                  <strong>Dados Brutos:</strong> Uma linha por paciente/cirurgia com todos os campos selecionados
+                  <strong style={{ color: '#D8DEEB' }}>Dados Brutos:</strong> Uma linha por paciente/cirurgia com todos os campos selecionados
                 </li>
                 <li>
-                  <strong>Estatísticas:</strong> Estatísticas descritivas (médias, desvios-padrão, frequências)
+                  <strong style={{ color: '#D8DEEB' }}>Estatísticas:</strong> Estatísticas descritivas (médias, desvios-padrão, frequências)
                 </li>
                 {fields.painTrajectory && (
                   <li>
-                    <strong>Trajetória de Dor:</strong> Matriz paciente x dia (D+1 a D+14)
+                    <strong style={{ color: '#D8DEEB' }}>Trajetória de Dor:</strong> Matriz paciente x dia (D+1 a D+14)
                   </li>
                 )}
               </ul>
@@ -414,15 +426,15 @@ export default function ExportarPage() {
         )}
 
         {/* Citação Sugerida */}
-        <Card className="bg-slate-50 border-slate-200" data-tutorial="apa-citation">
+        <Card className="border-0" data-tutorial="apa-citation" style={{ backgroundColor: '#161B27', boxShadow: '0 0 0 1px #1E2535' }}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-slate-700 flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
+            <CardTitle className="text-base flex items-center gap-2" style={{ color: '#D8DEEB' }}>
+              <BookOpen className="h-4 w-4" style={{ color: '#14BDAE' }} />
               Citação Sugerida (APA 7th)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <code className="text-sm text-slate-600 bg-white p-2 rounded border block">
+            <code className="text-sm p-2 rounded border block" style={{ color: '#D8DEEB', backgroundColor: '#111520', borderColor: '#1E2535' }}>
               Viana, J. V. (2025). <em>Dados Clínicos de Acompanhamento Pós-Operatório</em> [Base de dados]. VigIA.
             </code>
           </CardContent>
@@ -436,6 +448,7 @@ export default function ExportarPage() {
             disabled={isExporting}
             className="min-w-48"
             data-tutorial="download-btn"
+            style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
           >
             <Download className="h-5 w-5 mr-2" />
             {isExporting ? 'Exportando...' : 'Exportar Dados'}

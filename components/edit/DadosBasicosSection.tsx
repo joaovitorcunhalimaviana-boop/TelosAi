@@ -119,13 +119,13 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Dados Básicos do Paciente</h2>
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+      <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Dados Básicos do Paciente</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Nome Completo */}
         <div className="md:col-span-2">
-          <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="name" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Nome Completo <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Input
@@ -135,13 +135,14 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="Nome completo do paciente"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             required
           />
         </div>
 
         {/* CPF */}
         <div>
-          <Label htmlFor="cpf" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="cpf" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             CPF <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Input
@@ -152,13 +153,14 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             placeholder="000.000.000-00"
             maxLength={14}
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             required
           />
         </div>
 
         {/* Data de Nascimento */}
         <div>
-          <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="dateOfBirth" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Data de Nascimento <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <div className="flex gap-2 items-center">
@@ -168,10 +170,11 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
               value={formData.dateOfBirth}
               onChange={(e) => handleChange('dateOfBirth', e.target.value)}
               className="mt-1 flex-1"
+              style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
               required
             />
             {age !== null && (
-              <span className="text-sm font-medium text-gray-600 mt-1">
+              <span className="text-sm font-medium mt-1" style={{ color: '#7A8299' }}>
                 {age} anos
               </span>
             )}
@@ -180,11 +183,11 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
 
         {/* Sexo */}
         <div>
-          <Label htmlFor="sex" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="sex" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Sexo <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Select value={formData.sex} onValueChange={(value) => handleChange('sex', value)}>
-            <SelectTrigger className="mt-1">
+            <SelectTrigger className="mt-1" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
               <SelectValue placeholder="Selecione o sexo" />
             </SelectTrigger>
             <SelectContent>
@@ -197,7 +200,7 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
 
         {/* Telefone (WhatsApp) */}
         <div>
-          <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="phone" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Telefone/WhatsApp <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Input
@@ -208,13 +211,14 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             placeholder="(00) 00000-0000"
             maxLength={15}
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             required
           />
         </div>
 
         {/* Email */}
         <div>
-          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="email" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Email <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Input
@@ -224,12 +228,13 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             onChange={(e) => handleChange('email', e.target.value)}
             placeholder="email@exemplo.com"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           />
         </div>
 
         {/* Hospital */}
         <div className="md:col-span-2">
-          <Label htmlFor="hospital" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="hospital" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Hospital <ResearchRequiredIndicator isResearchParticipant={isResearchParticipant} />
           </Label>
           <Input
@@ -239,13 +244,14 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             onChange={(e) => handleChange('hospital', e.target.value)}
             placeholder="Nome do hospital onde a cirurgia foi realizada"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
             required
           />
         </div>
 
         {/* Duração da Cirurgia */}
         <div>
-          <Label htmlFor="surgeryDuration" className="text-sm font-medium text-gray-700">
+          <Label htmlFor="surgeryDuration" className="text-sm font-medium" style={{ color: '#7A8299' }}>
             Duração da Cirurgia (minutos)
           </Label>
           <Input
@@ -256,11 +262,12 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             placeholder="Ex: 45"
             min="0"
             className="mt-1"
+            style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           />
         </div>
 
         {/* Paciente de Teste */}
-        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', border: '1px solid #2A3147' }}>
           <Checkbox
             id="isTest"
             checked={formData.isTest}
@@ -269,10 +276,10 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
             }
           />
           <div>
-            <Label htmlFor="isTest" className="text-sm font-medium text-amber-800 cursor-pointer">
+            <Label htmlFor="isTest" className="text-sm font-medium cursor-pointer" style={{ color: '#D4AF37' }}>
               Paciente de teste
             </Label>
-            <p className="text-xs text-amber-600 mt-0.5">
+            <p className="text-xs mt-0.5" style={{ color: '#7A8299' }}>
               Pacientes de teste são excluídos dos dados agregados e estatísticas para publicação.
             </p>
           </div>

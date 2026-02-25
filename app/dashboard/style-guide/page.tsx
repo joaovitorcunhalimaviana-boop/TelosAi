@@ -46,24 +46,24 @@ import {
 
 export default function StyleGuidePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
       <div className="container mx-auto px-6 py-12 max-w-7xl">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-telos-blue-500 rounded-xl">
+            <div className="p-3 rounded-xl" style={{ backgroundColor: '#0D7377' }}>
               <Palette className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold" style={{ color: COLORS.primary }}>
+              <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
                 VigIA Design System
               </h1>
-              <p className="text-lg text-gray-600 mt-1">
+              <p className="text-lg mt-1" style={{ color: '#7A8299' }}>
                 Style Guide & Component Library
               </p>
             </div>
           </div>
-          <p className="text-gray-600 max-w-3xl">
+          <p className="max-w-3xl" style={{ color: '#7A8299' }}>
             A comprehensive design system for medical professional applications. Built on Tailwind CSS with
             accessibility, consistency, and scalability as core principles.
           </p>
@@ -71,49 +71,45 @@ export default function StyleGuidePage() {
 
         {/* Tabs Navigation */}
         <Tabs defaultValue="colors" className="space-y-8">
-          <TabsList className="grid grid-cols-6 w-full h-auto p-1 bg-gray-100">
-            <TabsTrigger value="colors" className="gap-2">
+          <TabsList className="grid grid-cols-6 w-full h-auto p-1" style={{ backgroundColor: '#161B27' }}>
+            <TabsTrigger value="colors" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <Palette className="h-4 w-4" />
               Colors
             </TabsTrigger>
-            <TabsTrigger value="typography" className="gap-2">
+            <TabsTrigger value="typography" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <Type className="h-4 w-4" />
               Typography
             </TabsTrigger>
-            <TabsTrigger value="spacing" className="gap-2">
+            <TabsTrigger value="spacing" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <Layout className="h-4 w-4" />
               Spacing
             </TabsTrigger>
-            <TabsTrigger value="components" className="gap-2">
+            <TabsTrigger value="components" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <Sparkles className="h-4 w-4" />
               Components
             </TabsTrigger>
-            <TabsTrigger value="cards" className="gap-2">
+            <TabsTrigger value="cards" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <Layout className="h-4 w-4" />
               Cards
             </TabsTrigger>
-            <TabsTrigger value="badges" className="gap-2">
+            <TabsTrigger value="badges" className="gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-[#F0EAD6]" style={{ color: '#D8DEEB' }}>
               <CheckCircle2 className="h-4 w-4" />
               Badges
             </TabsTrigger>
           </TabsList>
 
-          {/* ============================================================================ */}
           {/* COLORS TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="colors" className="space-y-8">
-            {/* Primary Colors */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Primary Colors</CardTitle>
-                <CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Primary Colors</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>
                   VigIA Blue, Gold, and Purple - The foundation of our brand identity
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                {/* VigIA Blue */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Blue</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#D8DEEB' }}>VigIA Blue</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#E6EBF2' },
@@ -128,21 +124,20 @@ export default function StyleGuidePage() {
                     ].map((color) => (
                       <div key={color.name} className="space-y-2">
                         <div
-                          className="h-20 rounded-lg shadow-sm border border-gray-200"
-                          style={{ backgroundColor: color.value }}
+                          className="h-20 rounded-lg shadow-sm"
+                          style={{ backgroundColor: color.value, border: '1px solid #1E2535' }}
                         />
                         <div className="text-center">
-                          <div className="text-xs font-semibold text-gray-700">{color.name}</div>
-                          <div className="text-xs font-mono text-gray-500">{color.value}</div>
+                          <div className="text-xs font-semibold" style={{ color: '#D8DEEB' }}>{color.name}</div>
+                          <div className="text-xs font-mono" style={{ color: '#7A8299' }}>{color.value}</div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* VigIA Gold */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Gold</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#D8DEEB' }}>VigIA Gold</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#FBF8EF' },
@@ -157,21 +152,20 @@ export default function StyleGuidePage() {
                     ].map((color) => (
                       <div key={color.name} className="space-y-2">
                         <div
-                          className="h-20 rounded-lg shadow-sm border border-gray-200"
-                          style={{ backgroundColor: color.value }}
+                          className="h-20 rounded-lg shadow-sm"
+                          style={{ backgroundColor: color.value, border: '1px solid #1E2535' }}
                         />
                         <div className="text-center">
-                          <div className="text-xs font-semibold text-gray-700">{color.name}</div>
-                          <div className="text-xs font-mono text-gray-500">{color.value}</div>
+                          <div className="text-xs font-semibold" style={{ color: '#D8DEEB' }}>{color.name}</div>
+                          <div className="text-xs font-mono" style={{ color: '#7A8299' }}>{color.value}</div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* VigIA Purple */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">VigIA Purple (Research)</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#D8DEEB' }}>VigIA Purple (Research)</h3>
                   <div className="grid grid-cols-9 gap-2">
                     {[
                       { name: '50', value: '#F3EEFB' },
@@ -186,12 +180,12 @@ export default function StyleGuidePage() {
                     ].map((color) => (
                       <div key={color.name} className="space-y-2">
                         <div
-                          className="h-20 rounded-lg shadow-sm border border-gray-200"
-                          style={{ backgroundColor: color.value }}
+                          className="h-20 rounded-lg shadow-sm"
+                          style={{ backgroundColor: color.value, border: '1px solid #1E2535' }}
                         />
                         <div className="text-center">
-                          <div className="text-xs font-semibold text-gray-700">{color.name}</div>
-                          <div className="text-xs font-mono text-gray-500">{color.value}</div>
+                          <div className="text-xs font-semibold" style={{ color: '#D8DEEB' }}>{color.name}</div>
+                          <div className="text-xs font-mono" style={{ color: '#7A8299' }}>{color.value}</div>
                         </div>
                       </div>
                     ))}
@@ -200,13 +194,10 @@ export default function StyleGuidePage() {
               </CardContent>
             </Card>
 
-            {/* Semantic Colors */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Semantic Colors</CardTitle>
-                <CardDescription>
-                  Status indicators and feedback colors
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Semantic Colors</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Status indicators and feedback colors</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-4 gap-6">
@@ -219,15 +210,12 @@ export default function StyleGuidePage() {
                     <div key={color.name} className="space-y-2">
                       <div
                         className="h-24 rounded-lg shadow-sm border-2"
-                        style={{
-                          backgroundColor: color.value,
-                          borderColor: color.value,
-                        }}
+                        style={{ backgroundColor: color.value, borderColor: color.value }}
                       />
                       <div className="text-center">
-                        <div className="text-sm font-semibold text-gray-900">{color.name}</div>
-                        <div className="text-xs font-mono text-gray-600">{color.value}</div>
-                        <div className="text-xs text-gray-500 mt-1">Light: {color.bg}</div>
+                        <div className="text-sm font-semibold" style={{ color: '#F0EAD6' }}>{color.name}</div>
+                        <div className="text-xs font-mono" style={{ color: '#7A8299' }}>{color.value}</div>
+                        <div className="text-xs mt-1" style={{ color: '#7A8299' }}>Light: {color.bg}</div>
                       </div>
                     </div>
                   ))}
@@ -235,13 +223,10 @@ export default function StyleGuidePage() {
               </CardContent>
             </Card>
 
-            {/* Neutral Grays */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Neutral Grays</CardTitle>
-                <CardDescription>
-                  Text, borders, and backgrounds
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Neutral Grays</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Text, borders, and backgrounds</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-10 gap-2">
@@ -259,12 +244,12 @@ export default function StyleGuidePage() {
                   ].map((color) => (
                     <div key={color.name} className="space-y-2">
                       <div
-                        className="h-16 rounded-lg shadow-sm border border-gray-200"
-                        style={{ backgroundColor: color.value }}
+                        className="h-16 rounded-lg shadow-sm"
+                        style={{ backgroundColor: color.value, border: '1px solid #1E2535' }}
                       />
                       <div className="text-center">
-                        <div className="text-xs font-semibold text-gray-700">{color.name}</div>
-                        <div className="text-xs font-mono text-gray-500">{color.value}</div>
+                        <div className="text-xs font-semibold" style={{ color: '#D8DEEB' }}>{color.name}</div>
+                        <div className="text-xs font-mono" style={{ color: '#7A8299' }}>{color.value}</div>
                       </div>
                     </div>
                   ))}
@@ -273,16 +258,12 @@ export default function StyleGuidePage() {
             </Card>
           </TabsContent>
 
-          {/* ============================================================================ */}
           {/* TYPOGRAPHY TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="typography" className="space-y-8">
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Type Scale</CardTitle>
-                <CardDescription>
-                  Font sizes, weights, and line heights
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Type Scale</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Font sizes, weights, and line heights</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {[
@@ -295,13 +276,13 @@ export default function StyleGuidePage() {
                   { size: 'sm', value: '0.875rem', class: 'text-sm', example: 'Secondary Text' },
                   { size: 'xs', value: '0.75rem', class: 'text-xs', example: 'Caption & Labels' },
                 ].map((type) => (
-                  <div key={type.size} className="flex items-center justify-between border-b border-gray-200 pb-4 last:border-0">
+                  <div key={type.size} className="flex items-center justify-between pb-4 last:border-0" style={{ borderBottom: '1px solid #1E2535' }}>
                     <div className="flex items-center gap-4 flex-1">
                       <div className="w-20">
-                        <Badge variant="outline">{type.size}</Badge>
+                        <Badge variant="outline" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>{type.size}</Badge>
                       </div>
-                      <div className="text-sm text-gray-600 font-mono w-24">{type.value}</div>
-                      <div className={`${type.class} font-semibold text-gray-900`}>
+                      <div className="text-sm font-mono w-24" style={{ color: '#7A8299' }}>{type.value}</div>
+                      <div className={`${type.class} font-semibold`} style={{ color: '#F0EAD6' }}>
                         {type.example}
                       </div>
                     </div>
@@ -310,12 +291,10 @@ export default function StyleGuidePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Font Weights</CardTitle>
-                <CardDescription>
-                  Weight variations for emphasis and hierarchy
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Font Weights</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Weight variations for emphasis and hierarchy</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
@@ -325,13 +304,13 @@ export default function StyleGuidePage() {
                   { weight: 'Bold (700)', class: 'font-bold', usage: 'Strong emphasis, primary headings' },
                   { weight: 'Extrabold (800)', class: 'font-extrabold', usage: 'Hero text, impact' },
                 ].map((weight) => (
-                  <div key={weight.weight} className="flex items-center justify-between border-b border-gray-200 pb-3 last:border-0">
+                  <div key={weight.weight} className="flex items-center justify-between pb-3 last:border-0" style={{ borderBottom: '1px solid #1E2535' }}>
                     <div className="flex-1">
-                      <div className={`text-xl ${weight.class} text-gray-900 mb-1`}>
+                      <div className={`text-xl ${weight.class} mb-1`} style={{ color: '#F0EAD6' }}>
                         The quick brown fox jumps over the lazy dog
                       </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-semibold">{weight.weight}</span> - {weight.usage}
+                      <div className="text-sm" style={{ color: '#7A8299' }}>
+                        <span className="font-semibold" style={{ color: '#D8DEEB' }}>{weight.weight}</span> - {weight.usage}
                       </div>
                     </div>
                   </div>
@@ -340,16 +319,12 @@ export default function StyleGuidePage() {
             </Card>
           </TabsContent>
 
-          {/* ============================================================================ */}
           {/* SPACING TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="spacing" className="space-y-8">
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Spacing Scale</CardTitle>
-                <CardDescription>
-                  Based on 4px grid for consistent, predictable spacing
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Spacing Scale</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Based on 4px grid for consistent, predictable spacing</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -363,47 +338,45 @@ export default function StyleGuidePage() {
                     { token: 'space-12', value: '48px', usage: 'Major section dividers' },
                     { token: 'space-16', value: '64px', usage: 'Large section spacing' },
                   ].map((space) => (
-                    <div key={space.token} className="flex items-center gap-6 border-b border-gray-200 pb-4 last:border-0">
+                    <div key={space.token} className="flex items-center gap-6 pb-4 last:border-0" style={{ borderBottom: '1px solid #1E2535' }}>
                       <div className="w-32">
-                        <Badge variant="outline" className="font-mono">{space.token}</Badge>
+                        <Badge variant="outline" className="font-mono" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>{space.token}</Badge>
                       </div>
-                      <div className="w-16 text-sm text-gray-600">{space.value}</div>
+                      <div className="w-16 text-sm" style={{ color: '#7A8299' }}>{space.value}</div>
                       <div
-                        className="h-8 bg-telos-blue-500 rounded"
-                        style={{ width: space.value }}
+                        className="h-8 rounded"
+                        style={{ width: space.value, backgroundColor: '#0D7377' }}
                       />
-                      <div className="text-sm text-gray-600 flex-1">{space.usage}</div>
+                      <div className="text-sm flex-1" style={{ color: '#7A8299' }}>{space.usage}</div>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Shadows</CardTitle>
-                <CardDescription>
-                  Depth and elevation for cards and components
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Shadows</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Depth and elevation for cards and components</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-6">
                   {[
-                    { name: 'Small', shadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)', usage: 'Default cards' },
-                    { name: 'Medium', shadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', usage: 'Elevated elements' },
-                    { name: 'Large', shadow: '0 10px 20px -5px rgb(0 0 0 / 0.1)', usage: 'Modals, hover states' },
+                    { name: 'Small', shadow: '0 1px 3px 0 rgb(0 0 0 / 0.3)', usage: 'Default cards' },
+                    { name: 'Medium', shadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)', usage: 'Elevated elements' },
+                    { name: 'Large', shadow: '0 10px 20px -5px rgb(0 0 0 / 0.3)', usage: 'Modals, hover states' },
+                    { name: 'Teal Glow', shadow: '0 0 30px rgba(13, 115, 119, 0.5)', usage: 'Primary emphasis' },
                     { name: 'Gold Glow', shadow: '0 0 30px rgba(212, 175, 55, 0.5)', usage: 'Premium elements' },
-                    { name: 'Blue Glow', shadow: '0 0 30px rgba(10, 38, 71, 0.3)', usage: 'Primary emphasis' },
                     { name: 'Purple Glow', shadow: '0 0 30px rgba(124, 58, 237, 0.4)', usage: 'Research features' },
                   ].map((shadow) => (
                     <div key={shadow.name} className="space-y-3">
                       <div
-                        className="h-24 bg-white rounded-lg flex items-center justify-center"
-                        style={{ boxShadow: shadow.shadow }}
+                        className="h-24 rounded-lg flex items-center justify-center"
+                        style={{ boxShadow: shadow.shadow, backgroundColor: '#161B27' }}
                       >
-                        <span className="font-semibold text-gray-700">{shadow.name}</span>
+                        <span className="font-semibold" style={{ color: '#D8DEEB' }}>{shadow.name}</span>
                       </div>
-                      <div className="text-sm text-gray-600 text-center">{shadow.usage}</div>
+                      <div className="text-sm text-center" style={{ color: '#7A8299' }}>{shadow.usage}</div>
                     </div>
                   ))}
                 </div>
@@ -411,37 +384,32 @@ export default function StyleGuidePage() {
             </Card>
           </TabsContent>
 
-          {/* ============================================================================ */}
           {/* COMPONENTS TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="components" className="space-y-8">
-            {/* Buttons */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Buttons</CardTitle>
-                <CardDescription>
-                  Primary, secondary, and specialized button styles
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Buttons</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Primary, secondary, and specialized button styles</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
-                    <Button style={{ backgroundColor: COLORS.primary }}>Primary Button</Button>
-                    <Button variant="outline">Secondary Button</Button>
+                    <Button style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>Primary Button</Button>
+                    <Button variant="outline" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>Secondary Button</Button>
                     <Button style={{ backgroundColor: COLORS.accent, color: COLORS.primary }}>Gold CTA</Button>
                     <Button variant="destructive">Danger Button</Button>
-                    <Button variant="ghost">Ghost Button</Button>
+                    <Button variant="ghost" style={{ color: '#D8DEEB' }}>Ghost Button</Button>
                   </div>
-                  <Separator />
+                  <Separator style={{ backgroundColor: '#1E2535' }} />
                   <div className="flex items-center gap-4">
-                    <Button size="sm">Small</Button>
-                    <Button size="default">Default</Button>
-                    <Button size="lg">Large</Button>
+                    <Button size="sm" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>Small</Button>
+                    <Button size="default" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>Default</Button>
+                    <Button size="lg" style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>Large</Button>
                   </div>
-                  <Separator />
+                  <Separator style={{ backgroundColor: '#1E2535' }} />
                   <div className="flex items-center gap-4">
                     <Button disabled>Disabled Button</Button>
-                    <Button>
+                    <Button style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}>
                       <Users className="mr-2 h-4 w-4" />
                       With Icon
                     </Button>
@@ -450,61 +418,55 @@ export default function StyleGuidePage() {
               </CardContent>
             </Card>
 
-            {/* Forms */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Form Elements</CardTitle>
-                <CardDescription>
-                  Inputs, selects, and form controls
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Form Elements</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Inputs, selects, and form controls</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="input-default">Default Input</Label>
-                    <Input id="input-default" placeholder="Enter text..." />
+                    <Label htmlFor="input-default" style={{ color: '#D8DEEB' }}>Default Input</Label>
+                    <Input id="input-default" placeholder="Enter text..." style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="input-disabled">Disabled Input</Label>
-                    <Input id="input-disabled" placeholder="Disabled" disabled />
+                    <Label htmlFor="input-disabled" style={{ color: '#D8DEEB' }}>Disabled Input</Label>
+                    <Input id="input-disabled" placeholder="Disabled" disabled style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#7A8299' }} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="select-default">Select Dropdown</Label>
+                    <Label htmlFor="select-default" style={{ color: '#D8DEEB' }}>Select Dropdown</Label>
                     <Select>
-                      <SelectTrigger id="select-default">
+                      <SelectTrigger id="select-default" style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                         <SelectValue placeholder="Select option..." />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Option 1</SelectItem>
-                        <SelectItem value="2">Option 2</SelectItem>
-                        <SelectItem value="3">Option 3</SelectItem>
+                      <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                        <SelectItem value="1" style={{ color: '#D8DEEB' }}>Option 1</SelectItem>
+                        <SelectItem value="2" style={{ color: '#D8DEEB' }}>Option 2</SelectItem>
+                        <SelectItem value="3" style={{ color: '#D8DEEB' }}>Option 3</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="input-error">Input with Error</Label>
+                    <Label htmlFor="input-error" style={{ color: '#D8DEEB' }}>Input with Error</Label>
                     <Input
                       id="input-error"
                       placeholder="Invalid input"
                       className="border-red-500 focus:ring-red-500"
+                      style={{ backgroundColor: '#161B27', color: '#D8DEEB' }}
                     />
-                    <p className="text-xs text-red-500">This field is required</p>
+                    <p className="text-xs text-red-400">This field is required</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* ============================================================================ */}
           {/* CARDS TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="cards" className="space-y-8">
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Card Variants</CardTitle>
-                <CardDescription>
-                  Standardized card components for different use cases
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Card Variants</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Standardized card components for different use cases</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
@@ -551,106 +513,48 @@ export default function StyleGuidePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Specialized Cards</CardTitle>
-                <CardDescription>
-                  Purpose-built card components
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Specialized Cards</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Purpose-built card components</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-3 gap-6">
-                  <StatCard
-                    icon={<Users className="h-5 w-5" />}
-                    label="Total Patients"
-                    value="248"
-                    change={{ value: 12, trend: "up" }}
-                  />
-
-                  <StatCard
-                    icon={<Activity className="h-5 w-5" />}
-                    label="Active Cases"
-                    value="42"
-                    variant="success"
-                  />
-
-                  <StatCard
-                    icon={<AlertCircle className="h-5 w-5" />}
-                    label="Critical Alerts"
-                    value="3"
-                    variant="error"
-                  />
+                  <StatCard icon={<Users className="h-5 w-5" />} label="Total Patients" value="248" change={{ value: 12, trend: "up" }} />
+                  <StatCard icon={<Activity className="h-5 w-5" />} label="Active Cases" value="42" variant="success" />
+                  <StatCard icon={<AlertCircle className="h-5 w-5" />} label="Critical Alerts" value="3" variant="error" />
                 </div>
-
-                <Separator />
-
-                <PatientCard
-                  patientName="João da Silva"
-                  surgeryType="Hemorroidectomia"
-                  postOpDay={5}
-                  riskLevel="medium"
-                  status="active"
-                />
-
-                <Separator />
-
-                <FeatureCard
-                  icon={<FlaskConical className="h-8 w-8" />}
-                  title="Research Module"
-                  description="Advanced statistical analysis and data visualization for clinical research studies."
-                  highlighted
-                />
-
-                <Separator />
-
-                <EmptyStateCard
-                  icon={<Users className="h-12 w-12" />}
-                  title="No patients found"
-                  description="Start by adding your first patient to the system. You can track their post-operative recovery and manage follow-ups."
-                  action={{
-                    label: "Add Patient",
-                    onClick: () => alert("Add patient clicked")
-                  }}
-                />
+                <Separator style={{ backgroundColor: '#1E2535' }} />
+                <PatientCard patientName="João da Silva" surgeryType="Hemorroidectomia" postOpDay={5} riskLevel="medium" status="active" />
+                <Separator style={{ backgroundColor: '#1E2535' }} />
+                <FeatureCard icon={<FlaskConical className="h-8 w-8" />} title="Research Module" description="Advanced statistical analysis and data visualization for clinical research studies." highlighted />
+                <Separator style={{ backgroundColor: '#1E2535' }} />
+                <EmptyStateCard icon={<Users className="h-12 w-12" />} title="No patients found" description="Start by adding your first patient to the system." action={{ label: "Add Patient", onClick: () => alert("Add patient clicked") }} />
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* ============================================================================ */}
           {/* BADGES TAB */}
-          {/* ============================================================================ */}
           <TabsContent value="badges" className="space-y-8">
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle>Badge Variants</CardTitle>
-                <CardDescription>
-                  Semantic badges for status, risk, and categories
-                </CardDescription>
+                <CardTitle style={{ color: '#F0EAD6' }}>Badge Variants</CardTitle>
+                <CardDescription style={{ color: '#7A8299' }}>Semantic badges for status, risk, and categories</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
-                {/* Base Badges */}
                 <div>
-                  <h3 className="font-semibold mb-4">Base Variants</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Base Variants</h3>
                   <div className="flex flex-wrap gap-3">
                     <Badge>Default</Badge>
                     <Badge variant="default">Primary</Badge>
                     <Badge variant="secondary">Secondary</Badge>
-                    <Badge variant="secondary">Success</Badge>
-                    <Badge variant="outline">Warning</Badge>
-                    <Badge variant="destructive">Error</Badge>
-                    <Badge variant="outline">Info</Badge>
-                    <Badge variant="secondary">Gold</Badge>
-                    <Badge variant="secondary">Purple</Badge>
                     <Badge variant="outline">Outline</Badge>
-                    <Badge variant="outline">Outline Primary</Badge>
+                    <Badge variant="destructive">Error</Badge>
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Status Badges */}
+                <Separator style={{ backgroundColor: '#1E2535' }} />
                 <div>
-                  <h3 className="font-semibold mb-4">Status Badges</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Status Badges</h3>
                   <div className="flex flex-wrap gap-3">
                     <StatusBadge status="active" />
                     <StatusBadge status="inactive" />
@@ -659,12 +563,9 @@ export default function StyleGuidePage() {
                     <StatusBadge status="cancelled" />
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Risk Badges */}
+                <Separator style={{ backgroundColor: '#1E2535' }} />
                 <div>
-                  <h3 className="font-semibold mb-4">Risk Badges</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Risk Badges</h3>
                   <div className="flex flex-wrap gap-3">
                     <RiskBadge risk="low" />
                     <RiskBadge risk="medium" />
@@ -672,32 +573,23 @@ export default function StyleGuidePage() {
                     <RiskBadge risk="critical" />
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Research & Special Badges */}
+                <Separator style={{ backgroundColor: '#1E2535' }} />
                 <div>
-                  <h3 className="font-semibold mb-4">Research & Special</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Research & Special</h3>
                   <div className="flex flex-wrap gap-3">
                     <ResearchBadge groupCode="A" />
                     <ResearchBadge groupCode="B" />
                     <PostOpDayBadge day={3} />
                     <PostOpDayBadge day={15} />
-                    <PostOpDayBadge day={35} />
                     <NewBadge />
                     <CompletenessBadge percentage={100} />
                     <CompletenessBadge percentage={65} />
-                    <CompletenessBadge percentage={25} />
                     <CountBadge count={5} />
-                    <CountBadge count={42} />
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Surgery Type Badges */}
+                <Separator style={{ backgroundColor: '#1E2535' }} />
                 <div>
-                  <h3 className="font-semibold mb-4">Surgery Types</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Surgery Types</h3>
                   <div className="flex flex-wrap gap-3">
                     <SurgeryTypeBadge type="hemorroidectomia" />
                     <SurgeryTypeBadge type="fistula" />
@@ -705,28 +597,13 @@ export default function StyleGuidePage() {
                     <SurgeryTypeBadge type="pilonidal" />
                   </div>
                 </div>
-
-                <Separator />
-
-                {/* Trending Badges */}
+                <Separator style={{ backgroundColor: '#1E2535' }} />
                 <div>
-                  <h3 className="font-semibold mb-4">Trending</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#D8DEEB' }}>Trending</h3>
                   <div className="flex flex-wrap gap-3">
                     <TrendingBadge trend="up" value={15} />
                     <TrendingBadge trend="down" value={8} />
                     <TrendingBadge trend="neutral" />
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Badge Sizes */}
-                <div>
-                  <h3 className="font-semibold mb-4">Sizes</h3>
-                  <div className="flex items-center flex-wrap gap-3">
-                    <Badge variant="default" className="text-[10px] px-1.5 py-0">Small</Badge>
-                    <Badge variant="default">Medium</Badge>
-                    <Badge variant="default" className="text-sm px-3 py-1">Large</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -735,15 +612,15 @@ export default function StyleGuidePage() {
         </Tabs>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
+        <div className="mt-16 pt-8" style={{ borderTop: '1px solid #1E2535' }}>
           <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: '#7A8299' }}>
               VigIA Design System v1.0.0 &quot; Last Updated: November 11, 2025
             </p>
             <div className="flex justify-center gap-6 text-sm">
-              <a href="/dashboard" className="text-telos-blue-500 hover:underline">Dashboard</a>
-              <a href="/DESIGN_SYSTEM.md" className="text-telos-blue-500 hover:underline">Full Documentation</a>
-              <a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" className="text-telos-blue-500 hover:underline">Tailwind Docs</a>
+              <a href="/dashboard" style={{ color: '#14BDAE' }} className="hover:underline">Dashboard</a>
+              <a href="/DESIGN_SYSTEM.md" style={{ color: '#14BDAE' }} className="hover:underline">Full Documentation</a>
+              <a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" style={{ color: '#14BDAE' }} className="hover:underline">Tailwind Docs</a>
             </div>
           </div>
         </div>

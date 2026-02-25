@@ -14,29 +14,29 @@ interface MetricCardProps {
 
 export function MetricCard({ title, value, icon: Icon, description, trend }: MetricCardProps) {
   return (
-    <Card className="border-0 bg-white/70 backdrop-blur-md shadow-lg shadow-blue-900/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ring-1 ring-gray-100">
-      <CardHeader className="pb-3 border-b border-gray-100/50">
+    <Card className="border-0 backdrop-blur-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+      <CardHeader className="pb-3" style={{ borderBottom: '1px solid #1E2535' }}>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+          <CardTitle className="text-sm font-bold uppercase tracking-wider" style={{ color: '#7A8299' }}>
             {title}
           </CardTitle>
-          <div className="p-2 rounded-lg bg-blue-50 text-[#0A2647]">
+          <div className="p-2 rounded-lg" style={{ backgroundColor: '#1E2535', color: '#14BDAE' }}>
             <Icon className="h-5 w-5" />
           </div>
         </div>
       </CardHeader>
       <CardContent className="pt-4">
-        <div className="text-3xl font-bold text-[#0A2647] mb-2 font-mono tracking-tight">
+        <div className="text-3xl font-bold mb-2 font-mono tracking-tight" style={{ color: '#F0EAD6' }}>
           {value}
         </div>
         {description && (
-          <p className="text-xs text-gray-500 font-medium">{description}</p>
+          <p className="text-xs font-medium" style={{ color: '#7A8299' }}>{description}</p>
         )}
         {trend && (
-          <div className={`text-xs font-bold mt-2 flex items-center gap-1 ${trend.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <div className={`text-xs font-bold mt-2 flex items-center gap-1 ${trend.isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
             <span>{trend.isPositive ? '↑' : '↓'}</span>
             <span>{Math.abs(trend.value)}%</span>
-            <span className="text-gray-400 font-normal ml-1">vs mês anterior</span>
+            <span className="font-normal ml-1" style={{ color: '#7A8299' }}>vs mês anterior</span>
           </div>
         )}
       </CardContent>

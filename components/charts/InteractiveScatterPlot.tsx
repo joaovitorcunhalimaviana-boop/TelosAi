@@ -166,7 +166,7 @@ export function InteractiveScatterPlot({
               >
                 p = {regressionLine.pValue < 0.001 ? '<0.001' : regressionLine.pValue.toFixed(3)}
               </Badge>
-              <span className="text-gray-600">
+              <span style={{ color: '#7A8299' }}>
                 y = {regressionLine.slope.toFixed(3)}x +{' '}
                 {regressionLine.intercept.toFixed(2)}
               </span>
@@ -204,7 +204,7 @@ export function InteractiveScatterPlot({
 
       {/* Legend for groups */}
       {settings.showLegend && groupBy && Object.keys(groupedData).length > 1 && (
-        <div className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: '#0B0E14' }}>
           {Object.keys(groupedData).map((groupKey, index) => {
             const color = colors[index % colors.length];
             const isHovered = hoveredGroup === groupKey;
@@ -214,7 +214,7 @@ export function InteractiveScatterPlot({
                 key={groupKey}
                 onMouseEnter={() => setHoveredGroup(groupKey)}
                 onMouseLeave={() => setHoveredGroup(null)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:bg-white ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all hover:opacity-80 ${
                   isHovered || hoveredGroup === null ? 'opacity-100' : 'opacity-40'
                 }`}
               >
@@ -222,7 +222,7 @@ export function InteractiveScatterPlot({
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-sm font-medium">{groupKey}</span>
+                <span className="text-sm font-medium" style={{ color: '#D8DEEB' }}>{groupKey}</span>
                 <Badge variant="secondary" className="text-xs">
                   n={groupedData[groupKey].length}
                 </Badge>
@@ -236,31 +236,33 @@ export function InteractiveScatterPlot({
       <ResponsiveContainer width="100%" height={height}>
         <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           {settings.showGridLines && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
           )}
 
           <XAxis
             type="number"
             dataKey="x"
             name={xAxisKey}
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               xAxisLabel
-                ? { value: xAxisLabel, position: 'insideBottom', offset: -10 }
+                ? { value: xAxisLabel, position: 'insideBottom', offset: -10, fill: '#7A8299' }
                 : undefined
             }
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <YAxis
             type="number"
             dataKey="y"
             name={yAxisKey}
+            stroke="#1E2535"
+            tick={{ fill: '#7A8299', fontSize: settings.fontSize }}
             label={
               yAxisLabel
-                ? { value: yAxisLabel, angle: -90, position: 'insideLeft' }
+                ? { value: yAxisLabel, angle: -90, position: 'insideLeft', fill: '#7A8299' }
                 : undefined
             }
-            tick={{ fontSize: settings.fontSize }}
           />
 
           <ZAxis range={[50, 200]} />
@@ -355,7 +357,7 @@ export function InteractiveScatterPlot({
       </ResponsiveContainer>
 
       {/* Hint */}
-      <div className="text-xs text-center text-gray-500">
+      <div className="text-xs text-center" style={{ color: '#7A8299' }}>
         Clique nos pontos para ver detalhes do paciente
       </div>
 
@@ -376,26 +378,26 @@ export function InteractiveScatterPlot({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="p-3 border rounded-lg">
-                  <div className="text-gray-600 mb-1">{xAxisLabel || xAxisKey}</div>
+                  <div style={{ color: '#7A8299' }} className="mb-1">{xAxisLabel || xAxisKey}</div>
                   <div className="text-2xl font-bold">{selectedPoint[xAxisKey]}</div>
                 </div>
 
                 <div className="p-3 border rounded-lg">
-                  <div className="text-gray-600 mb-1">{yAxisLabel || yAxisKey}</div>
+                  <div style={{ color: '#7A8299' }} className="mb-1">{yAxisLabel || yAxisKey}</div>
                   <div className="text-2xl font-bold">{selectedPoint[yAxisKey]}</div>
                 </div>
 
                 {selectedPoint.predicted !== undefined && (
                   <>
                     <div className="p-3 border rounded-lg bg-blue-50">
-                      <div className="text-gray-600 mb-1">Valor Predito</div>
+                      <div style={{ color: '#7A8299' }} className="mb-1">Valor Predito</div>
                       <div className="text-2xl font-bold text-blue-700">
                         {selectedPoint.predicted.toFixed(2)}
                       </div>
                     </div>
 
                     <div className="p-3 border rounded-lg">
-                      <div className="text-gray-600 mb-1">Resíduo</div>
+                      <div style={{ color: '#7A8299' }} className="mb-1">Resíduo</div>
                       <div
                         className={`text-2xl font-bold ${
                           Math.abs(selectedPoint[yAxisKey] - selectedPoint.predicted) > 2
@@ -411,7 +413,7 @@ export function InteractiveScatterPlot({
 
                 {selectedPoint.cooksDistance !== undefined && (
                   <div className="col-span-2 p-3 border rounded-lg">
-                    <div className="text-gray-600 mb-1">Cook's Distance</div>
+                    <div style={{ color: '#7A8299' }} className="mb-1">Cook's Distance</div>
                     <div className="flex items-center justify-between">
                       <div className="text-2xl font-bold">
                         {selectedPoint.cooksDistance.toFixed(4)}
@@ -425,7 +427,7 @@ export function InteractiveScatterPlot({
 
                 {selectedPoint.group && (
                   <div className="col-span-2 p-3 border rounded-lg bg-gray-50">
-                    <div className="text-gray-600 mb-1">Grupo</div>
+                    <div style={{ color: '#7A8299' }} className="mb-1">Grupo</div>
                     <Badge variant="secondary">{selectedPoint.group}</Badge>
                   </div>
                 )}
@@ -448,7 +450,7 @@ export function InteractiveScatterPlot({
                       )
                       .map(([key, value]) => (
                         <div key={key} className="flex justify-between">
-                          <span className="text-gray-600">{key}:</span>
+                          <span style={{ color: '#7A8299' }}>{key}:</span>
                           <span className="font-medium">{String(value)}</span>
                         </div>
                       ))}

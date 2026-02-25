@@ -220,34 +220,34 @@ export default function ExportReportModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="outline" size="lg">
+          <Button variant="outline" size="lg" style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}>
             <Download className="mr-2 h-5 w-5" />
             Exportar Relatório
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
         <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-2">
-            <FileText className="h-6 w-6" />
+          <DialogTitle className="text-2xl flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+            <FileText className="h-6 w-6" style={{ color: '#14BDAE' }} />
             Exportar Relatório de Pesquisa
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription style={{ color: '#7A8299' }}>
             Configure o formato e conteúdo do relatório para exportação profissional
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="mt-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="format" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3" style={{ backgroundColor: '#161B27' }}>
+            <TabsTrigger value="format" className="flex items-center gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-white" style={{ color: '#D8DEEB' }}>
               <File className="h-4 w-4" />
               Formato
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
+            <TabsTrigger value="content" className="flex items-center gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-white" style={{ color: '#D8DEEB' }}>
               <Settings className="h-4 w-4" />
               Conteúdo
             </TabsTrigger>
-            <TabsTrigger value="style" className="flex items-center gap-2">
+            <TabsTrigger value="style" className="flex items-center gap-2 data-[state=active]:bg-[#0D7377] data-[state=active]:text-white" style={{ color: '#D8DEEB' }}>
               <FileSpreadsheet className="h-4 w-4" />
               Estilo
             </TabsTrigger>
@@ -257,18 +257,18 @@ export default function ExportReportModal({
           <TabsContent value="format" className="space-y-6">
             {/* Export Format */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Formato de Exportação</Label>
+              <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Formato de Exportação</Label>
               <RadioGroup
                 value={config.format}
                 onValueChange={(value) => setConfig({ ...config, format: value as 'docx' | 'pdf' })}
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div
-                    className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                      config.format === 'docx'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                    style={{
+                      borderColor: config.format === 'docx' ? '#0D7377' : '#1E2535',
+                      backgroundColor: config.format === 'docx' ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                    }}
                     onClick={() => setConfig({ ...config, format: 'docx' })}
                   >
                     <RadioGroupItem value="docx" id="format-docx" />
@@ -276,25 +276,26 @@ export default function ExportReportModal({
                       <Label
                         htmlFor="format-docx"
                         className="cursor-pointer font-semibold flex items-center gap-2"
+                        style={{ color: '#F0EAD6' }}
                       >
                         <FileText className="h-4 w-4" />
                         Word (.docx)
                       </Label>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                         Documento editável com formatação APA. Ideal para manuscritos científicos.
                       </p>
-                      <Badge variant="outline" className="mt-2">
+                      <Badge variant="outline" className="mt-2" style={{ borderColor: '#2A3147', color: '#14BDAE' }}>
                         Recomendado para publicações
                       </Badge>
                     </div>
                   </div>
 
                   <div
-                    className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                      config.format === 'pdf'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                    style={{
+                      borderColor: config.format === 'pdf' ? '#0D7377' : '#1E2535',
+                      backgroundColor: config.format === 'pdf' ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                    }}
                     onClick={() => setConfig({ ...config, format: 'pdf' })}
                   >
                     <RadioGroupItem value="pdf" id="format-pdf" />
@@ -302,14 +303,15 @@ export default function ExportReportModal({
                       <Label
                         htmlFor="format-pdf"
                         className="cursor-pointer font-semibold flex items-center gap-2"
+                        style={{ color: '#F0EAD6' }}
                       >
                         <File className="h-4 w-4" />
                         PDF
                       </Label>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                         Documento fixo com layout profissional. Ideal para compartilhamento.
                       </p>
-                      <Badge variant="outline" className="mt-2">
+                      <Badge variant="outline" className="mt-2" style={{ borderColor: '#2A3147', color: '#14BDAE' }}>
                         Pronto para impressão
                       </Badge>
                     </div>
@@ -318,21 +320,21 @@ export default function ExportReportModal({
               </RadioGroup>
             </div>
 
-            <Separator />
+            <Separator style={{ backgroundColor: '#1E2535' }} />
 
             {/* Template Selection */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Tipo de Relatório</Label>
+              <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Tipo de Relatório</Label>
               <Select value={config.template} onValueChange={(value) => setConfig({ ...config, template: value })}>
-                <SelectTrigger>
+                <SelectTrigger style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                   {templates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
                       <div className="flex flex-col items-start">
                         <span className="font-medium">{template.name}</span>
-                        <span className="text-xs text-gray-500">{template.description}</span>
+                        <span className="text-xs" style={{ color: '#7A8299' }}>{template.description}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -340,19 +342,19 @@ export default function ExportReportModal({
               </Select>
 
               {selectedTemplate && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">{selectedTemplate.name}</h4>
-                  <p className="text-sm text-blue-800 mb-3">{selectedTemplate.description}</p>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(13, 115, 119, 0.08)', border: '1px solid rgba(13, 115, 119, 0.2)' }}>
+                  <h4 className="font-semibold mb-2" style={{ color: '#14BDAE' }}>{selectedTemplate.name}</h4>
+                  <p className="text-sm mb-3" style={{ color: '#D8DEEB' }}>{selectedTemplate.description}</p>
                   <div className="space-y-1">
-                    <p className="text-xs font-semibold text-blue-900">Seções incluídas:</p>
+                    <p className="text-xs font-semibold" style={{ color: '#14BDAE' }}>Seções incluídas:</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedTemplate.sections.slice(0, 5).map((section) => (
-                        <Badge key={section.id} variant="secondary" className="text-xs">
+                        <Badge key={section.id} variant="secondary" className="text-xs" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>
                           {section.title}
                         </Badge>
                       ))}
                       {selectedTemplate.sections.length > 5 && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>
                           +{selectedTemplate.sections.length - 5} mais
                         </Badge>
                       )}
@@ -366,12 +368,12 @@ export default function ExportReportModal({
           {/* CONTENT TAB */}
           <TabsContent value="content" className="space-y-6">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">Selecionar Seções</Label>
+              <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Selecionar Seções</Label>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={selectAllSections}>
+                <Button variant="outline" size="sm" onClick={selectAllSections} style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}>
                   Selecionar Todas
                 </Button>
-                <Button variant="outline" size="sm" onClick={deselectAllSections}>
+                <Button variant="outline" size="sm" onClick={deselectAllSections} style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}>
                   Limpar
                 </Button>
               </div>
@@ -380,9 +382,11 @@ export default function ExportReportModal({
             <div className="grid grid-cols-2 gap-4">
               {/* ANOVA Results */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.anova ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.anova ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.anova ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('anova', !config.sections.anova)}
               >
                 <Checkbox
@@ -391,10 +395,10 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('anova', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-anova" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-anova" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Resultados ANOVA
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Análise de variância entre grupos, testes post-hoc e tamanhos de efeito
                   </p>
                 </div>
@@ -402,9 +406,11 @@ export default function ExportReportModal({
 
               {/* Chi-Square Analysis */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.chiSquare ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.chiSquare ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.chiSquare ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('chiSquare', !config.sections.chiSquare)}
               >
                 <Checkbox
@@ -413,10 +419,10 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('chiSquare', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-chisquare" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-chisquare" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Análise Qui-Quadrado
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Testes de associação para variáveis categóricas
                   </p>
                 </div>
@@ -424,9 +430,11 @@ export default function ExportReportModal({
 
               {/* Regression Models */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.regression ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.regression ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.regression ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('regression', !config.sections.regression)}
               >
                 <Checkbox
@@ -435,10 +443,10 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('regression', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-regression" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-regression" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Modelos de Regressão
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Análises preditivas e relações entre variáveis
                   </p>
                 </div>
@@ -446,9 +454,11 @@ export default function ExportReportModal({
 
               {/* Survival Analysis */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.survival ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.survival ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.survival ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('survival', !config.sections.survival)}
               >
                 <Checkbox
@@ -457,10 +467,10 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('survival', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-survival" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-survival" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Análise de Sobrevivência
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Curvas Kaplan-Meier e modelos de Cox
                   </p>
                 </div>
@@ -468,9 +478,11 @@ export default function ExportReportModal({
 
               {/* Demographics */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.demographics ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.demographics ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.demographics ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('demographics', !config.sections.demographics)}
               >
                 <Checkbox
@@ -479,10 +491,10 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('demographics', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-demographics" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-demographics" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Demografia dos Pacientes
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Características basais e distribuição por grupo
                   </p>
                 </div>
@@ -490,9 +502,11 @@ export default function ExportReportModal({
 
               {/* Raw Data Tables */}
               <div
-                className={`flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all ${
-                  config.sections.rawData ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                }`}
+                className="flex items-start space-x-3 rounded-lg border-2 p-4 cursor-pointer transition-all"
+                style={{
+                  borderColor: config.sections.rawData ? '#0D7377' : '#1E2535',
+                  backgroundColor: config.sections.rawData ? 'rgba(13, 115, 119, 0.08)' : '#161B27',
+                }}
                 onClick={() => updateSection('rawData', !config.sections.rawData)}
               >
                 <Checkbox
@@ -501,18 +515,18 @@ export default function ExportReportModal({
                   onCheckedChange={(checked) => updateSection('rawData', checked as boolean)}
                 />
                 <div className="flex-1">
-                  <Label htmlFor="section-rawdata" className="cursor-pointer font-semibold">
+                  <Label htmlFor="section-rawdata" className="cursor-pointer font-semibold" style={{ color: '#F0EAD6' }}>
                     Tabelas de Dados Brutos
                   </Label>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm mt-1" style={{ color: '#7A8299' }}>
                     Dados individuais para apêndices (pode aumentar tamanho do arquivo)
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-700">
+            <div className="p-3 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+              <p className="text-sm" style={{ color: '#D8DEEB' }}>
                 <strong>{getSelectedSectionsCount()}</strong> de 6 seções selecionadas
               </p>
             </div>
@@ -522,24 +536,24 @@ export default function ExportReportModal({
           <TabsContent value="style" className="space-y-6">
             {/* Citation Style */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Estilo de Citação</Label>
+              <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Estilo de Citação</Label>
               <RadioGroup value={config.style} onValueChange={(value) => setConfig({ ...config, style: value as any })}>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="apa" id="style-apa" />
-                    <Label htmlFor="style-apa" className="cursor-pointer">
-                      APA 7ª Edição (American Psychological Association)
+                    <Label htmlFor="style-apa" className="cursor-pointer" style={{ color: '#D8DEEB' }}>
+                      APA 7a Edição (American Psychological Association)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="vancouver" id="style-vancouver" />
-                    <Label htmlFor="style-vancouver" className="cursor-pointer">
+                    <Label htmlFor="style-vancouver" className="cursor-pointer" style={{ color: '#D8DEEB' }}>
                       Vancouver (International Committee of Medical Journal Editors)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="custom" id="style-custom" />
-                    <Label htmlFor="style-custom" className="cursor-pointer">
+                    <Label htmlFor="style-custom" className="cursor-pointer" style={{ color: '#D8DEEB' }}>
                       Personalizado
                     </Label>
                   </div>
@@ -547,12 +561,12 @@ export default function ExportReportModal({
               </RadioGroup>
             </div>
 
-            <Separator />
+            <Separator style={{ backgroundColor: '#1E2535' }} />
 
             {/* Charts */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Gráficos e Figuras</Label>
+                <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Gráficos e Figuras</Label>
                 <Checkbox
                   id="include-charts"
                   checked={config.includeCharts}
@@ -561,27 +575,27 @@ export default function ExportReportModal({
               </div>
 
               {config.includeCharts && (
-                <div className="space-y-2 pl-4 border-l-2 border-blue-500">
-                  <Label className="text-sm">Resolução dos Gráficos</Label>
+                <div className="space-y-2 pl-4" style={{ borderLeft: '2px solid #0D7377' }}>
+                  <Label className="text-sm" style={{ color: '#D8DEEB' }}>Resolução dos Gráficos</Label>
                   <RadioGroup
                     value={config.chartResolution}
                     onValueChange={(value) => setConfig({ ...config, chartResolution: value as any })}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="standard" id="res-standard" />
-                      <Label htmlFor="res-standard" className="cursor-pointer text-sm">
+                      <Label htmlFor="res-standard" className="cursor-pointer text-sm" style={{ color: '#D8DEEB' }}>
                         Padrão (72 DPI) - Arquivos menores
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="high" id="res-high" />
-                      <Label htmlFor="res-high" className="cursor-pointer text-sm">
+                      <Label htmlFor="res-high" className="cursor-pointer text-sm" style={{ color: '#D8DEEB' }}>
                         Alta (150 DPI) - Melhor qualidade
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="print" id="res-print" />
-                      <Label htmlFor="res-print" className="cursor-pointer text-sm">
+                      <Label htmlFor="res-print" className="cursor-pointer text-sm" style={{ color: '#D8DEEB' }}>
                         Impressão (300 DPI) - Qualidade máxima
                       </Label>
                     </div>
@@ -590,14 +604,14 @@ export default function ExportReportModal({
               )}
             </div>
 
-            <Separator />
+            <Separator style={{ backgroundColor: '#1E2535' }} />
 
             {/* Privacy */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label className="text-base font-semibold">Anonimização de Dados</Label>
-                  <p className="text-sm text-gray-600">
+                  <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Anonimização de Dados</Label>
+                  <p className="text-sm" style={{ color: '#7A8299' }}>
                     Remover nomes e informações identificáveis dos pacientes
                   </p>
                 </div>
@@ -609,21 +623,21 @@ export default function ExportReportModal({
               </div>
             </div>
 
-            <Separator />
+            <Separator style={{ backgroundColor: '#1E2535' }} />
 
             {/* Language */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Idioma</Label>
+              <Label className="text-base font-semibold" style={{ color: '#F0EAD6' }}>Idioma</Label>
               <RadioGroup value={config.language} onValueChange={(value) => setConfig({ ...config, language: value as any })}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="pt" id="lang-pt" />
-                  <Label htmlFor="lang-pt" className="cursor-pointer">
+                  <Label htmlFor="lang-pt" className="cursor-pointer" style={{ color: '#D8DEEB' }}>
                     Português (Brasil)
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="en" id="lang-en" />
-                  <Label htmlFor="lang-en" className="cursor-pointer">
+                  <Label htmlFor="lang-en" className="cursor-pointer" style={{ color: '#D8DEEB' }}>
                     English (US)
                   </Label>
                 </div>
@@ -634,13 +648,13 @@ export default function ExportReportModal({
 
         {/* Export Progress */}
         {isExporting && (
-          <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="space-y-3 p-4 rounded-lg" style={{ backgroundColor: 'rgba(13, 115, 119, 0.08)', border: '1px solid rgba(13, 115, 119, 0.2)' }}>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-blue-900">Gerando relatório...</span>
-              <span className="text-sm font-semibold text-blue-700">{exportProgress}%</span>
+              <span className="text-sm font-medium" style={{ color: '#14BDAE' }}>Gerando relatório...</span>
+              <span className="text-sm font-semibold" style={{ color: '#14BDAE' }}>{exportProgress}%</span>
             </div>
             <Progress value={exportProgress} className="h-2" />
-            <p className="text-xs text-blue-700">
+            <p className="text-xs" style={{ color: '#7A8299' }}>
               {exportProgress < 30 && 'Coletando dados da pesquisa...'}
               {exportProgress >= 30 && exportProgress < 60 && 'Gerando tabelas estatísticas...'}
               {exportProgress >= 60 && exportProgress < 90 && 'Renderizando gráficos...'}
@@ -650,20 +664,30 @@ export default function ExportReportModal({
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center pt-4 border-t">
-          <Button variant="outline" onClick={handlePreview} disabled={isExporting}>
+        <div className="flex justify-between items-center pt-4" style={{ borderTop: '1px solid #1E2535' }}>
+          <Button
+            variant="outline"
+            onClick={handlePreview}
+            disabled={isExporting}
+            style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}
+          >
             <Eye className="mr-2 h-4 w-4" />
             Visualizar Preview
           </Button>
 
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={isExporting}>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isExporting}
+              style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#D8DEEB' }}
+            >
               Cancelar
             </Button>
             <Button
               onClick={handleExport}
               disabled={isExporting || getSelectedSectionsCount() === 0}
-              style={{ backgroundColor: '#0A2647', color: 'white' }}
+              style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
             >
               {isExporting ? (
                 <>
@@ -681,7 +705,7 @@ export default function ExportReportModal({
         </div>
 
         {/* File Size Estimate */}
-        <div className="text-xs text-gray-500 text-center">
+        <div className="text-xs text-center" style={{ color: '#7A8299' }}>
           Tamanho estimado do arquivo:{' '}
           {config.includeCharts && config.chartResolution === 'print'
             ? '5-15 MB'

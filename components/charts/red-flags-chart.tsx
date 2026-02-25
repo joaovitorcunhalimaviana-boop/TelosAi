@@ -72,8 +72,8 @@ export function RedFlagsChart({ data }: RedFlagsChartProps) {
       const percentage = total > 0 ? ((data.count / total) * 100).toFixed(1) : '0.0';
 
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="font-semibold mb-2">{data.category}</p>
+        <div className="p-3 shadow-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }}>
+          <p className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>{data.category}</p>
           <p className="text-sm">
             <span className="font-semibold">{data.count}</span> ocorrências
           </p>
@@ -93,13 +93,13 @@ export function RedFlagsChart({ data }: RedFlagsChartProps) {
   };
 
   return (
-    <Card className="border-2 hover:shadow-lg transition-shadow">
+    <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2" style={{ color: '#F0EAD6' }}>
           <span className="text-2xl">🚨</span>
           Red Flags Detectados
         </CardTitle>
-        <CardDescription>
+        <CardDescription style={{ color: '#7A8299' }}>
           Frequência de alertas críticos identificados pela IA nos follow-ups
         </CardDescription>
       </CardHeader>
@@ -155,19 +155,21 @@ export function RedFlagsChart({ data }: RedFlagsChartProps) {
                 data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
                 <XAxis
                   dataKey="category"
-                  stroke="#6b7280"
+                  stroke="#1E2535"
+                  tick={{ fill: '#7A8299' }}
                   style={{ fontSize: '14px', fontWeight: 600 }}
                   angle={-15}
                   textAnchor="end"
                   height={80}
                 />
                 <YAxis
-                  stroke="#6b7280"
+                  stroke="#1E2535"
+                  tick={{ fill: '#7A8299' }}
                   style={{ fontSize: '14px', fontWeight: 600 }}
-                  label={{ value: 'Número de Ocorrências', angle: -90, position: 'insideLeft' }}
+                  label={{ value: 'Número de Ocorrências', angle: -90, position: 'insideLeft', fill: '#7A8299' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="count" radius={[8, 8, 0, 0]}>
@@ -179,9 +181,9 @@ export function RedFlagsChart({ data }: RedFlagsChartProps) {
             </ResponsiveContainer>
 
             {/* Resumo e Insights */}
-            <div className="mt-6 pt-4 border-t space-y-3">
+            <div className="mt-6 pt-4 space-y-3" style={{ borderTopColor: '#1E2535', borderTopWidth: '1px', borderTopStyle: 'solid' }}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-semibold" style={{ color: '#D8DEEB' }}>
                   Total de Red Flags
                 </span>
                 <Badge variant="destructive" className="text-lg px-3 py-1">
@@ -231,8 +233,8 @@ export function RedFlagsChart({ data }: RedFlagsChartProps) {
           </div>
         )}
 
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-4 pt-4" style={{ borderTopColor: '#1E2535', borderTopWidth: '1px', borderTopStyle: 'solid' }}>
+          <p className="text-sm" style={{ color: '#7A8299' }}>
             <strong>Nota:</strong> Red flags são identificados automaticamente pela IA ao analisar
             as respostas dos pacientes nos follow-ups. Alertas críticos requerem atenção imediata.
           </p>

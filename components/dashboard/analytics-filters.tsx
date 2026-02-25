@@ -68,20 +68,20 @@ export function AnalyticsFilters({
   const isFiltered = localFilters.dateRange !== '30' || localFilters.surgeryType !== 'all';
 
   return (
-    <Card className="border-2 shadow-sm mb-6">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+    <Card className="border-2 shadow-sm mb-6" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+      <CardHeader style={{ background: 'linear-gradient(to right, rgba(13, 115, 119, 0.1), rgba(13, 115, 119, 0.05))' }}>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2" style={{ color: '#0A2647' }}>
+            <CardTitle className="flex items-center gap-2" style={{ color: '#14BDAE' }}>
               <Filter className="h-5 w-5" />
               Filtros de Analytics
             </CardTitle>
-            <CardDescription className="mt-1">
+            <CardDescription className="mt-1" style={{ color: '#7A8299' }}>
               Personalize o período e tipo de cirurgia para análise dos dados
             </CardDescription>
           </div>
           {isFiltered && (
-            <Badge variant="secondary" className="text-sm">
+            <Badge variant="secondary" className="text-sm" style={{ backgroundColor: '#2A3147', color: '#14BDAE' }}>
               Filtros ativos
             </Badge>
           )}
@@ -91,7 +91,7 @@ export function AnalyticsFilters({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
           {/* Período */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <Label className="text-sm font-semibold flex items-center gap-2" style={{ color: '#D8DEEB' }}>
               <Calendar className="h-4 w-4" />
               Período de Análise
             </Label>
@@ -100,10 +100,10 @@ export function AnalyticsFilters({
               onValueChange={handleDateRangeChange}
               disabled={isLoading}
             >
-              <SelectTrigger className="w-full h-11 border-2">
+              <SelectTrigger className="w-full h-11 border-2" style={{ backgroundColor: '#0B0E14', borderColor: '#2A3147', color: '#F0EAD6' }}>
                 <SelectValue placeholder="Selecione o período" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                 {DATE_RANGE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -111,14 +111,14 @@ export function AnalyticsFilters({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs" style={{ color: '#7A8299' }}>
               Dados dos últimos {localFilters.dateRange} dias
             </p>
           </div>
 
           {/* Tipo de Cirurgia */}
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+            <Label className="text-sm font-semibold flex items-center gap-2" style={{ color: '#D8DEEB' }}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4"
@@ -141,10 +141,10 @@ export function AnalyticsFilters({
               onValueChange={handleSurgeryTypeChange}
               disabled={isLoading}
             >
-              <SelectTrigger className="w-full h-11 border-2">
+              <SelectTrigger className="w-full h-11 border-2" style={{ backgroundColor: '#0B0E14', borderColor: '#2A3147', color: '#F0EAD6' }}>
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                 {SURGERY_TYPE_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -152,7 +152,7 @@ export function AnalyticsFilters({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs" style={{ color: '#7A8299' }}>
               {localFilters.surgeryType === 'all' ? 'Todos os procedimentos' : SURGERY_TYPE_OPTIONS.find(o => o.value === localFilters.surgeryType)?.label}
             </p>
           </div>
@@ -163,7 +163,7 @@ export function AnalyticsFilters({
               onClick={onApply}
               disabled={isLoading}
               className="flex-1 h-11 font-semibold"
-              style={{ backgroundColor: '#0A2647', color: 'white' }}
+              style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
             >
               {isLoading ? (
                 <>
@@ -183,6 +183,7 @@ export function AnalyticsFilters({
                 variant="outline"
                 disabled={isLoading}
                 className="h-11"
+                style={{ borderColor: '#2A3147', color: '#D8DEEB' }}
                 title="Resetar para padrão (30 dias, todos os tipos)"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -193,9 +194,9 @@ export function AnalyticsFilters({
 
         {/* Resumo dos filtros aplicados */}
         {isFiltered && (
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-4 pt-4" style={{ borderTop: '1px solid #1E2535' }}>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Filtros aplicados:</span>
+              <span className="text-sm" style={{ color: '#7A8299' }}>Filtros aplicados:</span>
               {localFilters.dateRange !== '30' && (
                 <Badge variant="outline" className="gap-1">
                   <Calendar className="h-3 w-3" />

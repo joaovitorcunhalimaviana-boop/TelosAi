@@ -268,10 +268,10 @@ export default function EditPatientPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando dados do paciente...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#14BDAE] mx-auto mb-4"></div>
+          <p style={{ color: '#D8DEEB' }}>Carregando dados do paciente...</p>
         </div>
       </div>
     )
@@ -279,16 +279,16 @@ export default function EditPatientPage() {
 
   if (!patient) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
+        <Card className="max-w-md" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
-            <CardTitle>Paciente não encontrado</CardTitle>
-            <CardDescription>
+            <CardTitle style={{ color: '#F0EAD6' }}>Paciente não encontrado</CardTitle>
+            <CardDescription style={{ color: '#7A8299' }}>
               Não foi possível encontrar os dados deste paciente
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push("/dashboard")}>
+            <Button onClick={() => router.push("/dashboard")} style={{ backgroundColor: '#0D7377', color: '#fff' }}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar ao Dashboard
             </Button>
@@ -299,24 +299,25 @@ export default function EditPatientPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] to-[#E2E8F0] p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: '#0B0E14' }}>
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
             className="mb-4"
+            style={{ color: '#D8DEEB' }}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar ao Dashboard
           </Button>
 
-          <Card>
+          <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-2xl">{patient.name}</CardTitle>
-                  <CardDescription className="mt-2">
+                  <CardTitle className="text-2xl" style={{ color: '#F0EAD6' }}>{patient.name}</CardTitle>
+                  <CardDescription className="mt-2" style={{ color: '#7A8299' }}>
                     {(patient.surgery?.type || "não informado").charAt(0).toUpperCase() + (patient.surgery?.type || "não informado").slice(1)} - {" "}
                     {patient.surgery?.date ? new Date(patient.surgery.date).toLocaleDateString("pt-BR") : "Data desconhecida"}
                   </CardDescription>
@@ -329,7 +330,7 @@ export default function EditPatientPage() {
                     {Math.round(completionPercentage)}% Completo
                   </Badge>
                   {lastSaved && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs" style={{ color: '#7A8299' }}>
                       Salvo às {lastSaved.toLocaleTimeString("pt-BR")}
                     </p>
                   )}
@@ -338,7 +339,7 @@ export default function EditPatientPage() {
 
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm" style={{ color: '#D8DEEB' }}>
                     {completedSections.size} de {sections.length} seções completas
                   </span>
                 </div>
@@ -395,10 +396,10 @@ export default function EditPatientPage() {
           <ConversationTimeline patientId={patient.id} />
         </div>
 
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-4 lg:grid-cols-8 mb-6">
+              <TabsList className="grid grid-cols-4 lg:grid-cols-8 mb-6" style={{ backgroundColor: '#0B0E14' }}>
                 {sections.map(section => (
                   <TabsTrigger
                     key={section.id}
@@ -428,7 +429,7 @@ export default function EditPatientPage() {
               })}
             </Tabs>
 
-            <div className="flex justify-center gap-3 mt-6 pt-6 border-t">
+            <div className="flex justify-center gap-3 mt-6 pt-6 border-t" style={{ borderColor: '#1E2535' }}>
               <Button
                 variant="outline"
                 onClick={() => setApplyDialogOpen(true)}
@@ -448,7 +449,7 @@ export default function EditPatientPage() {
               </Button>
             </div>
 
-            <div className="flex justify-between mt-4 pt-4 border-t">
+            <div className="flex justify-between mt-4 pt-4 border-t" style={{ borderColor: '#1E2535' }}>
               <Button
                 variant="outline"
                 onClick={() => router.push("/dashboard")}

@@ -113,30 +113,30 @@ export default function PatientDetailsPage() {
     }, [params]);
 
     if (loading) {
-        return <div className="flex h-screen items-center justify-center">Carregando...</div>;
+        return <div className="flex h-screen items-center justify-center" style={{ backgroundColor: '#0B0E14', color: '#D8DEEB' }}>Carregando...</div>;
     }
 
     if (!patientData) {
-        return <div className="p-8">Paciente não encontrado.</div>;
+        return <div className="p-8" style={{ backgroundColor: '#0B0E14', color: '#D8DEEB' }}>Paciente não encontrado.</div>;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#F5F7FA] via-white to-[#F5F7FA] px-4 py-4 md:p-6">
+        <div className="min-h-screen px-4 py-4 md:p-6" style={{ backgroundColor: '#0B0E14' }}>
             <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 mb-2 md:mb-4">
-                    <Button variant="outline" onClick={() => router.back()} className="w-fit hover:scale-105 transition-transform" size="sm">
+                    <Button variant="outline" onClick={() => router.back()} className="w-fit hover:scale-105 transition-transform" size="sm" style={{ borderColor: '#1E2535', color: '#D8DEEB', backgroundColor: '#161B27' }}>
                         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
                     </Button>
                     <div>
-                        <h1 className="text-xl md:text-3xl font-bold text-[#0A2647]">
+                        <h1 className="text-xl md:text-3xl font-bold" style={{ color: '#F0EAD6' }}>
                             {patientData.patient.name}
                         </h1>
                         <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-1 text-sm md:text-base">
-                            <span className="text-gray-600">{patientData.type}</span>
-                            <span className="text-gray-400">•</span>
-                            <span className="text-gray-600">
+                            <span style={{ color: '#D8DEEB' }}>{patientData.type}</span>
+                            <span style={{ color: '#7A8299' }}>•</span>
+                            <span style={{ color: '#D8DEEB' }}>
                                 {new Date(patientData.date).toLocaleDateString("pt-BR", {
                                     day: 'numeric',
                                     month: 'short',
@@ -145,7 +145,7 @@ export default function PatientDetailsPage() {
                             </span>
                             {patientData.followUps.length > 0 && (
                                 <>
-                                    <span className="text-gray-400 hidden sm:inline">•</span>
+                                    <span style={{ color: '#7A8299' }} className="hidden sm:inline">•</span>
                                     <PostOpDayBadge day={patientData.followUps[patientData.followUps.length - 1]?.dayNumber || 0} />
                                 </>
                             )}
@@ -159,28 +159,31 @@ export default function PatientDetailsPage() {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Gráfico de Evolução */}
-                        <Card>
+                        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
                             <CardHeader>
-                                <CardTitle className="text-[#0A2647]">
+                                <CardTitle style={{ color: '#F0EAD6' }}>
                                     Evolução da Dor
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="h-[250px] md:h-[300px] pt-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={graphData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                                        <XAxis dataKey="day" tick={{ fill: '#64748B', fontSize: 12 }} />
-                                        <YAxis domain={[0, 10]} tick={{ fill: '#64748B', fontSize: 12 }} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
+                                        <XAxis dataKey="day" tick={{ fill: '#7A8299', fontSize: 12 }} />
+                                        <YAxis domain={[0, 10]} tick={{ fill: '#7A8299', fontSize: 12 }} />
                                         <Tooltip
                                             contentStyle={{
-                                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                                backgroundColor: 'rgba(22,27,39,0.95)',
                                                 borderRadius: '12px',
-                                                border: '1px solid #E2E8F0',
-                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                                border: '1px solid #1E2535',
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                                                color: '#D8DEEB'
                                             }}
+                                            labelStyle={{ color: '#F0EAD6' }}
+                                            itemStyle={{ color: '#D8DEEB' }}
                                         />
-                                        <Legend />
-                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#0A2647" strokeWidth={3} dot={{ fill: '#0A2647', strokeWidth: 2, r: 4 }} connectNulls={false} />
+                                        <Legend wrapperStyle={{ color: '#D8DEEB' }} />
+                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#14BDAE" strokeWidth={3} dot={{ fill: '#14BDAE', strokeWidth: 2, r: 4 }} connectNulls={false} />
                                         <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={3} dot={{ fill: '#D4AF37', strokeWidth: 2, r: 4 }} connectNulls={false} />
                                     </LineChart>
                                 </ResponsiveContainer>
@@ -198,17 +201,18 @@ export default function PatientDetailsPage() {
                                         onClick={() => hasResponse && setSelectedFollowUp(f)}
                                         className={`p-2 md:p-3 rounded-lg md:rounded-xl border-2 cursor-pointer transition-all duration-200 text-center
                                 ${isSelected
-                                    ? 'border-[#0A2647] bg-gradient-to-br from-[#0A2647] to-[#144272] text-white shadow-lg'
+                                    ? 'border-[#0D7377] bg-gradient-to-br from-[#0D7377] to-[#14BDAE] text-white shadow-lg'
                                     : hasResponse
-                                        ? 'border-gray-200 bg-white hover:border-blue-400 hover:shadow-md'
-                                        : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                                        ? 'border-[#1E2535] hover:border-[#0D7377] hover:shadow-md'
+                                        : 'border-[#1E2535] opacity-50 cursor-not-allowed'
                                 }
                             `}
+                                        style={!isSelected ? { backgroundColor: hasResponse ? '#111520' : '#0B0E14' } : undefined}
                                     >
-                                        <div className={`text-sm md:text-base font-bold ${isSelected ? 'text-white' : 'text-[#0A2647]'}`}>
+                                        <div className={`text-sm md:text-base font-bold ${isSelected ? 'text-white' : ''}`} style={!isSelected ? { color: '#F0EAD6' } : undefined}>
                                             D+{f.dayNumber}
                                         </div>
-                                        <div className={`text-[9px] md:text-[10px] font-medium ${isSelected ? 'text-blue-200' : hasResponse ? 'text-emerald-600' : 'text-gray-400'}`}>
+                                        <div className={`text-[9px] md:text-[10px] font-medium ${isSelected ? 'text-teal-200' : hasResponse ? 'text-emerald-400' : ''}`} style={!isSelected && !hasResponse ? { color: '#7A8299' } : undefined}>
                                             {hasResponse ? '✓' : '—'}
                                         </div>
                                     </div>
@@ -219,25 +223,26 @@ export default function PatientDetailsPage() {
 
                     {/* Coluna Direita: Chat */}
                     <div className="lg:col-span-1">
-                        <Card className="h-[400px] md:h-[600px] flex flex-col">
+                        <Card className="h-[400px] md:h-[600px] flex flex-col" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
                             <CardHeader>
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2" style={{ color: '#F0EAD6' }}>
                                         {showFullHistory ? <History className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
                                         {showFullHistory ? 'Histórico Completo' : 'Chat com IA'}
-                                        {!showFullHistory && selectedFollowUp && <Badge variant="outline">Dia {selectedFollowUp.dayNumber}</Badge>}
+                                        {!showFullHistory && selectedFollowUp && <Badge variant="outline" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>Dia {selectedFollowUp.dayNumber}</Badge>}
                                     </CardTitle>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setShowFullHistory(!showFullHistory)}
                                         className="text-xs"
+                                        style={{ color: '#14BDAE' }}
                                     >
                                         {showFullHistory ? 'Ver por dia' : 'Ver tudo'}
                                     </Button>
                                 </div>
                                 {showFullHistory && (
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
                                         {fullConversation.length} mensagens no total
                                     </p>
                                 )}
@@ -250,12 +255,13 @@ export default function PatientDetailsPage() {
                                             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                                 <div className={`max-w-[85%] rounded-lg p-3 text-sm
                                                     ${msg.role === 'user'
-                                                        ? 'bg-blue-600 text-white rounded-tr-none'
-                                                        : 'bg-gray-100 text-gray-800 rounded-tl-none border'
-                                                    }`}>
+                                                        ? 'bg-[#0D7377] text-white rounded-tr-none'
+                                                        : 'rounded-tl-none'
+                                                    }`}
+                                                style={msg.role !== 'user' ? { backgroundColor: '#1E2535', color: '#D8DEEB', borderColor: '#2A3147' } : undefined}>
                                                     {msg.content}
                                                     {msg.timestamp && (
-                                                        <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-blue-200' : 'text-gray-400'}`}>
+                                                        <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-teal-200' : ''}`} style={msg.role !== 'user' ? { color: '#7A8299' } : undefined}>
                                                             {new Date(msg.timestamp).toLocaleString('pt-BR')}
                                                         </div>
                                                     )}
@@ -263,7 +269,7 @@ export default function PatientDetailsPage() {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center text-gray-400 mt-10">
+                                        <div className="text-center mt-10" style={{ color: '#7A8299' }}>
                                             Nenhuma conversa registrada ainda.
                                         </div>
                                     )
@@ -291,7 +297,7 @@ export default function PatientDetailsPage() {
                                             ));
                                         })()
                                     ) : (
-                                        <div className="text-center text-gray-400 mt-10">
+                                        <div className="text-center mt-10" style={{ color: '#7A8299' }}>
                                             Selecione um dia respondido para ver a conversa.
                                         </div>
                                     )

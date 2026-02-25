@@ -10,10 +10,11 @@ interface StatsCardsProps {
   stats: DashboardStats | null
 }
 
-const PRIMARY_COLOR = '#0A2647'
-const DANGER_COLOR = '#DC2626'
-const HEADER_BG = '#F8F9FB'
-const DANGER_BG = '#FEF2F2'
+const PRIMARY_COLOR = '#14BDAE'
+const DANGER_COLOR = '#C0392B'
+const HEADER_BG = '#0B0E14'
+const DANGER_BG = 'rgba(192, 57, 43, 0.15)'
+const CARD_BG = '#161B27'
 
 export function StatsCards({ stats }: StatsCardsProps) {
   const prefersReducedMotion = usePrefersReducedMotion()
@@ -30,11 +31,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-total-patients"
-            style={{ borderColor: PRIMARY_COLOR }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
           >
             <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Pacientes Totais
                 </CardTitle>
                 <UsersRound
@@ -63,11 +64,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-active-patients"
-            style={{ borderColor: PRIMARY_COLOR }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
           >
             <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Pacientes Ativos
                 </CardTitle>
                 <Users
@@ -96,11 +97,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-followups-today"
-            style={{ borderColor: PRIMARY_COLOR }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
           >
             <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Follow-ups Hoje
                 </CardTitle>
                 <Clock
@@ -129,14 +130,14 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-critical-alerts"
-            style={{ borderColor: hasCriticalAlerts ? DANGER_COLOR : PRIMARY_COLOR }}
+            style={{ borderColor: hasCriticalAlerts ? DANGER_COLOR : PRIMARY_COLOR, backgroundColor: CARD_BG }}
           >
             <CardHeader
               className="pb-3"
               style={{ backgroundColor: hasCriticalAlerts ? DANGER_BG : HEADER_BG }}
             >
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Alertas Críticos
                 </CardTitle>
                 <AlertCircle

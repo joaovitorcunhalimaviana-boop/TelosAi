@@ -61,32 +61,34 @@ export function DataTable<T extends Record<string, any>>({
 
   const getSortIcon = (columnKey: string) => {
     if (sortKey !== columnKey) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-gray-400" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4" style={{ color: '#7A8299' }} />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="ml-2 h-4 w-4 text-blue-600" />
+      <ArrowUp className="ml-2 h-4 w-4" style={{ color: '#14BDAE' }} />
     ) : (
-      <ArrowDown className="ml-2 h-4 w-4 text-blue-600" />
+      <ArrowDown className="ml-2 h-4 w-4" style={{ color: '#14BDAE' }} />
     );
   };
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="rounded-lg shadow overflow-hidden" style={{ backgroundColor: '#111520' }}>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+          <thead style={{ backgroundColor: '#161B27', borderBottom: '1px solid #1E2535' }}>
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.width || ""
+                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${column.width || ""
                     }`}
+                  style={{ color: '#7A8299' }}
                 >
                   {column.sortable ? (
                     <Button
                       variant="ghost"
                       onClick={() => handleSort(column.key)}
                       className="h-auto p-0 hover:bg-transparent font-medium"
+                      style={{ color: '#7A8299' }}
                     >
                       {column.label}
                       {getSortIcon(column.key)}
@@ -98,12 +100,13 @@ export function DataTable<T extends Record<string, any>>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody>
             {sortedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-6 py-8 text-center text-gray-500"
+                  className="px-6 py-8 text-center"
+                  style={{ color: '#7A8299' }}
                 >
                   Nenhum registro encontrado
                 </td>
@@ -113,11 +116,12 @@ export function DataTable<T extends Record<string, any>>({
                 <tr
                   key={String(row[keyField])}
                   onClick={() => onRowClick?.(row)}
-                  className={`${onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
+                  className={`${onRowClick ? "cursor-pointer hover:bg-[#1E2535]" : ""
                     } transition-colors`}
+                  style={{ borderBottom: '1px solid #1E2535' }}
                 >
                   {columns.map((column) => (
-                    <td key={column.key} className="px-6 py-4 whitespace-nowrap">
+                    <td key={column.key} className="px-6 py-4 whitespace-nowrap" style={{ color: '#D8DEEB' }}>
                       {column.render
                         ? column.render(row[column.key], row)
                         : row[column.key]}

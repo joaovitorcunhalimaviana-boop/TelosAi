@@ -45,7 +45,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 // Color palette for charts
-const COLORS = ['#0A2647', '#144272', '#205295', '#2C74B3', '#5AB2FF', '#7AC5FF', '#9DD4FF', '#C0E6FF'];
+const COLORS = ['#14BDAE', '#0D7377', '#C9A84C', '#D4AF37', '#5AB2FF', '#7AC5FF', '#9DD4FF', '#C0E6FF'];
 const RISK_COLORS = {
   low: '#22c55e',
   medium: '#eab308',
@@ -136,10 +136,10 @@ export default function ResearchStatsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando estatísticas...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: '#14BDAE' }}></div>
+          <p className="mt-4" style={{ color: '#7A8299' }}>Carregando estatísticas...</p>
         </div>
       </div>
     );
@@ -147,14 +147,14 @@ export default function ResearchStatsPage() {
 
   if (!stats) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <Card className="border-2">
+      <div className="container mx-auto p-6 max-w-7xl" style={{ backgroundColor: '#0B0E14' }}>
+        <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            <h3 className="text-xl font-semibold mb-2" style={{ color: '#F0EAD6' }}>
               Pesquisa não encontrada
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="mb-6" style={{ color: '#7A8299' }}>
               Não foi possível carregar os dados da pesquisa.
             </p>
             <Button onClick={() => router.push('/dashboard/pesquisas')}>
@@ -198,7 +198,7 @@ export default function ResearchStatsPage() {
   );
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-6 max-w-7xl" style={{ backgroundColor: '#0B0E14', minHeight: '100vh' }}>
       {/* Header */}
       <div className="mb-8">
         <Button
@@ -206,6 +206,7 @@ export default function ResearchStatsPage() {
           size="sm"
           onClick={() => router.push('/dashboard/pesquisas')}
           className="mb-4"
+          style={{ color: '#7A8299' }}
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Voltar para Pesquisas
@@ -214,8 +215,8 @@ export default function ResearchStatsPage() {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl font-bold" style={{ color: '#0A2647' }}>
-                <FlaskConical className="inline-block mr-3 h-10 w-10" />
+              <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
+                <FlaskConical className="inline-block mr-3 h-10 w-10" style={{ color: '#14BDAE' }} />
                 {research.title}
               </h1>
               <Badge
@@ -229,10 +230,10 @@ export default function ResearchStatsPage() {
                 {research.isActive ? 'Ativa' : 'Inativa'}
               </Badge>
             </div>
-            <p className="text-gray-600 text-lg">{research.description}</p>
+            <p className="text-lg" style={{ color: '#7A8299' }}>{research.description}</p>
             {research.surgeryType && (
-              <p className="text-sm text-gray-500 mt-2">
-                Tipo de cirurgia: <strong>{research.surgeryType}</strong>
+              <p className="text-sm mt-2" style={{ color: '#7A8299' }}>
+                Tipo de cirurgia: <strong style={{ color: '#D8DEEB' }}>{research.surgeryType}</strong>
               </p>
             )}
           </div>
@@ -242,20 +243,20 @@ export default function ResearchStatsPage() {
 
       {/* Overview Cards */}
       <div className="grid grid-cols-5 gap-4 mb-8">
-        <Card className="border-2 hover:shadow-lg transition-shadow">
+        <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Total de Pacientes
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <Users className="h-8 w-8 text-blue-600" />
+              <Users className="h-8 w-8" style={{ color: '#14BDAE' }} />
               <div>
-                <p className="text-3xl font-bold text-blue-700">
+                <p className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                   {overview.totalPatients}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs" style={{ color: '#7A8299' }}>
                   {overview.totalGroups} grupos
                 </p>
               </div>
@@ -263,28 +264,28 @@ export default function ResearchStatsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:shadow-lg transition-shadow">
+        <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Idade Média
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <Activity className="h-8 w-8 text-purple-600" />
+              <Activity className="h-8 w-8" style={{ color: '#C9A84C' }} />
               <div>
-                <p className="text-3xl font-bold text-purple-700">
+                <p className="text-3xl font-bold" style={{ color: '#C9A84C' }}>
                   {overview.avgAge}
                 </p>
-                <p className="text-xs text-gray-500">anos</p>
+                <p className="text-xs" style={{ color: '#7A8299' }}>anos</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:shadow-lg transition-shadow">
+        <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Completude de Dados
             </CardTitle>
           </CardHeader>
@@ -292,7 +293,7 @@ export default function ResearchStatsPage() {
             <div className="flex items-center gap-3">
               <CheckCircle2 className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-3xl font-bold text-green-700">
+                <p className="text-3xl font-bold text-green-600">
                   {overview.dataCompleteness}%
                 </p>
                 <Progress value={overview.dataCompleteness} className="mt-2" />
@@ -301,40 +302,40 @@ export default function ResearchStatsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:shadow-lg transition-shadow">
+        <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Data de Início
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-orange-600" />
+              <Calendar className="h-8 w-8" style={{ color: '#D4AF37' }} />
               <div>
-                <p className="text-lg font-bold text-orange-700">
+                <p className="text-lg font-bold" style={{ color: '#D4AF37' }}>
                   {format(startDate, 'dd/MM/yyyy', { locale: ptBR })}
                 </p>
-                <p className="text-xs text-gray-500">{durationDays} dias</p>
+                <p className="text-xs" style={{ color: '#7A8299' }}>{durationDays} dias</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-2 hover:shadow-lg transition-shadow">
+        <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
               Status
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <Clock className="h-8 w-8 text-teal-600" />
+              <Clock className="h-8 w-8" style={{ color: '#14BDAE' }} />
               <div>
-                <p className="text-lg font-bold text-teal-700">
+                <p className="text-lg font-bold" style={{ color: '#14BDAE' }}>
                   {research.isActive ? 'Em Andamento' : 'Finalizada'}
                 </p>
                 {research.endDate && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs" style={{ color: '#7A8299' }}>
                     {format(new Date(research.endDate), 'dd/MM/yyyy', { locale: ptBR })}
                   </p>
                 )}
@@ -358,7 +359,7 @@ export default function ResearchStatsPage() {
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             {/* Sex Distribution */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <PieChartIcon className="h-5 w-5" />
@@ -384,15 +385,15 @@ export default function ResearchStatsPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
-                    <Legend />
+                    <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
+                    <Legend wrapperStyle={{ color: '#D8DEEB' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
             {/* Age Distribution */}
-            <Card className="border-2">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
@@ -402,14 +403,14 @@ export default function ResearchStatsPage() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={ageDistributionData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="Idade Mínima" fill="#5AB2FF" />
-                    <Bar dataKey="Idade Média" fill="#0A2647" />
-                    <Bar dataKey="Idade Máxima" fill="#205295" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
+                    <XAxis dataKey="name" tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} />
+                    <YAxis tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
+                    <Legend wrapperStyle={{ color: '#D8DEEB' }} />
+                    <Bar dataKey="Idade Mínima" fill="#0D7377" />
+                    <Bar dataKey="Idade Média" fill="#14BDAE" />
+                    <Bar dataKey="Idade Máxima" fill="#C9A84C" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -417,7 +418,7 @@ export default function ResearchStatsPage() {
           </div>
 
           {/* Group Comparison */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
@@ -431,13 +432,13 @@ export default function ResearchStatsPage() {
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={groupComparisonData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
                   <Legend />
-                  <Bar dataKey="Pacientes" fill="#0A2647" />
-                  <Bar dataKey="Idade Média" fill="#2C74B3" />
-                  <Bar dataKey="Taxa de Resposta" fill="#5AB2FF" />
+                  <Bar dataKey="Pacientes" fill="#14BDAE" />
+                  <Bar dataKey="Idade Média" fill="#0D7377" />
+                  <Bar dataKey="Taxa de Resposta" fill="#C9A84C" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -457,15 +458,15 @@ export default function ResearchStatsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Pacientes</p>
-                      <p className="text-2xl font-bold text-blue-700">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Pacientes</p>
+                      <p className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                         {group.patientCount}
                       </p>
                     </div>
-                    <div className="p-4 bg-purple-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Idade Média</p>
-                      <p className="text-2xl font-bold text-purple-700">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Idade Média</p>
+                      <p className="text-2xl font-bold" style={{ color: '#C9A84C' }}>
                         {group.avgAge} anos
                       </p>
                     </div>
@@ -477,7 +478,7 @@ export default function ResearchStatsPage() {
                     <h4 className="font-semibold mb-2">Distribuição por Sexo</h4>
                     {Object.entries(group.sexDistribution).map(([sex, count]) => (
                       <div key={sex} className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">{sex}</span>
+                        <span className="text-sm" style={{ color: '#7A8299' }}>{sex}</span>
                         <div className="flex items-center gap-2">
                           <Progress
                             value={(count / group.patientCount) * 100}
@@ -494,7 +495,7 @@ export default function ResearchStatsPage() {
                   <div>
                     <h4 className="font-semibold mb-2">Faixa Etária</h4>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm" style={{ color: '#7A8299' }}>
                         {group.ageRange[0]} - {group.ageRange[1]} anos
                       </span>
                       <Badge variant="outline">Amplitude: {group.ageRange[1] - group.ageRange[0]}</Badge>
@@ -524,27 +525,27 @@ export default function ResearchStatsPage() {
                     <p className="text-3xl font-bold" style={{ color: COLORS[idx] }}>
                       {group.patientCount}
                     </p>
-                    <p className="text-sm text-gray-500">pacientes</p>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>pacientes</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-4 gap-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Idade Média</p>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>Idade Média</p>
                     <p className="text-2xl font-bold">{group.avgAge}</p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Completude</p>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>Completude</p>
                     <p className="text-2xl font-bold">{group.avgCompleteness}%</p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Taxa de Resposta</p>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>Taxa de Resposta</p>
                     <p className="text-2xl font-bold">{group.responseRate}%</p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Complicações</p>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <p className="text-sm" style={{ color: '#7A8299' }}>Complicações</p>
                     <p className="text-2xl font-bold">{group.complicationRate}%</p>
                   </div>
                 </div>
@@ -580,15 +581,15 @@ export default function ResearchStatsPage() {
                 <div>
                   <h4 className="font-semibold mb-3">Follow-up</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Total de Follow-ups</p>
-                      <p className="text-2xl font-bold text-blue-700">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Total de Follow-ups</p>
+                      <p className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                         {group.totalFollowUps}
                       </p>
                     </div>
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Respondidos</p>
-                      <p className="text-2xl font-bold text-green-700">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Respondidos</p>
+                      <p className="text-2xl font-bold text-green-600">
                         {group.respondedFollowUps}
                       </p>
                     </div>
@@ -602,7 +603,7 @@ export default function ResearchStatsPage() {
         {/* Outcomes Tab */}
         <TabsContent value="outcomes" className="space-y-6">
           {/* Pain Scores Over Time */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5" />
@@ -615,18 +616,22 @@ export default function ResearchStatsPage() {
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
                 <LineChart>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
                   <XAxis
                     dataKey="day"
                     type="number"
-                    label={{ value: 'Dia de Follow-up', position: 'insideBottom', offset: -5 }}
+                    tick={{ fill: '#7A8299' }}
+                    axisLine={{ stroke: '#1E2535' }}
+                    label={{ value: 'Dia de Follow-up', position: 'insideBottom', offset: -5, fill: '#7A8299' }}
                   />
                   <YAxis
-                    label={{ value: 'Nível de Dor', angle: -90, position: 'insideLeft' }}
+                    tick={{ fill: '#7A8299' }}
+                    axisLine={{ stroke: '#1E2535' }}
+                    label={{ value: 'Nível de Dor', angle: -90, position: 'insideLeft', fill: '#7A8299' }}
                     domain={[0, 10]}
                   />
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
+                  <Legend wrapperStyle={{ color: '#D8DEEB' }} />
                   {groups.map((group, idx) => (
                     <Line
                       key={group.groupCode}
@@ -645,7 +650,7 @@ export default function ResearchStatsPage() {
           </Card>
 
           {/* Complication Rates */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
@@ -656,9 +661,9 @@ export default function ResearchStatsPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={groupComparisonData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis label={{ value: 'Taxa (%)', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
+                  <XAxis dataKey="name" tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} />
+                  <YAxis tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} label={{ value: 'Taxa (%)', angle: -90, position: 'insideLeft', fill: '#7A8299' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
                   <Bar dataKey="Taxa de Complicação" fill="#ef4444" />
                 </BarChart>
               </ResponsiveContainer>
@@ -666,7 +671,7 @@ export default function ResearchStatsPage() {
           </Card>
 
           {/* Response Rates */}
-          <Card className="border-2">
+          <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5" />
@@ -677,9 +682,9 @@ export default function ResearchStatsPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={groupComparisonData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis label={{ value: 'Taxa (%)', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
+                  <XAxis dataKey="name" tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} />
+                  <YAxis tick={{ fill: '#7A8299' }} axisLine={{ stroke: '#1E2535' }} label={{ value: 'Taxa (%)', angle: -90, position: 'insideLeft', fill: '#7A8299' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }} />
                   <Bar dataKey="Taxa de Resposta" fill="#22c55e" />
                 </BarChart>
               </ResponsiveContainer>
@@ -765,41 +770,41 @@ export default function ResearchStatsPage() {
 
           {/* Statistical Tests */}
           {stats.statisticalTests && (
-            <Card className="border-2 bg-blue-50">
+            <Card className="border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+                  <BarChart3 className="h-5 w-5" style={{ color: '#14BDAE' }} />
                   Testes Estatísticos
                 </CardTitle>
-                <CardDescription>
+                <CardDescription style={{ color: '#7A8299' }}>
                   Comparações estatísticas entre grupos
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {stats.statisticalTests.ageTTest && (
-                  <div className="p-4 bg-white rounded-lg">
-                    <h4 className="font-semibold mb-2">Teste t para Idade</h4>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
+                    <h4 className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>Teste t para Idade</h4>
                     <div className="grid grid-cols-4 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-600">Estatística t</p>
+                        <p style={{ color: '#7A8299' }}>Estatística t</p>
                         <p className="text-lg font-bold">
                           {stats.statisticalTests.ageTTest.tStatistic}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-600">Média Grupo 1</p>
+                        <p style={{ color: '#7A8299' }}>Média Grupo 1</p>
                         <p className="text-lg font-bold">
                           {stats.statisticalTests.ageTTest.mean1}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-600">Média Grupo 2</p>
+                        <p style={{ color: '#7A8299' }}>Média Grupo 2</p>
                         <p className="text-lg font-bold">
                           {stats.statisticalTests.ageTTest.mean2}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-600">Diferença</p>
+                        <p style={{ color: '#7A8299' }}>Diferença</p>
                         <p className="text-lg font-bold">
                           {stats.statisticalTests.ageTTest.difference}
                         </p>

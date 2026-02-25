@@ -85,7 +85,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
       transition={{ duration: 0.4 }}
       className="mb-6"
     >
-      <Card className="border-4 border-red-500 bg-red-50 dark:bg-red-950/20 shadow-2xl" role="region" aria-label="Alertas urgentes de pacientes" aria-live="polite">
+      <Card className="border-4 border-red-500 shadow-2xl" style={{ backgroundColor: 'rgba(192, 57, 43, 0.1)' }} role="region" aria-label="Alertas urgentes de pacientes" aria-live="polite">
         <CardHeader className="pb-4 bg-red-500 text-white">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
@@ -118,7 +118,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <Card className="border-2 border-red-300 hover:border-red-400 transition-all hover:shadow-lg" role="article" aria-label={`Alerta urgente: ${redFlag.patient.name}, ${getRiskLabel(redFlag.response.riskLevel)}`}>
+                  <Card className="border-2 transition-all hover:shadow-lg" style={{ backgroundColor: '#161B27', borderColor: 'rgba(192, 57, 43, 0.4)' }} role="article" aria-label={`Alerta urgente: ${redFlag.patient.name}, ${getRiskLabel(redFlag.response.riskLevel)}`}>
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
@@ -126,7 +126,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                             {/* Header com nome e risco */}
                             <div className="flex items-start gap-3 flex-wrap">
                               <div className="flex-1">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                <h3 className="text-lg font-bold" style={{ color: '#F0EAD6' }}>
                                   {redFlag.patient.name}
                                 </h3>
                                 <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -136,7 +136,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                                   <Badge variant="secondary" className="text-xs">
                                     D+{redFlag.followUp.dayNumber}
                                   </Badge>
-                                  <span className="text-xs text-muted-foreground">
+                                  <span className="text-xs" style={{ color: '#7A8299' }}>
                                     {format(
                                       new Date(redFlag.response.createdAt),
                                       "dd/MM/yyyy 'às' HH:mm",
@@ -154,22 +154,23 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
 
                             {/* Red Flags */}
                             {redFlag.response.redFlags.length > 0 && (
-                              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200">
-                                <p className="text-sm font-semibold text-red-900 dark:text-red-100 mb-2">
+                              <div className="rounded-lg p-3" style={{ backgroundColor: '#0B0E14', border: '1px solid rgba(192, 57, 43, 0.3)' }}>
+                                <p className="text-sm font-semibold mb-2" style={{ color: '#F0EAD6' }}>
                                   Sintomas Preocupantes:
                                 </p>
                                 <ul className="space-y-1">
                                   {redFlag.response.redFlags.slice(0, 3).map((flag, idx) => (
                                     <li
                                       key={idx}
-                                      className="text-sm text-red-800 dark:text-red-200 flex items-start gap-2"
+                                      className="text-sm flex items-start gap-2"
+                                      style={{ color: '#D8DEEB' }}
                                     >
-                                      <span className="text-red-500 mt-0.5">•</span>
+                                      <span className="mt-0.5" style={{ color: '#C0392B' }}>•</span>
                                       <span>{getRedFlagLabel(flag)}</span>
                                     </li>
                                   ))}
                                   {redFlag.response.redFlags.length > 3 && (
-                                    <li className="text-sm text-red-700 dark:text-red-300 font-medium">
+                                    <li className="text-sm font-medium" style={{ color: '#C0392B' }}>
                                       + {redFlag.response.redFlags.length - 3} outros sintomas
                                     </li>
                                   )}
@@ -179,7 +180,7 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
 
                             {/* Visualizado badge */}
                             {redFlag.isViewed && redFlag.lastViewedAt && (
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs" style={{ color: '#7A8299' }}>
                                 Visualizado em{' '}
                                 {format(
                                   new Date(redFlag.lastViewedAt),
@@ -208,7 +209,8 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                                 href={`https://wa.me/${redFlag.patient.phone.replace(/\D/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                                style={{ backgroundColor: 'rgba(26, 140, 106, 0.15)', color: '#1A8C6A' }}
                                 aria-label={`Enviar WhatsApp para ${redFlag.patient.name}`}
                               >
                                 <MessageCircle className="h-3.5 w-3.5" />
@@ -216,7 +218,8 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
                               </a>
                               <a
                                 href={`tel:${redFlag.patient.phone}`}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                                style={{ backgroundColor: 'rgba(13, 115, 119, 0.15)', color: '#14BDAE' }}
                                 aria-label={`Ligar para ${redFlag.patient.name}`}
                               >
                                 <Phone className="h-3.5 w-3.5" />
@@ -234,8 +237,8 @@ export function RedFlagsCard({ redFlags, count, onView }: RedFlagsCardProps) {
           </AnimatePresence>
 
           {/* Informação adicional */}
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-300 rounded-lg" role="note">
-            <p className="text-sm text-yellow-900 dark:text-yellow-100">
+          <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)' }} role="note">
+            <p className="text-sm" style={{ color: '#D4AF37' }}>
               <strong>Atenção:</strong> Estes pacientes apresentam sintomas que requerem avaliação urgente.
               Os alertas permanecem visíveis por 24 horas após a primeira visualização.
             </p>

@@ -32,14 +32,14 @@ export function NotasMedicasSection({ patient, onUpdate, onComplete }: NotasMedi
   }, [doctorNotes, onUpdate]);
 
   return (
-    <Card className="p-6">
+    <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <div className="flex items-center gap-2 mb-4">
-        <Stethoscope className="h-6 w-6 text-blue-600" />
-        <h2 className="text-2xl font-semibold text-gray-800">Notas do Médico</h2>
+        <Stethoscope className="h-6 w-6" style={{ color: '#14BDAE' }} />
+        <h2 className="text-2xl font-semibold" style={{ color: '#F0EAD6' }}>Notas do Médico</h2>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-        <p className="text-sm text-amber-800">
+      <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#1E2535', border: '1px solid #2A3147' }}>
+        <p className="text-sm" style={{ color: '#D4AF37' }}>
           <strong>Importante:</strong> Orientações escritas aqui têm <strong>prioridade sobre o protocolo padrão</strong> nas
           conversas da IA com o paciente. Use este campo para registrar adaptações específicas para este caso
           (ex: manter compressa gelada ao invés de água morna, trocar medicação, cuidados especiais).
@@ -47,7 +47,7 @@ export function NotasMedicasSection({ patient, onUpdate, onComplete }: NotasMedi
       </div>
 
       <div>
-        <Label htmlFor="doctor-notes" className="text-sm font-medium text-gray-700">
+        <Label htmlFor="doctor-notes" className="text-sm font-medium" style={{ color: '#7A8299' }}>
           Orientações específicas para este paciente
         </Label>
         <Textarea
@@ -56,9 +56,10 @@ export function NotasMedicasSection({ patient, onUpdate, onComplete }: NotasMedi
           onChange={(e) => setDoctorNotes(e.target.value)}
           placeholder="Ex: Paciente com inflamação maior que o normal. Manter banho de assento com água gelada em vez de morna. Aumentar frequência de analgésico se necessário."
           className="mt-2 min-h-[150px]"
+          style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}
           rows={6}
         />
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-2 text-xs" style={{ color: '#7A8299' }}>
           A IA usará estas notas para adaptar as orientações ao caso específico do paciente, sem contradizer suas instruções.
         </p>
       </div>

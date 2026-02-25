@@ -107,13 +107,13 @@ export default function ApiConfigPage() {
 
   const getStatusBadge = (status: ApiStatus) => {
     if (status.loading) {
-      return <Badge variant="outline">Testando...</Badge>;
+      return <Badge variant="outline" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>Testando...</Badge>;
     }
     if (status.connected === null) {
-      return <Badge variant="outline">Não testado</Badge>;
+      return <Badge variant="outline" style={{ borderColor: '#1E2535', color: '#7A8299' }}>Não testado</Badge>;
     }
     if (status.connected) {
-      return <Badge className="bg-green-500">Conectado</Badge>;
+      return <Badge className="bg-green-500 text-white">Conectado</Badge>;
     }
     if (!status.configured) {
       return <Badge variant="destructive">Não configurado</Badge>;
@@ -122,26 +122,26 @@ export default function ApiConfigPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4" style={{ backgroundColor: '#0B0E14' }}>
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Configuração de APIs</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Configuração de APIs</h1>
+          <p style={{ color: '#7A8299' }}>
             Configure e teste as integrações com APIs externas
           </p>
         </div>
 
         {/* Anthropic API */}
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                  <Bot className="h-6 w-6 text-purple-600 dark:text-purple-300" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: '#1E2535' }}>
+                  <Bot className="h-6 w-6" style={{ color: '#14BDAE' }} />
                 </div>
                 <div>
-                  <CardTitle>Anthropic API (Claude AI)</CardTitle>
-                  <CardDescription>
+                  <CardTitle style={{ color: '#F0EAD6' }}>Anthropic API (Claude AI)</CardTitle>
+                  <CardDescription style={{ color: '#7A8299' }}>
                     IA para análise inteligente de respostas dos pacientes
                   </CardDescription>
                 </div>
@@ -151,11 +151,11 @@ export default function ApiConfigPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <h4 className="font-semibold">Como configurar:</h4>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Acesse <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">console.anthropic.com/settings/keys</a></li>
+              <h4 className="font-semibold" style={{ color: '#D8DEEB' }}>Como configurar:</h4>
+              <ol className="list-decimal list-inside space-y-1 text-sm" style={{ color: '#7A8299' }}>
+                <li>Acesse <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" style={{ color: '#14BDAE' }} className="hover:underline">console.anthropic.com/settings/keys</a></li>
                 <li>Crie uma nova API Key</li>
-                <li>Adicione a chave no arquivo .env como <code className="bg-muted px-1 py-0.5 rounded">ANTHROPIC_API_KEY</code></li>
+                <li>Adicione a chave no arquivo .env como <code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>ANTHROPIC_API_KEY</code></li>
                 <li>Reinicie o servidor de desenvolvimento</li>
               </ol>
             </div>
@@ -168,9 +168,9 @@ export default function ApiConfigPage() {
             )}
 
             {anthropicStatus.connected && anthropicStatus.details && (
-              <Alert>
-                <CheckCircle2 className="h-4 w-4" />
-                <AlertDescription>
+              <Alert style={{ backgroundColor: '#0D7377', borderColor: '#14BDAE' }}>
+                <CheckCircle2 className="h-4 w-4" style={{ color: '#14BDAE' }} />
+                <AlertDescription style={{ color: '#F0EAD6' }}>
                   Conexão bem-sucedida! Modelo: {anthropicStatus.details.model}
                 </AlertDescription>
               </Alert>
@@ -180,6 +180,7 @@ export default function ApiConfigPage() {
               onClick={testAnthropicConnection}
               disabled={anthropicStatus.loading}
               className="w-full sm:w-auto"
+              style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
             >
               {anthropicStatus.loading ? (
                 <>
@@ -194,16 +195,16 @@ export default function ApiConfigPage() {
         </Card>
 
         {/* WhatsApp API */}
-        <Card>
+        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                  <MessageSquare className="h-6 w-6 text-green-600 dark:text-green-300" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: '#1E2535' }}>
+                  <MessageSquare className="h-6 w-6 text-green-400" />
                 </div>
                 <div>
-                  <CardTitle>WhatsApp Business API</CardTitle>
-                  <CardDescription>
+                  <CardTitle style={{ color: '#F0EAD6' }}>WhatsApp Business API</CardTitle>
+                  <CardDescription style={{ color: '#7A8299' }}>
                     Envio de mensagens e questionários automáticos
                   </CardDescription>
                 </div>
@@ -213,17 +214,17 @@ export default function ApiConfigPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <h4 className="font-semibold">Como configurar:</h4>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Acesse <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">developers.facebook.com/apps</a></li>
+              <h4 className="font-semibold" style={{ color: '#D8DEEB' }}>Como configurar:</h4>
+              <ol className="list-decimal list-inside space-y-1 text-sm" style={{ color: '#7A8299' }}>
+                <li>Acesse <a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer" style={{ color: '#14BDAE' }} className="hover:underline">developers.facebook.com/apps</a></li>
                 <li>Crie um novo app e adicione o produto &quot;WhatsApp Business API&quot;</li>
                 <li>Configure um número de telefone de teste</li>
                 <li>Obtenha o Phone Number ID e Access Token</li>
                 <li>Adicione no arquivo .env:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li><code className="bg-muted px-1 py-0.5 rounded">WHATSAPP_PHONE_NUMBER_ID</code></li>
-                    <li><code className="bg-muted px-1 py-0.5 rounded">WHATSAPP_ACCESS_TOKEN</code></li>
-                    <li><code className="bg-muted px-1 py-0.5 rounded">DOCTOR_PHONE_NUMBER</code></li>
+                    <li><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>WHATSAPP_PHONE_NUMBER_ID</code></li>
+                    <li><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>WHATSAPP_ACCESS_TOKEN</code></li>
+                    <li><code className="px-1 py-0.5 rounded" style={{ backgroundColor: '#1E2535', color: '#D8DEEB' }}>DOCTOR_PHONE_NUMBER</code></li>
                   </ul>
                 </li>
                 <li>Reinicie o servidor de desenvolvimento</li>
@@ -238,9 +239,9 @@ export default function ApiConfigPage() {
             )}
 
             {whatsappStatus.connected && whatsappStatus.details && (
-              <Alert>
-                <CheckCircle2 className="h-4 w-4" />
-                <AlertDescription>
+              <Alert style={{ backgroundColor: '#0D7377', borderColor: '#14BDAE' }}>
+                <CheckCircle2 className="h-4 w-4" style={{ color: '#14BDAE' }} />
+                <AlertDescription style={{ color: '#F0EAD6' }}>
                   Conexão bem-sucedida! Phone Number ID: {whatsappStatus.details.phoneNumberId?.slice(0, 10)}...
                 </AlertDescription>
               </Alert>
@@ -250,6 +251,7 @@ export default function ApiConfigPage() {
               onClick={testWhatsAppConnection}
               disabled={whatsappStatus.loading}
               className="w-full sm:w-auto"
+              style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
             >
               {whatsappStatus.loading ? (
                 <>
@@ -264,9 +266,9 @@ export default function ApiConfigPage() {
         </Card>
 
         {/* Info adicional */}
-        <Alert>
-          <AlertDescription>
-            <strong>Nota:</strong> As APIs são necessárias para o funcionamento completo do sistema.
+        <Alert style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+          <AlertDescription style={{ color: '#D8DEEB' }}>
+            <strong style={{ color: '#F0EAD6' }}>Nota:</strong> As APIs são necessárias para o funcionamento completo do sistema.
             A API Anthropic analisa as respostas dos pacientes e a API WhatsApp envia os questionários automaticamente.
           </AlertDescription>
         </Alert>

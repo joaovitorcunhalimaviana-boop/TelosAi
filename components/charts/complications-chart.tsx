@@ -66,15 +66,15 @@ export function ComplicationsChart({ data }: ComplicationsChartProps) {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="font-semibold mb-2">{payload[0].payload.name}</p>
+        <div className="p-3 shadow-lg" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535', borderRadius: '8px', color: '#D8DEEB' }}>
+          <p className="font-semibold mb-2" style={{ color: '#F0EAD6' }}>{payload[0].payload.name}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.fill }} className="text-sm">
               {entry.name}: {entry.value} pacientes
             </p>
           ))}
           {payload[0].payload.rate !== undefined && (
-            <p className="text-sm font-semibold mt-1 pt-1 border-t">
+            <p className="text-sm font-semibold mt-1 pt-1" style={{ borderTopColor: '#1E2535', color: '#D8DEEB' }}>
               Taxa: {payload[0].payload.rate}%
             </p>
           )}
@@ -104,13 +104,13 @@ export function ComplicationsChart({ data }: ComplicationsChartProps) {
   };
 
   return (
-    <Card className="border-2 hover:shadow-lg transition-shadow">
+    <Card className="border-2 hover:shadow-lg transition-shadow" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2" style={{ color: '#F0EAD6' }}>
           <span className="text-2xl">⚕️</span>
           Taxa de Complicações
         </CardTitle>
-        <CardDescription>
+        <CardDescription style={{ color: '#7A8299' }}>
           Percentual de pacientes com e sem complicações pós-operatórias
         </CardDescription>
       </CardHeader>
@@ -186,19 +186,21 @@ export function ComplicationsChart({ data }: ComplicationsChartProps) {
                 data={barData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
                 <XAxis
                   dataKey="name"
-                  stroke="#6b7280"
+                  stroke="#1E2535"
+                  tick={{ fill: '#7A8299' }}
                   style={{ fontSize: '12px', fontWeight: 600 }}
                   angle={-15}
                   textAnchor="end"
                   height={80}
                 />
                 <YAxis
-                  stroke="#6b7280"
+                  stroke="#1E2535"
+                  tick={{ fill: '#7A8299' }}
                   style={{ fontSize: '14px', fontWeight: 600 }}
-                  label={{ value: 'Número de Pacientes', angle: -90, position: 'insideLeft' }}
+                  label={{ value: 'Número de Pacientes', angle: -90, position: 'insideLeft', fill: '#7A8299' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
@@ -218,23 +220,23 @@ export function ComplicationsChart({ data }: ComplicationsChartProps) {
             </ResponsiveContainer>
 
             {/* Tabela de detalhes */}
-            <div className="mt-4 border rounded-lg overflow-hidden">
+            <div className="mt-4 rounded-lg overflow-hidden" style={{ border: '1px solid #1E2535' }}>
               <table className="w-full">
-                <thead className="bg-gray-100 dark:bg-gray-800">
+                <thead style={{ backgroundColor: '#0B0E14' }}>
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Tipo de Cirurgia</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">Total</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">Com Complicações</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">Taxa</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold" style={{ color: '#F0EAD6' }}>Tipo de Cirurgia</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold" style={{ color: '#F0EAD6' }}>Total</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold" style={{ color: '#F0EAD6' }}>Com Complicações</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold" style={{ color: '#F0EAD6' }}>Taxa</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y" style={{ borderColor: '#1E2535' }}>
                   {data.bySurgeryType.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <td className="px-4 py-3 text-sm font-medium">
+                    <tr key={index} style={{ borderColor: '#1E2535' }} className="hover:opacity-80">
+                      <td className="px-4 py-3 text-sm font-medium" style={{ color: '#D8DEEB' }}>
                         {SURGERY_LABELS[item.surgeryType] || item.surgeryType}
                       </td>
-                      <td className="px-4 py-3 text-center text-sm">{item.total}</td>
+                      <td className="px-4 py-3 text-center text-sm" style={{ color: '#D8DEEB' }}>{item.total}</td>
                       <td className="px-4 py-3 text-center text-sm">
                         <span className="font-semibold text-red-600">
                           {item.withComplications}
@@ -253,8 +255,8 @@ export function ComplicationsChart({ data }: ComplicationsChartProps) {
           </TabsContent>
         </Tabs>
 
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-4 pt-4" style={{ borderTopColor: '#1E2535', borderTopWidth: '1px', borderTopStyle: 'solid' }}>
+          <p className="text-sm" style={{ color: '#7A8299' }}>
             <strong>Nota:</strong> Complicações incluem qualquer intercorrência reportada no campo
             de descrição cirúrgica ou detectada via follow-ups.
           </p>

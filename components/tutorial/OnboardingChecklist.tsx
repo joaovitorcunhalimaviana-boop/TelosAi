@@ -86,25 +86,25 @@ export function OnboardingChecklist() {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#0A2647', '#D4AF37', '#3B82F6', '#10B981'],
+        colors: ['#0D7377', '#14BDAE', '#F0EAD6', '#10B981'],
       });
     }
   }, [isAllComplete, hasShownConfetti]);
 
   if (isAllComplete) {
     return (
-      <Card className="border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50">
+      <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 2px #0D7377' }}>
         <CardContent className="pt-6">
           <div className="text-center space-y-3">
             <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                 <Trophy className="h-8 w-8 text-white" />
               </div>
             </div>
-            <h3 className="text-xl font-bold text-green-900">
-              Parabéns! Você completou o onboarding! 🎉
+            <h3 className="text-xl font-bold" style={{ color: '#F0EAD6' }}>
+              Parabéns! Você completou o onboarding!
             </h3>
-            <p className="text-sm text-green-700">
+            <p className="text-sm" style={{ color: '#7A8299' }}>
               Agora você domina todas as funcionalidades principais do VigIA
             </p>
             <Button
@@ -112,8 +112,9 @@ export function OnboardingChecklist() {
               size="sm"
               onClick={() => setHasShownConfetti(false)}
               className="mt-2"
+              style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#14BDAE' }}
             >
-              🎊 Celebrar novamente
+              Celebrar novamente
             </Button>
           </div>
         </CardContent>
@@ -122,16 +123,16 @@ export function OnboardingChecklist() {
   }
 
   return (
-    <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-      <CardHeader className="pb-3">
+    <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 2px #0D7377' }}>
+      <CardHeader className="pb-3" style={{ borderBottom: '1px solid #1E2535' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0D7377] to-[#0A5A5E] flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <div>
-              <CardTitle className="text-lg">Checklist de Onboarding</CardTitle>
-              <CardDescription className="text-xs">
+              <CardTitle className="text-lg" style={{ color: '#F0EAD6' }}>Checklist de Onboarding</CardTitle>
+              <CardDescription className="text-xs" style={{ color: '#7A8299' }}>
                 Complete estas etapas para dominar o sistema
               </CardDescription>
             </div>
@@ -139,7 +140,8 @@ export function OnboardingChecklist() {
           <div className="flex items-center gap-2">
             <Badge
               variant="secondary"
-              className="bg-blue-100 text-blue-700 font-semibold"
+              className="font-semibold"
+              style={{ backgroundColor: 'rgba(13, 115, 119, 0.2)', color: '#14BDAE' }}
             >
               {completedCount}/{totalCount}
             </Badge>
@@ -147,7 +149,8 @@ export function OnboardingChecklist() {
               variant="ghost"
               size="icon"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-[#1E2535]"
+              style={{ color: '#D8DEEB' }}
             >
               {isCollapsed ? (
                 <ChevronDown className="h-4 w-4" />
@@ -160,12 +163,12 @@ export function OnboardingChecklist() {
       </CardHeader>
 
       {!isCollapsed && (
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-4">
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-gray-700">Progresso</span>
-              <span className="font-bold text-blue-600">
+              <span className="font-medium" style={{ color: '#D8DEEB' }}>Progresso</span>
+              <span className="font-bold" style={{ color: '#14BDAE' }}>
                 {Math.round(progressPercentage)}%
               </span>
             </div>
@@ -177,28 +180,29 @@ export function OnboardingChecklist() {
             {checklistItems.map((item) => (
               <div
                 key={item.id}
-                className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-all ${
-                  item.completed
-                    ? 'bg-green-50 border-green-300'
-                    : 'bg-white border-gray-200 hover:border-blue-300'
-                }`}
+                className="flex items-start gap-3 p-3 rounded-lg transition-all"
+                style={{
+                  backgroundColor: item.completed ? 'rgba(16, 185, 129, 0.08)' : '#161B27',
+                  border: item.completed ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid #1E2535',
+                }}
               >
                 <div className="mt-0.5">
                   {item.completed ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <CheckCircle2 className="h-5 w-5 text-emerald-400" />
                   ) : (
-                    <Circle className="h-5 w-5 text-gray-400" />
+                    <Circle className="h-5 w-5" style={{ color: '#7A8299' }} />
                   )}
                 </div>
                 <div className="flex-1 space-y-1">
                   <h4
                     className={`font-semibold text-sm ${
-                      item.completed ? 'text-green-900 line-through' : 'text-gray-900'
+                      item.completed ? 'line-through' : ''
                     }`}
+                    style={{ color: item.completed ? '#7A8299' : '#F0EAD6' }}
                   >
                     {item.title}
                   </h4>
-                  <p className="text-xs text-gray-600">{item.description}</p>
+                  <p className="text-xs" style={{ color: '#7A8299' }}>{item.description}</p>
                 </div>
                 {!item.completed && item.action && (
                   <Button
@@ -206,6 +210,7 @@ export function OnboardingChecklist() {
                     variant="outline"
                     onClick={item.action}
                     className="shrink-0 text-xs h-8 px-3"
+                    style={{ backgroundColor: '#1E2535', borderColor: '#2A3147', color: '#14BDAE' }}
                   >
                     {item.actionLabel}
                   </Button>
@@ -215,11 +220,11 @@ export function OnboardingChecklist() {
           </div>
 
           {/* Encouragement Message */}
-          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-3 border border-blue-200">
-            <p className="text-sm text-blue-800 text-center font-medium">
-              {completedCount === 0 && '🚀 Comece sua jornada no VigIA!'}
-              {completedCount > 0 && completedCount < 3 && '💪 Continue! Você está indo muito bem!'}
-              {completedCount >= 3 && completedCount < totalCount && '⭐ Quase lá! Falta pouco!'}
+          <div className="rounded-lg p-3" style={{ backgroundColor: 'rgba(13, 115, 119, 0.1)', border: '1px solid rgba(13, 115, 119, 0.2)' }}>
+            <p className="text-sm text-center font-medium" style={{ color: '#14BDAE' }}>
+              {completedCount === 0 && 'Comece sua jornada no VigIA!'}
+              {completedCount > 0 && completedCount < 3 && 'Continue! Você está indo muito bem!'}
+              {completedCount >= 3 && completedCount < totalCount && 'Quase lá! Falta pouco!'}
             </p>
           </div>
         </CardContent>

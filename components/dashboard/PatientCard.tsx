@@ -74,7 +74,7 @@ const getRiskBorderClass = (riskLevel: 'low' | 'medium' | 'high' | 'critical') =
     low: 'border-green-600 hover:border-green-700',
     medium: 'border-yellow-500 hover:border-yellow-600',
     high: 'border-orange-500 hover:border-orange-600',
-    critical: 'border-red-600 hover:border-red-700 bg-red-50/50 dark:bg-red-950/20',
+    critical: 'border-red-600 hover:border-red-700',
   }
   return borders[riskLevel]
 }
@@ -148,7 +148,8 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
     >
       <ScaleOnHover scale={1.02}>
         <Card
-          className={`glass-card border-none hover-lift-tech transition-all ${getRiskBorderClass(riskLevel)} relative ${isCritical ? 'bg-red-50/90 border-l-4 border-l-red-600' : 'bg-white/80'}`}
+          className={`glass-card border-none hover-lift-tech transition-all ${getRiskBorderClass(riskLevel)} relative ${isCritical ? 'border-l-4 border-l-red-600' : ''}`}
+          style={{ backgroundColor: isCritical ? 'rgba(192, 57, 43, 0.15)' : '#161B27' }}
           role="article"
           aria-label={`Paciente ${patient.patientName}, ${getSurgeryTypeLabel(patient.surgeryType)}, ${patient.followUpDay}`}
           data-tutorial="patient-card"
@@ -157,7 +158,7 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
                 <div className="flex items-start gap-2 mb-1">
-                  <CardTitle className="text-lg flex-1">
+                  <CardTitle className="text-lg flex-1" style={{ color: '#F0EAD6' }}>
                     {patient.patientName}
                   </CardTitle>
                   {isTest && (
@@ -220,14 +221,14 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
           <CardContent>
             {/* Research Data Warning */}
             {patient.isResearchParticipant && !patient.researchDataComplete && (
-              <div className="bg-red-50 border border-red-300 rounded-lg p-3 mb-4" role="status" aria-live="polite">
+              <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: 'rgba(192, 57, 43, 0.15)', border: '1px solid rgba(192, 57, 43, 0.4)' }} role="status" aria-live="polite">
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: '#C0392B' }} aria-hidden="true" />
                   <div className="flex-1">
-                    <p className="font-semibold text-red-900 text-sm mb-1">
+                    <p className="font-semibold text-sm mb-1" style={{ color: '#F0EAD6' }}>
                       Dados de Pesquisa Incompletos
                     </p>
-                    <p className="text-xs text-red-800">
+                    <p className="text-xs" style={{ color: '#D8DEEB' }}>
                       Faltam {patient.researchMissingFieldsCount} campo{patient.researchMissingFieldsCount > 1 ? 's' : ''} obrigatório{patient.researchMissingFieldsCount > 1 ? 's' : ''} para pesquisa
                     </p>
                   </div>
@@ -240,7 +241,7 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
 
             <div className="space-y-3">
               {/* Data da cirurgia */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm" style={{ color: '#7A8299' }}>
                 <Calendar className="h-4 w-4" aria-hidden="true" />
                 <span>
                   {format(new Date(patient.surgeryDate), "dd 'de' MMMM 'de' yyyy", {
@@ -250,13 +251,13 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
               </div>
 
               {/* Completude de dados - Gamificada */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-lg border" data-tutorial="patient-completeness">
+              <div className="p-3 rounded-lg" style={{ background: 'linear-gradient(to right, #0B0E14, #111520)', border: '1px solid #1E2535' }} data-tutorial="patient-completeness">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className={`text-lg ${getCompletenessMessage(patient.dataCompleteness).color} font-semibold`}>
                       {getCompletenessMessage(patient.dataCompleteness).icon}
                     </span>
-                    <span className="text-sm font-semibold text-gray-700">
+                    <span className="text-sm font-semibold" style={{ color: '#D8DEEB' }}>
                       Completude de dados
                     </span>
                   </div>
@@ -268,7 +269,7 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
+                  <div className="w-full rounded-full h-3 relative overflow-hidden" style={{ backgroundColor: '#2A3147' }}>
                     <div
                       className={`h-3 rounded-full transition-all duration-500 ${getCompletenessColor(patient.dataCompleteness)} relative`}
                       style={{ width: `${patient.dataCompleteness}%` }}
@@ -287,15 +288,15 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
 
               {/* Red flags */}
               {patient.hasRedFlags && (
-                <div className="bg-red-100 dark:bg-red-950/50 border border-red-300 dark:border-red-800 rounded-lg p-3" role="alert">
+                <div className="rounded-lg p-3" style={{ backgroundColor: 'rgba(192, 57, 43, 0.15)', border: '1px solid rgba(192, 57, 43, 0.4)' }} role="alert">
                   <div className="flex items-start gap-2">
-                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: '#C0392B' }} aria-hidden="true" />
                     <div>
-                      <p className="font-semibold text-red-900 dark:text-red-100 text-sm mb-1">
+                      <p className="font-semibold text-sm mb-1" style={{ color: '#F0EAD6' }}>
                         ALERTA
                       </p>
                       {patient.redFlags.length > 0 && (
-                        <ul className="text-xs text-red-800 dark:text-red-200 space-y-0.5">
+                        <ul className="text-xs space-y-0.5" style={{ color: '#D8DEEB' }}>
                           {patient.redFlags.slice(0, 2).map((flag, idx) => (
                             <li key={idx}>• {flag}</li>
                           ))}
@@ -313,8 +314,8 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
               {patient.painHistory && patient.painHistory.length > 0 && (
                 <div className="mt-4 mb-2">
                   <div className="flex justify-between items-center mb-1 px-1">
-                    <span className="text-xs font-medium text-gray-500">Dor Recente</span>
-                    <span className="text-xs font-bold text-[#0A2647] bg-gray-100 px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-medium" style={{ color: '#7A8299' }}>Dor Recente</span>
+                    <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ color: '#14BDAE', backgroundColor: '#1E2535' }}>
                       {patient.painHistory[patient.painHistory.length - 1]?.value ?? 0}/10
                     </span>
                   </div>
@@ -325,7 +326,7 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke="#0A2647"
+                          stroke="#14BDAE"
                           strokeWidth={2}
                           dot={{ r: 2, fill: "#D4AF37", strokeWidth: 0 }}
                           activeDot={{ r: 4 }}
@@ -341,12 +342,12 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
               {(patient.latestResponse?.usedExtraMedication || patient.latestResponse?.localCareAdherence === false) && (
                 <div className="flex flex-wrap gap-1.5">
                   {patient.latestResponse?.usedExtraMedication && (
-                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
+                    <Badge variant="outline" className="text-xs" style={{ backgroundColor: 'rgba(124, 58, 237, 0.15)', color: '#A78BFA', borderColor: '#7C3AED' }}>
                       Med. extra{patient.latestResponse.extraMedicationDetails ? `: ${patient.latestResponse.extraMedicationDetails}` : ''}
                     </Badge>
                   )}
                   {patient.latestResponse?.localCareAdherence === false && (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs">
+                    <Badge variant="outline" className="text-xs" style={{ backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#D4AF37', borderColor: '#D4AF37' }}>
                       Cuidados locais
                     </Badge>
                   )}
@@ -354,11 +355,12 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
               )}
 
               {/* Quick Action Buttons - WhatsApp & Phone */}
-              <div className="flex gap-2 pb-2 border-b border-gray-200" data-tutorial="quick-actions">
+              <div className="flex gap-2 pb-2" style={{ borderBottom: '1px solid #1E2535' }} data-tutorial="quick-actions">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 gap-2 border-green-500 text-green-700 hover:bg-green-50"
+                  className="flex-1 gap-2"
+                  style={{ borderColor: '#1A8C6A', color: '#1A8C6A' }}
                   onClick={handleWhatsAppClick}
                   aria-label={`Enviar mensagem no WhatsApp para ${patient.patientName}`}
                 >
@@ -368,7 +370,8 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 gap-2 border-blue-500 text-blue-700 hover:bg-blue-50"
+                  className="flex-1 gap-2"
+                  style={{ borderColor: '#0D7377', color: '#14BDAE' }}
                   onClick={handlePhoneClick}
                   aria-label={`Ligar para ${patient.patientName}`}
                 >
@@ -412,7 +415,8 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+                    className="w-full"
+                    style={{ borderColor: '#7C3AED', color: '#A78BFA' }}
                     onClick={() => onAddToResearch(patient.id)}
                     aria-label={`Adicionar ${patient.patientName} à pesquisa`}
                   >
@@ -427,10 +431,11 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                     <Button
                       variant="outline"
                       size="sm"
-                      className={`flex-1 gap-1.5 text-xs ${confirmComplete
-                        ? 'border-green-600 bg-green-50 text-green-700 hover:bg-green-100'
-                        : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-                      }`}
+                      className="flex-1 gap-1.5 text-xs"
+                      style={confirmComplete
+                        ? { borderColor: '#1A8C6A', backgroundColor: 'rgba(26, 140, 106, 0.15)', color: '#1A8C6A' }
+                        : { borderColor: '#2A3147', color: '#7A8299' }
+                      }
                       onClick={handleCompleteSurgery}
                       onBlur={() => setConfirmComplete(false)}
                       disabled={loading === 'complete'}
@@ -442,10 +447,11 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`gap-1.5 text-xs ${isTest
-                      ? 'border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                      : 'border-gray-300 text-gray-400 hover:text-amber-600 hover:border-amber-300'
-                    }`}
+                    className="gap-1.5 text-xs"
+                    style={isTest
+                      ? { borderColor: '#D4AF37', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#D4AF37' }
+                      : { borderColor: '#2A3147', color: '#7A8299' }
+                    }
                     onClick={handleToggleTest}
                     disabled={loading === 'test'}
                   >
@@ -455,10 +461,11 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`gap-1.5 text-xs ${confirmDelete
-                      ? 'border-red-600 bg-red-50 text-red-700 hover:bg-red-100'
-                      : 'border-gray-300 text-gray-400 hover:text-red-600 hover:border-red-300'
-                    }`}
+                    className="gap-1.5 text-xs"
+                    style={confirmDelete
+                      ? { borderColor: '#C0392B', backgroundColor: 'rgba(192, 57, 43, 0.15)', color: '#C0392B' }
+                      : { borderColor: '#2A3147', color: '#7A8299' }
+                    }
                     onClick={handleDeletePatient}
                     onBlur={() => setConfirmDelete(false)}
                     disabled={loading === 'delete'}
