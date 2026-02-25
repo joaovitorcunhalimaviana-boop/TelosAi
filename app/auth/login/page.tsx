@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 const loginSchema = z.object({
-  email: z.string().email("Email invalido"),
-  senha: z.string().min(1, "Senha e obrigatoria"),
+  email: z.string().email("Email inválido"),
+  senha: z.string().min(1, "Senha é obrigatória"),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
@@ -93,7 +93,7 @@ function LoginForm() {
               Bem-vindo de volta
             </h1>
             <p style={{ color: '#7A8299' }}>
-              Faca login para acessar sua conta
+              Faça login para acessar sua conta
             </p>
           </div>
 
@@ -244,7 +244,7 @@ function LoginForm() {
                 <div className="w-full" style={{ borderTop: '1px solid #1E2535' }}></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4" style={{ backgroundColor: '#111520', color: '#7A8299' }}>Ainda nao tem conta?</span>
+                <span className="px-4" style={{ backgroundColor: '#111520', color: '#7A8299' }}>Ainda não tem conta?</span>
               </div>
             </div>
 
@@ -282,7 +282,7 @@ function LoginForm() {
               onMouseEnter={(e) => e.currentTarget.style.color = '#F0EAD6'}
               onMouseLeave={(e) => e.currentTarget.style.color = '#14BDAE'}
             >
-              &larr; Voltar para pagina inicial
+              &larr; Voltar para página inicial
             </Link>
           </div>
         </div>

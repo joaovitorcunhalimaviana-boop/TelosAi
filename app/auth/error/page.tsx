@@ -11,10 +11,10 @@ function AuthErrorPage() {
   const error = searchParams.get("error");
 
   const errorMessages: Record<string, string> = {
-    Configuration: "Erro de configuracao do servidor. Contate o suporte.",
-    AccessDenied: "Acesso negado. Voce nao tem permissao.",
-    Verification: "Token de verificacao invalido ou expirado.",
-    Default: "Ocorreu um erro durante a autenticacao.",
+    Configuration: "Erro de configuração do servidor. Contate o suporte.",
+    AccessDenied: "Acesso negado. Você não tem permissão.",
+    Verification: "Token de verificação inválido ou expirado.",
+    Default: "Ocorreu um erro durante a autenticação.",
   };
 
   const errorMessage = error ? errorMessages[error] || errorMessages.Default : errorMessages.Default;
@@ -50,7 +50,7 @@ function AuthErrorPage() {
                 </svg>
               </div>
               <h1 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>
-                Erro de Autenticacao
+                Erro de Autenticação
               </h1>
               <p style={{ color: '#7A8299' }}>{errorMessage}</p>
             </div>
@@ -70,7 +70,7 @@ function AuthErrorPage() {
                   className="w-full font-semibold"
                   style={{ backgroundColor: '#161B27', borderColor: '#1E2535', color: '#D8DEEB' }}
                 >
-                  Ir para Pagina Inicial
+                  Ir para Página Inicial
                 </Button>
               </Link>
             </div>

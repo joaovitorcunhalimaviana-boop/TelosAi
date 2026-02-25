@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
 
       setSuccess(true)
     } catch (err: any) {
-      setError(err.message || "Erro ao enviar email de recuperacao")
+      setError(err.message || "Erro ao enviar email de recuperação")
     } finally {
       setIsLoading(false)
     }
@@ -54,14 +54,14 @@ export default function ForgotPasswordPage() {
               </div>
               <h2 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Email Enviado!</h2>
               <p className="mb-6" style={{ color: '#7A8299' }}>
-                Enviamos instrucoes de recuperacao de senha para <strong style={{ color: '#D8DEEB' }}>{email}</strong>
+                Enviamos instruções de recuperação de senha para <strong style={{ color: '#D8DEEB' }}>{email}</strong>
               </p>
             </div>
             <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
               <div className="flex items-start gap-3">
                 <Mail className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#14BDAE' }} />
                 <p className="text-sm" style={{ color: '#D8DEEB' }}>
-                  Verifique sua caixa de entrada e tambem a pasta de spam. O link expira em 1 hora.
+                  Verifique sua caixa de entrada e também a pasta de spam. O link expira em 1 hora.
                 </p>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
             </Link>
             <h2 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Esqueceu sua senha?</h2>
             <p style={{ color: '#7A8299' }}>
-              Digite seu email e enviaremos instrucoes para recuperar sua senha
+              Digite seu email e enviaremos instruções para recuperar sua senha
             </p>
           </div>
 
@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
               disabled={isLoading}
               style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
             >
-              {isLoading ? "Enviando..." : "Enviar Link de Recuperacao"}
+              {isLoading ? "Enviando..." : "Enviar Link de Recuperação"}
             </Button>
 
             <div className="text-center text-sm" style={{ color: '#7A8299' }}>

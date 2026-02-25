@@ -90,7 +90,7 @@ export default function SobrePage() {
                 <div className="relative">
                   <div className="relative w-full h-[400px] flex items-center justify-center">
                     <Image
-                      src="/icons/icon-512.png"
+                      src="/icons/vigia-logo.svg"
                       alt="VigIA Logo"
                       width={350}
                       height={350}

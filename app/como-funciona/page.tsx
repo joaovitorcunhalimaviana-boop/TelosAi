@@ -55,10 +55,10 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-blue-500/20 to-telos-purple-500/20 rounded-2xl blur-xl"></div>
-                      <div className="relative bg-gradient-to-br from-telos-blue-500 to-telos-blue-600 rounded-2xl p-8 shadow-xl">
+                      <div className="absolute -inset-4 rounded-2xl blur-xl" style={{ background: 'linear-gradient(to right, rgba(13,115,119,0.2), rgba(26,37,68,0.2))' }}></div>
+                      <div className="relative rounded-2xl p-8 shadow-xl" style={{ backgroundColor: '#0D7377' }}>
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
-                          <svg className="w-12 h-12 text-telos-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-12 h-12" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                           </svg>
                         </div>
@@ -99,7 +99,7 @@ export default function ComoFuncionaPage() {
                 </div>
 
                 {/* Linha conectora */}
-                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5 bg-gradient-to-b from-telos-blue-500 to-transparent"></div>
+                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5" style={{ background: 'linear-gradient(to bottom, #0D7377, transparent)' }}></div>
               </div>
             </FadeIn>
 
@@ -109,10 +109,10 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-purple-500/20 to-[#0D7377]/20 rounded-2xl blur-xl"></div>
-                      <div className="relative bg-gradient-to-br from-telos-purple-500 to-telos-purple-600 rounded-2xl p-8 shadow-xl">
+                      <div className="absolute -inset-4 rounded-2xl blur-xl" style={{ background: 'linear-gradient(to right, rgba(26,37,68,0.2), rgba(13,115,119,0.2))' }}></div>
+                      <div className="relative rounded-2xl p-8 shadow-xl" style={{ backgroundColor: '#1A2544' }}>
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
-                          <svg className="w-12 h-12 text-telos-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-12 h-12" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                           </svg>
                         </div>
@@ -152,7 +152,7 @@ export default function ComoFuncionaPage() {
                   </div>
                 </div>
 
-                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5 bg-gradient-to-b from-telos-purple-500 to-transparent"></div>
+                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5" style={{ background: 'linear-gradient(to bottom, #1A2544, transparent)' }}></div>
               </div>
             </FadeIn>
 
@@ -162,7 +162,7 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-[#0D7377]/20 to-telos-blue-500/20 rounded-2xl blur-xl animate-pulse-slow"></div>
+                      <div className="absolute -inset-4 rounded-2xl blur-xl animate-pulse-slow" style={{ background: 'linear-gradient(to right, rgba(13,115,119,0.2), rgba(20,189,174,0.2))' }}></div>
                       <div className="relative bg-[#0D7377] rounded-2xl p-8 shadow-xl">
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
                           <svg className="w-12 h-12 text-[#14BDAE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,10 +215,10 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-blue-500/20 to-[#0D7377]/20 rounded-2xl blur-xl"></div>
-                      <div className="relative bg-gradient-to-br from-telos-blue-500 via-telos-blue-600 to-telos-purple-600 rounded-2xl p-8 shadow-xl">
+                      <div className="absolute -inset-4 rounded-2xl blur-xl" style={{ background: 'linear-gradient(to right, rgba(13,115,119,0.2), rgba(26,37,68,0.2))' }}></div>
+                      <div className="relative rounded-2xl p-8 shadow-xl" style={{ background: 'linear-gradient(to bottom right, #0D7377, #1A2544)' }}>
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
-                          <svg className="w-12 h-12 text-telos-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-12 h-12" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                           </svg>
                         </div>
@@ -290,10 +290,10 @@ export default function ComoFuncionaPage() {
             {/* Machine Learning Preditivo */}
             <FadeIn delay={0.1}>
               <div className="group relative rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#1E2535] hover:border-[#14BDAE]/30" style={{ backgroundColor: '#161B27' }}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-telos-blue-500/10 to-transparent rounded-bl-full"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full" style={{ background: 'linear-gradient(to bottom right, rgba(13,115,119,0.1), transparent)' }}></div>
 
                 <div className="relative">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-telos-blue-500 to-telos-blue-600 rounded-xl mb-6 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#0D7377' }}>
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
@@ -341,10 +341,10 @@ export default function ComoFuncionaPage() {
             {/* Inteligência Coletiva */}
             <FadeIn delay={0.2}>
               <div className="group relative rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#1E2535] hover:border-[#14BDAE]/30" style={{ backgroundColor: '#161B27' }}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-telos-purple-500/10 to-transparent rounded-bl-full"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full" style={{ background: 'linear-gradient(to bottom right, rgba(26,37,68,0.1), transparent)' }}></div>
 
                 <div className="relative">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-telos-purple-500 to-telos-purple-600 rounded-xl mb-6 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#1A2544' }}>
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -526,7 +526,7 @@ export default function ComoFuncionaPage() {
                             <span className="text-lg font-bold" style={{ color: '#D8DEEB' }}>Sistema Tradicional</span>
                           </div>
                         </th>
-                        <th className="px-6 py-4 text-center bg-gradient-to-br from-telos-blue-500 to-telos-blue-600">
+                        <th className="px-6 py-4 text-center" style={{ backgroundColor: '#0D7377' }}>
                           <div className="flex items-center justify-center gap-2">
                             <svg className="w-5 h-5 text-[#14BDAE]" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -663,131 +663,59 @@ export default function ComoFuncionaPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-b from-[#061A33] to-[#040E1D] text-white">
+      <footer style={{ backgroundColor: '#0B0E14', borderTop: '1px solid #1E2535' }}>
         <div className="container mx-auto px-6">
-          {/* Main Footer Content */}
           <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Company Info */}
             <div className="space-y-6">
               <div className="flex items-baseline gap-0.5">
-                <span className="text-3xl font-bold text-white">VigIA</span>
+                <span className="font-brand text-3xl" style={{ fontWeight: 300, color: '#F0EAD6' }}>
+                  Vig<em className="not-italic" style={{ color: '#14BDAE', fontStyle: 'italic' }}>IA</em>
+                </span>
               </div>
-              <p className="text-blue-200 leading-relaxed text-justify">
+              <p className="leading-relaxed text-justify" style={{ color: '#7A8299' }}>
                 A Inteligência no Cuidado para o Propósito da Recuperação.
               </p>
-              <p className="text-blue-200 leading-relaxed text-justify">
+              <p className="leading-relaxed text-justify" style={{ color: '#7A8299' }}>
                 Transformando o acompanhamento pós-operatório com IA.
               </p>
-              <div className="flex gap-4">
-                <a href="#" className="w-14 h-14 bg-[#1E2535] hover:bg-[#0D7377] rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                </a>
-              </div>
             </div>
 
-            {/* Navegação */}
+            {/* Navigation */}
             <div className="space-y-6">
-              <h3 className="text-lg font-bold text-white">Navegação</h3>
+              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Navegação</h3>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Início
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sobre" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Sobre
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Planos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cadastro-medico" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Cadastro
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/auth/login" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Login
-                  </Link>
-                </li>
+                <li><Link href="/" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Início</Link></li>
+                <li><Link href="/sobre" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Sobre</Link></li>
+                <li><Link href="/pricing" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Planos</Link></li>
+                <li><Link href="/cadastro-medico" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Cadastro</Link></li>
               </ul>
             </div>
 
-            {/* Para Médicos */}
+            {/* For Doctors */}
             <div className="space-y-6">
-              <h3 className="text-lg font-bold text-white">Para Médicos</h3>
+              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Para Médicos</h3>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/pricing" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Planos e Preços
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/como-funciona" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    Como Funciona
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/faq" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    FAQ
-                  </Link>
-                </li>
+                <li><Link href="/pricing" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Planos e Preços</Link></li>
+                <li><Link href="/como-funciona" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Como Funciona</Link></li>
+                <li><Link href="/faq" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>FAQ</Link></li>
               </ul>
             </div>
 
-            {/* Contato */}
+            {/* Contact */}
             <div className="space-y-6">
-              <h3 className="text-lg font-bold text-white">Contato</h3>
+              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Contato</h3>
               <ul className="space-y-4">
-                <li className="flex items-start gap-3 text-blue-200">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                <li>
                   <div>
-                    <p className="font-semibold text-white">Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="hover:text-[#14BDAE] transition-colors">
-                      telos.ia@gmail.com
-                    </a>
+                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Email</p>
+                    <a href="mailto:telos.ia@gmail.com" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>telos.ia@gmail.com</a>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 text-blue-200">
-                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                <li>
                   <div>
-                    <p className="font-semibold text-white">Localização</p>
-                    <p>João Pessoa, Paraíba</p>
+                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Localização</p>
+                    <p style={{ color: '#7A8299' }}>João Pessoa, Paraíba</p>
                   </div>
                 </li>
               </ul>
@@ -795,24 +723,14 @@ export default function ComoFuncionaPage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="border-t border-white/10 py-8">
+          <div className="py-8" style={{ borderTop: '1px solid #1E2535' }}>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-blue-200 text-sm text-center md:text-left">
+              <p className="text-sm text-center md:text-left" style={{ color: '#7A8299' }}>
                 © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <Link href="/termos" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
-                  Termos de Uso
-                </Link>
-                <Link href="/termos" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
-                  Política de Privacidade
-                </Link>
-                <a href="#" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
-                  LGPD
-                </a>
-                <a href="#" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
-                  Cookies
-                </a>
+                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Termos de Uso</Link>
+                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Política de Privacidade</Link>
               </div>
             </div>
           </div>

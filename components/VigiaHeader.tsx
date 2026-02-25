@@ -9,9 +9,9 @@ export function VigiaHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const navItems = [
-    { href: "/", label: "Inicio" },
+    { href: "/", label: "Início" },
     { href: "/como-funciona", label: "Como Funciona" },
-    { href: "/pricing", label: "Precos" },
+    { href: "/pricing", label: "Preços" },
     { href: "/sobre", label: "Sobre" },
   ]
 
@@ -70,7 +70,7 @@ export function VigiaHeader() {
           href="/cadastro-medico?plan=professional"
           className="px-5 py-2 bg-[#0D7377] text-[#F0EAD6] text-[11px] font-semibold uppercase tracking-[0.15em] rounded transition-colors duration-200 hover:bg-[#14BDAE]"
         >
-          Comecar Agora
+          Começar Agora
         </Link>
       </div>
 
@@ -158,7 +158,7 @@ export function VigiaHeader() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-center px-4 py-3 bg-[#0D7377] text-[#F0EAD6] text-[11px] font-semibold uppercase tracking-[0.15em] rounded transition-colors duration-200 hover:bg-[#14BDAE]"
               >
-                Comecar Agora
+                Começar Agora
               </Link>
             </div>
           </div>

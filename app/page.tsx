@@ -57,7 +57,7 @@ export default function Home() {
                   color: '#14BDAE',
                 }}
               >
-                Sistema de Monitoramento Pos-Operatorio
+                Sistema de Monitoramento Pós-Operatório
               </p>
             </FadeIn>
 
@@ -84,7 +84,7 @@ export default function Home() {
                   color: '#D8DEEB',
                 }}
               >
-                Vigilancia continua. Decisao sua.
+                Vigilância contínua. Decisão sua.
               </p>
             </FadeIn>
 
@@ -98,8 +98,8 @@ export default function Home() {
                   color: '#7A8299',
                 }}
               >
-                Sistema de monitoramento pos-operatorio inteligente. Criado por um coloproctologista,
-                para a medicina que nao para quando a cirurgia termina.
+                Sistema de monitoramento pós-operatório inteligente. Criado por um coloproctologista,
+                para a medicina que não para quando a cirurgia termina.
               </p>
             </FadeIn>
 
@@ -118,7 +118,7 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </div>
                   <span className="relative flex items-center justify-center gap-2">
-                    Comecar Agora
+                    Começar Agora
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -172,7 +172,7 @@ export default function Home() {
                 Por que Assinar o <em className="not-italic" style={{ color: '#14BDAE' }}>VigIA</em>?
               </h2>
               <p className="text-xl max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
-                Beneficios reais para sua pratica medica e producao cientifica
+                Benefícios reais para sua prática médica e produção científica
               </p>
             </div>
           </FadeIn>
@@ -181,32 +181,32 @@ export default function Home() {
             {[
               {
                 title: "Organiza Dados Automaticamente",
-                description: "Diga adeus as planilhas manuais. O sistema estrutura todos os dados dos seus pacientes para pesquisa.",
+                description: "Diga adeus às planilhas manuais. O sistema estrutura todos os dados dos seus pacientes para pesquisa.",
                 icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
               },
               {
-                title: "Detecte Complicacoes",
-                description: "Algoritmos de IA monitoram sinais de alerta e notificam voce precocemente sobre possiveis complicacoes.",
+                title: "Detecte Complicações",
+                description: "Algoritmos de IA monitoram sinais de alerta e notificam você precocemente sobre possíveis complicações.",
                 icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               },
               {
                 title: "Fidelize Pacientes",
-                description: "O acompanhamento proximo e tecnologico aumenta a satisfacao e a confianca do seu paciente.",
+                description: "O acompanhamento próximo e tecnológico aumenta a satisfação e a confiança do seu paciente.",
                 icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
               },
               {
                 title: "Publique Mais",
-                description: "Com dados organizados e estruturados, sua producao cientifica se torna muito mais agil e frequente.",
+                description: "Com dados organizados e estruturados, sua produção científica se torna muito mais ágil e frequente.",
                 icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
               },
               {
                 title: "Economize Tempo",
-                description: "Automatize o follow-up de rotina e foque sua atencao apenas nos casos que realmente precisam.",
+                description: "Automatize o follow-up de rotina e foque sua atenção apenas nos casos que realmente precisam.",
                 icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               },
               {
-                title: "Seguranca Juridica",
-                description: "Tenha todo o historico de recuperacao documentado e protegido, garantindo respaldo para sua conduta.",
+                title: "Segurança Jurídica",
+                description: "Tenha todo o histórico de recuperação documentado e protegido, garantindo respaldo para sua conduta.",
                 icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
               }
             ].map((item, index) => (
@@ -266,7 +266,7 @@ export default function Home() {
                 Como <em className="not-italic" style={{ color: '#14BDAE' }}>Funciona</em>
               </h2>
               <p className="text-xl max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
-                Passos simples para revolucionar seu pos-operatorio
+                Passos simples para revolucionar seu pós-operatório
               </p>
             </div>
           </FadeIn>
@@ -290,19 +290,19 @@ export default function Home() {
                 {
                   step: "2",
                   title: "Monitoramento",
-                  description: "O paciente recebe questionarios automaticos via WhatsApp nos dias programados.",
+                  description: "O paciente recebe questionários automáticos via WhatsApp nos dias programados.",
                   icon: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
                 },
                 {
                   step: "3",
-                  title: "Analise IA",
-                  description: "Nossa IA analisa as respostas e classifica o risco de complicacoes em tempo real.",
+                  title: "Análise IA",
+                  description: "Nossa IA analisa as respostas e classifica o risco de complicações em tempo real.",
                   icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 },
                 {
                   step: "4",
-                  title: "Acao",
-                  description: "Voce recebe alertas apenas se houver necessidade de intervencao. Tranquilidade total.",
+                  title: "Ação",
+                  description: "Você recebe alertas apenas se houver necessidade de intervenção. Tranquilidade total.",
                   icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                 }
               ].map((item, index) => (
@@ -379,27 +379,27 @@ export default function Home() {
                 <h2 className="font-brand text-4xl sm:text-5xl lg:text-6xl leading-tight" style={{ fontWeight: 400, color: '#F0EAD6' }}>
                   Modo Pesquisa
                   <br />
-                  <em className="not-italic" style={{ color: '#14BDAE' }}>Cientifica</em>
+                  <em className="not-italic" style={{ color: '#14BDAE' }}>Científica</em>
                 </h2>
 
                 <p className="text-xl sm:text-2xl font-light max-w-xl" style={{ color: '#D8DEEB' }}>
-                  Transforme dados clinicos em <span className="font-semibold" style={{ color: '#F0EAD6' }}>publicacoes de alto impacto</span> automaticamente.
+                  Transforme dados clínicos em <span className="font-semibold" style={{ color: '#F0EAD6' }}>publicações de alto impacto</span> automaticamente.
                 </p>
 
                 <p className="text-base sm:text-lg leading-relaxed text-justify max-w-xl" style={{ color: '#7A8299' }}>
-                  O primeiro sistema de IA medica do Brasil que organiza seus estudos clinicos enquanto voce opera.
+                  O primeiro sistema de IA médica do Brasil que organiza seus estudos clínicos enquanto você opera.
                 </p>
 
                 {/* Key Features */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   {[
-                    "Dados Estruturados para Publicacao",
-                    "Exportacao Excel/CSV em 1 Clique",
+                    "Dados Estruturados para Publicação",
+                    "Exportação Excel/CSV em 1 Clique",
                     "Grupos de Estudo Ilimitados",
-                    "Analise Estatistica Automatica",
+                    "Análise Estatística Automática",
                     "Conformidade 100% LGPD",
                     "TCLE Digital Integrado",
-                    "Filtros por Procedimento/Periodo",
+                    "Filtros por Procedimento/Período",
                     "Dashboards em Tempo Real"
                   ].map((feature, idx) => (
                     <div key={idx} className="flex items-center gap-3" style={{ color: '#D8DEEB' }}>
@@ -449,15 +449,15 @@ export default function Home() {
                         <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#1A8C6A' }}>Sistema Ativo</span>
                       </div>
                       <h3 className="font-brand text-2xl mb-2" style={{ fontWeight: 400, color: '#F0EAD6' }}>Central de Pesquisa</h3>
-                      <p className="text-sm" style={{ color: '#7A8299' }}>Gerenciamento completo de dados cientificos</p>
+                      <p className="text-sm" style={{ color: '#7A8299' }}>Gerenciamento completo de dados científicos</p>
                     </div>
 
                     {/* Stats grid - 2x2 */}
                     <div className="grid grid-cols-2 gap-4">
                       {[
                         { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "LGPD", sub: "Conformidade Total" },
-                        { icon: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4", title: "Exportacao", sub: "Excel/CSV Instantaneo" },
-                        { icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", title: "Analytics", sub: "Estatisticas Automaticas" },
+                        { icon: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4", title: "Exportação", sub: "Excel/CSV Instantâneo" },
+                        { icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", title: "Analytics", sub: "Estatísticas Automáticas" },
                         { icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10", title: "Grupos", sub: "Estudos Comparativos" },
                       ].map((stat, idx) => (
                         <div
@@ -485,7 +485,7 @@ export default function Home() {
                     {/* Research mode promo */}
                     <div className="pt-6" style={{ borderTop: '1px solid #1E2535' }}>
                       <p className="text-sm leading-relaxed text-justify" style={{ color: '#D8DEEB' }}>
-                        <span className="font-semibold" style={{ color: '#14BDAE' }}>Publique mais, com menos esforco.</span> O Modo Pesquisa transforma automaticamente os dados de acompanhamento dos seus pacientes em tabelas prontas para analise estatistica. Ideal para residentes, mestrandos e cirurgioes que querem aumentar sua producao cientifica sem perder tempo com planilhas manuais.
+                        <span className="font-semibold" style={{ color: '#14BDAE' }}>Publique mais, com menos esforço.</span> O Modo Pesquisa transforma automaticamente os dados de acompanhamento dos seus pacientes em tabelas prontas para análise estatística. Ideal para residentes, mestrandos e cirurgiões que querem aumentar sua produção científica sem perder tempo com planilhas manuais.
                       </p>
                     </div>
                   </div>
@@ -535,10 +535,10 @@ export default function Home() {
                 Tecnologia
               </p>
               <h2 className="font-brand text-3xl lg:text-4xl mb-4" style={{ fontWeight: 400, color: '#F0EAD6' }}>
-                Tecnologia a Servico do <em className="not-italic" style={{ color: '#14BDAE' }}>Cuidado</em>
+                Tecnologia a Serviço do <em className="not-italic" style={{ color: '#14BDAE' }}>Cuidado</em>
               </h2>
               <p className="text-lg max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
-                Um ecossistema completo de inteligencia clinica
+                Um ecossistema completo de inteligência clínica
               </p>
             </div>
           </FadeIn>
@@ -546,18 +546,18 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
               {
-                title: "Follow-up Automatico",
-                desc: "Jornada do paciente automatizada em D+1, D+2, D+3, D+5, D+7, D+10 e D+14 via WhatsApp. Sem intervencao manual.",
+                title: "Follow-up Automático",
+                desc: "Jornada do paciente automatizada em D+1, D+2, D+3, D+5, D+7, D+10 e D+14 via WhatsApp. Sem intervenção manual.",
                 icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               },
               {
                 title: "Machine Learning Preditivo",
-                desc: "Algoritmos que aprendem com cada caso para prever complicacoes antes que elas se tornem emergencias.",
+                desc: "Algoritmos que aprendem com cada caso para prever complicações antes que elas se tornem emergências.",
                 icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
               },
               {
-                title: "Inteligencia Coletiva",
-                desc: "Benchmarking anonimo com outros cirurgioes. Compare seus resultados com a media nacional.",
+                title: "Inteligência Coletiva",
+                desc: "Benchmarking anônimo com outros cirurgiões. Compare seus resultados com a média nacional.",
                 icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
               }
             ].map((feature, idx) => (
@@ -611,13 +611,13 @@ export default function Home() {
                 color: '#14BDAE',
               }}
             >
-              Junte-se a nos
+              Junte-se a nós
             </p>
             <h2 className="font-brand text-4xl lg:text-5xl tracking-tight" style={{ fontWeight: 400, color: '#F0EAD6' }}>
               Pronto para o Futuro da <em className="not-italic" style={{ color: '#14BDAE' }}>Cirurgia</em>?
             </h2>
             <p className="text-xl max-w-2xl mx-auto font-light" style={{ color: '#7A8299' }}>
-              Junte-se a elite medica que ja utiliza inteligencia artificial para elevar o padrao de cuidado.
+              Junte-se à elite médica que já utiliza inteligência artificial para elevar o padrão de cuidado.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-4">
@@ -647,7 +647,7 @@ export default function Home() {
                   color: '#D8DEEB',
                 }}
               >
-                Ver Planos e Precos
+                Ver Planos e Preços
               </Link>
             </div>
 
@@ -661,9 +661,9 @@ export default function Home() {
                     color: '#7A8299',
                   }}
                 >
-                  Desenvolvido por cirurgiao para cirurgioes
+                  Desenvolvido por cirurgião para cirurgiões
                 </p>
-                <p className="text-xl font-brand" style={{ color: '#F0EAD6' }}>Dr. Joao Vitor Viana</p>
+                <p className="text-xl font-brand" style={{ color: '#F0EAD6' }}>Dr. João Vitor Viana</p>
                 <p className="text-sm" style={{ color: '#7A8299' }}>Coloproctologista | CRM-PB 12831</p>
               </div>
             </div>
@@ -686,18 +686,18 @@ export default function Home() {
                 </span>
               </div>
               <p className="leading-relaxed text-justify" style={{ color: '#7A8299' }}>
-                A Inteligencia no Cuidado para o Proposito da Recuperacao.
+                A Inteligência no Cuidado para o Propósito da Recuperação.
               </p>
               <p className="leading-relaxed text-justify" style={{ color: '#7A8299' }}>
-                Transformando o acompanhamento pos-operatorio com IA.
+                Transformando o acompanhamento pós-operatório com IA.
               </p>
             </div>
 
             {/* Navigation */}
             <div className="space-y-6">
-              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Navegacao</h3>
+              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Navegação</h3>
               <ul className="space-y-3">
-                <li><Link href="/" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Inicio</Link></li>
+                <li><Link href="/" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Início</Link></li>
                 <li><Link href="/sobre" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Sobre</Link></li>
                 <li><Link href="/pricing" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Planos</Link></li>
                 <li><Link href="/cadastro-medico" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Cadastro</Link></li>
@@ -706,9 +706,9 @@ export default function Home() {
 
             {/* For Doctors */}
             <div className="space-y-6">
-              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Para Medicos</h3>
+              <h3 className="font-brand text-lg" style={{ fontWeight: 400, color: '#F0EAD6' }}>Para Médicos</h3>
               <ul className="space-y-3">
-                <li><Link href="/pricing" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Planos e Precos</Link></li>
+                <li><Link href="/pricing" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Planos e Preços</Link></li>
                 <li><a href="#" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Como Funciona</a></li>
                 <li><a href="#" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>FAQ</a></li>
               </ul>
@@ -726,8 +726,8 @@ export default function Home() {
                 </li>
                 <li>
                   <div>
-                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Localizacao</p>
-                    <p style={{ color: '#7A8299' }}>Joao Pessoa, Paraiba</p>
+                    <p className="font-semibold" style={{ color: '#F0EAD6' }}>Localização</p>
+                    <p style={{ color: '#7A8299' }}>João Pessoa, Paraíba</p>
                   </div>
                 </li>
               </ul>
@@ -738,11 +738,11 @@ export default function Home() {
           <div className="py-8" style={{ borderTop: '1px solid #1E2535' }}>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-center md:text-left" style={{ color: '#7A8299' }}>
-                &copy; 2025 VigIA - Dr. Joao Vitor Viana. Todos os direitos reservados.
+                &copy; 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Termos de Uso</Link>
-                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Politica de Privacidade</Link>
+                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Política de Privacidade</Link>
               </div>
             </div>
           </div>

@@ -26,7 +26,7 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      setError("Token invalido ou expirado")
+      setError("Token inválido ou expirado")
       setIsValidatingToken(false)
       return
     }
@@ -38,7 +38,7 @@ function ResetPasswordForm() {
         const data = await response.json()
 
         if (!response.ok || !data.valid) {
-          setError("Token invalido ou expirado")
+          setError("Token inválido ou expirado")
           setTokenValid(false)
         } else {
           setTokenValid(true)
@@ -59,12 +59,12 @@ function ResetPasswordForm() {
     setError("")
 
     if (password.length < 8) {
-      setError("A senha deve ter no minimo 8 caracteres")
+      setError("A senha deve ter no mínimo 8 caracteres")
       return
     }
 
     if (password !== confirmPassword) {
-      setError("As senhas nao coincidem")
+      setError("As senhas não coincidem")
       return
     }
 
@@ -85,7 +85,7 @@ function ResetPasswordForm() {
 
       setSuccess(true)
 
-      // Redireciona para login apos 3 segundos
+      // Redireciona para login após 3 segundos
       setTimeout(() => {
         router.push("/auth/login")
       }, 3000)
@@ -120,9 +120,9 @@ function ResetPasswordForm() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: 'rgba(220, 38, 38, 0.15)' }}>
                 <AlertCircle className="h-8 w-8 text-red-400" />
               </div>
-              <h2 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Link Invalido ou Expirado</h2>
+              <h2 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Link Inválido ou Expirado</h2>
               <p style={{ color: '#7A8299' }}>
-                Este link de recuperacao de senha e invalido ou ja foi utilizado.
+                Este link de recuperação de senha é inválido ou já foi utilizado.
               </p>
             </div>
 
@@ -159,7 +159,7 @@ function ResetPasswordForm() {
               </div>
               <h2 className="text-2xl font-bold mb-2" style={{ color: '#F0EAD6' }}>Senha Redefinida!</h2>
               <p style={{ color: '#7A8299' }}>
-                Sua senha foi alterada com sucesso. Voce sera redirecionado para o login.
+                Sua senha foi alterada com sucesso. Você será redirecionado para o login.
               </p>
             </div>
             <Button
@@ -203,7 +203,7 @@ function ResetPasswordForm() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Minimo 8 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -256,7 +256,7 @@ function ResetPasswordForm() {
               <p className="text-sm font-medium mb-1" style={{ color: '#D8DEEB' }}>Requisitos da senha:</p>
               <ul className="text-xs space-y-1" style={{ color: '#7A8299' }}>
                 <li className={password.length >= 8 ? "text-[#14BDAE]" : ""}>
-                  - Minimo de 8 caracteres
+                  - Mínimo de 8 caracteres
                 </li>
                 <li className={password === confirmPassword && password !== "" ? "text-[#14BDAE]" : ""}>
                   - Senhas devem coincidir

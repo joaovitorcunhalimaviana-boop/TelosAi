@@ -174,7 +174,7 @@ export function analyzeComplications(
       observed.length === 2 && observed[0].length === 2
         ? calculateFisherExact(observed)
         : null,
-    interpretation: `${chiSquareResult.significant ? 'Diferenca significativa' : 'Sem diferenca significativa'} na taxa de complicacoes entre grupos (p=${chiSquareResult.pValue.toFixed(3)}). ${chiSquareResult.useFisherExact ? 'Recomenda-se usar Teste Exato de Fisher devido ao tamanho amostral pequeno.' : ''}`,
+    interpretation: `${chiSquareResult.significant ? 'Diferença significativa' : 'Sem diferença significativa'} na taxa de complicações entre grupos (p=${chiSquareResult.pValue.toFixed(3)}). ${chiSquareResult.useFisherExact ? 'Recomenda-se usar Teste Exato de Fisher devido ao tamanho amostral pequeno.' : ''}`,
   };
 }
 
