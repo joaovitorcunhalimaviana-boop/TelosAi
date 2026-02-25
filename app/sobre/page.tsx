@@ -333,7 +333,7 @@ export default function SobrePage() {
                     <div className="space-y-3">
                       <h3 className="text-xl font-bold" style={{ color: '#F0EAD6' }}>IA Conversacional Real</h3>
                       <p className="leading-relaxed text-justify" style={{ color: '#D8DEEB' }}>
-                        Powered by <strong>Claude Sonnet 4.5</strong>, a IA mais avançada da Anthropic.
+                        Powered by <strong>Claude Haiku</strong>, a IA mais avançada da Anthropic.
                         Conversas naturais com pacientes, compreensão de contexto médico, e análise
                         de sintomas que vai muito além de chatbots simples. É inteligência de verdade.
                       </p>
@@ -524,8 +524,8 @@ export default function SobrePage() {
                   </svg>
                   <div>
                     <p className="font-semibold" style={{ color: '#F0EAD6' }}>Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="hover:text-[#F0EAD6] transition-colors">
-                      telos.ia@gmail.com
+                    <a href="mailto:vigia.app.br@gmail.com" className="hover:text-[#F0EAD6] transition-colors">
+                      vigia.app.br@gmail.com
                     </a>
                   </div>
                 </li>

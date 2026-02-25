@@ -532,7 +532,7 @@ export function RegistrationWizardExample() {
     description: "Leia e aceite os termos necessários",
     fields: (
       <div className="space-y-6">
-        <div className="p-4 border-2 border-telos-blue rounded-lg space-y-4">
+        <div className="p-4 border-2 border-[#0D7377] rounded-lg space-y-4">
           <div className="flex items-start space-x-3">
             <Checkbox
               id="dataConsent"
@@ -553,7 +553,7 @@ export function RegistrationWizardExample() {
           </div>
         </div>
 
-        <div className="p-4 border-2 border-telos-gold rounded-lg space-y-4">
+        <div className="p-4 border-2 border-[#C9A84C] rounded-lg space-y-4">
           <div className="flex items-start space-x-3">
             <Checkbox
               id="researchConsent"
@@ -689,7 +689,7 @@ export function RegistrationWizardExample() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-telos-gray-light to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#161B27] to-white py-12 px-4">
       <RegistrationWizard
         steps={wizardSteps}
         currentStep={currentStep}

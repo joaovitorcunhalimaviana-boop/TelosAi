@@ -31,7 +31,7 @@ const faqData: FAQItem[] = [
   {
     category: "ia",
     question: "Qual modelo de IA é usado?",
-    answer: "Usamos Claude Sonnet 4.5 da Anthropic para análise conversacional e detecção de padrões em respostas dos pacientes. Para predição de complicações, usamos Random Forest e Gradient Boosting treinados especificamente para dados pós-operatórios."
+    answer: "Usamos Claude Haiku da Anthropic para análise conversacional e detecção de padrões em respostas dos pacientes. Para predição de complicações, usamos Random Forest e Gradient Boosting treinados especificamente para dados pós-operatórios."
   },
   {
     category: "ia",
@@ -295,7 +295,7 @@ export default function FAQPage() {
                 </svg>
               </Link>
               <a
-                href="mailto:telos.ia@gmail.com"
+                href="mailto:vigia.app.br@gmail.com"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#161B27] text-[#F0EAD6] border border-[#1E2535] rounded-xl font-bold text-lg hover-lift shadow-2xl hover:bg-[#1E2535] transition-colors"
               >
                 Falar com Equipe

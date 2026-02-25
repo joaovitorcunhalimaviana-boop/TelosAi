@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🚀 Criando usuário admin inicial...");
 
-  const adminEmail = "telos.ia@gmail.com";
+  const adminEmail = "vigia.app.br@gmail.com";
   const adminPassword = "Logos1.1";
 
   try {

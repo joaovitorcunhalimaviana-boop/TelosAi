@@ -244,7 +244,7 @@ export function CadastroPacienteCompleto({ onSubmit }: CadastroPacienteCompletoP
 
       {/* Dados Pessoais */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-telos-blue border-b pb-2">Dados Pessoais</h3>
+        <h3 className="text-lg font-semibold text-[#14BDAE] border-b pb-2">Dados Pessoais</h3>
 
         {/* Nome Completo */}
         <div className="space-y-2">
@@ -382,7 +382,7 @@ export function CadastroPacienteCompleto({ onSubmit }: CadastroPacienteCompletoP
 
       {/* Dados da Cirurgia */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-telos-blue border-b pb-2">Dados da Cirurgia</h3>
+        <h3 className="text-lg font-semibold text-[#14BDAE] border-b pb-2">Dados da Cirurgia</h3>
 
         {/* Tipo de Cirurgia */}
         <div className="space-y-2">

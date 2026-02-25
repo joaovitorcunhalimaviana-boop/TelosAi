@@ -69,7 +69,7 @@ export default function TermosPage() {
               <p className="mb-2" style={{ color: '#D8DEEB' }}>
                 <strong style={{ color: '#14BDAE' }}>Suporte VigIA:</strong>
               </p>
-              <p className="mb-1" style={{ color: '#D8DEEB' }}>E-mail: contato@telos.ai</p>
+              <p className="mb-1" style={{ color: '#D8DEEB' }}>E-mail: contato@vigia.app.br</p>
               <p style={{ color: '#D8DEEB' }}>Telefone: +55 83 9166-4904</p>
             </div>
           </section>

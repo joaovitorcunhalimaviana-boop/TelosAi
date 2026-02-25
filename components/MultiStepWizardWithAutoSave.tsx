@@ -187,7 +187,7 @@ export function MultiStepWizardWithAutoSave({
         <CardHeader className="border-b bg-gradient-to-r from-[#F5F7FA] to-white">
           {currentStep === 1 && (
             <>
-              <CardTitle className="text-2xl text-telos-blue">
+              <CardTitle className="text-2xl text-[#14BDAE]">
                 Informações Pessoais
               </CardTitle>
               <CardDescription className="text-base">
@@ -197,7 +197,7 @@ export function MultiStepWizardWithAutoSave({
           )}
           {currentStep === 2 && (
             <>
-              <CardTitle className="text-2xl text-telos-blue">
+              <CardTitle className="text-2xl text-[#14BDAE]">
                 Informações Médicas
               </CardTitle>
               <CardDescription className="text-base">
@@ -207,7 +207,7 @@ export function MultiStepWizardWithAutoSave({
           )}
           {currentStep === 3 && (
             <>
-              <CardTitle className="text-2xl text-telos-blue">
+              <CardTitle className="text-2xl text-[#14BDAE]">
                 Informações Adicionais
               </CardTitle>
               <CardDescription className="text-base">
@@ -409,7 +409,7 @@ export function MultiStepWizardWithAutoSave({
                 <Button
                   type="button"
                   onClick={nextStep}
-                  className="gap-2 bg-telos-blue hover:bg-blue-900"
+                  className="gap-2 bg-[#0D7377] hover:bg-blue-900"
                 >
                   Próximo
                   <ChevronRight className="h-4 w-4" />

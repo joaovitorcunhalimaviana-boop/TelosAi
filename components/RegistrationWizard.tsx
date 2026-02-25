@@ -213,7 +213,7 @@ export function RegistrationWizard({
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-telos-blue">
+          <span className="font-medium text-[#14BDAE]">
             Etapa {currentStep + 1} de {totalSteps}
           </span>
           <span className="text-muted-foreground">
@@ -244,9 +244,9 @@ export function RegistrationWizard({
                 disabled={!isCompleted && index > currentStep}
                 className={cn(
                   "relative flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all",
-                  "focus:outline-none focus:ring-2 focus:ring-telos-gold focus:ring-offset-2",
-                  status === "completed" && "bg-telos-blue border-telos-blue text-white",
-                  status === "current" && "bg-white border-telos-gold text-telos-gold shadow-lg scale-110",
+                  "focus:outline-none focus:ring-2 focus:ring-[#C9A84C] focus:ring-offset-2",
+                  status === "completed" && "bg-[#0D7377] border-[#0D7377] text-white",
+                  status === "current" && "bg-white border-[#C9A84C] text-[#C9A84C] shadow-lg scale-110",
                   status === "pending" && "bg-white border-gray-300 text-gray-400",
                   isCompleted && index < currentStep && "cursor-pointer hover:scale-105"
                 )}
@@ -265,7 +265,7 @@ export function RegistrationWizard({
                 <div
                   className={cn(
                     "flex-1 h-0.5 mx-2 transition-colors",
-                    status === "completed" ? "bg-telos-blue" : "bg-gray-300"
+                    status === "completed" ? "bg-[#0D7377]" : "bg-gray-300"
                   )}
                 />
               )}
@@ -285,8 +285,8 @@ export function RegistrationWizard({
               key={step.id}
               className={cn(
                 "h-2 rounded-full transition-all",
-                status === "completed" && "bg-telos-blue w-8",
-                status === "current" && "bg-telos-gold w-12",
+                status === "completed" && "bg-[#0D7377] w-8",
+                status === "current" && "bg-[#C9A84C] w-12",
                 status === "pending" && "bg-gray-300 w-6"
               )}
             />
@@ -300,7 +300,7 @@ export function RegistrationWizard({
         <div className="mb-8">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h2 className="text-2xl font-bold text-telos-blue flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-[#14BDAE] flex items-center gap-2">
                 {steps[currentStep].title}
                 {isResearchMode && (
                   <Badge variant="secondary" className="text-xs">
@@ -327,7 +327,7 @@ export function RegistrationWizard({
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="text-telos-blue">
+                  <DialogTitle className="text-[#14BDAE]">
                     Resumo do Cadastro
                   </DialogTitle>
                   <DialogDescription>
@@ -343,16 +343,16 @@ export function RegistrationWizard({
                         key={step.id}
                         className={cn(
                           "p-4 rounded-lg border-2 transition-all",
-                          isCompleted ? "border-telos-blue bg-telos-gray-light" : "border-gray-200 bg-gray-50 opacity-60"
+                          isCompleted ? "border-[#0D7377] bg-[#161B27]" : "border-gray-200 bg-gray-50 opacity-60"
                         )}
                       >
                         <div className="flex items-center gap-2 mb-2">
                           {isCompleted ? (
-                            <Check className="w-5 h-5 text-telos-blue" />
+                            <Check className="w-5 h-5 text-[#14BDAE]" />
                           ) : (
                             <Circle className="w-5 h-5 text-gray-400" />
                           )}
-                          <h3 className="font-semibold text-telos-blue">
+                          <h3 className="font-semibold text-[#14BDAE]">
                             {index + 1}. {step.title}
                           </h3>
                         </div>
@@ -368,7 +368,7 @@ export function RegistrationWizard({
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-telos-blue via-telos-gold to-transparent mt-4" />
+          <div className="h-px bg-gradient-to-r from-[#0D7377] via-[#C9A84C] to-transparent mt-4" />
         </div>
 
         {/* Step Content */}
@@ -414,7 +414,7 @@ export function RegistrationWizard({
             <Button
               onClick={handleNext}
               disabled={isValidating || isSaving}
-              className="min-w-[120px] bg-telos-blue hover:bg-telos-blue/90"
+              className="min-w-[120px] bg-[#0D7377] hover:bg-[#0D7377]/90"
             >
               {isValidating ? (
                 <>
@@ -432,7 +432,7 @@ export function RegistrationWizard({
             <Button
               onClick={handleComplete}
               disabled={isValidating || isSaving || isCompleting}
-              className="min-w-[120px] bg-telos-gold hover:bg-telos-gold/90 text-white"
+              className="min-w-[120px] bg-[#C9A84C] hover:bg-[#C9A84C]/90 text-white"
             >
               {isCompleting ? (
                 <>

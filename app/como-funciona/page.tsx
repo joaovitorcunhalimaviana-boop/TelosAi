@@ -179,7 +179,7 @@ export default function ComoFuncionaPage() {
                       IA Analisa Respostas
                     </h3>
                     <p className="text-lg mb-6" style={{ color: '#D8DEEB' }}>
-                      Nossa IA (Claude Sonnet 4.5) extrai dados estruturados das conversas e o modelo
+                      Nossa IA (Claude Haiku) extrai dados estruturados das conversas e o modelo
                       de Machine Learning analisa mais de 15 variáveis para calcular score de risco.
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -406,7 +406,7 @@ export default function ComoFuncionaPage() {
                   </h3>
 
                   <p className="mb-6" style={{ color: '#D8DEEB' }}>
-                    Claude Sonnet 4.5 processa linguagem natural do paciente, extrai dados
+                    Claude Haiku processa linguagem natural do paciente, extrai dados
                     estruturados e identifica padrões de risco automaticamente.
                   </p>
 
@@ -709,7 +709,7 @@ export default function ComoFuncionaPage() {
                 <li>
                   <div>
                     <p className="font-semibold" style={{ color: '#F0EAD6' }}>Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>telos.ia@gmail.com</a>
+                    <a href="mailto:vigia.app.br@gmail.com" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>vigia.app.br@gmail.com</a>
                   </div>
                 </li>
                 <li>

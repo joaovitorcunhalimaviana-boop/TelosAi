@@ -130,7 +130,7 @@ export function PseudonymMappingTable({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white rounded-lg border">
             <div>
               <p className="text-sm text-gray-600">Total de Pacientes</p>
-              <p className="text-2xl font-bold text-telos-blue">{mappings.length}</p>
+              <p className="text-2xl font-bold text-[#14BDAE]">{mappings.length}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Pesquisa</p>
@@ -138,7 +138,7 @@ export function PseudonymMappingTable({
             </div>
             <div>
               <p className="text-sm text-gray-600">Grupos</p>
-              <p className="text-2xl font-bold text-telos-blue">
+              <p className="text-2xl font-bold text-[#14BDAE]">
                 {new Set(mappings.map(m => m.researchGroup).filter(Boolean)).size}
               </p>
             </div>
@@ -181,7 +181,7 @@ export function PseudonymMappingTable({
                     >
                       <TableCell className="font-mono text-sm bg-gray-50">
                         <div className="flex items-center gap-2">
-                          <code className="text-telos-blue font-semibold">
+                          <code className="text-[#14BDAE] font-semibold">
                             {mapping.pseudonymousId}
                           </code>
                           <Button
@@ -199,7 +199,7 @@ export function PseudonymMappingTable({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="px-2 py-1 bg-telos-blue/10 text-telos-blue rounded font-semibold">
+                        <span className="px-2 py-1 bg-[#0D7377]/10 text-[#14BDAE] rounded font-semibold">
                           {mapping.researchGroup || '-'}
                         </span>
                       </TableCell>

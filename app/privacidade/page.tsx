@@ -175,7 +175,7 @@ export default function PrivacidadePage() {
               <p className="mb-2" style={{ color: '#D8DEEB' }}>
                 <strong>Encarregado de Proteção de Dados (DPO):</strong>
               </p>
-              <p className="mb-1" style={{ color: '#D8DEEB' }}>E-mail: privacidade@telos.ai</p>
+              <p className="mb-1" style={{ color: '#D8DEEB' }}>E-mail: privacidade@vigia.app.br</p>
               <p className="mb-1" style={{ color: '#D8DEEB' }}>Telefone: +55 83 9166-4904</p>
               <p style={{ color: '#D8DEEB' }}>Endereço: [Endereço da clínica]</p>
             </div>

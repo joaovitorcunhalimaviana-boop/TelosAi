@@ -103,7 +103,7 @@ function getHemorroidectomiaExpectations(day: number): ExpectedOutcomes {
       bowelMovement: 'Confortável com analgesia mínima',
       specificExpectations: [
         'Dor controlada com analgésicos simples',
-        'Sangramento raro',
+        'Sangramento pouco frequente',
         'Retorno gradual às atividades',
         'Cicatrização em andamento',
       ],
@@ -183,7 +183,7 @@ function getFissuraExpectations(day: number): ExpectedOutcomes {
       specificExpectations: [
         'Melhora progressiva da dor',
         'Redução do espasmo anal',
-        'Sangramento raro',
+        'Sangramento pouco frequente',
         'Fezes amolecidas com laxantes',
       ],
     };

@@ -234,7 +234,7 @@ export default function MedicosPage() {
   ];
 
   return (
-    <div className="min-h-screen telos-gradient">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B0E14] to-[#111520]">
       {/* Header */}
       <header className="bg-white border-b shadow-sm">
         <div className="container mx-auto px-6 py-6">

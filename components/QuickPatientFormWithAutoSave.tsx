@@ -157,7 +157,7 @@ export function QuickPatientFormWithAutoSave({
       <CardHeader className="border-b bg-gradient-to-r from-[#F5F7FA] to-white">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-2xl text-telos-blue">Dados do Paciente</CardTitle>
+            <CardTitle className="text-2xl text-[#14BDAE]">Dados do Paciente</CardTitle>
             <CardDescription className="text-base text-gray-600">
               Preencha os dados essenciais para iniciar o acompanhamento automatizado
             </CardDescription>

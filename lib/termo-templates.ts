@@ -20,9 +20,9 @@ export const termoTemplates = {
         <li>Dor no pós-operatório (controlada com medicação adequada)</li>
         <li>Sangramento leve a moderado nas primeiras 24-48 horas</li>
         <li>Dificuldade para urinar temporariamente</li>
-        <li>Infecção local (rara com os cuidados adequados)</li>
-        <li>Incontinência temporária ou permanente (muito rara)</li>
-        <li>Estenose anal (estreitamento do canal anal - raro)</li>
+        <li>Infecção local (pouco frequente com os cuidados adequados)</li>
+        <li>Incontinência temporária ou permanente (pouco frequente)</li>
+        <li>Estenose anal (estreitamento do canal anal - pouco frequente)</li>
         <li>Recidiva das hemorroidas (nova formação)</li>
       </ul>
 
@@ -84,8 +84,8 @@ export const termoTemplates = {
         <li>Incontinência fecal temporária ou permanente, geralmente para gases (5-10% dos casos)</li>
         <li>Infecção local</li>
         <li>Hematoma (acúmulo de sangue no local)</li>
-        <li>Persistência ou recidiva da fissura (rara)</li>
-        <li>Formação de abscesso ou fístula (muito raro)</li>
+        <li>Persistência ou recidiva da fissura (pouco frequente)</li>
+        <li>Formação de abscesso ou fístula (pouco frequente)</li>
       </ul>
 
       <h3>Cuidados pós-operatórios:</h3>
@@ -141,7 +141,7 @@ export const termoTemplates = {
       <p><strong>Controlador:</strong> Dr. João Vitor Viana - CRM-PB 12831<br/>
       <strong>Plataforma:</strong> VigIA - Sistema de Acompanhamento Pós-Operatório<br/>
       <strong>Endereço:</strong> João Pessoa, Paraíba<br/>
-      <strong>E-mail para contato:</strong> telos.ia@gmail.com</p>
+      <strong>E-mail para contato:</strong> vigia.app.br@gmail.com</p>
 
       <h3>2. Base Legal do Tratamento:</h3>
       <p>O tratamento dos seus dados pessoais é realizado com base nas seguintes hipóteses legais previstas no Art. 7º e 11º da LGPD:</p>
@@ -220,7 +220,7 @@ export const termoTemplates = {
         <li><strong>Oposição:</strong> Ao tratamento realizado com dispensa de consentimento</li>
         <li><strong>Revisão:</strong> De decisões automatizadas (quando aplicável)</li>
       </ul>
-      <p><strong>Como exercer seus direitos:</strong> Entre em contato através do e-mail telos.ia@gmail.com ou durante consulta médica presencial.</p>
+      <p><strong>Como exercer seus direitos:</strong> Entre em contato através do e-mail vigia.app.br@gmail.com ou durante consulta médica presencial.</p>
 
       <h3>8. Tratamento Automatizado e Inteligência Artificial:</h3>
       <p>A plataforma VigIA utiliza Inteligência Artificial para:</p>
@@ -283,7 +283,7 @@ export const termoTemplates = {
       <p><strong>Responsável Técnico:</strong> Dr. João Vitor Viana - CRM-PB 12831<br/>
       <strong>Plataforma:</strong> VigIA - Sistema de Acompanhamento Pós-Operatório com Inteligência Artificial<br/>
       <strong>Endereço:</strong> João Pessoa, Paraíba<br/>
-      <strong>E-mail de contato:</strong> telos.ia@gmail.com</p>
+      <strong>E-mail de contato:</strong> vigia.app.br@gmail.com</p>
 
       <h3>2. Descrição do Serviço de Acompanhamento:</h3>
       <p>Fui informado(a) que o Dr. João Vitor Viana oferece um serviço inovador de acompanhamento pós-operatório que combina o WhatsApp com tecnologia de Inteligência Artificial, proporcionando:</p>
@@ -464,7 +464,7 @@ export const termoTemplates = {
       <p style="margin-top: 30px;"><em>Data do consentimento: ${data.data}${data.cidade ? ` - ${data.cidade}` : ''}</em></p>
 
       <p style="margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-left: 4px solid #0A2647;">
-        <strong>Importante:</strong> Este é um documento legal que estabelece os termos do serviço de acompanhamento pós-operatório. Guarde uma cópia para referência futura. Em caso de dúvidas, entre em contato através do e-mail telos.ia@gmail.com
+        <strong>Importante:</strong> Este é um documento legal que estabelece os termos do serviço de acompanhamento pós-operatório. Guarde uma cópia para referência futura. Em caso de dúvidas, entre em contato através do e-mail vigia.app.br@gmail.com
       </p>
     `
   }

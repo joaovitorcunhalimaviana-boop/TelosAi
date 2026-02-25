@@ -721,7 +721,7 @@ export default function Home() {
                 <li>
                   <div>
                     <p className="font-semibold" style={{ color: '#F0EAD6' }}>Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>telos.ia@gmail.com</a>
+                    <a href="mailto:vigia.app.br@gmail.com" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>vigia.app.br@gmail.com</a>
                   </div>
                 </li>
                 <li>
