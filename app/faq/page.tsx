@@ -177,7 +177,7 @@ export default function FAQPage() {
                 </span>
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-[#F0EAD6] mb-6">
+              <h1 className="text-4xl lg:text-6xl font-brand text-[#F0EAD6] mb-6" style={{ fontWeight: 300 }}>
                 Dúvidas sobre o VigIA?
               </h1>
               <p className="text-lg text-[#7A8299]">
@@ -278,7 +278,7 @@ export default function FAQPage() {
       <section className="py-16 bg-gradient-to-br from-[#111520] via-[#0D7377]/10 to-[#111520] border-t border-[#1E2535]">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-3xl lg:text-4xl font-bold text-[#F0EAD6]">
+            <h2 className="text-3xl lg:text-5xl font-brand text-[#F0EAD6]" style={{ fontWeight: 300 }}>
               Ainda tem dúvidas?
             </h2>
             <p className="text-xl text-[#7A8299]">

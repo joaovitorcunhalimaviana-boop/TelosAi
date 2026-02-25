@@ -34,7 +34,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="max-w-4xl mx-auto text-center space-y-6">
-              <h1 className="text-5xl lg:text-6xl font-bold" style={{ color: '#F0EAD6' }}>
+              <h1 className="text-5xl lg:text-7xl font-brand" style={{ fontWeight: 300, color: '#F0EAD6' }}>
                 Planos e Preços Transparentes
               </h1>
               <p className="text-2xl font-light" style={{ color: '#D8DEEB' }}>
@@ -157,7 +157,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.15} direction="up">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: '#F0EAD6' }}>
                 Por que Investir no VigIA?
               </h2>
               <p className="text-xl" style={{ color: '#7A8299' }}>
@@ -229,7 +229,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4" style={{ color: "#F0EAD6" }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: "#F0EAD6" }}>
                 Comparativo de Investimento
               </h2>
               <p className="text-xl" style={{ color: "#7A8299" }}>
@@ -359,7 +359,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4" style={{ color: "#F0EAD6" }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: "#F0EAD6" }}>
                 Comparação Detalhada
               </h2>
               <p style={{ color: "#7A8299" }}>
@@ -476,7 +476,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4" style={{ color: "#F0EAD6" }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: "#F0EAD6" }}>
                 Perguntas Frequentes
               </h2>
             </div>
@@ -531,7 +531,7 @@ export default function PricingPage() {
       <section className="py-20" style={{ backgroundColor: "#0B0E14" }}>
         <div className="container mx-auto px-6 text-center">
           <FadeIn delay={0.1} direction="up">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4" style={{ color: "#F0EAD6" }}>
+            <h2 className="text-3xl lg:text-5xl font-brand mb-4" style={{ fontWeight: 300, color: "#F0EAD6" }}>
               Pronto para começar?
             </h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: "#D8DEEB" }}>

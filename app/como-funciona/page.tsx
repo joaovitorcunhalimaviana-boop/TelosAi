@@ -14,9 +14,9 @@ export default function ComoFuncionaPage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="max-w-4xl mx-auto text-center space-y-6">
-              <h1 className="text-5xl lg:text-6xl font-bold">
+              <h1 className="text-5xl lg:text-7xl font-brand" style={{ fontWeight: 300, color: '#F0EAD6' }}>
                 Como Funciona a{" "}
-                <span className="font-bold" style={{ color: '#14BDAE' }}>VigIA</span>
+                <span style={{ color: '#14BDAE' }}>VigIA</span>
               </h1>
               <p className="text-2xl font-light" style={{ color: '#D8DEEB' }}>
                 Combinamos{" "}
@@ -39,7 +39,7 @@ export default function ComoFuncionaPage() {
         <div className="container mx-auto px-6">
           <FadeIn>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: '#F0EAD6' }}>
                 O Processo em 4 Etapas Simples
               </h2>
               <p className="text-lg max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
@@ -276,7 +276,7 @@ export default function ComoFuncionaPage() {
                 <span className="text-sm font-medium text-[#14BDAE]">Stack Tecnológico</span>
               </div>
 
-              <h2 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: '#F0EAD6' }}>
                 A Tecnologia Por Trás
               </h2>
               <p className="text-lg max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
@@ -499,7 +499,7 @@ export default function ComoFuncionaPage() {
         <div className="container mx-auto px-6">
           <FadeIn>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
+              <h2 className="text-4xl font-brand mb-4" style={{ fontWeight: 400, color: '#F0EAD6' }}>
                 Diferencial vs Sistemas Tradicionais
               </h2>
               <p className="text-lg max-w-2xl mx-auto" style={{ color: '#7A8299' }}>
@@ -638,7 +638,7 @@ export default function ComoFuncionaPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <FadeIn delay={0.1} direction="up">
-            <h2 className="text-3xl lg:text-4xl font-bold" style={{ color: '#F0EAD6' }}>
+            <h2 className="text-3xl lg:text-5xl font-brand" style={{ fontWeight: 300, color: '#F0EAD6' }}>
               Pronto para Ver na Prática?
             </h2>
             </FadeIn>

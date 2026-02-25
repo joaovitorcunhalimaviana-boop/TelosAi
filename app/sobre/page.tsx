@@ -15,7 +15,7 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <FadeIn delay={0.1} direction="up">
             <div className="max-w-4xl mx-auto text-center space-y-6">
-              <h1 className="text-5xl lg:text-6xl font-bold" style={{ color: '#F0EAD6' }}>
+              <h1 className="text-5xl lg:text-7xl font-brand" style={{ fontWeight: 300, color: '#F0EAD6' }}>
                 Sobre a{" "}
                 <span className="font-brand"><span style={{ color: '#F0EAD6' }}>Vig</span><span style={{ color: '#14BDAE' }}>IA</span></span>
               </h1>
@@ -42,7 +42,7 @@ export default function SobrePage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <FadeIn delay={0.2} direction="left">
                 <div className="space-y-6">
-                  <h2 className="text-3xl font-bold" style={{ color: '#F0EAD6' }}>O Projeto</h2>
+                  <h2 className="text-4xl font-brand" style={{ fontWeight: 400, color: '#F0EAD6' }}>O Projeto</h2>
                   <div className="space-y-4 text-lg leading-relaxed" style={{ color: '#D8DEEB' }}>
                     <p className="text-justify">
                       <span className="font-semibold" style={{ color: '#14BDAE' }}>VigIA</span> nasceu da
@@ -89,12 +89,13 @@ export default function SobrePage() {
               <FadeIn delay={0.3} direction="right">
                 <div className="relative">
                   <div className="relative w-full h-[400px] flex items-center justify-center">
-                    <Image
+                    <img
                       src="/icons/vigia-logo.svg"
                       alt="VigIA Logo"
                       width={350}
                       height={350}
                       className="drop-shadow-2xl hover-scale"
+                      style={{ borderRadius: '32px' }}
                     />
                   </div>
                 </div>
@@ -129,7 +130,7 @@ export default function SobrePage() {
 
               <FadeIn delay={0.4} direction="right">
                 <div className="order-1 lg:order-2 space-y-6">
-                  <h2 className="text-3xl font-bold" style={{ color: '#F0EAD6' }}>O Fundador</h2>
+                  <h2 className="text-4xl font-brand" style={{ fontWeight: 400, color: '#F0EAD6' }}>O Fundador</h2>
                   <div className="space-y-4 text-lg leading-relaxed" style={{ color: '#D8DEEB' }}>
                     <p className="text-justify">
                       <strong style={{ color: '#14BDAE' }}>Dr. João Vitor Viana</strong> é cirurgião coloretal
@@ -175,7 +176,7 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-12">
             <FadeIn delay={0.1} direction="up">
-              <h2 className="text-3xl font-bold" style={{ color: '#F0EAD6' }}>Nossa Missão</h2>
+              <h2 className="text-4xl font-brand" style={{ fontWeight: 400, color: '#F0EAD6' }}>Nossa Missão</h2>
             </FadeIn>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -233,7 +234,7 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto space-y-12">
             <FadeIn delay={0.1} direction="up">
-              <h2 className="text-3xl font-bold text-center" style={{ color: '#F0EAD6' }}>Visão de Futuro</h2>
+              <h2 className="text-4xl font-brand text-center" style={{ fontWeight: 400, color: '#F0EAD6' }}>Visão de Futuro</h2>
             </FadeIn>
 
             <FadeIn delay={0.2} direction="up">
@@ -277,7 +278,7 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-5xl mx-auto space-y-12">
             <FadeIn delay={0.1} direction="up">
-              <h2 className="text-3xl font-bold text-center" style={{ color: '#F0EAD6' }}>Por que a VigIA é Diferente</h2>
+              <h2 className="text-4xl font-brand text-center" style={{ fontWeight: 400, color: '#F0EAD6' }}>Por que a VigIA é Diferente</h2>
             </FadeIn>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -370,7 +371,7 @@ export default function SobrePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <FadeIn delay={0.1} direction="up">
-              <h2 className="text-3xl lg:text-4xl font-bold" style={{ color: '#F0EAD6' }}>
+              <h2 className="text-3xl lg:text-5xl font-brand" style={{ fontWeight: 300, color: '#F0EAD6' }}>
                 Faça Parte da Revolução no Pós-Operatório
               </h2>
             </FadeIn>

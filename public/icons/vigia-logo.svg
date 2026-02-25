@@ -1,10 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Subtle teal glow at the top -->
-    <linearGradient id="topGlow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#14BDAE" stop-opacity="0.15"/>
-      <stop offset="40%" stop-color="#14BDAE" stop-opacity="0"/>
-    </linearGradient>
     <!-- Subtle radial glow behind the text -->
     <radialGradient id="centerGlow" cx="50%" cy="48%" r="40%">
       <stop offset="0%" stop-color="#14BDAE" stop-opacity="0.08"/>
@@ -21,9 +16,6 @@
     <!-- Dark background -->
     <rect width="512" height="512" fill="#0B0E14"/>
 
-    <!-- Top glow overlay -->
-    <rect width="512" height="512" fill="url(#topGlow)"/>
-
     <!-- Center glow -->
     <rect width="512" height="512" fill="url(#centerGlow)"/>
 
@@ -32,14 +24,10 @@
   </g>
 
   <!-- Border -->
-  <rect x="1" y="1" width="510" height="510" rx="63" ry="63" fill="none" stroke="#1E2535" stroke-width="2"/>
+  <rect x="0.5" y="0.5" width="511" height="511" rx="64" ry="64" fill="none" stroke="#1E2535" stroke-width="1"/>
 
-  <!-- "Vig" in cream, serif font -->
-  <text x="196" y="295" font-family="'Cormorant Garamond', 'Georgia', 'Times New Roman', serif" font-size="128" font-weight="600" fill="#F0EAD6" letter-spacing="2">Vig</text>
-
-  <!-- "IA" in teal, italic serif font -->
-  <text x="362" y="295" font-family="'Cormorant Garamond', 'Georgia', 'Times New Roman', serif" font-size="128" font-weight="600" font-style="italic" fill="#14BDAE" letter-spacing="2">IA</text>
-
-  <!-- Subtle underline accent -->
-  <line x1="176" y1="315" x2="336" y2="315" stroke="#1E2535" stroke-width="1.5" opacity="0.5"/>
+  <!-- VigIA text centered -->
+  <text x="256" y="290" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="120" font-weight="400">
+    <tspan fill="#F0EAD6">Vig</tspan><tspan fill="#14BDAE" font-style="italic">IA</tspan>
+  </text>
 </svg>
