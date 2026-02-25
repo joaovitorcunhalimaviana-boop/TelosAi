@@ -21,7 +21,7 @@ export default function SobrePage() {
               </h1>
               <p className="text-2xl font-light" style={{ color: '#D8DEEB' }}>
                 A{" "}
-                <span className="font-medium" style={{ color: '#C9A84C' }}>
+                <span className="font-medium" style={{ color: '#F0EAD6' }}>
                   Inteligência
                 </span>{" "}
                 no Cuidado para o{" "}
@@ -69,7 +69,7 @@ export default function SobrePage() {
                   <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-fade-in-up animation-delay-400">
                     <Link
                       href="/cadastro-medico?plan=founding"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-4 text-white rounded-lg font-semibold hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#C9A84C' }}
+                      className="inline-flex items-center justify-center gap-2 px-8 py-4 text-white rounded-lg font-semibold hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#0D7377' }}
                     >
                       Ser Founding Member
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ export default function SobrePage() {
                     </Link>
                     <Link
                       href="/pricing"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#14BDAE] rounded-lg font-semibold hover:border-[#C9A84C] hover-lift-strong transition-all shadow-lg" style={{ color: '#14BDAE' }}
+                      className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#14BDAE] rounded-lg font-semibold hover:border-[#14BDAE] hover-lift-strong transition-all shadow-lg" style={{ color: '#14BDAE' }}
                     >
                       Ver Planos
                     </Link>
@@ -152,7 +152,7 @@ export default function SobrePage() {
                   </div>
 
                   <div className="pt-4">
-                    <blockquote className="border-l-4 border-[#C9A84C] pl-6 py-4 rounded-r-lg" style={{ backgroundColor: '#161B27' }}>
+                    <blockquote className="border-l-4 border-[#14BDAE] pl-6 py-4 rounded-r-lg" style={{ backgroundColor: '#161B27' }}>
                       <p className="italic text-lg leading-relaxed text-justify" style={{ color: '#D8DEEB' }}>
                         &quot;A tecnologia não substitui o médico, mas potencializa sua capacidade de
                         cuidar. Com VigIA, cada médico pode acompanhar pacientes com mais
@@ -195,8 +195,8 @@ export default function SobrePage() {
               </FadeIn>
 
               <FadeIn delay={0.3} direction="up">
-                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#C9A84C] hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
-                  <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 hover-scale transition-transform" style={{ backgroundColor: '#C9A84C' }}>
+                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#14BDAE] hover-lift-strong transition-smooth shadow-lg card-shine flex flex-col" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                  <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 hover-scale transition-transform" style={{ backgroundColor: '#0D7377' }}>
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
@@ -254,7 +254,7 @@ export default function SobrePage() {
                 </p>
 
                 <p className="text-justify">
-                  Mais do que isso, estamos construindo uma <strong style={{ color: '#C9A84C' }}>inteligência coletiva</strong>: cada médico
+                  Mais do que isso, estamos construindo uma <strong style={{ color: '#14BDAE' }}>inteligência coletiva</strong>: cada médico
                   que usa VigIA contribui para um sistema que aprende com a experiência de centenas
                   de profissionais. Isso significa que decisões clínicas se tornam mais precisas, guidelines
                   se adaptam à realidade brasileira, e o conhecimento médico se multiplica exponencialmente.
@@ -302,9 +302,9 @@ export default function SobrePage() {
               </FadeIn>
 
               <FadeIn delay={0.3} direction="up">
-                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#C9A84C] hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#14BDAE] hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform" style={{ backgroundColor: '#C9A84C' }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform" style={{ backgroundColor: '#0D7377' }}>
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
@@ -342,9 +342,9 @@ export default function SobrePage() {
               </FadeIn>
 
               <FadeIn delay={0.5} direction="up">
-                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#C9A84C] hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
+                <div className="group h-full p-8 rounded-2xl border-2 hover:border-[#14BDAE] hover-lift-strong transition-smooth shadow-lg card-shine" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform" style={{ backgroundColor: '#C9A84C' }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 hover-scale transition-transform" style={{ backgroundColor: '#0D7377' }}>
                       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
@@ -382,7 +382,7 @@ export default function SobrePage() {
             <FadeIn delay={0.3} direction="up">
               <Link
                 href="/cadastro-medico?plan=founding"
-                className="inline-flex items-center gap-3 px-12 py-6 text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl transition-all duration-500 shadow-xl" style={{ backgroundColor: '#C9A84C' }}
+                className="inline-flex items-center gap-3 px-12 py-6 text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl transition-all duration-500 shadow-xl" style={{ backgroundColor: '#0D7377' }}
               >
                 Quero Fazer Parte Agora
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,7 +411,7 @@ export default function SobrePage() {
                 Transformando o acompanhamento pós-operatório com IA.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-14 h-14 bg-white/10 hover:bg-[#C9A84C] rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
+                <a href="#" className="w-14 h-14 bg-white/10 hover:bg-[#14BDAE] rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
@@ -424,7 +424,7 @@ export default function SobrePage() {
               <h3 className="text-lg font-bold" style={{ color: '#F0EAD6' }}>Navegação</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -432,7 +432,7 @@ export default function SobrePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sobre" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/sobre" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -440,7 +440,7 @@ export default function SobrePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/pricing" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -448,7 +448,7 @@ export default function SobrePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cadastro-medico" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/cadastro-medico" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -456,7 +456,7 @@ export default function SobrePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/login" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/auth/login" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -471,7 +471,7 @@ export default function SobrePage() {
               <h3 className="text-lg font-bold" style={{ color: '#F0EAD6' }}>Para Médicos</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/pricing" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <Link href="/pricing" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -479,7 +479,7 @@ export default function SobrePage() {
                   </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <a href="#" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -487,7 +487,7 @@ export default function SobrePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <a href="#" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -495,7 +495,7 @@ export default function SobrePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <a href="#" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -503,7 +503,7 @@ export default function SobrePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-[#C9A84C] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
+                  <a href="#" className="hover:text-[#F0EAD6] transition-colors flex items-center gap-2" style={{ color: '#7A8299' }}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -523,7 +523,7 @@ export default function SobrePage() {
                   </svg>
                   <div>
                     <p className="font-semibold" style={{ color: '#F0EAD6' }}>Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="hover:text-[#C9A84C] transition-colors">
+                    <a href="mailto:telos.ia@gmail.com" className="hover:text-[#F0EAD6] transition-colors">
                       telos.ia@gmail.com
                     </a>
                   </div>
@@ -549,16 +549,16 @@ export default function SobrePage() {
                 © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <Link href="/termos" className="hover:text-[#C9A84C] transition-colors" style={{ color: "#7A8299" }}>
+                <Link href="/termos" className="hover:text-[#F0EAD6] transition-colors" style={{ color: "#7A8299" }}>
                   Termos de Uso
                 </Link>
-                <Link href="/termos" className="hover:text-[#C9A84C] transition-colors" style={{ color: "#7A8299" }}>
+                <Link href="/termos" className="hover:text-[#F0EAD6] transition-colors" style={{ color: "#7A8299" }}>
                   Política de Privacidade
                 </Link>
-                <a href="#" className="hover:text-[#C9A84C] transition-colors" style={{ color: "#7A8299" }}>
+                <a href="#" className="hover:text-[#F0EAD6] transition-colors" style={{ color: "#7A8299" }}>
                   LGPD
                 </a>
-                <a href="#" className="hover:text-[#C9A84C] transition-colors" style={{ color: "#7A8299" }}>
+                <a href="#" className="hover:text-[#F0EAD6] transition-colors" style={{ color: "#7A8299" }}>
                   Cookies
                 </a>
               </div>

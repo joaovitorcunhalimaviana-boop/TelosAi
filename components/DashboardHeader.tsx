@@ -48,7 +48,7 @@ export function DashboardHeader() {
             href="/dashboard"
             className="text-sm font-medium transition-colors"
             style={{ color: pathname === '/dashboard' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard' ? 700 : 500 }}
-            onMouseEnter={(e) => { if (pathname !== '/dashboard') e.currentTarget.style.color = '#C9A84C' }}
+            onMouseEnter={(e) => { if (pathname !== '/dashboard') e.currentTarget.style.color = '#F0EAD6' }}
             onMouseLeave={(e) => { if (pathname !== '/dashboard') e.currentTarget.style.color = '#7A8299' }}
           >
             Dashboard
@@ -59,7 +59,7 @@ export function DashboardHeader() {
               href="/dashboard/protocolos"
               className="text-sm font-medium transition-colors"
               style={{ color: pathname === '/dashboard/protocolos' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/protocolos' ? 700 : 500 }}
-              onMouseEnter={(e) => { if (pathname !== '/dashboard/protocolos') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/protocolos') e.currentTarget.style.color = '#F0EAD6' }}
               onMouseLeave={(e) => { if (pathname !== '/dashboard/protocolos') e.currentTarget.style.color = '#7A8299' }}
             >
               Protocolos
@@ -71,7 +71,7 @@ export function DashboardHeader() {
             data-tutorial="research-btn"
             className="text-sm font-medium transition-colors"
             style={{ color: pathname === '/dashboard/pesquisas' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/pesquisas' ? 700 : 500 }}
-            onMouseEnter={(e) => { if (pathname !== '/dashboard/pesquisas') e.currentTarget.style.color = '#C9A84C' }}
+            onMouseEnter={(e) => { if (pathname !== '/dashboard/pesquisas') e.currentTarget.style.color = '#F0EAD6' }}
             onMouseLeave={(e) => { if (pathname !== '/dashboard/pesquisas') e.currentTarget.style.color = '#7A8299' }}
           >
             Pesquisas
@@ -82,7 +82,7 @@ export function DashboardHeader() {
               href="/dashboard/dados-agregados"
               className="text-sm font-medium transition-colors"
               style={{ color: pathname === '/dashboard/dados-agregados' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/dados-agregados' ? 700 : 500 }}
-              onMouseEnter={(e) => { if (pathname !== '/dashboard/dados-agregados') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/dados-agregados') e.currentTarget.style.color = '#F0EAD6' }}
               onMouseLeave={(e) => { if (pathname !== '/dashboard/dados-agregados') e.currentTarget.style.color = '#7A8299' }}
             >
               Dados Agregados
@@ -94,7 +94,7 @@ export function DashboardHeader() {
               href="/dashboard/billing"
               className="text-sm font-medium transition-colors"
               style={{ color: pathname === '/dashboard/billing' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/billing' ? 700 : 500 }}
-              onMouseEnter={(e) => { if (pathname !== '/dashboard/billing') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/billing') e.currentTarget.style.color = '#F0EAD6' }}
               onMouseLeave={(e) => { if (pathname !== '/dashboard/billing') e.currentTarget.style.color = '#7A8299' }}
             >
               Meu Plano
@@ -106,7 +106,7 @@ export function DashboardHeader() {
               href="/admin"
               className="text-sm font-medium transition-colors"
               style={{ color: pathname === '/admin' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/admin' ? 700 : 500 }}
-              onMouseEnter={(e) => { if (pathname !== '/admin') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseEnter={(e) => { if (pathname !== '/admin') e.currentTarget.style.color = '#F0EAD6' }}
               onMouseLeave={(e) => { if (pathname !== '/admin') e.currentTarget.style.color = '#7A8299' }}
             >
               Admin
@@ -140,7 +140,7 @@ export function DashboardHeader() {
             onClick={() => signOut({ callbackUrl: "/" })}
             className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
             style={{ color: '#7A8299', backgroundColor: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#161B27'; e.currentTarget.style.color = '#C9A84C' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#161B27'; e.currentTarget.style.color = '#F0EAD6' }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#7A8299' }}
             title="Sair"
           >

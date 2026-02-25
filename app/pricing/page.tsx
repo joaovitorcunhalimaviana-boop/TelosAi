@@ -25,7 +25,7 @@ export default function PricingPage() {
       {/* Background Animated Blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-20 -left-20 w-96 h-96 rounded-full blur-3xl animate-blob-move" style={{ backgroundColor: 'rgba(13,115,119,0.08)' }}></div>
-        <div className="absolute top-40 -right-20 w-96 h-96 rounded-full blur-3xl animate-blob-move animation-delay-2000" style={{ backgroundColor: 'rgba(201,168,76,0.06)' }}></div>
+        <div className="absolute top-40 -right-20 w-96 h-96 rounded-full blur-3xl animate-blob-move animation-delay-2000" style={{ backgroundColor: 'rgba(13,115,119,0.06)' }}></div>
         <div className="absolute -bottom-20 left-1/2 w-96 h-96 rounded-full blur-3xl animate-blob-move animation-delay-4000" style={{ backgroundColor: 'rgba(13,115,119,0.08)' }}></div>
       </div>
 
@@ -39,7 +39,7 @@ export default function PricingPage() {
               </h1>
               <p className="text-2xl font-light" style={{ color: '#D8DEEB' }}>
                 Escolha o plano ideal para sua prática médica.{" "}
-                <span className="font-medium" style={{ color: '#C9A84C' }}>Sem taxas ocultas</span>, sem surpresas.
+                <span className="font-medium" style={{ color: '#F0EAD6' }}>Sem taxas ocultas</span>, sem surpresas.
               </p>
             </div>
           </FadeIn>
@@ -204,18 +204,18 @@ export default function PricingPage() {
             </FadeIn>
 
             <FadeIn delay={0.3} direction="up">
-              <div className="h-full rounded-2xl p-8 hover-lift-strong card-shine flex flex-col" style={{ backgroundColor: '#161B27', borderWidth: '2px', borderColor: '#C9A84C' }}>
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(201,168,76,0.15)' }}>
+              <div className="h-full rounded-2xl p-8 hover-lift-strong card-shine flex flex-col" style={{ backgroundColor: '#161B27', borderWidth: '2px', borderColor: '#14BDAE' }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(13,115,119,0.15)' }}>
                   <span className="text-4xl">🚀</span>
                 </div>
                 <h3 className="text-2xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
                   Diferencial Competitivo
                 </h3>
                 <p className="leading-relaxed mb-4 flex-grow" style={{ color: '#D8DEEB' }}>
-                  Seja o cirurgião que usa <span className="font-bold" style={{ color: '#C9A84C' }}>Inteligência Artificial</span> no
+                  Seja o cirurgião que usa <span className="font-bold" style={{ color: '#14BDAE' }}>Inteligência Artificial</span> no
                   acompanhamento.
                 </p>
-                <p className="text-lg font-semibold" style={{ color: '#C9A84C' }}>
+                <p className="text-lg font-semibold" style={{ color: '#14BDAE' }}>
                   Pacientes escolhem inovação, tecnologia e cuidado proativo.
                 </p>
               </div>
@@ -247,7 +247,7 @@ export default function PricingPage() {
                       <th className="py-6 px-6 text-left text-lg font-bold" style={{ color: "#F0EAD6" }}>
                         Item
                       </th>
-                      <th className="py-6 px-6 text-center text-lg font-bold" style={{ color: "#C9A84C", backgroundColor: "rgba(201,168,76,0.05)" }}>
+                      <th className="py-6 px-6 text-center text-lg font-bold" style={{ color: "#14BDAE", backgroundColor: "rgba(13,115,119,0.05)" }}>
                         Founding Member
                       </th>
                       <th className="py-6 px-6 text-center text-lg font-bold" style={{ color: "#7A8299" }}>
@@ -263,8 +263,8 @@ export default function PricingPage() {
                       <td className="py-5 px-6 font-medium" style={{ color: "#D8DEEB" }}>
                         Custo mensal (3 pacientes)
                       </td>
-                      <td className="py-5 px-6 text-center" style={{ backgroundColor: "rgba(201,168,76,0.05)" }}>
-                        <span className="text-2xl font-bold" style={{ color: "#C9A84C" }}>R$ 400</span>
+                      <td className="py-5 px-6 text-center" style={{ backgroundColor: "rgba(13,115,119,0.05)" }}>
+                        <span className="text-2xl font-bold" style={{ color: "#14BDAE" }}>R$ 400</span>
                       </td>
                       <td className="py-5 px-6 text-center">
                         <span className="text-2xl font-bold" style={{ color: "#14BDAE" }}>R$ 500</span>
@@ -310,9 +310,9 @@ export default function PricingPage() {
                       <td className="py-6 px-6 font-bold text-lg" style={{ color: "#F0EAD6" }}>
                         ROI (Retorno sobre Investimento)
                       </td>
-                      <td className="py-6 px-6 text-center relative" style={{ backgroundColor: "rgba(201,168,76,0.08)", borderLeftWidth: "1px", borderRightWidth: "1px", borderColor: "rgba(201,168,76,0.2)" }}>
-                        <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "#C9A84C" }}></div>
-                        <span className="text-3xl font-black block" style={{ color: "#E8C97A" }}>+1.900%</span>
+                      <td className="py-6 px-6 text-center relative" style={{ backgroundColor: "rgba(13,115,119,0.08)", borderLeftWidth: "1px", borderRightWidth: "1px", borderColor: "rgba(13,115,119,0.2)" }}>
+                        <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: "#0D7377" }}></div>
+                        <span className="text-3xl font-black block" style={{ color: "#14BDAE" }}>+1.900%</span>
                         <span className="text-xs font-medium uppercase tracking-wide" style={{ color: "#7A8299" }}>Melhor Retorno</span>
                       </td>
                       <td className="py-6 px-6 text-center">
@@ -327,10 +327,10 @@ export default function PricingPage() {
               </div>
 
               {/* Conclusão */}
-              <div className="mt-8 p-8 rounded-2xl shadow-xl" style={{ backgroundColor: "#161B27", borderWidth: "2px", borderColor: "#C9A84C" }}>
+              <div className="mt-8 p-8 rounded-2xl shadow-xl" style={{ backgroundColor: "#161B27", borderWidth: "2px", borderColor: "#14BDAE" }}>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(201,168,76,0.15)" }}>
-                    <svg className="w-8 h-8" style={{ color: "#C9A84C" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(13,115,119,0.15)" }}>
+                    <svg className="w-8 h-8" style={{ color: "#14BDAE" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -376,7 +376,7 @@ export default function PricingPage() {
                     <th className="py-4 px-6 text-left text-lg font-bold" style={{ color: "#14BDAE" }}>
                       Recursos
                     </th>
-                    <th className="py-4 px-6 text-center text-lg font-bold" style={{ color: "#C9A84C" }}>
+                    <th className="py-4 px-6 text-center text-lg font-bold" style={{ color: "#14BDAE" }}>
                       <div className="flex items-center justify-center gap-2">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -416,7 +416,7 @@ export default function PricingPage() {
                       <td className="py-4 px-6 text-center">
                         {typeof row.founding === 'boolean' ? (
                           row.founding ? (
-                            <svg className="w-6 h-6 mx-auto" style={{ color: "#C9A84C" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 mx-auto" style={{ color: "#14BDAE" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           ) : (
@@ -425,7 +425,7 @@ export default function PricingPage() {
                             </svg>
                           )
                         ) : (
-                          <span className="font-semibold" style={{ color: "#C9A84C" }}>{row.founding}</span>
+                          <span className="font-semibold" style={{ color: "#14BDAE" }}>{row.founding}</span>
                         )}
                       </td>
 
@@ -539,7 +539,7 @@ export default function PricingPage() {
             </p>
             <Link
               href="/cadastro-medico?plan=founding"
-              className="inline-flex items-center gap-3 px-12 py-6 text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl transition-all duration-500 shadow-xl" style={{ backgroundColor: "#C9A84C" }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#E8C97A"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#C9A84C"}
+              className="inline-flex items-center gap-3 px-12 py-6 text-white text-xl rounded-2xl font-bold hover-lift-strong hover:shadow-2xl transition-all duration-500 shadow-xl" style={{ backgroundColor: "#0D7377" }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#14BDAE"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#0D7377"}
             >
               Quero Fazer Parte Agora
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -567,7 +567,7 @@ export default function PricingPage() {
                 Transformando o acompanhamento pós-operatório com IA.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-14 h-14 rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110" style={{ backgroundColor: "rgba(255,255,255,0.05)" }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)"}>
+                <a href="#" className="w-14 h-14 rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110" style={{ backgroundColor: "rgba(255,255,255,0.05)" }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#0D7377"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)"}>
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
@@ -580,7 +580,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-bold" style={{ color: "#F0EAD6" }}>Navegação</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -588,7 +588,7 @@ export default function PricingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sobre" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/sobre" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -596,7 +596,7 @@ export default function PricingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/pricing" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -604,7 +604,7 @@ export default function PricingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cadastro-medico" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/cadastro-medico" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -612,7 +612,7 @@ export default function PricingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/login" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/auth/login" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -627,7 +627,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-bold" style={{ color: "#F0EAD6" }}>Para Médicos</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/pricing" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <Link href="/pricing" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -635,7 +635,7 @@ export default function PricingPage() {
                   </Link>
                 </li>
                 <li>
-                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -643,7 +643,7 @@ export default function PricingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -651,7 +651,7 @@ export default function PricingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -659,7 +659,7 @@ export default function PricingPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                  <a href="#" className="transition-colors flex items-center gap-2" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -679,7 +679,7 @@ export default function PricingPage() {
                   </svg>
                   <div>
                     <p className="font-semibold" style={{ color: "#F0EAD6" }}>Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                    <a href="mailto:telos.ia@gmail.com" className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                       telos.ia@gmail.com
                     </a>
                   </div>
@@ -705,16 +705,16 @@ export default function PricingPage() {
                 © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <Link href="/termos" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                <Link href="/termos" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                   Termos de Uso
                 </Link>
-                <Link href="/termos" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                <Link href="/termos" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                   Política de Privacidade
                 </Link>
-                <a href="#" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                <a href="#" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                   LGPD
                 </a>
-                <a href="#" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#C9A84C"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
+                <a href="#" className="transition-colors" style={{ color: "#7A8299" }} onMouseEnter={(e) => e.currentTarget.style.color = "#F0EAD6"} onMouseLeave={(e) => e.currentTarget.style.color = "#7A8299"}>
                   Cookies
                 </a>
               </div>
@@ -731,7 +731,7 @@ export default function PricingPage() {
           background: #0B0E14;
           cursor: pointer;
           border-radius: 50%;
-          border: 3px solid #C9A84C;
+          border: 3px solid #14BDAE;
         }
 
         .slider::-moz-range-thumb {
@@ -740,7 +740,7 @@ export default function PricingPage() {
           background: #0B0E14;
           cursor: pointer;
           border-radius: 50%;
-          border: 3px solid #C9A84C;
+          border: 3px solid #14BDAE;
         }
       `}</style>
     </div>

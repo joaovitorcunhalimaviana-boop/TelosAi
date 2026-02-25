@@ -47,8 +47,8 @@ export function VigiaHeader() {
               className={`
                 text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200
                 ${isActive
-                  ? "text-[#C9A84C]"
-                  : "text-[#7A8299] hover:text-[#C9A84C]"
+                  ? "text-[#F0EAD6]"
+                  : "text-[#7A8299] hover:text-[#F0EAD6]"
                 }
               `}
             >
@@ -62,7 +62,7 @@ export function VigiaHeader() {
       <div className="hidden md:flex items-center gap-4 flex-shrink-0">
         <Link
           href="/auth/login"
-          className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#7A8299] hover:text-[#C9A84C] transition-colors duration-200"
+          className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#7A8299] hover:text-[#F0EAD6] transition-colors duration-200"
         >
           Login
         </Link>
@@ -135,8 +135,8 @@ export function VigiaHeader() {
                   className={`
                     block px-4 py-3 rounded text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200
                     ${isActive
-                      ? "text-[#C9A84C]"
-                      : "text-[#7A8299] hover:text-[#C9A84C]"
+                      ? "text-[#F0EAD6]"
+                      : "text-[#7A8299] hover:text-[#F0EAD6]"
                     }
                   `}
                 >
@@ -149,7 +149,7 @@ export function VigiaHeader() {
               <Link
                 href="/auth/login"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#7A8299] hover:text-[#C9A84C] transition-colors duration-200"
+                className="block px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#7A8299] hover:text-[#F0EAD6] transition-colors duration-200"
               >
                 Login
               </Link>

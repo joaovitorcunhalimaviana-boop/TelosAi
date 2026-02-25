@@ -20,7 +20,7 @@ export default function ComoFuncionaPage() {
               </h1>
               <p className="text-2xl font-light" style={{ color: '#D8DEEB' }}>
                 Combinamos{" "}
-                <span className="font-medium" style={{ color: '#E8C97A' }}>
+                <span className="font-medium" style={{ color: '#14BDAE' }}>
                   IA Preditiva
                 </span>
                 , Automação Inteligente e{" "}
@@ -77,7 +77,7 @@ export default function ComoFuncionaPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -86,7 +86,7 @@ export default function ComoFuncionaPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -109,7 +109,7 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-purple-500/20 to-telos-gold-500/20 rounded-2xl blur-xl"></div>
+                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-purple-500/20 to-[#0D7377]/20 rounded-2xl blur-xl"></div>
                       <div className="relative bg-gradient-to-br from-telos-purple-500 to-telos-purple-600 rounded-2xl p-8 shadow-xl">
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
                           <svg className="w-12 h-12 text-telos-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export default function ComoFuncionaPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -140,7 +140,7 @@ export default function ComoFuncionaPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -162,10 +162,10 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-gold-500/20 to-telos-blue-500/20 rounded-2xl blur-xl animate-pulse-slow"></div>
-                      <div className="relative bg-gradient-to-br from-telos-gold-500 to-telos-gold-600 rounded-2xl p-8 shadow-xl">
+                      <div className="absolute -inset-4 bg-gradient-to-r from-[#0D7377]/20 to-telos-blue-500/20 rounded-2xl blur-xl animate-pulse-slow"></div>
+                      <div className="relative bg-[#0D7377] rounded-2xl p-8 shadow-xl">
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
-                          <svg className="w-12 h-12 text-telos-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-12 h-12 text-[#14BDAE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                           </svg>
                         </div>
@@ -184,7 +184,7 @@ export default function ComoFuncionaPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -193,7 +193,7 @@ export default function ComoFuncionaPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -205,7 +205,7 @@ export default function ComoFuncionaPage() {
                   </div>
                 </div>
 
-                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5 bg-gradient-to-b from-telos-gold-500 to-transparent"></div>
+                <div className="hidden md:block absolute left-[5rem] top-full h-12 w-0.5 bg-gradient-to-b from-[#0D7377] to-transparent"></div>
               </div>
             </FadeIn>
 
@@ -215,7 +215,7 @@ export default function ComoFuncionaPage() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <div className="relative">
-                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-blue-500/20 to-telos-gold-500/20 rounded-2xl blur-xl"></div>
+                      <div className="absolute -inset-4 bg-gradient-to-r from-telos-blue-500/20 to-[#0D7377]/20 rounded-2xl blur-xl"></div>
                       <div className="relative bg-gradient-to-br from-telos-blue-500 via-telos-blue-600 to-telos-purple-600 rounded-2xl p-8 shadow-xl">
                         <div className="flex items-center justify-center w-20 h-20 bg-[#0B0E14] rounded-xl mb-4">
                           <svg className="w-12 h-12 text-telos-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function ComoFuncionaPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -246,7 +246,7 @@ export default function ComoFuncionaPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3">
-                        <svg className="w-6 h-6 text-telos-gold-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-6 h-6 text-[#14BDAE] flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                         <div>
@@ -268,12 +268,12 @@ export default function ComoFuncionaPage() {
         <div className="container mx-auto px-6">
           <FadeIn>
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-telos-gold-500/10 backdrop-blur-sm rounded-full mb-6 border border-telos-gold-500/20">
-                <svg className="w-5 h-5 text-telos-gold-500" fill="currentColor" viewBox="0 0 20 20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#0D7377]/10 backdrop-blur-sm rounded-full mb-6 border border-[#0D7377]/20">
+                <svg className="w-5 h-5 text-[#14BDAE]" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M13 7H7v6h6V7z" />
                   <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm font-medium text-telos-gold-700">Stack Tecnológico</span>
+                <span className="text-sm font-medium text-[#14BDAE]">Stack Tecnológico</span>
               </div>
 
               <h2 className="text-4xl font-bold mb-4" style={{ color: '#F0EAD6' }}>
@@ -310,25 +310,25 @@ export default function ComoFuncionaPage() {
 
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Análise de sintomas reportados</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Padrões temporais de evolução</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Correlação entre variáveis clínicas</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Score de risco estratificado</span>
@@ -361,25 +361,25 @@ export default function ComoFuncionaPage() {
 
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Dados anonimizados via SHA-256</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>100% conforme LGPD</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Melhoria contínua do modelo</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Benchmarks anônimos por especialidade</span>
@@ -391,17 +391,17 @@ export default function ComoFuncionaPage() {
 
             {/* IA Conversacional */}
             <FadeIn delay={0.3}>
-              <div className="group relative rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#1E2535] hover:border-[#E8C97A]/30" style={{ backgroundColor: '#161B27' }}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-telos-gold-500/10 to-transparent rounded-bl-full"></div>
+              <div className="group relative rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#1E2535] hover:border-[#14BDAE]/30" style={{ backgroundColor: '#161B27' }}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0D7377]/10 to-transparent rounded-bl-full"></div>
 
                 <div className="relative">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-telos-gold-500 to-telos-gold-600 rounded-xl mb-6 group-hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center w-16 h-16 bg-[#0D7377] rounded-xl mb-6 group-hover:scale-110 transition-transform">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-4" style={{ color: '#E8C97A' }}>
+                  <h3 className="text-2xl font-bold mb-4" style={{ color: '#14BDAE' }}>
                     IA Conversacional
                   </h3>
 
@@ -412,25 +412,25 @@ export default function ComoFuncionaPage() {
 
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>NLP médico especializado</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Extração automática de sintomas</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Entendimento de contexto clínico</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Geração de resumos estruturados</span>
@@ -463,25 +463,25 @@ export default function ComoFuncionaPage() {
 
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Criptografia end-to-end</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Alta taxa de abertura (98%+)</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Envios programados automáticos</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-telos-gold-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-[#14BDAE] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       <span className="text-sm" style={{ color: '#D8DEEB' }}>Confirmação de leitura e entrega</span>
@@ -528,7 +528,7 @@ export default function ComoFuncionaPage() {
                         </th>
                         <th className="px-6 py-4 text-center bg-gradient-to-br from-telos-blue-500 to-telos-blue-600">
                           <div className="flex items-center justify-center gap-2">
-                            <svg className="w-5 h-5 text-telos-gold-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-[#14BDAE]" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                             <span className="text-lg font-bold text-white">VigIA</span>
@@ -619,8 +619,8 @@ export default function ComoFuncionaPage() {
                   <div className="text-4xl font-bold mb-2" style={{ color: '#14BDAE' }}>90%+</div>
                   <p className="text-sm font-medium" style={{ color: '#D8DEEB' }}>Redução de tempo operacional</p>
                 </div>
-                <div className="rounded-xl p-6 border" style={{ backgroundColor: '#1E2535', borderColor: '#C9A84C' }}>
-                  <div className="text-4xl font-bold mb-2" style={{ color: '#E8C97A' }}>24/7</div>
+                <div className="rounded-xl p-6 border" style={{ backgroundColor: '#1E2535', borderColor: '#1E2535' }}>
+                  <div className="text-4xl font-bold mb-2" style={{ color: '#14BDAE' }}>24/7</div>
                   <p className="text-sm font-medium" style={{ color: '#D8DEEB' }}>Monitoramento contínuo ativo</p>
                 </div>
                 <div className="rounded-xl p-6 border" style={{ backgroundColor: '#1E2535', borderColor: '#14BDAE' }}>
@@ -679,7 +679,7 @@ export default function ComoFuncionaPage() {
                 Transformando o acompanhamento pós-operatório com IA.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="w-14 h-14 bg-[#1E2535] hover:bg-[#C9A84C] rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
+                <a href="#" className="w-14 h-14 bg-[#1E2535] hover:bg-[#0D7377] rounded-xl flex items-center justify-center transition-all hover-lift hover:scale-110">
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
@@ -692,7 +692,7 @@ export default function ComoFuncionaPage() {
               <h3 className="text-lg font-bold text-white">Navegação</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -700,7 +700,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sobre" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/sobre" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -708,7 +708,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/pricing" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -716,7 +716,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cadastro-medico" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/cadastro-medico" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -724,7 +724,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth/login" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/auth/login" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -739,7 +739,7 @@ export default function ComoFuncionaPage() {
               <h3 className="text-lg font-bold text-white">Para Médicos</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/pricing" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/pricing" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -747,7 +747,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/como-funciona" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/como-funciona" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -755,7 +755,7 @@ export default function ComoFuncionaPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="text-blue-200 hover:text-telos-gold transition-colors flex items-center gap-2">
+                  <Link href="/faq" className="text-blue-200 hover:text-[#14BDAE] transition-colors flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -775,7 +775,7 @@ export default function ComoFuncionaPage() {
                   </svg>
                   <div>
                     <p className="font-semibold text-white">Email</p>
-                    <a href="mailto:telos.ia@gmail.com" className="hover:text-telos-gold transition-colors">
+                    <a href="mailto:telos.ia@gmail.com" className="hover:text-[#14BDAE] transition-colors">
                       telos.ia@gmail.com
                     </a>
                   </div>
@@ -801,16 +801,16 @@ export default function ComoFuncionaPage() {
                 © 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">
+                <Link href="/termos" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
                   Termos de Uso
                 </Link>
-                <Link href="/termos" className="text-blue-200 hover:text-telos-gold transition-colors">
+                <Link href="/termos" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
                   Política de Privacidade
                 </Link>
-                <a href="#" className="text-blue-200 hover:text-telos-gold transition-colors">
+                <a href="#" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
                   LGPD
                 </a>
-                <a href="#" className="text-blue-200 hover:text-telos-gold transition-colors">
+                <a href="#" className="text-blue-200 hover:text-[#14BDAE] transition-colors">
                   Cookies
                 </a>
               </div>

@@ -228,7 +228,7 @@ export default function FAQPage() {
           <div className="max-w-4xl mx-auto space-y-4">
             {filteredFAQ.map((item, idx) => (
               <FadeIn key={idx} delay={idx * 0.05} direction="up">
-                <div className="border-2 border-[#1E2535] rounded-xl overflow-hidden hover:border-[#C9A84C] transition-all">
+                <div className="border-2 border-[#1E2535] rounded-xl overflow-hidden hover:border-[#14BDAE] transition-all">
                   <button
                     onClick={() => setOpenItem(openItem === idx ? null : idx)}
                     className="w-full px-6 py-5 flex items-start justify-between gap-4 text-left hover:bg-[#161B27] transition-colors"
@@ -247,7 +247,7 @@ export default function FAQPage() {
                       </h3>
                     </div>
                     <svg
-                      className={`w-6 h-6 text-[#C9A84C] flex-shrink-0 transition-transform ${
+                      className={`w-6 h-6 text-[#14BDAE] flex-shrink-0 transition-transform ${
                         openItem === idx ? "rotate-180" : ""
                       }`}
                       fill="none"
@@ -260,7 +260,7 @@ export default function FAQPage() {
 
                   {openItem === idx && (
                     <div className="px-6 pb-6">
-                      <div className="pl-4 border-l-4 border-[#C9A84C]">
+                      <div className="pl-4 border-l-4 border-[#14BDAE]">
                         <p className="text-[#D8DEEB] leading-relaxed text-justify">
                           {item.answer}
                         </p>
@@ -287,7 +287,7 @@ export default function FAQPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/cadastro-medico?plan=founding"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#C9A84C] text-[#0B0E14] rounded-xl font-bold text-lg hover-lift shadow-2xl hover:bg-[#E8C97A] transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#0D7377] text-[#F0EAD6] rounded-xl font-bold text-lg hover-lift shadow-2xl hover:bg-[#14BDAE] transition-colors"
               >
                 Começar Agora
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,16 +319,16 @@ export default function FAQPage() {
               A Inteligência no Cuidado para o Propósito da Recuperação
             </p>
             <div className="flex justify-center gap-6 text-sm">
-              <Link href="/" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
+              <Link href="/" className="text-[#7A8299] hover:text-[#F0EAD6] transition-colors">
                 Início
               </Link>
-              <Link href="/sobre" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
+              <Link href="/sobre" className="text-[#7A8299] hover:text-[#F0EAD6] transition-colors">
                 Sobre
               </Link>
-              <Link href="/pricing" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
+              <Link href="/pricing" className="text-[#7A8299] hover:text-[#F0EAD6] transition-colors">
                 Planos
               </Link>
-              <Link href="/termos" className="text-[#7A8299] hover:text-[#C9A84C] transition-colors">
+              <Link href="/termos" className="text-[#7A8299] hover:text-[#F0EAD6] transition-colors">
                 Termos
               </Link>
             </div>

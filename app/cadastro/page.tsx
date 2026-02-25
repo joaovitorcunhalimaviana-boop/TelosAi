@@ -72,10 +72,10 @@ export default function CadastroPage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-2 border" style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: '#C9A84C' }}></span>
-              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: '#C9A84C' }}></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: '#14BDAE' }}></span>
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: '#14BDAE' }}></span>
             </span>
-            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#E8C97A' }}>
+            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#14BDAE' }}>
               Concierge Digital
             </span>
           </div>

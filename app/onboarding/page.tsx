@@ -66,7 +66,7 @@ export default function OnboardingPage() {
           {currentStep === 1 && (
             <div className="p-12 text-center space-y-8">
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4" style={{ backgroundColor: '#0D7377' }}>
-                <svg className="w-12 h-12" style={{ color: '#E8C97A' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12" style={{ color: '#14BDAE' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                 </svg>
               </div>
@@ -249,7 +249,7 @@ export default function OnboardingPage() {
           {/* Step 4: First Patient CTA */}
           {currentStep === 4 && (
             <div className="p-12 text-center space-y-8">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4" style={{ backgroundColor: '#C9A84C' }}>
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4" style={{ backgroundColor: '#0D7377' }}>
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                       idx + 1 === currentStep
                         ? "bg-[#14BDAE] w-8"
                         : idx + 1 < currentStep
-                        ? "bg-[#C9A84C]"
+                        ? "bg-[#14BDAE]"
                         : "bg-[#1E2535]"
                     }`}
                   />

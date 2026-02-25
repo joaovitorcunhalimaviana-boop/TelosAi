@@ -138,7 +138,7 @@ function CadastroMedicoPage() {
     founding: {
       name: "Founding Members",
       price: "R$ 400",
-      color: "text-telos-gold",
+      color: "text-[#14BDAE]",
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -167,7 +167,7 @@ function CadastroMedicoPage() {
         <div className="max-w-2xl mx-auto">
           {/* Plan Badge */}
           <div className="text-center mb-8">
-            <div className={`inline-flex items-center gap-2 px-6 py-3 ${plan === 'founding' ? 'bg-[#C9A84C]' : 'bg-[#0D7377]'} text-white rounded-full shadow-lg mb-4`}>
+            <div className={`inline-flex items-center gap-2 px-6 py-3 ${plan === 'founding' ? 'bg-[#0D7377]' : 'bg-[#0D7377]'} text-white rounded-full shadow-lg mb-4`}>
               {selectedPlan.icon}
               <span className="font-bold text-lg">{selectedPlan.name}</span>
               <span className="text-lg">{selectedPlan.price}/mês</span>
@@ -349,7 +349,7 @@ function CadastroMedicoPage() {
                 )}
 
                 {/* NOVO: Termos de Uso e Compartilhamento de Dados */}
-                <div className="p-4 rounded-lg border-2" style={{ backgroundColor: '#1E2535', borderColor: '#C9A84C' }}>
+                <div className="p-4 rounded-lg border-2" style={{ backgroundColor: '#1E2535', borderColor: '#1E2535' }}>
                   <div className="flex items-start gap-3">
                     <Checkbox
                       id="acceptedTermsOfService"
@@ -357,7 +357,7 @@ function CadastroMedicoPage() {
                       onCheckedChange={(checked) => setValue("acceptedTermsOfService", checked as boolean)}
                     />
                     <Label htmlFor="acceptedTermsOfService" className="text-sm cursor-pointer leading-relaxed">
-                      <strong style={{ color: '#E8C97A' }}>OBRIGATÓRIO:</strong> Li e aceito os{" "}
+                      <strong style={{ color: '#14BDAE' }}>OBRIGATÓRIO:</strong> Li e aceito os{" "}
                       <Link href="/terms-of-service" className="font-bold underline" style={{ color: '#14BDAE' }} target="_blank">
                         Termos de Uso e Política de Privacidade
                       </Link>{" "}
