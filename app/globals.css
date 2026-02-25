@@ -178,11 +178,11 @@
 
   /* Glassmorphism Utilities */
   .glass-panel {
-    @apply backdrop-blur-md bg-white/10 border border-white/20 shadow-xl;
+    @apply backdrop-blur-md bg-[#0B0E14]/40 border border-white/10 shadow-xl;
   }
 
   .glass-card {
-    @apply backdrop-blur-sm bg-white/60 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply backdrop-blur-md bg-[#0B0E14]/60 border border-white/10 shadow-xl hover:shadow-2xl transition-all duration-300;
   }
 
   .glass-card-dark {
@@ -1257,11 +1257,11 @@ input[type="radio"]:focus-visible+label {
 
 /* Glassmorphism Premium */
 .glass-premium {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(11, 14, 20, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(11, 14, 20, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .glass-premium-dark {
@@ -1474,11 +1474,11 @@ input[type="radio"]:focus-visible+label {
 
 /* Header Glass Effect */
 .header-glass {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 1px 3px rgba(11, 14, 20, 0.04);
+  background: rgba(11, 14, 20, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid #1E2535;
+  box-shadow: none;
 }
 
 /* Spotlight Animation for Spline CTA */

@@ -16,7 +16,11 @@ export function DashboardHeader() {
   const isAdmin = userRole === 'admin';
 
   return (
-    <header id="dashboard-header" className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
+    <header
+      id="dashboard-header"
+      className="sticky top-0 z-50 w-full backdrop-blur-md"
+      style={{ backgroundColor: 'rgba(11, 14, 20, 0.9)', borderBottom: '1px solid #1E2535' }}
+    >
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
         {/* Logo e Nome */}
         <Link href="/dashboard" className="group flex items-center gap-3">
@@ -31,10 +35,10 @@ export function DashboardHeader() {
             />
           </div>
           <div className="hidden sm:block">
-            <h1 className="text-xl font-brand font-bold" style={{ color: '#0D7377' }}>
-              Vig<span style={{ color: '#14BDAE' }}>IA</span>
+            <h1 className="text-xl font-bold" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              <span style={{ color: '#F0EAD6' }}>Vig</span><span style={{ color: '#14BDAE', fontStyle: 'italic' }}>IA</span>
             </h1>
-            <p className="text-xs text-gray-600">Vigilância contínua</p>
+            <p className="text-xs" style={{ color: '#7A8299' }}>Vigilância contínua</p>
           </div>
         </Link>
 
@@ -42,8 +46,10 @@ export function DashboardHeader() {
         <nav className="hidden md:flex items-center gap-6 mx-6">
           <Link
             href="/dashboard"
-            className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-              }`}
+            className="text-sm font-medium transition-colors"
+            style={{ color: pathname === '/dashboard' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard' ? 700 : 500 }}
+            onMouseEnter={(e) => { if (pathname !== '/dashboard') e.currentTarget.style.color = '#C9A84C' }}
+            onMouseLeave={(e) => { if (pathname !== '/dashboard') e.currentTarget.style.color = '#7A8299' }}
           >
             Dashboard
           </Link>
@@ -51,8 +57,10 @@ export function DashboardHeader() {
           {(isMedico || isAdmin) && (
             <Link
               href="/dashboard/protocolos"
-              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/protocolos' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-                }`}
+              className="text-sm font-medium transition-colors"
+              style={{ color: pathname === '/dashboard/protocolos' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/protocolos' ? 700 : 500 }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/protocolos') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseLeave={(e) => { if (pathname !== '/dashboard/protocolos') e.currentTarget.style.color = '#7A8299' }}
             >
               Protocolos
             </Link>
@@ -61,8 +69,10 @@ export function DashboardHeader() {
           <Link
             href="/dashboard/pesquisas"
             data-tutorial="research-btn"
-            className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/pesquisas' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-              }`}
+            className="text-sm font-medium transition-colors"
+            style={{ color: pathname === '/dashboard/pesquisas' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/pesquisas' ? 700 : 500 }}
+            onMouseEnter={(e) => { if (pathname !== '/dashboard/pesquisas') e.currentTarget.style.color = '#C9A84C' }}
+            onMouseLeave={(e) => { if (pathname !== '/dashboard/pesquisas') e.currentTarget.style.color = '#7A8299' }}
           >
             Pesquisas
           </Link>
@@ -70,8 +80,10 @@ export function DashboardHeader() {
           {(isMedico || isAdmin) && (
             <Link
               href="/dashboard/dados-agregados"
-              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/dados-agregados' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-                }`}
+              className="text-sm font-medium transition-colors"
+              style={{ color: pathname === '/dashboard/dados-agregados' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/dados-agregados' ? 700 : 500 }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/dados-agregados') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseLeave={(e) => { if (pathname !== '/dashboard/dados-agregados') e.currentTarget.style.color = '#7A8299' }}
             >
               Dados Agregados
             </Link>
@@ -80,8 +92,10 @@ export function DashboardHeader() {
           {isMedico && (
             <Link
               href="/dashboard/billing"
-              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/dashboard/billing' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-                }`}
+              className="text-sm font-medium transition-colors"
+              style={{ color: pathname === '/dashboard/billing' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/dashboard/billing' ? 700 : 500 }}
+              onMouseEnter={(e) => { if (pathname !== '/dashboard/billing') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseLeave={(e) => { if (pathname !== '/dashboard/billing') e.currentTarget.style.color = '#7A8299' }}
             >
               Meu Plano
             </Link>
@@ -90,8 +104,10 @@ export function DashboardHeader() {
           {isAdmin && (
             <Link
               href="/admin"
-              className={`text-sm font-medium transition-colors hover:text-[#0D7377] ${pathname === '/admin' ? 'text-[#0D7377] font-bold' : 'text-gray-500'
-                }`}
+              className="text-sm font-medium transition-colors"
+              style={{ color: pathname === '/admin' ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/admin' ? 700 : 500 }}
+              onMouseEnter={(e) => { if (pathname !== '/admin') e.currentTarget.style.color = '#C9A84C' }}
+              onMouseLeave={(e) => { if (pathname !== '/admin') e.currentTarget.style.color = '#7A8299' }}
             >
               Admin
             </Link>
@@ -104,13 +120,16 @@ export function DashboardHeader() {
           <NotificationBell />
 
           {session?.user && (
-            <div className="hidden lg:flex items-center gap-3 px-4 py-2 bg-teal-50 rounded-lg">
-              <User className="w-5 h-5 text-vigia-teal" />
+            <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-lg" style={{ backgroundColor: '#161B27' }}>
+              <User className="w-5 h-5" style={{ color: '#14BDAE' }} />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-vigia-teal">
+                <span className="text-sm font-semibold" style={{ color: '#F0EAD6' }}>
                   {session.user.name}
                 </span>
-                <span className="text-xs text-gray-600 capitalize">
+                <span
+                  className="text-xs capitalize px-1.5 py-0.5 rounded"
+                  style={{ color: '#F0EAD6', backgroundColor: 'rgba(20, 189, 174, 0.2)' }}
+                >
                   {isAdmin ? 'Administrador' : 'Médico'}
                 </span>
               </div>
@@ -119,7 +138,10 @@ export function DashboardHeader() {
 
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            style={{ color: '#7A8299', backgroundColor: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#161B27'; e.currentTarget.style.color = '#C9A84C' }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#7A8299' }}
             title="Sair"
           >
             <LogOut className="w-5 h-5" />
@@ -128,7 +150,7 @@ export function DashboardHeader() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 text-vigia-teal">
+        <button className="md:hidden p-2" style={{ color: '#14BDAE' }}>
           <svg
             className="w-6 h-6"
             fill="none"
