@@ -25,7 +25,7 @@ export const authConfig = {
         "/cadastro-medico",
         "/pricing",
         "/sobre",
-        "/termos",
+        "/termos-de-servico",
         "/api/postop/webhook",
         "/api/test",
         "/api/whatsapp/webhook",

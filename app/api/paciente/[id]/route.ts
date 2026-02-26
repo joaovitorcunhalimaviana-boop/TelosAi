@@ -198,10 +198,13 @@ export async function GET(
         },
         followUps: {
           include: {
-            responses: true,
+            responses: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
           },
           orderBy: {
-            scheduledDate: 'desc',
+            dayNumber: 'asc',
           },
         },
         consentTerms: {
