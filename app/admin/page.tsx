@@ -50,16 +50,16 @@ export default async function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+      <header className="backdrop-blur-md sticky top-0 z-50" style={{ backgroundColor: '#111520', borderBottom: '1px solid #1E2535' }}>
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[#0A2647]">
+              <h1 className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                 Admin Dashboard - VigIA
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                 Sistema de Acompanhamento Pós-Operatório
               </p>
             </div>
@@ -103,50 +103,50 @@ export default async function AdminDashboard() {
 
         {/* Detalhamento de Planos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg ring-1 ring-gold-200/50 p-6 border-l-4 border-l-[#D4AF37]">
+          <div className="backdrop-blur-md rounded-2xl shadow-lg p-6 border-l-4 border-l-[#D4AF37]" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-yellow-50 rounded-lg">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(201, 168, 76, 0.15)' }}>
                 <Star className="h-6 w-6 text-[#D4AF37]" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Founding Members</h2>
+              <h2 className="text-xl font-bold" style={{ color: '#F0EAD6' }}>Founding Members</h2>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-2 bg-yellow-50/50 rounded-md">
-                <span className="text-gray-600 font-medium">Total de membros</span>
+              <div className="flex justify-between items-center p-2 rounded-md" style={{ backgroundColor: 'rgba(201, 168, 76, 0.08)' }}>
+                <span className="font-medium" style={{ color: '#D8DEEB' }}>Total de membros</span>
                 <span className="text-2xl font-bold text-[#D4AF37]">{foundingMembers}</span>
               </div>
               <div className="flex justify-between items-center text-sm px-2">
-                <span className="text-gray-500">Plano base</span>
-                <span className="font-bold text-gray-900">R$ 400/mês</span>
+                <span style={{ color: '#7A8299' }}>Plano base</span>
+                <span className="font-bold" style={{ color: '#F0EAD6' }}>R$ 400/mês</span>
               </div>
               <div className="flex justify-between items-center text-sm px-2">
-                <span className="text-gray-500">Paciente adicional</span>
-                <span className="font-bold text-gray-900">R$ 150</span>
+                <span style={{ color: '#7A8299' }}>Paciente adicional</span>
+                <span className="font-bold" style={{ color: '#F0EAD6' }}>R$ 150</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg ring-1 ring-blue-100 p-6 border-l-4 border-l-[#0A2647]">
+          <div className="backdrop-blur-md rounded-2xl shadow-lg p-6 border-l-4 border-l-[#14BDAE]" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <UserCheck className="h-6 w-6 text-[#0A2647]" />
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(13, 115, 119, 0.15)' }}>
+                <UserCheck className="h-6 w-6" style={{ color: '#14BDAE' }} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Professional</h2>
+              <h2 className="text-xl font-bold" style={{ color: '#F0EAD6' }}>Professional</h2>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-2 bg-blue-50/50 rounded-md">
-                <span className="text-gray-600 font-medium">Total de membros</span>
-                <span className="text-2xl font-bold text-[#0A2647]">
+              <div className="flex justify-between items-center p-2 rounded-md" style={{ backgroundColor: 'rgba(13, 115, 119, 0.08)' }}>
+                <span className="font-medium" style={{ color: '#D8DEEB' }}>Total de membros</span>
+                <span className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                   {totalMedicos - foundingMembers}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm px-2">
-                <span className="text-gray-500">Plano base</span>
-                <span className="font-bold text-gray-900">R$ 500/mês</span>
+                <span style={{ color: '#7A8299' }}>Plano base</span>
+                <span className="font-bold" style={{ color: '#F0EAD6' }}>R$ 500/mês</span>
               </div>
               <div className="flex justify-between items-center text-sm px-2">
-                <span className="text-gray-500">Paciente adicional</span>
-                <span className="font-bold text-gray-900">R$ 180</span>
+                <span style={{ color: '#7A8299' }}>Paciente adicional</span>
+                <span className="font-bold" style={{ color: '#F0EAD6' }}>R$ 180</span>
               </div>
             </div>
           </div>
@@ -154,8 +154,8 @@ export default async function AdminDashboard() {
 
         {/* Links rápidos */}
         <div className="mb-6 mt-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            🚀 Ações Rápidas
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2" style={{ color: '#F0EAD6' }}>
+            Ações Rápidas
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -175,13 +175,13 @@ export default async function AdminDashboard() {
             href="/admin/collective-intelligence"
             title="Inteligência Coletiva"
             description="Insights de Machine Learning baseados em dados agregados de todos os médicos"
-            icon={<Brain className="h-6 w-6 text-purple-600" />}
+            icon={<Brain className="h-6 w-6" />}
           />
           <QuickLink
             href="/admin/audit-logs"
             title="Auditoria do Sistema"
             description="Histórico completo de ações e eventos do sistema"
-            icon={<FileText className="h-6 w-6 text-blue-600" />}
+            icon={<FileText className="h-6 w-6" />}
           />
         </div>
       </div>

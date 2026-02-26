@@ -629,9 +629,20 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       if (stillMissing.length > 0) {
         console.log('⚠️ IA marcou isComplete=true mas ainda faltam dados:', stillMissing);
         isComplete = false;
-        // Substituir a despedida da IA por uma pergunta sobre o que falta
-        const nextMissing = stillMissing[0];
-        aiResponse = `Antes de encerrar, preciso perguntar mais uma coisa: ${nextMissing}`;
+        // Substituir a despedida da IA por uma pergunta amigável sobre o que falta
+        // Usar perguntas prontas para campos comuns, caso contrário usar a descrição técnica
+        const friendlyQuestions: Record<string, string> = {
+          'Se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas)':
+            'Ah, antes de encerrar, preciso te perguntar uma coisa importante: você está seguindo os cuidados locais orientados pelo médico? Como uso de pomadas, banhos de assento, compressas... Está conseguindo fazer direitinho?',
+          'Deseja relatar mais alguma coisa ao médico':
+            'E para finalizar: tem mais alguma coisa que você gostaria de me contar? Qualquer sintoma, dúvida ou preocupação — pode falar livremente! 😊',
+        };
+        // Priorizar: additionalSymptoms deve ser o ÚLTIMO. Se há outros campos faltando, perguntar eles primeiro.
+        const missingExceptAdditional = stillMissing.filter(
+          m => m !== 'Deseja relatar mais alguma coisa ao médico'
+        );
+        const nextMissing = missingExceptAdditional.length > 0 ? missingExceptAdditional[0] : stillMissing[0];
+        aiResponse = friendlyQuestions[nextMissing] || `Antes de encerrar, preciso perguntar mais uma coisa: ${nextMissing}`;
       }
     }
 

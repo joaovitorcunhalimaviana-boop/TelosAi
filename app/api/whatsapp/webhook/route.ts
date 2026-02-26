@@ -674,6 +674,45 @@ async function sendImageScale(phone: string, scaleType: 'pain_scale') {
 // Funções legadas (determineCurrentPhase, interpretResponseLocally) removidas em favor da integração com IA conversacional.
 
 /**
+ * Gera pergunta forçada pelo servidor quando a IA esqueceu de perguntar campos obrigatórios.
+ * Isso garante que localCareAdherence e additionalSymptoms SEMPRE sejam perguntados.
+ */
+function getServerSideForcedQuestion(fieldName: string): string | null {
+  const questions: Record<string, string> = {
+    localCareAdherence:
+      'Ah, antes de encerrar, preciso te perguntar uma coisa importante: você está seguindo os cuidados locais orientados pelo médico? Como uso de pomadas, banhos de assento, compressas... Está conseguindo fazer direitinho?',
+    additionalSymptoms:
+      'E para finalizar: tem mais alguma coisa que você gostaria de me contar? Qualquer sintoma, dúvida ou preocupação — pode falar livremente! 😊',
+    pain:
+      'Preciso saber: como está sua dor agora, em repouso? Me diz um número de 0 a 10.',
+    bowelMovementSinceLastContact:
+      'Me conta: você evacuou desde a última vez que conversamos?',
+    bleeding:
+      'E sobre sangramento: está tendo algum sangramento? (nenhum, leve, moderado ou intenso)',
+    fever:
+      'Você teve febre?',
+    medications:
+      'Está tomando as medicações conforme o médico prescreveu?',
+    usedExtraMedication:
+      'Além das medicações prescritas, você tomou alguma outra medicação por conta própria?',
+    urination:
+      'Está conseguindo urinar normalmente?',
+    discharge:
+      'Você tem saída de secreção (líquido) pela ferida operatória?',
+    painDuringBowelMovement:
+      'E a dor durante a evacuação, de 0 a 10, quanto foi?',
+    satisfactionRating:
+      'De 0 a 10, qual nota você daria para o acompanhamento que recebeu durante sua recuperação?',
+    wouldRecommend:
+      'Você recomendaria este tipo de acompanhamento pós-operatório para outros pacientes?',
+    improvementSuggestions:
+      'Você tem alguma sugestão de como podemos melhorar o acompanhamento para futuros pacientes?',
+  };
+
+  return questions[fieldName] || null;
+}
+
+/**
  * Processa resposta do questionário com IA conversacional
  */
 async function processQuestionnaireAnswer(
@@ -801,9 +840,63 @@ async function processQuestionnaireAnswer(
     });
     const isActuallyComplete = aiResult.isComplete && updatedMissingFields.length === 0;
 
+    // PROACTIVE FORCE: Se a conversa já está longa (12+ mensagens) e faltam APENAS
+    // localCareAdherence e/ou additionalSymptoms, a IA provavelmente está ignorando esses campos.
+    // Forçar a pergunta proativamente mesmo sem isComplete=true.
+    const conversationLength = conversationHistory.length;
+    const criticalMissing = updatedMissingFields.filter(
+      f => f === 'localCareAdherence' || f === 'additionalSymptoms'
+    );
+    const otherMissing = updatedMissingFields.filter(
+      f => f !== 'localCareAdherence' && f !== 'additionalSymptoms'
+    );
+
+    if (!aiResult.isComplete && criticalMissing.length > 0 && otherMissing.length === 0 && conversationLength >= 12) {
+      // Todos os outros campos foram coletados, só faltam os críticos.
+      // A IA deveria estar perguntando estes mas não está. Forçar.
+      // Prioridade: localCareAdherence primeiro, additionalSymptoms por último
+      const fieldToForce = criticalMissing.includes('localCareAdherence')
+        ? 'localCareAdherence'
+        : 'additionalSymptoms';
+
+      const proactiveQuestion = getServerSideForcedQuestion(fieldToForce);
+      if (proactiveQuestion) {
+        // Verificar se a IA já perguntou sobre isso na resposta atual (evitar duplicata)
+        const aiResponseLower = aiResult.aiResponse.toLowerCase();
+        const alreadyAsked =
+          (fieldToForce === 'localCareAdherence' &&
+            (aiResponseLower.includes('cuidados locais') || aiResponseLower.includes('banho de assento') || aiResponseLower.includes('pomada'))) ||
+          (fieldToForce === 'additionalSymptoms' &&
+            (aiResponseLower.includes('mais alguma coisa') || aiResponseLower.includes('algo mais') || aiResponseLower.includes('relatar mais')));
+
+        if (!alreadyAsked) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          await sendEmpatheticResponse(phone, proactiveQuestion);
+          conversationHistory.push({ role: 'assistant', content: proactiveQuestion });
+          logger.info('🔄 Pergunta PROATIVA forçada para campo crítico:', fieldToForce);
+        }
+      }
+    }
+
+    // SERVER-SIDE FORCE: Se a IA marcou isComplete mas faltam campos,
+    // enviar mensagem ADICIONAL perguntando sobre o campo que falta.
+    // Isso garante que localCareAdherence e additionalSymptoms SEMPRE sejam perguntados.
     if (aiResult.isComplete && updatedMissingFields.length > 0) {
       logger.warn('⚠️ Claude marcou isComplete=true mas ainda faltam campos:', updatedMissingFields);
       logger.warn('Dados coletados até agora:', mergedData);
+
+      // Determinar qual campo perguntar (additionalSymptoms sempre por último)
+      const fieldToAsk = updatedMissingFields.includes('additionalSymptoms') && updatedMissingFields.length === 1
+        ? 'additionalSymptoms'
+        : updatedMissingFields.find(f => f !== 'additionalSymptoms') || updatedMissingFields[0];
+
+      const forcedQuestion = getServerSideForcedQuestion(fieldToAsk);
+      if (forcedQuestion) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Pequena pausa
+        await sendEmpatheticResponse(phone, forcedQuestion);
+        conversationHistory.push({ role: 'assistant', content: forcedQuestion });
+        logger.info('🔄 Pergunta forçada enviada para campo:', fieldToAsk);
+      }
     }
 
     const updatedQuestionnaireData = {
@@ -857,6 +950,7 @@ async function processQuestionnaireAnswer(
       await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData as any, response?.id || '');
     } else if (aiResult.isComplete && updatedMissingFields.length > 0) {
       logger.info('🔄 Forçando continuação: faltam campos', updatedMissingFields);
+      // A pergunta forçada já foi enviada acima. Não finalizar.
     }
 
     // 10. Alertar médico se urgência alta

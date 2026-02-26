@@ -133,8 +133,8 @@ export default function PacientesPage() {
       sortable: true,
       render: (value, row) => (
         <div>
-          <div className="font-medium">{value}</div>
-          <div className="text-xs text-gray-500">{row.phone}</div>
+          <div className="font-medium" style={{ color: '#F0EAD6' }}>{value}</div>
+          <div className="text-xs" style={{ color: '#7A8299' }}>{row.phone}</div>
         </div>
       ),
     },
@@ -142,10 +142,10 @@ export default function PacientesPage() {
       key: "age",
       label: "Idade/Sexo",
       render: (value, row) => (
-        <div className="text-sm">
+        <div className="text-sm" style={{ color: '#D8DEEB' }}>
           {value || "N/A"} anos
           {row.sex && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs" style={{ color: '#7A8299' }}>
               {row.sex === "Masculino" ? "M" : row.sex === "Feminino" ? "F" : row.sex}
             </div>
           )}
@@ -159,17 +159,17 @@ export default function PacientesPage() {
       render: (value) => {
         if (!value) {
           return (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs border-0" style={{ backgroundColor: 'rgba(122, 130, 153, 0.15)', color: '#7A8299' }}>
               Sem cirurgia
             </Badge>
           );
         }
         return (
           <div>
-            <Badge variant="default" className="text-xs">
+            <Badge variant="default" className="text-xs border-0" style={{ backgroundColor: 'rgba(13, 115, 119, 0.15)', color: '#14BDAE' }}>
               {getSurgeryTypeLabel(value.type)}
             </Badge>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs mt-1" style={{ color: '#7A8299' }}>
               {new Date(value.date).toLocaleDateString("pt-BR")}
             </div>
           </div>
@@ -182,8 +182,8 @@ export default function PacientesPage() {
       sortable: false,
       render: (value) => (
         <div>
-          <div className="font-medium text-sm">{value.nomeCompleto}</div>
-          <div className="text-xs text-gray-500">{value.email}</div>
+          <div className="font-medium text-sm" style={{ color: '#F0EAD6' }}>{value.nomeCompleto}</div>
+          <div className="text-xs" style={{ color: '#7A8299' }}>{value.email}</div>
         </div>
       ),
     },
@@ -193,34 +193,37 @@ export default function PacientesPage() {
       sortable: false,
       render: (value) => {
         if (!value) {
-          return <span className="text-xs text-gray-400">N/A</span>;
+          return <span className="text-xs" style={{ color: '#7A8299' }}>N/A</span>;
         }
         return (
           <div>
             <Badge
               variant={value.status === "active" ? "default" : "secondary"}
-              className={
+              className="text-xs border-0"
+              style={
                 value.status === "active"
-                  ? "bg-green-500 hover:bg-green-600 text-xs"
-                  : "text-xs"
+                  ? { backgroundColor: 'rgba(26, 140, 106, 0.15)', color: '#1A8C6A' }
+                  : { backgroundColor: 'rgba(122, 130, 153, 0.15)', color: '#7A8299' }
               }
             >
               {value.status === "active" ? "Ativo" : value.status}
             </Badge>
             <div className="mt-1">
               <div className="flex items-center gap-2">
-                <div className="w-16 bg-gray-200 rounded-full h-2">
+                <div className="w-16 rounded-full h-2" style={{ backgroundColor: '#1E2535' }}>
                   <div
-                    className={`h-2 rounded-full ${value.dataCompleteness >= 80
-                      ? "bg-green-500"
-                      : value.dataCompleteness >= 40
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                      }`}
-                    style={{ width: `${value.dataCompleteness}%` }}
+                    className="h-2 rounded-full"
+                    style={{
+                      width: `${value.dataCompleteness}%`,
+                      backgroundColor: value.dataCompleteness >= 80
+                        ? '#1A8C6A'
+                        : value.dataCompleteness >= 40
+                          ? '#E8C97A'
+                          : '#C0392B',
+                    }}
                   />
                 </div>
-                <span className="text-xs text-gray-600">
+                <span className="text-xs" style={{ color: '#7A8299' }}>
                   {value.dataCompleteness}%
                 </span>
               </div>
@@ -234,7 +237,7 @@ export default function PacientesPage() {
       label: "Cadastro",
       sortable: true,
       render: (value) => (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm" style={{ color: '#D8DEEB' }}>
           {new Date(value).toLocaleDateString("pt-BR")}
         </div>
       ),
@@ -244,7 +247,7 @@ export default function PacientesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B0E14] to-[#111520]">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="shadow-sm" style={{ backgroundColor: '#111520', borderBottom: '1px solid #1E2535' }}>
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -256,10 +259,10 @@ export default function PacientesPage() {
                   </Button>
                 </Link>
               </div>
-              <h1 className="text-3xl font-bold text-blue-900">
+              <h1 className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                 Gerenciar Pacientes
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                 Visualize e exporte dados de todos os pacientes cadastrados
               </p>
             </div>
@@ -269,15 +272,15 @@ export default function PacientesPage() {
 
       <div className="container mx-auto px-6 py-8">
         {/* Filtros */}
-        <Card className="mb-6 border-2">
-          <CardHeader>
-            <CardTitle>Filtros e Busca</CardTitle>
+        <Card className="mb-6 border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Filtros e Busca</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Busca */}
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#7A8299' }} />
                 <Input
                   type="text"
                   placeholder="Buscar por nome, telefone ou email..."
@@ -331,34 +334,34 @@ export default function PacientesPage() {
 
         {/* Estatísticas rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Total de Pacientes</div>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Total de Pacientes</div>
+              <div className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                 {pagination.totalCount}
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Pacientes Ativos</div>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Pacientes Ativos</div>
+              <div className="text-2xl font-bold" style={{ color: '#1A8C6A' }}>
                 {pacientes.filter((p) => p.isActive).length}
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Com Cirurgia</div>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Com Cirurgia</div>
+              <div className="text-2xl font-bold text-purple-400">
                 {pacientes.filter((p) => p.lastSurgery !== null).length}
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Completude Média</div>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Completude Média</div>
+              <div className="text-2xl font-bold" style={{ color: '#E8C97A' }}>
                 {pacientes.length > 0
                   ? Math.round(
                     pacientes
@@ -380,8 +383,8 @@ export default function PacientesPage() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Carregando pacientes...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#14BDAE' }}></div>
+              <p style={{ color: '#D8DEEB' }}>Carregando pacientes...</p>
             </div>
           </div>
         ) : (
@@ -395,7 +398,7 @@ export default function PacientesPage() {
             {/* Pagination Controls */}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-between mt-6 px-2">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm" style={{ color: '#7A8299' }}>
                   Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{" "}
                   {Math.min(pagination.page * pagination.limit, pagination.totalCount)} de{" "}
                   {pagination.totalCount} pacientes
@@ -411,7 +414,7 @@ export default function PacientesPage() {
                     <ChevronLeft className="h-4 w-4" />
                     Anterior
                   </Button>
-                  <span className="text-sm font-medium px-3">
+                  <span className="text-sm font-medium px-3" style={{ color: '#D8DEEB' }}>
                     Página {pagination.page} de {pagination.totalPages}
                   </span>
                   <Button

@@ -31,9 +31,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-total-patients"
-            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG, gap: 0, padding: 0 }}
           >
-            <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
+            <CardHeader className="p-4" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Pacientes Totais
@@ -45,7 +45,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
                 />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-3">
               <div className="text-3xl font-bold" style={{ color: PRIMARY_COLOR }}>
                 {prefersReducedMotion ? (
                   stats?.totalPatients || 0
@@ -64,9 +64,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-active-patients"
-            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG, gap: 0, padding: 0 }}
           >
-            <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
+            <CardHeader className="p-4" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Pacientes Ativos
@@ -78,7 +78,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
                 />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-3">
               <div className="text-3xl font-bold" style={{ color: PRIMARY_COLOR }}>
                 {prefersReducedMotion ? (
                   stats?.activePatientsCount || 0
@@ -97,9 +97,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-followups-today"
-            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG }}
+            style={{ borderColor: PRIMARY_COLOR, backgroundColor: CARD_BG, gap: 0, padding: 0 }}
           >
-            <CardHeader className="pb-3" style={{ backgroundColor: HEADER_BG }}>
+            <CardHeader className="p-4" style={{ backgroundColor: HEADER_BG }}>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium" style={{ color: '#7A8299' }}>
                   Follow-ups Hoje
@@ -111,7 +111,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
                 />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-3">
               <div className="text-3xl font-bold" style={{ color: PRIMARY_COLOR }}>
                 {prefersReducedMotion ? (
                   stats?.pendingFollowUpsToday || 0
@@ -130,10 +130,10 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <Card
             className="border-2 hover:shadow-lg transition-shadow"
             data-tutorial="stats-critical-alerts"
-            style={{ borderColor: hasCriticalAlerts ? DANGER_COLOR : PRIMARY_COLOR, backgroundColor: CARD_BG }}
+            style={{ borderColor: hasCriticalAlerts ? DANGER_COLOR : PRIMARY_COLOR, backgroundColor: CARD_BG, gap: 0, padding: 0 }}
           >
             <CardHeader
-              className="pb-3"
+              className="p-4"
               style={{ backgroundColor: hasCriticalAlerts ? DANGER_BG : HEADER_BG }}
             >
               <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
                 />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-3">
               <div
                 className="text-3xl font-bold"
                 style={{ color: hasCriticalAlerts ? DANGER_COLOR : PRIMARY_COLOR }}

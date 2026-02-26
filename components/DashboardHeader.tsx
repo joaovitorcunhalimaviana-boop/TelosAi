@@ -26,7 +26,7 @@ export function DashboardHeader() {
         <Link href="/dashboard" className="group flex items-center gap-3">
           <div className="relative w-14 h-14">
             <Image
-              src="/icons/icon-192.png"
+              src="/icons/vigia-logo.svg"
               alt="VigIA Logo"
               width={56}
               height={56}

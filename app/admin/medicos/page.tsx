@@ -136,8 +136,8 @@ export default function MedicosPage() {
       sortable: true,
       render: (value, row) => (
         <div>
-          <div className="font-medium">{value}</div>
-          <div className="text-xs text-gray-500">{row.email}</div>
+          <div className="font-medium" style={{ color: '#F0EAD6' }}>{value}</div>
+          <div className="text-xs" style={{ color: '#7A8299' }}>{row.email}</div>
         </div>
       ),
     },
@@ -146,9 +146,9 @@ export default function MedicosPage() {
       label: "WhatsApp",
       render: (value, row) => (
         <div>
-          <div className="text-sm">{value || "Não informado"}</div>
+          <div className="text-sm" style={{ color: '#D8DEEB' }}>{value || "Não informado"}</div>
           {row.whatsappConnected && (
-            <Badge variant="default" className="mt-1 text-xs bg-green-500">
+            <Badge variant="default" className="mt-1 text-xs" style={{ backgroundColor: 'rgba(26, 140, 106, 0.15)', color: '#1A8C6A' }}>
               Conectado
             </Badge>
           )}
@@ -159,7 +159,7 @@ export default function MedicosPage() {
       key: "crm",
       label: "CRM",
       render: (value, row) => (
-        <div className="text-sm">
+        <div className="text-sm" style={{ color: '#D8DEEB' }}>
           {value ? `${value}/${row.estado}` : "Não informado"}
         </div>
       ),
@@ -172,16 +172,17 @@ export default function MedicosPage() {
         <div>
           <Badge
             variant={value === "founding" ? "secondary" : "default"}
-            className={
+            className="border-0"
+            style={
               value === "founding"
-                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                ? { backgroundColor: 'rgba(201, 168, 76, 0.15)', color: '#E8C97A' }
+                : { backgroundColor: 'rgba(13, 115, 119, 0.15)', color: '#14BDAE' }
             }
           >
             {value === "founding" ? "Founding" : "Professional"}
           </Badge>
           {row.isLifetimePrice && (
-            <div className="text-xs text-yellow-700 mt-1">Preço vitalício</div>
+            <div className="text-xs mt-1" style={{ color: '#E8C97A' }}>Preço vitalício</div>
           )}
         </div>
       ),
@@ -192,11 +193,11 @@ export default function MedicosPage() {
       sortable: true,
       render: (value, row) => (
         <div>
-          <div className="font-semibold">
+          <div className="font-semibold" style={{ color: '#F0EAD6' }}>
             {value}/{row.maxPatients}
           </div>
           {row.billing.additionalPatients > 0 && (
-            <div className="text-xs text-yellow-700">
+            <div className="text-xs" style={{ color: '#E8C97A' }}>
               +{row.billing.additionalPatients} adicionais
             </div>
           )}
@@ -209,11 +210,11 @@ export default function MedicosPage() {
       sortable: false,
       render: (value) => (
         <div>
-          <div className="font-bold text-blue-600">
+          <div className="font-bold" style={{ color: '#14BDAE' }}>
             R$ {value.totalMonthly.toFixed(2)}
           </div>
           {value.additionalPatients > 0 && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs" style={{ color: '#7A8299' }}>
               Base: R$ {value.basePrice.toFixed(2)} + R${" "}
               {value.additionalCost.toFixed(2)}
             </div>
@@ -226,7 +227,7 @@ export default function MedicosPage() {
       label: "Cadastro",
       sortable: true,
       render: (value) => (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm" style={{ color: '#D8DEEB' }}>
           {new Date(value).toLocaleDateString("pt-BR")}
         </div>
       ),
@@ -236,7 +237,7 @@ export default function MedicosPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B0E14] to-[#111520]">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm">
+      <header className="shadow-sm" style={{ backgroundColor: '#111520', borderBottom: '1px solid #1E2535' }}>
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -248,10 +249,10 @@ export default function MedicosPage() {
                   </Button>
                 </Link>
               </div>
-              <h1 className="text-3xl font-bold text-blue-900">
+              <h1 className="text-3xl font-bold" style={{ color: '#14BDAE' }}>
                 Gerenciar Médicos
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm mt-1" style={{ color: '#D8DEEB' }}>
                 Visualize e exporte dados de todos os médicos cadastrados
               </p>
             </div>
@@ -261,15 +262,15 @@ export default function MedicosPage() {
 
       <div className="container mx-auto px-6 py-8">
         {/* Filtros */}
-        <Card className="mb-6 border-2">
-          <CardHeader>
-            <CardTitle>Filtros e Busca</CardTitle>
+        <Card className="mb-6 border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
+          <CardHeader style={{ borderBottom: '1px solid #1E2535' }}>
+            <CardTitle style={{ color: '#F0EAD6' }}>Filtros e Busca</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Busca */}
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: '#7A8299' }} />
                 <Input
                   type="text"
                   placeholder="Buscar por nome, email ou WhatsApp..."
@@ -321,26 +322,26 @@ export default function MedicosPage() {
 
         {/* Estatísticas rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Total de Médicos</div>
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Total de Médicos</div>
+              <div className="text-2xl font-bold" style={{ color: '#14BDAE' }}>
                 {pagination.totalCount}
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Total de Pacientes</div>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Total de Pacientes</div>
+              <div className="text-2xl font-bold" style={{ color: '#1A8C6A' }}>
                 {medicos.reduce((sum, m) => sum + m.currentPatients, 0)}
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">MRR Total</div>
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>MRR Total</div>
+              <div className="text-2xl font-bold text-purple-400">
                 R${" "}
                 {medicos
                   .reduce((sum, m) => sum + m.billing.totalMonthly, 0)
@@ -351,10 +352,10 @@ export default function MedicosPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2">
+          <Card className="border-0" style={{ backgroundColor: '#111520', boxShadow: '0 0 0 1px #1E2535' }}>
             <CardContent className="pt-6">
-              <div className="text-sm text-gray-600">Pacientes Adicionais</div>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-sm" style={{ color: '#7A8299' }}>Pacientes Adicionais</div>
+              <div className="text-2xl font-bold" style={{ color: '#E8C97A' }}>
                 {medicos.reduce((sum, m) => sum + m.billing.additionalPatients, 0)}
               </div>
             </CardContent>
@@ -365,8 +366,8 @@ export default function MedicosPage() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Carregando médicos...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#14BDAE' }}></div>
+              <p style={{ color: '#D8DEEB' }}>Carregando médicos...</p>
             </div>
           </div>
         ) : (
@@ -380,7 +381,7 @@ export default function MedicosPage() {
             {/* Pagination Controls */}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-between mt-6 px-2">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm" style={{ color: '#7A8299' }}>
                   Mostrando {((pagination.page - 1) * pagination.limit) + 1} a{" "}
                   {Math.min(pagination.page * pagination.limit, pagination.totalCount)} de{" "}
                   {pagination.totalCount} médicos
@@ -396,7 +397,7 @@ export default function MedicosPage() {
                     <ChevronLeft className="h-4 w-4" />
                     Anterior
                   </Button>
-                  <span className="text-sm font-medium px-3">
+                  <span className="text-sm font-medium px-3" style={{ color: '#D8DEEB' }}>
                     Página {pagination.page} de {pagination.totalPages}
                   </span>
                   <Button
