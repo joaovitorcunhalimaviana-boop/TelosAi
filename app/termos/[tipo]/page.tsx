@@ -33,13 +33,14 @@ function TermoPage() {
 
   if (!termo) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Termo não encontrado</h1>
-          <p className="text-gray-600 mb-6">O tipo de termo solicitado não existe.</p>
+          <h1 className="text-2xl font-bold mb-4" style={{ color: '#D8DEEB' }}>Termo não encontrado</h1>
+          <p className="mb-6" style={{ color: '#7A8299' }}>O tipo de termo solicitado não existe.</p>
           <Link
             href="/termos"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 rounded-md hover:opacity-90"
+            style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
           >
             Voltar para Central de Termos
           </Link>
@@ -58,7 +59,8 @@ function TermoPage() {
       <div className="no-print fixed top-4 right-4 z-50 flex gap-2">
         <button
           onClick={handlePrint}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-lg flex items-center gap-2"
+          className="px-4 py-2 rounded-md shadow-lg flex items-center gap-2 hover:opacity-90"
+          style={{ backgroundColor: '#14BDAE', color: '#0B0E14' }}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -67,7 +69,8 @@ function TermoPage() {
         </button>
         <Link
           href="/termos"
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 shadow-lg flex items-center gap-2"
+          className="px-4 py-2 rounded-md shadow-lg flex items-center gap-2 hover:opacity-90"
+          style={{ backgroundColor: '#1C2233', color: '#D8DEEB' }}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -77,7 +80,7 @@ function TermoPage() {
       </div>
 
       {/* Container A4 */}
-      <div className="min-h-screen bg-gray-100 py-8 no-print-bg">
+      <div className="min-h-screen py-8 no-print-bg" style={{ backgroundColor: '#0B0E14' }}>
         <div className="a4-container mx-auto bg-white shadow-lg">
           {/* Cabeçalho */}
           <div className="header-section text-center border-b-2 border-gray-300 pb-4 mb-6">
@@ -95,55 +98,67 @@ function TermoPage() {
           </div>
 
           {/* Campos editáveis - apenas na tela */}
-          <div className="no-print mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-sm font-semibold text-yellow-800 mb-3">
+          <div className="no-print mb-6 p-4 rounded-md" style={{ backgroundColor: '#161B27', borderColor: '#2A3348', borderWidth: '1px', borderStyle: 'solid' }}>
+            <p className="text-sm font-semibold mb-3" style={{ color: '#14BDAE' }}>
               Preencha os dados abaixo antes de imprimir:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#D8DEEB' }}>
                   Nome do Paciente *
                 </label>
                 <input
                   type="text"
                   value={data.pacienteNome}
                   onChange={(e) => setData({ ...data, pacienteNome: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2"
+                  style={{ backgroundColor: '#1C2233', borderColor: '#2A3348', color: '#D8DEEB', borderWidth: '1px', borderStyle: 'solid' }}
+                  onFocus={(e) => { e.target.style.borderColor = '#14BDAE'; e.target.style.boxShadow = '0 0 0 2px rgba(20,189,174,0.3)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#2A3348'; e.target.style.boxShadow = 'none'; }}
                   placeholder="Nome completo"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#D8DEEB' }}>
                   CPF (opcional)
                 </label>
                 <input
                   type="text"
                   value={data.pacienteCPF}
                   onChange={(e) => setData({ ...data, pacienteCPF: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2"
+                  style={{ backgroundColor: '#1C2233', borderColor: '#2A3348', color: '#D8DEEB', borderWidth: '1px', borderStyle: 'solid' }}
+                  onFocus={(e) => { e.target.style.borderColor = '#14BDAE'; e.target.style.boxShadow = '0 0 0 2px rgba(20,189,174,0.3)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#2A3348'; e.target.style.boxShadow = 'none'; }}
                   placeholder="000.000.000-00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#D8DEEB' }}>
                   Cidade
                 </label>
                 <input
                   type="text"
                   value={data.cidade}
                   onChange={(e) => setData({ ...data, cidade: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2"
+                  style={{ backgroundColor: '#1C2233', borderColor: '#2A3348', color: '#D8DEEB', borderWidth: '1px', borderStyle: 'solid' }}
+                  onFocus={(e) => { e.target.style.borderColor = '#14BDAE'; e.target.style.boxShadow = '0 0 0 2px rgba(20,189,174,0.3)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#2A3348'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: '#D8DEEB' }}>
                   Data
                 </label>
                 <input
                   type="text"
                   value={data.data}
                   onChange={(e) => setData({ ...data, data: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2"
+                  style={{ backgroundColor: '#1C2233', borderColor: '#2A3348', color: '#D8DEEB', borderWidth: '1px', borderStyle: 'solid' }}
+                  onFocus={(e) => { e.target.style.borderColor = '#14BDAE'; e.target.style.boxShadow = '0 0 0 2px rgba(20,189,174,0.3)'; }}
+                  onBlur={(e) => { e.target.style.borderColor = '#2A3348'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
             </div>
@@ -202,7 +217,7 @@ function TermoPage() {
         }
 
         .no-print-bg {
-          background-color: #f3f4f6;
+          background-color: #0B0E14;
         }
 
         /* Estilos do conteúdo do termo */
@@ -320,7 +335,7 @@ function TermoPage() {
 
         /* Melhorias visuais */
         .header-section h1 {
-          color: #1e40af;
+          color: #14BDAE;
         }
 
         .header-section h2 {
@@ -338,10 +353,10 @@ function TermoPage() {
 export default function TermoPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando termo...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#14BDAE' }}></div>
+          <p style={{ color: '#7A8299' }}>Carregando termo...</p>
         </div>
       </div>
     }>

@@ -10,30 +10,57 @@ export const termoTemplates = {
     titulo: "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO",
     subtitulo: "Hemorroidectomia (Cirurgia de Hemorroidas)",
     conteudo: (data: TermoData) => `
-      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo Dr. João Vitor Viana, CRM-PB 12831, sobre o procedimento cirúrgico de <strong>Hemorroidectomia</strong> que será realizado.</p>
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo <strong>Dr. João Vitor Viana, CRM-PB 12831</strong>, sobre o procedimento cirúrgico de <strong>Hemorroidectomia</strong>, e forneço meu consentimento nos termos abaixo descritos.</p>
 
-      <h3>Informações sobre o procedimento:</h3>
-      <p>A hemorroidectomia é a cirurgia indicada para tratamento de hemorroidas (dilatações das veias do ânus e reto) quando outros tratamentos não foram eficazes. O procedimento consiste na remoção cirúrgica dos mamilos hemorroidários através de técnicas modernas que visam diminuir a dor no pós-operatório.</p>
+      <h3>1. Informações sobre o procedimento:</h3>
+      <p>A hemorroidectomia consiste na remoção cirúrgica dos coxins hemorroidários (estruturas vasculares localizadas no canal anal) quando estes se encontram doentes, causando sintomas como sangramento, prolapso (exteriorização), dor ou desconforto. O procedimento é indicado quando os tratamentos conservadores (medicações, mudanças alimentares) e procedimentos ambulatoriais (ligadura elástica) não foram suficientes para o controle dos sintomas.</p>
+      <p>Existem diferentes técnicas cirúrgicas disponíveis, entre elas: a técnica de Milligan-Morgan (ferida aberta), a técnica de Ferguson (ferida fechada com sutura) e a hemorroidopexia com grampeador (PPH). A escolha da técnica será definida pelo cirurgião com base no grau das hemorroidas, na anatomia do paciente e nas condições encontradas durante o ato operatório. O procedimento é realizado sob anestesia (raquidiana, geral ou combinada), conforme avaliação do anestesiologista.</p>
 
-      <h3>Riscos e complicações possíveis:</h3>
+      <h3>2. Complicações que podem ocorrer:</h3>
+      <p>Apesar de todos os cuidados técnicos adotados, complicações podem ocorrer, incluindo:</p>
       <ul>
-        <li>Dor no pós-operatório (controlada com medicação adequada)</li>
-        <li>Sangramento leve a moderado nas primeiras 24-48 horas</li>
-        <li>Dificuldade para urinar temporariamente</li>
-        <li>Infecção local (pouco frequente com os cuidados adequados)</li>
-        <li>Incontinência temporária ou permanente (pouco frequente)</li>
-        <li>Estenose anal (estreitamento do canal anal - pouco frequente)</li>
-        <li>Recidiva das hemorroidas (nova formação)</li>
+        <li><strong>Dor pós-operatória:</strong> Pode ocorrer dor na região anal, especialmente durante as evacuações nas primeiras duas semanas. <em>Impacto:</em> Desconforto que pode dificultar atividades cotidianas como sentar e caminhar. <em>Manejo:</em> Controlada com analgésicos, banhos de assento com água morna e uso de laxantes para amolecimento das fezes.</li>
+        <li><strong>Sangramento:</strong> Pode ocorrer sangramento durante ou após a cirurgia, no período de cicatrização. <em>Impacto:</em> Perda de sangue que pode causar preocupação e, se significativo, necessitar de intervenção. <em>Manejo:</em> Na maioria das vezes é autolimitado e cessa espontaneamente; em casos mais significativos, pode ser necessária revisão cirúrgica para hemostasia.</li>
+        <li><strong>Retenção urinária:</strong> Pode ocorrer dificuldade para urinar após a cirurgia, em decorrência da anestesia e do reflexo local. <em>Impacto:</em> Impossibilidade de esvaziamento vesical, causando desconforto abdominal. <em>Manejo:</em> Pode requerer passagem temporária de sonda vesical até a normalização da função urinária.</li>
+        <li><strong>Infecção da ferida operatória:</strong> Pode ocorrer infecção no local cirúrgico. <em>Impacto:</em> Sinais como vermelhidão, inchaço, secreção purulenta e febre podem surgir, retardando a cicatrização. <em>Manejo:</em> Tratada com antibióticos e cuidados locais da ferida.</li>
+        <li><strong>Incontinência fecal:</strong> Pode ocorrer dificuldade no controle de gases ou fezes. <em>Impacto:</em> Pode ser temporária ou, em situações excepcionais, permanente, afetando a qualidade de vida e atividades sociais. <em>Manejo:</em> Tratada com reabilitação do assoalho pélvico (biofeedback) e, quando necessário, acompanhamento especializado.</li>
+        <li><strong>Estenose anal:</strong> Pode ocorrer estreitamento do canal anal durante o processo de cicatrização. <em>Impacto:</em> Dificuldade para evacuar, fezes afiladas e desconforto. <em>Manejo:</em> Tratada com dilatações anais seriadas ou, em casos persistentes, cirurgia de revisão.</li>
+        <li><strong>Recidiva:</strong> Pode ocorrer reaparecimento das hemorroidas ao longo do tempo. <em>Impacto:</em> Retorno dos sintomas originais. <em>Manejo:</em> Pode necessitar de novo tratamento clínico ou cirúrgico.</li>
+        <li><strong>Fissura anal pós-operatória:</strong> Pode ocorrer formação de uma ferida na região do canal anal durante a cicatrização. <em>Impacto:</em> Dor ao evacuar. <em>Manejo:</em> Tratada com medicações tópicas e cuidados locais.</li>
+        <li><strong>Trombose hemorroidária residual:</strong> Pode ocorrer formação de coágulo em tecido hemorroidário remanescente. <em>Impacto:</em> Dor e inchaço local. <em>Manejo:</em> Tratada com anti-inflamatórios e, se necessário, drenagem.</li>
       </ul>
 
-      <h3>Cuidados pós-operatórios:</h3>
-      <p>Fui orientado(a) sobre a importância dos cuidados no pós-operatório, incluindo: higiene adequada da região anal, uso correto das medicações prescritas, alimentação rica em fibras, hidratação adequada e repouso nas primeiras semanas. O retorno às atividades normais será gradual conforme orientação médica.</p>
+      <h3>3. Fatores individuais que podem influenciar o resultado:</h3>
+      <p>Fui informado(a) de que determinadas condições pessoais podem influenciar o resultado cirúrgico e o processo de cicatrização, entre elas:</p>
+      <ul>
+        <li><strong>Diabetes mellitus:</strong> Pode retardar a cicatrização e aumentar o risco de infecção.</li>
+        <li><strong>Obesidade:</strong> Pode dificultar o acesso cirúrgico e a cicatrização.</li>
+        <li><strong>Tabagismo:</strong> Compromete a microcirculação e prejudica a cicatrização tecidual.</li>
+        <li><strong>Imunossupressão:</strong> Condições ou medicamentos que reduzem a imunidade podem aumentar o risco de complicações infecciosas.</li>
+        <li><strong>Uso crônico de corticosteroides:</strong> Pode enfraquecer os tecidos e dificultar a cicatrização.</li>
+        <li><strong>Cirurgias prévias na região anal:</strong> Podem alterar a anatomia e aumentar a complexidade do procedimento.</li>
+        <li><strong>Doença inflamatória intestinal:</strong> Pode comprometer a cicatrização e alterar o planejamento cirúrgico.</li>
+        <li><strong>Coagulopatias ou uso de anticoagulantes:</strong> Podem aumentar o risco de sangramento no período perioperatório.</li>
+      </ul>
 
-      <h3>Alternativas de tratamento:</h3>
-      <p>Fui informado(a) sobre as alternativas de tratamento não cirúrgico, incluindo tratamento clínico com medicações, mudanças alimentares, e procedimentos ambulatoriais como ligadura elástica. Compreendo que a cirurgia foi indicada por ser a melhor opção para o meu caso.</p>
+      <h3>4. Cuidados pós-operatórios:</h3>
+      <p>Fui orientado(a) sobre a importância dos cuidados no pós-operatório, incluindo: higiene adequada da região anal após cada evacuação, banhos de assento com água morna, uso correto das medicações prescritas (analgésicos, anti-inflamatórios, laxantes), alimentação rica em fibras e ingestão abundante de líquidos para manter as fezes macias, e repouso relativo nas primeiras semanas. O retorno às atividades laborais e físicas será gradual, conforme orientação médica individualizada. As consultas de retorno são indispensáveis para acompanhamento da cicatrização.</p>
 
-      <h3>Consentimento:</h3>
-      <p>Declaro que tive oportunidade de esclarecer todas as minhas dúvidas e que compreendi todas as informações fornecidas. Autorizo a realização do procedimento cirúrgico e estou ciente dos riscos envolvidos.</p>
+      <h3>5. Alternativas de tratamento:</h3>
+      <p>Fui informado(a) sobre as alternativas ao tratamento cirúrgico, incluindo: tratamento clínico conservador com medicações tópicas e orais, mudanças na dieta e hábitos intestinais, e procedimentos ambulatoriais como a ligadura elástica. Compreendo que a cirurgia foi indicada por ser a melhor opção para o meu caso clínico, considerando o grau das hemorroidas e a resposta insatisfatória aos tratamentos prévios.</p>
+
+      <h3>6. Consentimento:</h3>
+      <p>Declaro que:</p>
+      <ul>
+        <li>Fui informado(a), em linguagem acessível, sobre o procedimento a ser realizado, seus riscos, benefícios e alternativas terapêuticas;</li>
+        <li>Tive a oportunidade de fazer perguntas e todas as minhas dúvidas foram esclarecidas de forma satisfatória;</li>
+        <li>Compreendo que complicações podem ocorrer mesmo quando a técnica cirúrgica é realizada de forma correta e dentro dos padrões estabelecidos pela boa prática médica;</li>
+        <li>Compreendo que o resultado do procedimento não pode ser garantido de forma absoluta;</li>
+        <li>Autorizo o Dr. João Vitor Viana, CRM-PB 12831, e sua equipe a realizarem o procedimento cirúrgico de hemorroidectomia, bem como quaisquer procedimentos adicionais que se façam necessários durante o ato operatório;</li>
+        <li>Recebi uma cópia deste Termo de Consentimento Livre e Esclarecido.</li>
+      </ul>
+
+      <p style="margin-top: 30px;"><em>Data do consentimento: ${data.data}${data.cidade ? ` - ${data.cidade}` : ''}</em></p>
     `
   },
 
@@ -41,30 +68,57 @@ export const termoTemplates = {
     titulo: "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO",
     subtitulo: "Tratamento Cirúrgico de Fístula Anal",
     conteudo: (data: TermoData) => `
-      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo Dr. João Vitor Viana, CRM-PB 12831, sobre o procedimento cirúrgico para tratamento de <strong>Fístula Anal</strong>.</p>
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo <strong>Dr. João Vitor Viana, CRM-PB 12831</strong>, sobre o procedimento cirúrgico para tratamento de <strong>Fístula Anal</strong>, e forneço meu consentimento nos termos abaixo descritos.</p>
 
-      <h3>Informações sobre o procedimento:</h3>
-      <p>A fístula anal é um trajeto anormal que se forma entre o canal anal e a pele ao redor do ânus, geralmente como consequência de um abscesso. O tratamento cirúrgico visa identificar e tratar o trajeto fistuloso, podendo envolver diferentes técnicas dependendo da complexidade da fístula (fistulotomia, uso de seton, LIFT, entre outras).</p>
+      <h3>1. Informações sobre o procedimento:</h3>
+      <p>A fístula anal é um trajeto anormal (túnel) que se forma entre o interior do canal anal e a pele da região ao redor do ânus, geralmente como consequência de um abscesso (coleção de pus) prévio. Esse trajeto mantém secreção persistente e pode causar dor, desconforto e infecções de repetição, sendo o tratamento cirúrgico necessário para a resolução definitiva.</p>
+      <p>Existem diversas técnicas cirúrgicas disponíveis, cuja escolha depende da complexidade do trajeto fistuloso e do grau de envolvimento do músculo esfíncter anal. Entre as opções estão: fistulotomia (abertura do trajeto), colocação de sedenho (fio de drenagem), técnica LIFT (ligadura do trajeto interesfincteriano), retalho de avanço mucoso, VAAFT (tratamento videoassistido) e FiLaC (fechamento a laser). O cirurgião definirá a melhor abordagem com base nos achados clínicos e intraoperatórios.</p>
 
-      <h3>Riscos e complicações possíveis:</h3>
+      <h3>2. Complicações que podem ocorrer:</h3>
+      <p>Apesar de todos os cuidados técnicos adotados, complicações podem ocorrer, incluindo:</p>
       <ul>
-        <li>Dor e desconforto no pós-operatório</li>
-        <li>Sangramento local</li>
-        <li>Infecção da ferida operatória</li>
-        <li>Recidiva da fístula (reaparecimento do trajeto fistuloso)</li>
-        <li>Incontinência fecal parcial ou total (risco maior em fístulas complexas que envolvem o esfíncter anal)</li>
-        <li>Estenose anal (estreitamento do canal anal)</li>
-        <li>Necessidade de mais de um procedimento cirúrgico</li>
+        <li><strong>Dor e desconforto pós-operatório:</strong> Pode ocorrer dor na região anal e perianal nos dias seguintes à cirurgia. <em>Impacto:</em> Desconforto que pode limitar atividades cotidianas. <em>Manejo:</em> Controlada com analgésicos e banhos de assento com água morna.</li>
+        <li><strong>Sangramento:</strong> Pode ocorrer sangramento no local operado. <em>Impacto:</em> Geralmente leve, com manchas em curativos ou papel higiênico. <em>Manejo:</em> Na maioria das vezes é autolimitado; em casos mais significativos, pode ser necessária avaliação médica e hemostasia.</li>
+        <li><strong>Infecção da ferida operatória:</strong> Pode ocorrer infecção no local da cirurgia. <em>Impacto:</em> Dor, vermelhidão, inchaço e secreção purulenta, podendo retardar a cicatrização. <em>Manejo:</em> Tratada com antibióticos e cuidados locais intensificados.</li>
+        <li><strong>Recidiva da fístula:</strong> Pode ocorrer reaparecimento do trajeto fistuloso após a cirurgia. <em>Impacto:</em> Retorno dos sintomas de secreção e desconforto, necessitando de nova abordagem. <em>Manejo:</em> Pode requerer procedimento cirúrgico adicional com técnica diferente.</li>
+        <li><strong>Incontinência fecal:</strong> Pode ocorrer dificuldade no controle de gases ou fezes, dependendo do grau de envolvimento do esfíncter pelo trajeto fistuloso. <em>Impacto:</em> Pode ser temporária ou, em situações excepcionais, permanente, comprometendo a qualidade de vida. <em>Manejo:</em> Tratada com reabilitação do assoalho pélvico (biofeedback) e acompanhamento especializado.</li>
+        <li><strong>Estenose anal:</strong> Pode ocorrer estreitamento do canal anal durante a cicatrização. <em>Impacto:</em> Dificuldade para evacuar e desconforto. <em>Manejo:</em> Tratada com dilatações anais ou, se necessário, cirurgia de revisão.</li>
+        <li><strong>Formação de abscesso:</strong> Pode ocorrer nova coleção de pus na região perianal. <em>Impacto:</em> Dor intensa, inchaço e febre. <em>Manejo:</em> Requer drenagem cirúrgica e antibioticoterapia.</li>
+        <li><strong>Cicatrização prolongada:</strong> Pode ocorrer demora na cicatrização da ferida operatória, levando semanas a meses para fechamento completo. <em>Impacto:</em> Necessidade de curativos prolongados e acompanhamento frequente. <em>Manejo:</em> Cuidados locais da ferida, curativos regulares e acompanhamento ambulatorial.</li>
+        <li><strong>Necessidade de múltiplos procedimentos:</strong> Pode ocorrer a necessidade de cirurgias em etapas, especialmente em fístulas complexas. <em>Impacto:</em> Prolonga o tempo total de tratamento. <em>Manejo:</em> Planejamento cirúrgico sequencial visando a cura com preservação da função esfincteriana.</li>
       </ul>
 
-      <h3>Cuidados pós-operatórios:</h3>
-      <p>Fui orientado(a) sobre a importância dos cuidados pós-operatórios: higiene meticulosa da região, banhos de assento com água morna, uso das medicações conforme prescrito, alimentação adequada e acompanhamento regular. O processo de cicatrização pode levar semanas a meses, dependendo da complexidade da fístula.</p>
+      <h3>3. Fatores individuais que podem influenciar o resultado:</h3>
+      <p>Fui informado(a) de que determinadas condições pessoais podem influenciar o resultado cirúrgico e o processo de cicatrização, entre elas:</p>
+      <ul>
+        <li><strong>Diabetes mellitus:</strong> Pode retardar a cicatrização e aumentar o risco de infecção.</li>
+        <li><strong>Obesidade:</strong> Pode dificultar o acesso cirúrgico e a cicatrização.</li>
+        <li><strong>Tabagismo:</strong> Compromete a microcirculação e prejudica a cicatrização tecidual.</li>
+        <li><strong>Imunossupressão:</strong> Condições ou medicamentos que reduzem a imunidade podem aumentar o risco de complicações infecciosas.</li>
+        <li><strong>Uso crônico de corticosteroides:</strong> Pode enfraquecer os tecidos e dificultar a cicatrização.</li>
+        <li><strong>Cirurgias prévias na região anal:</strong> Podem alterar a anatomia, aumentar a complexidade do procedimento e afetar a continência.</li>
+        <li><strong>Doença inflamatória intestinal (Doença de Crohn):</strong> Pode comprometer significativamente a cicatrização e está associada a fístulas de maior complexidade.</li>
+        <li><strong>Coagulopatias ou uso de anticoagulantes:</strong> Podem aumentar o risco de sangramento no período perioperatório.</li>
+      </ul>
 
-      <h3>Expectativas de tratamento:</h3>
-      <p>Compreendo que o tratamento de fístulas anais pode ser desafiador e que, em alguns casos, pode haver necessidade de mais de uma cirurgia. A escolha da técnica cirúrgica leva em consideração a preservação da função esfincteriana e a melhor chance de cura definitiva.</p>
+      <h3>4. Cuidados pós-operatórios:</h3>
+      <p>Fui orientado(a) sobre a importância dos cuidados pós-operatórios, incluindo: higiene meticulosa da região perianal, banhos de assento com água morna após evacuações, uso correto das medicações prescritas, alimentação equilibrada rica em fibras e boa hidratação para manter fezes macias. O processo de cicatrização pode levar semanas a meses, dependendo da complexidade da fístula e da técnica empregada. O acompanhamento regular em consultas de retorno é fundamental para avaliação da cicatrização e detecção precoce de recidiva.</p>
 
-      <h3>Consentimento:</h3>
-      <p>Declaro que tive oportunidade de esclarecer todas as minhas dúvidas e que compreendi todas as informações fornecidas. Autorizo a realização do procedimento cirúrgico e estou ciente dos riscos envolvidos.</p>
+      <h3>5. Expectativas de tratamento:</h3>
+      <p>Compreendo que o tratamento de fístulas anais pode ser desafiador e que, em alguns casos, pode haver necessidade de mais de um procedimento cirúrgico para alcançar a cura definitiva. A escolha da técnica cirúrgica leva em consideração o equilíbrio entre a melhor chance de cura e a preservação da função esfincteriana (continência). Compreendo que não é possível garantir a cura em um único procedimento e que o planejamento terapêutico pode ser ajustado conforme a evolução clínica.</p>
+
+      <h3>6. Consentimento:</h3>
+      <p>Declaro que:</p>
+      <ul>
+        <li>Fui informado(a), em linguagem acessível, sobre o procedimento a ser realizado, seus riscos, benefícios e alternativas terapêuticas;</li>
+        <li>Tive a oportunidade de fazer perguntas e todas as minhas dúvidas foram esclarecidas de forma satisfatória;</li>
+        <li>Compreendo que complicações podem ocorrer mesmo quando a técnica cirúrgica é realizada de forma correta e dentro dos padrões estabelecidos pela boa prática médica;</li>
+        <li>Compreendo que o resultado do procedimento não pode ser garantido de forma absoluta;</li>
+        <li>Autorizo o Dr. João Vitor Viana, CRM-PB 12831, e sua equipe a realizarem o procedimento cirúrgico para tratamento da fístula anal, bem como quaisquer procedimentos adicionais que se façam necessários durante o ato operatório;</li>
+        <li>Recebi uma cópia deste Termo de Consentimento Livre e Esclarecido.</li>
+      </ul>
+
+      <p style="margin-top: 30px;"><em>Data do consentimento: ${data.data}${data.cidade ? ` - ${data.cidade}` : ''}</em></p>
     `
   },
 
@@ -72,30 +126,56 @@ export const termoTemplates = {
     titulo: "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO",
     subtitulo: "Tratamento Cirúrgico de Fissura Anal",
     conteudo: (data: TermoData) => `
-      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo Dr. João Vitor Viana, CRM-PB 12831, sobre o procedimento cirúrgico para tratamento de <strong>Fissura Anal</strong>.</p>
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo <strong>Dr. João Vitor Viana, CRM-PB 12831</strong>, sobre o procedimento cirúrgico para tratamento de <strong>Fissura Anal</strong>, e forneço meu consentimento nos termos abaixo descritos.</p>
 
-      <h3>Informações sobre o procedimento:</h3>
-      <p>A fissura anal é uma ferida ou rachadura na mucosa do canal anal que causa dor intensa durante e após as evacuações. Quando o tratamento clínico não é eficaz, indica-se o tratamento cirúrgico, geralmente através da esfincterotomia lateral interna (corte parcial do músculo esfíncter interno) para diminuir a pressão no canal anal e permitir a cicatrização.</p>
+      <h3>1. Informações sobre o procedimento:</h3>
+      <p>A fissura anal é uma ferida (úlcera) localizada na mucosa do canal anal, que provoca dor intensa durante e após as evacuações, frequentemente acompanhada de sangramento. Quando a fissura se torna crônica (persistente apesar do tratamento clínico), o tratamento cirúrgico é indicado para promover a cicatrização definitiva.</p>
+      <p>A técnica mais utilizada é a esfincterotomia lateral interna, que consiste na secção parcial e controlada do músculo esfíncter interno do ânus, com o objetivo de reduzir a pressão excessiva no canal anal e permitir que a fissura cicatrize. Outras opções cirúrgicas incluem a injeção de toxina botulínica (Botox) no esfíncter e o retalho de avanço mucoso. A escolha da técnica será feita pelo cirurgião de acordo com as características clínicas de cada paciente. O procedimento é realizado sob anestesia (raquidiana, geral ou combinada), conforme avaliação do anestesiologista.</p>
 
-      <h3>Riscos e complicações possíveis:</h3>
+      <h3>2. Complicações que podem ocorrer:</h3>
+      <p>Apesar de todos os cuidados técnicos adotados, complicações podem ocorrer, incluindo:</p>
       <ul>
-        <li>Dor no pós-operatório inicial</li>
-        <li>Sangramento leve a moderado</li>
-        <li>Incontinência fecal temporária ou permanente, geralmente para gases (5-10% dos casos)</li>
-        <li>Infecção local</li>
-        <li>Hematoma (acúmulo de sangue no local)</li>
-        <li>Persistência ou recidiva da fissura (pouco frequente)</li>
-        <li>Formação de abscesso ou fístula (pouco frequente)</li>
+        <li><strong>Dor pós-operatória:</strong> Pode ocorrer dor na região anal nos primeiros dias, geralmente de intensidade inferior à dor causada pela fissura antes da cirurgia. <em>Impacto:</em> Desconforto que pode limitar temporariamente as atividades. <em>Manejo:</em> Controlada com analgésicos, banhos de assento e manutenção de fezes macias.</li>
+        <li><strong>Sangramento:</strong> Pode ocorrer sangramento leve no local da cirurgia. <em>Impacto:</em> Manchas em curativos ou papel higiênico. <em>Manejo:</em> Na maioria das vezes é autolimitado e cessa espontaneamente.</li>
+        <li><strong>Infecção local:</strong> Pode ocorrer infecção na região operada. <em>Impacto:</em> Dor, vermelhidão e secreção, podendo retardar a cicatrização. <em>Manejo:</em> Tratada com antibióticos e cuidados locais da ferida.</li>
+        <li><strong>Incontinência fecal:</strong> Pode ocorrer dificuldade no controle de gases ou, menos comumente, de fezes, em decorrência da secção parcial do esfíncter. <em>Impacto:</em> Pode ser temporária ou, em situações excepcionais, permanente, afetando as atividades sociais e a qualidade de vida. <em>Manejo:</em> Tratada com reabilitação do assoalho pélvico (biofeedback) e acompanhamento especializado.</li>
+        <li><strong>Hematoma perianal:</strong> Pode ocorrer acúmulo de sangue nos tecidos ao redor do ânus. <em>Impacto:</em> Inchaço e dor local. <em>Manejo:</em> Na maioria das vezes resolve espontaneamente; se volumoso, pode necessitar de drenagem.</li>
+        <li><strong>Persistência ou recidiva da fissura:</strong> Pode ocorrer que a fissura não cicatrize completamente ou que retorne. <em>Impacto:</em> Manutenção ou retorno dos sintomas de dor e sangramento. <em>Manejo:</em> Pode necessitar de tratamento clínico adicional ou nova intervenção cirúrgica.</li>
+        <li><strong>Formação de abscesso:</strong> Pode ocorrer coleção de pus na região perianal. <em>Impacto:</em> Dor, inchaço e febre. <em>Manejo:</em> Requer drenagem e antibioticoterapia.</li>
+        <li><strong>Fístula anal:</strong> Pode ocorrer formação de um trajeto anormal entre o canal anal e a pele perianal. <em>Impacto:</em> Secreção persistente pela pele perianal. <em>Manejo:</em> Pode necessitar de tratamento cirúrgico específico.</li>
       </ul>
 
-      <h3>Cuidados pós-operatórios:</h3>
-      <p>Fui orientado(a) sobre os cuidados necessários: higiene adequada, uso de pomadas e medicações prescritas, manutenção de fezes macias através de dieta rica em fibras e hidratação, evitar esforço evacuatório. A cicatrização completa geralmente ocorre em 4 a 6 semanas.</p>
+      <h3>3. Fatores individuais que podem influenciar o resultado:</h3>
+      <p>Fui informado(a) de que determinadas condições pessoais podem influenciar o resultado cirúrgico e o processo de cicatrização, entre elas:</p>
+      <ul>
+        <li><strong>Diabetes mellitus:</strong> Pode retardar a cicatrização e aumentar o risco de infecção.</li>
+        <li><strong>Obesidade:</strong> Pode dificultar o acesso cirúrgico e a cicatrização.</li>
+        <li><strong>Tabagismo:</strong> Compromete a microcirculação e prejudica a cicatrização tecidual.</li>
+        <li><strong>Imunossupressão:</strong> Condições ou medicamentos que reduzem a imunidade podem aumentar o risco de complicações infecciosas.</li>
+        <li><strong>Uso crônico de corticosteroides:</strong> Pode enfraquecer os tecidos e dificultar a cicatrização.</li>
+        <li><strong>Cirurgias prévias na região anal:</strong> Podem alterar a anatomia esfincteriana e aumentar o risco de incontinência.</li>
+        <li><strong>Doença inflamatória intestinal:</strong> Pode comprometer a cicatrização e alterar o planejamento cirúrgico.</li>
+        <li><strong>Coagulopatias ou uso de anticoagulantes:</strong> Podem aumentar o risco de sangramento no período perioperatório.</li>
+      </ul>
 
-      <h3>Tratamento prévio:</h3>
-      <p>Compreendo que a cirurgia foi indicada após tentativa de tratamento clínico (pomadas, amaciantes de fezes, mudanças alimentares) sem sucesso adequado. A fissura crônica tem menor chance de cicatrização espontânea, sendo a cirurgia a melhor opção para resolução definitiva.</p>
+      <h3>4. Cuidados pós-operatórios:</h3>
+      <p>Fui orientado(a) sobre os cuidados necessários no pós-operatório, incluindo: higiene adequada da região anal, banhos de assento com água morna, uso correto das medicações prescritas (analgésicos, pomadas tópicas), manutenção de fezes macias através de dieta rica em fibras e ingestão abundante de líquidos, evitando esforço evacuatório. A cicatrização completa geralmente ocorre em quatro a seis semanas. As consultas de retorno são indispensáveis para acompanhamento da evolução.</p>
 
-      <h3>Consentimento:</h3>
-      <p>Declaro que tive oportunidade de esclarecer todas as minhas dúvidas e que compreendi todas as informações fornecidas. Autorizo a realização do procedimento cirúrgico e estou ciente dos riscos envolvidos.</p>
+      <h3>5. Alternativas de tratamento:</h3>
+      <p>Compreendo que a cirurgia foi indicada após tentativa de tratamento clínico conservador (pomadas cicatrizantes, vasodilatadores tópicos, laxantes, mudanças alimentares) sem resposta satisfatória. A fissura anal crônica apresenta menor chance de cicatrização espontânea, sendo a abordagem cirúrgica considerada a melhor opção para resolução definitiva do quadro. Fui informado(a) sobre a possibilidade de tratamento com toxina botulínica como alternativa menos invasiva, com suas respectivas taxas de sucesso e limitações.</p>
+
+      <h3>6. Consentimento:</h3>
+      <p>Declaro que:</p>
+      <ul>
+        <li>Fui informado(a), em linguagem acessível, sobre o procedimento a ser realizado, seus riscos, benefícios e alternativas terapêuticas;</li>
+        <li>Tive a oportunidade de fazer perguntas e todas as minhas dúvidas foram esclarecidas de forma satisfatória;</li>
+        <li>Compreendo que complicações podem ocorrer mesmo quando a técnica cirúrgica é realizada de forma correta e dentro dos padrões estabelecidos pela boa prática médica;</li>
+        <li>Compreendo que o resultado do procedimento não pode ser garantido de forma absoluta;</li>
+        <li>Autorizo o Dr. João Vitor Viana, CRM-PB 12831, e sua equipe a realizarem o procedimento cirúrgico para tratamento da fissura anal, bem como quaisquer procedimentos adicionais que se façam necessários durante o ato operatório;</li>
+        <li>Recebi uma cópia deste Termo de Consentimento Livre e Esclarecido.</li>
+      </ul>
+
+      <p style="margin-top: 30px;"><em>Data do consentimento: ${data.data}${data.cidade ? ` - ${data.cidade}` : ''}</em></p>
     `
   },
 
@@ -103,31 +183,57 @@ export const termoTemplates = {
     titulo: "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO",
     subtitulo: "Tratamento Cirúrgico de Doença Pilonidal (Cisto Pilonidal)",
     conteudo: (data: TermoData) => `
-      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo Dr. João Vitor Viana, CRM-PB 12831, sobre o procedimento cirúrgico para tratamento de <strong>Doença Pilonidal</strong>.</p>
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo <strong>Dr. João Vitor Viana, CRM-PB 12831</strong>, sobre o procedimento cirúrgico para tratamento de <strong>Doença Pilonidal (Cisto Pilonidal)</strong>, e forneço meu consentimento nos termos abaixo descritos.</p>
 
-      <h3>Informações sobre o procedimento:</h3>
-      <p>A doença pilonidal caracteriza-se pela formação de cistos ou abscessos na região do cóccix (rabinho), causados por pelos que penetram na pele. O tratamento cirúrgico envolve a remoção completa do cisto e trajetos associados. Existem diferentes técnicas cirúrgicas, que podem deixar a ferida aberta para cicatrização por segunda intenção ou fechada com suturas, dependendo de cada caso.</p>
+      <h3>1. Informações sobre o procedimento:</h3>
+      <p>A doença pilonidal é uma condição que acomete a região sacrococcígea (entre as nádegas, próximo ao cóccix), caracterizada pela formação de cistos, abscessos e trajetos (seios) contendo pelos e debris, causando dor, secreção e infecções de repetição. O tratamento cirúrgico visa a remoção completa do cisto e de todos os trajetos associados, promovendo a cura definitiva.</p>
+      <p>Existem diversas técnicas cirúrgicas disponíveis, entre elas: excisão com cicatrização por segunda intenção (ferida aberta), excisão com fechamento primário (sutura direta), retalhos cutâneos (Limberg, Karydakis) e técnicas minimamente invasivas (pit picking, tratamento endoscópico). A escolha da técnica será definida pelo cirurgião com base na extensão da doença, nas condições locais e nas características individuais do paciente. O procedimento é realizado sob anestesia (raquidiana, geral ou combinada), conforme avaliação do anestesiologista.</p>
 
-      <h3>Riscos e complicações possíveis:</h3>
+      <h3>2. Complicações que podem ocorrer:</h3>
+      <p>Apesar de todos os cuidados técnicos adotados, complicações podem ocorrer, incluindo:</p>
       <ul>
-        <li>Dor no pós-operatório, especialmente ao sentar</li>
-        <li>Sangramento e formação de hematoma</li>
-        <li>Infecção da ferida operatória</li>
-        <li>Deiscência da ferida (abertura dos pontos em casos de sutura)</li>
-        <li>Cicatrização prolongada (especialmente em feridas deixadas abertas)</li>
-        <li>Recidiva da doença (retorno do cisto - pode ocorrer em 10-30% dos casos dependendo da técnica)</li>
-        <li>Necessidade de curativos frequentes</li>
-        <li>Afastamento prolongado de atividades laborais</li>
+        <li><strong>Dor pós-operatória:</strong> Pode ocorrer dor na região operada, especialmente ao sentar. <em>Impacto:</em> Desconforto que pode limitar a posição sentada e atividades cotidianas nas primeiras semanas. <em>Manejo:</em> Controlada com analgésicos e uso de almofada ou coxim ao sentar.</li>
+        <li><strong>Sangramento e hematoma:</strong> Pode ocorrer sangramento no local cirúrgico e acúmulo de sangue nos tecidos. <em>Impacto:</em> Inchaço, dor local e manchas no curativo. <em>Manejo:</em> Na maioria das vezes é autolimitado; hematomas volumosos podem necessitar de drenagem.</li>
+        <li><strong>Infecção da ferida operatória:</strong> Pode ocorrer infecção no local da cirurgia. <em>Impacto:</em> Dor, vermelhidão, secreção purulenta e febre, podendo retardar significativamente a cicatrização. <em>Manejo:</em> Tratada com antibióticos e cuidados locais da ferida.</li>
+        <li><strong>Deiscência da ferida:</strong> Pode ocorrer abertura dos pontos e separação das bordas da ferida cirúrgica. <em>Impacto:</em> Necessidade de cicatrização por segunda intenção com curativos prolongados. <em>Manejo:</em> Cuidados locais intensificados com curativos regulares até cicatrização completa; em casos selecionados, pode ser indicada nova sutura.</li>
+        <li><strong>Cicatrização prolongada:</strong> Pode ocorrer demora na cicatrização, especialmente quando a ferida é deixada aberta (técnica de segunda intenção). <em>Impacto:</em> O processo pode levar semanas a meses, requerendo curativos frequentes e acompanhamento ambulatorial. <em>Manejo:</em> Curativos regulares, acompanhamento médico e, em casos selecionados, terapias auxiliares de cicatrização.</li>
+        <li><strong>Recidiva da doença:</strong> Pode ocorrer reaparecimento da doença pilonidal, mesmo após cirurgia bem-sucedida. <em>Impacto:</em> Retorno dos sintomas de dor, secreção e infecção. <em>Manejo:</em> Medidas preventivas como depilação regular da região são fundamentais; se houver recidiva, pode ser necessário novo procedimento cirúrgico.</li>
+        <li><strong>Seroma:</strong> Pode ocorrer acúmulo de líquido seroso (claro) no local da cirurgia. <em>Impacto:</em> Inchaço e sensação de flutuação local. <em>Manejo:</em> Pode necessitar de aspiração com seringa e curativo compressivo.</li>
+        <li><strong>Necrose de retalho:</strong> Pode ocorrer sofrimento ou morte parcial do retalho cutâneo, nas técnicas que utilizam retalhos. <em>Impacto:</em> Atraso na cicatrização e possível necessidade de nova intervenção. <em>Manejo:</em> Cuidados locais e, se necessário, desbridamento ou cirurgia de revisão.</li>
+        <li><strong>Alteração estética da região:</strong> Pode ocorrer formação de cicatriz visível na região interglútea. <em>Impacto:</em> Alteração cosmética no local operado. <em>Manejo:</em> A cicatriz tende a melhorar com o tempo; em casos selecionados, podem ser adotadas medidas para otimização estética.</li>
       </ul>
 
-      <h3>Cuidados pós-operatórios:</h3>
-      <p>Fui orientado(a) sobre a importância dos cuidados: manutenção da ferida limpa e seca, realização de curativos conforme orientação, depilação regular da região para prevenir recidiva, evitar permanecer sentado por períodos prolongados nas primeiras semanas, uso adequado das medicações prescritas. O tempo de cicatrização varia conforme a técnica utilizada.</p>
+      <h3>3. Fatores individuais que podem influenciar o resultado:</h3>
+      <p>Fui informado(a) de que determinadas condições pessoais podem influenciar o resultado cirúrgico e o processo de cicatrização, entre elas:</p>
+      <ul>
+        <li><strong>Diabetes mellitus:</strong> Pode retardar a cicatrização e aumentar o risco de infecção.</li>
+        <li><strong>Obesidade:</strong> Pode dificultar o acesso cirúrgico, aumentar a tensão na ferida e prejudicar a cicatrização.</li>
+        <li><strong>Tabagismo:</strong> Compromete a microcirculação e prejudica significativamente a cicatrização tecidual.</li>
+        <li><strong>Imunossupressão:</strong> Condições ou medicamentos que reduzem a imunidade podem aumentar o risco de complicações infecciosas.</li>
+        <li><strong>Uso crônico de corticosteroides:</strong> Pode enfraquecer os tecidos e dificultar a cicatrização.</li>
+        <li><strong>Cirurgias prévias na região sacrococcígea:</strong> Podem alterar a anatomia local e aumentar a complexidade do procedimento.</li>
+        <li><strong>Pilosidade excessiva:</strong> Pode aumentar o risco de recidiva da doença.</li>
+        <li><strong>Coagulopatias ou uso de anticoagulantes:</strong> Podem aumentar o risco de sangramento e formação de hematoma no período perioperatório.</li>
+      </ul>
 
-      <h3>Expectativas realistas:</h3>
-      <p>Compreendo que o tratamento da doença pilonidal pode requerer um período de recuperação relativamente longo e que medidas preventivas (como depilação regular da região) são importantes para reduzir o risco de recidiva após a cicatrização completa.</p>
+      <h3>4. Cuidados pós-operatórios:</h3>
+      <p>Fui orientado(a) sobre a importância dos cuidados no pós-operatório, incluindo: manutenção da ferida limpa e seca, realização de curativos conforme orientação médica, depilação regular da região para prevenção de recidiva (após cicatrização completa), evitar permanecer sentado por períodos prolongados nas primeiras semanas, uso adequado das medicações prescritas e higiene cuidadosa da região. O tempo de cicatrização varia conforme a técnica utilizada e pode ser prolongado, especialmente em feridas abertas. As consultas de retorno são indispensáveis para acompanhamento da cicatrização e orientação sobre medidas preventivas.</p>
 
-      <h3>Consentimento:</h3>
-      <p>Declaro que tive oportunidade de esclarecer todas as minhas dúvidas e que compreendi todas as informações fornecidas. Autorizo a realização do procedimento cirúrgico e estou ciente dos riscos envolvidos.</p>
+      <h3>5. Expectativas de tratamento:</h3>
+      <p>Compreendo que o tratamento da doença pilonidal pode requerer um período de recuperação relativamente longo, que varia conforme a técnica cirúrgica empregada e as características individuais de cicatrização. Compreendo que medidas preventivas, como a depilação regular da região interglútea e a manutenção de boa higiene local, são fundamentais para reduzir o risco de recidiva após a cicatrização completa. Compreendo que, apesar de todas as medidas adotadas, a doença pode recorrer e eventualmente necessitar de novo tratamento.</p>
+
+      <h3>6. Consentimento:</h3>
+      <p>Declaro que:</p>
+      <ul>
+        <li>Fui informado(a), em linguagem acessível, sobre o procedimento a ser realizado, seus riscos, benefícios e alternativas terapêuticas;</li>
+        <li>Tive a oportunidade de fazer perguntas e todas as minhas dúvidas foram esclarecidas de forma satisfatória;</li>
+        <li>Compreendo que complicações podem ocorrer mesmo quando a técnica cirúrgica é realizada de forma correta e dentro dos padrões estabelecidos pela boa prática médica;</li>
+        <li>Compreendo que o resultado do procedimento não pode ser garantido de forma absoluta;</li>
+        <li>Autorizo o Dr. João Vitor Viana, CRM-PB 12831, e sua equipe a realizarem o procedimento cirúrgico para tratamento da doença pilonidal, bem como quaisquer procedimentos adicionais que se façam necessários durante o ato operatório;</li>
+        <li>Recebi uma cópia deste Termo de Consentimento Livre e Esclarecido.</li>
+      </ul>
+
+      <p style="margin-top: 30px;"><em>Data do consentimento: ${data.data}${data.cidade ? ` - ${data.cidade}` : ''}</em></p>
     `
   },
 

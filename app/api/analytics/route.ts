@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { parseQuestionnaireData } from "@/lib/questionnaire-parser";
 
 export const dynamic = "force-dynamic";
 
@@ -88,13 +89,18 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Pain evolution - FIXED: uses `pain` field, filters test patients
+// Pain evolution - uses centralized parser, takes only latest response per followUp
 async function getPainEvolution(userId: string, baseFilter: any) {
   const surgeries = await prisma.surgery.findMany({
     where: baseFilter,
     include: {
       followUps: {
-        include: { responses: true },
+        include: {
+          responses: {
+            orderBy: { createdAt: 'desc' as const },
+            take: 1,
+          },
+        },
       },
     },
   });
@@ -108,22 +114,20 @@ async function getPainEvolution(userId: string, baseFilter: any) {
     }
 
     surgery.followUps.forEach((followUp) => {
-      followUp.responses.forEach((response) => {
-        try {
-          const data = JSON.parse(response.questionnaireData);
-          // FIX: use correct field name `pain` (not painLevel/dor)
-          const painLevel = data.pain;
-          if (painLevel === undefined || painLevel === null) return;
-          const day = followUp.dayNumber;
-
-          if (!painByDayAndType[surgeryType][day]) {
-            painByDayAndType[surgeryType][day] = [];
-          }
-          painByDayAndType[surgeryType][day].push(Number(painLevel));
-        } catch (e) {
-          console.error("Erro ao parsear questionnaireData:", e);
-        }
+      if (followUp.responses.length === 0) return;
+      const response = followUp.responses[0]; // latest (ordered desc, take 1)
+      const parsed = parseQuestionnaireData(response.questionnaireData, {
+        painAtRest: response.painAtRest,
+        painDuringBowel: response.painDuringBowel,
       });
+      const painLevel = parsed.painAtRest;
+      if (painLevel === undefined || painLevel === null) return;
+      const day = followUp.dayNumber;
+
+      if (!painByDayAndType[surgeryType][day]) {
+        painByDayAndType[surgeryType][day] = [];
+      }
+      painByDayAndType[surgeryType][day].push(Number(painLevel));
     });
   });
 
@@ -331,7 +335,10 @@ async function getAggregatedData(userId: string) {
       patient: true,
       followUps: {
         include: {
-          responses: true,
+          responses: {
+            orderBy: { createdAt: 'desc' as const },
+            take: 1,
+          },
         },
       },
     },
@@ -353,10 +360,10 @@ async function getAggregatedData(userId: string) {
   const responseRate = totalFollowUps > 0 ? ((respondedFollowUps / totalFollowUps) * 100) : 0;
 
   // Pain at rest by day and surgery type
-  const painAtRest = getPainByDayAndType(surgeries, 'pain');
+  const painAtRest = getPainByDayAndType(surgeries, 'painAtRest');
 
   // Pain during bowel movement by day and surgery type
-  const painDuringBowel = getPainByDayAndType(surgeries, 'painDuringBowelMovement');
+  const painDuringBowel = getPainByDayAndType(surgeries, 'painDuringEvacuation');
 
   // First bowel movement stats by surgery type
   const firstBowelMovement = getFirstBowelMovementStats(surgeries);
@@ -389,7 +396,7 @@ async function getAggregatedData(userId: string) {
   };
 }
 
-function getPainByDayAndType(surgeries: any[], painField: string) {
+function getPainByDayAndType(surgeries: any[], painField: 'painAtRest' | 'painDuringEvacuation') {
   const data: Record<string, Record<number, number[]>> = {};
 
   surgeries.forEach(surgery => {
@@ -397,18 +404,20 @@ function getPainByDayAndType(surgeries: any[], painField: string) {
     if (!data[type]) data[type] = {};
 
     surgery.followUps.forEach((followUp: any) => {
-      followUp.responses.forEach((response: any) => {
-        try {
-          const qData = JSON.parse(response.questionnaireData);
-          const extracted = qData.extractedData || qData;
-          const val = extracted[painField];
-          if (val !== undefined && val !== null && typeof Number(val) === 'number' && !isNaN(Number(val))) {
-            const day = followUp.dayNumber;
-            if (!data[type][day]) data[type][day] = [];
-            data[type][day].push(Number(val));
-          }
-        } catch { /* skip */ }
+      if (!followUp.responses || followUp.responses.length === 0) return;
+      // Take only the latest response (already ordered desc by createdAt, take 1)
+      const response = followUp.responses[0];
+      const parsed = parseQuestionnaireData(response.questionnaireData, {
+        painAtRest: response.painAtRest,
+        painDuringBowel: response.painDuringBowel,
       });
+      const val = parsed[painField];
+      if (val !== undefined && val !== null && !isNaN(Number(val))) {
+        const day = followUp.dayNumber;
+        if (!data[type][day]) data[type] = { ...data[type], [day]: [] };
+        if (!data[type][day]) data[type][day] = [];
+        data[type][day].push(Number(val));
+      }
     });
   });
 
@@ -469,18 +478,17 @@ function getExtraMedicationStats(surgeries: any[]) {
     if (!data[type]) data[type] = {};
 
     surgery.followUps.forEach((followUp: any) => {
-      followUp.responses.forEach((response: any) => {
-        try {
-          const qData = JSON.parse(response.questionnaireData);
-          const extracted = qData.extractedData || qData;
-          const day = followUp.dayNumber;
-          if (!data[type][day]) data[type][day] = { used: 0, total: 0 };
-          data[type][day].total++;
-          if (extracted.usedExtraMedication === true) {
-            data[type][day].used++;
-          }
-        } catch { /* skip */ }
-      });
+      if (!followUp.responses || followUp.responses.length === 0) return;
+      const response = followUp.responses[0]; // latest (ordered desc, take 1)
+      try {
+        const parsed = parseQuestionnaireData(response.questionnaireData);
+        const day = followUp.dayNumber;
+        if (!data[type][day]) data[type][day] = { used: 0, total: 0 };
+        data[type][day].total++;
+        if (parsed.usedExtraMedication === true) {
+          data[type][day].used++;
+        }
+      } catch { /* skip */ }
     });
   });
 
@@ -508,22 +516,19 @@ function getSatisfactionStats(surgeries: any[]) {
 
     surgery.followUps.forEach((followUp: any) => {
       if (followUp.dayNumber < 14) return; // Satisfaction only on D+14
-
-      followUp.responses.forEach((response: any) => {
-        try {
-          const qData = JSON.parse(response.questionnaireData);
-          const extracted = qData.extractedData || qData;
-
-          if (extracted.satisfactionRating !== undefined && extracted.satisfactionRating !== null) {
-            if (!byType[type]) byType[type] = { ratings: [], wouldRecommend: 0, total: 0 };
-            byType[type].ratings.push(Number(extracted.satisfactionRating));
-            byType[type].total++;
-            if (extracted.wouldRecommend === true) {
-              byType[type].wouldRecommend++;
-            }
+      if (!followUp.responses || followUp.responses.length === 0) return;
+      const response = followUp.responses[0]; // latest (ordered desc, take 1)
+      try {
+        const parsed = parseQuestionnaireData(response.questionnaireData);
+        if (parsed.satisfactionRating !== undefined && parsed.satisfactionRating !== null) {
+          if (!byType[type]) byType[type] = { ratings: [], wouldRecommend: 0, total: 0 };
+          byType[type].ratings.push(Number(parsed.satisfactionRating));
+          byType[type].total++;
+          if (parsed.wouldRecommend === true) {
+            byType[type].wouldRecommend++;
           }
-        } catch { /* skip */ }
-      });
+        }
+      } catch { /* skip */ }
     });
   });
 
@@ -545,19 +550,18 @@ function getComplicationStats(surgeries: any[]) {
     if (!data[type]) data[type] = {};
 
     surgery.followUps.forEach((followUp: any) => {
-      followUp.responses.forEach((response: any) => {
-        try {
-          const qData = JSON.parse(response.questionnaireData);
-          const extracted = qData.extractedData || qData;
-          const day = followUp.dayNumber;
-          if (!data[type][day]) data[type][day] = { fever: 0, bleeding: 0, retention: 0, total: 0 };
-          data[type][day].total++;
+      if (!followUp.responses || followUp.responses.length === 0) return;
+      const response = followUp.responses[0]; // latest (ordered desc, take 1)
+      try {
+        const parsed = parseQuestionnaireData(response.questionnaireData);
+        const day = followUp.dayNumber;
+        if (!data[type][day]) data[type][day] = { fever: 0, bleeding: 0, retention: 0, total: 0 };
+        data[type][day].total++;
 
-          if (extracted.fever === true) data[type][day].fever++;
-          if (extracted.bleeding && extracted.bleeding !== 'none') data[type][day].bleeding++;
-          if (extracted.urination === false) data[type][day].retention++;
-        } catch { /* skip */ }
-      });
+        if (parsed.fever === true) data[type][day].fever++;
+        if (parsed.bleeding && parsed.bleeding !== 'none') data[type][day].bleeding++;
+        if (parsed.urinated === false) data[type][day].retention++;
+      } catch { /* skip */ }
     });
   });
 
