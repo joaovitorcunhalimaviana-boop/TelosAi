@@ -795,9 +795,144 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       }
     }
 
-    // Fallback final: resposta genérica mais amigável
+    // Tentar detectar respostas sim/não para campos pendentes
+    const isYes = userMessageLower === 'sim' || userMessageLower === 's' || userMessageLower.includes('sim') || userMessageLower.includes('tô') || userMessageLower.includes('estou') || userMessageLower.includes('consigo');
+    const isNo = userMessageLower === 'não' || userMessageLower === 'nao' || userMessageLower === 'n' || userMessageLower.includes('não') || userMessageLower.includes('nao') || userMessageLower.includes('nenhum');
+
+    // Detectar se fala sobre medicação
+    const mentionsMedication = userMessageLower.includes('remédio') || userMessageLower.includes('medicação') || userMessageLower.includes('medicamento') || userMessageLower.includes('pozinho') || userMessageLower.includes('comprimido') || userMessageLower.includes('analgésico') || userMessageLower.includes('tramadol') || userMessageLower.includes('dipirona') || userMessageLower.includes('paracetamol') || userMessageLower.includes('prescrit');
+
+    // Se fala sobre medicação e temos pain mas não temos medications/usedExtraMedication
+    if (mentionsMedication) {
+      const updatedMeds = { ...currentData };
+      if (isNo || userMessageLower.includes('só o que') || userMessageLower.includes('só o prescrit') || userMessageLower.includes('só o pozinho') || userMessageLower.includes('conforme prescrito')) {
+        updatedMeds.medications = true;
+        updatedMeds.usedExtraMedication = false;
+      } else if (isYes || userMessageLower.includes('tomei') || userMessageLower.includes('usei')) {
+        updatedMeds.usedExtraMedication = true;
+        updatedMeds.extraMedicationDetails = userMessage;
+      }
+      return {
+        aiResponse: 'Entendi! Obrigada pela informação sobre as medicações. 😊 Agora me conta: você evacuou desde a última vez que conversamos?',
+        updatedData: updatedMeds,
+        isComplete: false,
+        needsDoctorAlert: false,
+        urgencyLevel: 'low'
+      };
+    }
+
+    // Detectar se fala sobre evacuação
+    const mentionsBowel = userMessageLower.includes('evacu') || userMessageLower.includes('cocô') || userMessageLower.includes('fezes') || userMessageLower.includes('intestino');
+    if (mentionsBowel || (currentData.pain !== undefined && currentData.pain !== null && currentData.bowelMovementSinceLastContact === undefined)) {
+      if (isYes || userMessageLower.includes('evacu') || userMessageLower.includes('fiz') || userMessageLower.includes('consegui')) {
+        return {
+          aiResponse: 'Que bom que evacuou! E a dor durante a evacuação, de 0 a 10, quanto foi?',
+          updatedData: { ...currentData, bowelMovementSinceLastContact: true },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+      if (isNo) {
+        return {
+          aiResponse: 'Entendi, sem evacuação ainda. Agora me conta: está tendo algum sangramento? (nenhum, leve, moderado ou intenso)',
+          updatedData: { ...currentData, bowelMovementSinceLastContact: false },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+    }
+
+    // Detectar se fala sobre sangramento
+    const mentionsBleeding = userMessageLower.includes('sangr') || userMessageLower.includes('sangue');
+    if (mentionsBleeding || (currentData.bowelMovementSinceLastContact !== undefined && currentData.bleeding === undefined)) {
+      if (isNo || userMessageLower.includes('nenhum') || userMessageLower.includes('sem sangr')) {
+        return {
+          aiResponse: 'Ótimo, sem sangramento! Agora me conta: você teve febre?',
+          updatedData: { ...currentData, bleeding: 'none' },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+      if (userMessageLower.includes('leve') || userMessageLower.includes('pouco') || userMessageLower.includes('papel')) {
+        return {
+          aiResponse: 'Entendi, sangramento leve. Isso é comum nos primeiros dias. Agora me conta: você teve febre?',
+          updatedData: { ...currentData, bleeding: 'minimal' },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+    }
+
+    // Detectar se fala sobre febre
+    const mentionsFever = userMessageLower.includes('febre') || userMessageLower.includes('temperatura') || userMessageLower.includes('graus');
+    if (mentionsFever || (currentData.bleeding !== undefined && currentData.fever === undefined)) {
+      if (isNo || userMessageLower.includes('sem febre') || userMessageLower.includes('não tive')) {
+        return {
+          aiResponse: 'Que bom, sem febre! Agora me conta: está tomando as medicações conforme o médico prescreveu?',
+          updatedData: { ...currentData, fever: false },
+          isComplete: false,
+          needsDoctorAlert: false,
+          urgencyLevel: 'low'
+        };
+      }
+    }
+
+    // FALLBACK CONTEXTO-AWARE: perguntar o PRÓXIMO campo faltante, não sempre dor
+    const hadFirstBowelMovement = surgery?.hadFirstBowelMovement || false;
+    const stillMissing = getMissingInformation(currentData, daysPostOp, hadFirstBowelMovement);
+
+    if (stillMissing.length > 0 && currentData.pain !== undefined && currentData.pain !== null) {
+      // Dor já foi coletada, não perguntar de novo!
+      // Perguntar sobre o próximo campo faltante
+      const nextField = stillMissing[0];
+      const friendlyNextQuestion: Record<string, string> = {
+        'Se evacuou desde o último contato': 'Recebi sua mensagem! 😊 Agora me conta: você evacuou desde a última vez que conversamos?',
+        'Quando foi a última evacuação': 'Recebi sua mensagem! 😊 Me conta: quando foi a última vez que você evacuou?',
+        'Dor durante a evacuação (0-10 na escala numérica)': 'Recebi sua mensagem! 😊 E a dor durante a evacuação, de 0 a 10, quanto foi?',
+        'Informações sobre sangramento (nenhum, leve, moderado, intenso)': 'Recebi sua mensagem! 😊 Agora me conta: está tendo algum sangramento? (nenhum, leve, moderado ou intenso)',
+        'Se está com febre': 'Recebi sua mensagem! 😊 Você teve febre?',
+        'Se está tomando a medicação conforme prescrito': 'Recebi sua mensagem! 😊 Está tomando as medicações conforme o médico prescreveu?',
+      };
+
+      // Tentar encontrar uma pergunta amigável, senão usar genérica
+      let nextQuestion = '';
+      for (const [key, question] of Object.entries(friendlyNextQuestion)) {
+        if (nextField.toLowerCase().includes(key.toLowerCase().substring(0, 15))) {
+          nextQuestion = question;
+          break;
+        }
+      }
+      if (!nextQuestion) {
+        nextQuestion = `Recebi sua mensagem! 😊 Para continuar o questionário: ${nextField}`;
+      }
+
+      return {
+        aiResponse: nextQuestion,
+        updatedData: currentData,
+        isComplete: false,
+        needsDoctorAlert: false,
+        urgencyLevel: 'low'
+      };
+    }
+
+    // Fallback FINAL: só pergunta sobre dor se dor REALMENTE não foi coletada
+    if (currentData.pain === undefined || currentData.pain === null) {
+      return {
+        aiResponse: 'Recebi sua mensagem! 😊 Para eu entender melhor, você poderia me dizer: como está sua dor agora? Se 0 é sem dor e 10 é a pior dor da sua vida, qual número você daria?',
+        updatedData: currentData,
+        isComplete: false,
+        needsDoctorAlert: false,
+        urgencyLevel: 'low'
+      };
+    }
+
+    // Se temos dor E o fallback chegou aqui, algo estranho aconteceu. Não perguntar dor de novo.
     return {
-      aiResponse: 'Recebi sua mensagem! 😊 Para eu entender melhor, você poderia me dizer: como está sua dor agora? Se 0 é sem dor e 10 é a pior dor da sua vida, qual número você daria?',
+      aiResponse: 'Obrigada pela informação! 😊 Pode continuar me contando sobre como está se sentindo hoje.',
       updatedData: currentData,
       isComplete: false,
       needsDoctorAlert: false,
