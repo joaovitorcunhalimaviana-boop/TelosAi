@@ -15,6 +15,10 @@
  * - Suporte a mensagens interativas e não-texto
  */
 
+// Vercel Hobby plan: default 10s timeout mata a função antes da IA responder.
+// maxDuration=60 permite até 60 segundos (máximo do Hobby plan).
+export const maxDuration = 60;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { invalidateDashboardStats } from '@/lib/cache-helpers';

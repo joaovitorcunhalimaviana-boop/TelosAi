@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+// Vercel Hobby plan: default 10s timeout mata a função antes da IA responder.
+export const maxDuration = 60;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { invalidateDashboardStats } from '@/lib/cache-helpers';

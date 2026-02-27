@@ -559,14 +559,13 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.log('🧠 Messages array length:', messages.length);
     console.log('🧠 Calling Anthropic API...');
 
-    // Retry com timeout para garantir que a API sempre responda
+    // Chamada à API com retry rápido (máximo 1 retry, timeout 45s)
+    // Vercel Hobby permite até 60s com maxDuration=60
     let response;
     let retries = 0;
-    const maxRetries = 2;
+    const maxRetries = 1; // Apenas 1 retry para não desperdiçar tempo
     while (retries <= maxRetries) {
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
         response = await anthropic.messages.create({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 1024,
@@ -574,14 +573,13 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
           system: systemPrompt,
           messages: messages,
         });
-        clearTimeout(timeoutId);
         break; // Sucesso, sair do loop
       } catch (retryError: any) {
         retries++;
         console.error(`🧠 Anthropic API attempt ${retries} failed:`, retryError?.message);
         if (retries > maxRetries) throw retryError;
-        // Esperar antes de tentar novamente (backoff exponencial)
-        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+        // Espera curta antes do retry
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
 
