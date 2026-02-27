@@ -150,12 +150,16 @@ async function processMessages(value: any) {
     }
 
     // DEDUPLICAÇÃO ROBUSTA (Banco de Dados + Memória)
+    // Protege contra retries do Meta (Meta reenvia se resposta demora >20s)
     try {
       if (processedMessageIds.has(message.id)) {
         logger.debug(`Duplicate message ignored (memory): ${message.id}`);
         continue;
       }
 
+      // Usar upsert para evitar race condition entre check e create
+      // Se dois requests chegam ao mesmo tempo, o upsert garante que
+      // apenas um cria o registro (o outro faz update sem efeito)
       const existing = await prisma.processedMessage.findUnique({
         where: { id: message.id }
       });
@@ -166,9 +170,20 @@ async function processMessages(value: any) {
         continue;
       }
 
-      await prisma.processedMessage.create({
-        data: { id: message.id }
-      });
+      // Tentar criar - se falhar com unique constraint, é duplicado
+      try {
+        await prisma.processedMessage.create({
+          data: { id: message.id }
+        });
+      } catch (createError: any) {
+        // P2002 = Unique constraint violation = outra instância já criou
+        if (createError?.code === 'P2002') {
+          logger.debug(`Duplicate message caught by unique constraint: ${message.id}`);
+          processedMessageIds.add(message.id);
+          continue;
+        }
+        throw createError;
+      }
       processedMessageIds.add(message.id);
 
       // Limpar IDs antigos da memória
@@ -374,14 +389,10 @@ Por favor, me diga um número de 0 a 10, onde:
 
       const shouldProcessFirstMessage = !isPositiveResponse;
 
-      // 1. Enviar saudação
-      await sendEmpatheticResponse(phone, initialMessage);
-
-      // 2. Enviar escala de dor
-      await new Promise(resolve => setTimeout(resolve, 500));
-      await sendImageScale(phone, 'pain_scale');
-
-      // 3. Criar FollowUpResponse + atualizar status em transação
+      // PRIMEIRO: Criar FollowUpResponse + atualizar status em transação
+      // Isso PRECISA vir ANTES de enviar mensagens para evitar duplicação
+      // Se o Meta reenvia o webhook (retry por timeout >20s), a transaction
+      // detecta ALREADY_STARTED e não envia o greeting de novo
       try {
         await prisma.$transaction(async (tx) => {
           const currentFollowUp = await tx.followUp.findUnique({
@@ -418,15 +429,19 @@ Por favor, me diga um número de 0 a 10, onde:
         });
       } catch (txError: any) {
         if (txError?.message === 'ALREADY_STARTED') {
-          logger.warn('⚠️ Questionário já foi iniciado (race condition prevenida)');
-          await sendEmpatheticResponse(
-            phone,
-            `${firstName}, o questionário já foi iniciado. Por favor, continue respondendo as perguntas. 😊`
-          );
+          logger.warn('⚠️ Questionário já foi iniciado (race condition prevenida) - NÃO reenviando greeting');
+          // NÃO envia nada - o greeting já foi enviado pela primeira instância
           return;
         }
         throw txError;
       }
+
+      // SÓ AGORA envia o greeting (após transaction confirmar que somos a primeira instância)
+      await sendEmpatheticResponse(phone, initialMessage);
+
+      // Enviar escala de dor
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await sendImageScale(phone, 'pain_scale');
 
       invalidateDashboardStats();
 
