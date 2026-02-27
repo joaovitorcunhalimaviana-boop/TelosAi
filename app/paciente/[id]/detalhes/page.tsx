@@ -134,7 +134,7 @@ export default function PatientDetailsPage() {
                             {patientData.patient.name}
                         </h1>
                         <div className="flex flex-wrap items-center gap-1 md:gap-2 mt-1 text-sm md:text-base">
-                            <span style={{ color: '#D8DEEB' }}>{patientData.type}</span>
+                            <span style={{ color: '#D8DEEB' }}>{patientData.type ? patientData.type.charAt(0).toUpperCase() + patientData.type.slice(1) : ''}</span>
                             <span style={{ color: '#7A8299' }}>•</span>
                             <span style={{ color: '#D8DEEB' }}>
                                 {new Date(patientData.date).toLocaleDateString("pt-BR", {
