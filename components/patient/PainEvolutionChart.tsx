@@ -92,11 +92,13 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             const day = f.dayNumber
 
             if (followUpDays.includes(day) || painDataMap.has(day)) {
+              // Manter null quando não há dado (não converter para 0)
+              // 0 é um valor válido (sem dor), null = dado não coletado
               painDataMap.set(day, {
                 day,
                 label: `D+${day}`,
                 date: resp.createdAt ? new Date(resp.createdAt).toLocaleDateString('pt-BR') : '',
-                painAtRest: parsed.painAtRest ?? 0,
+                painAtRest: parsed.painAtRest,
                 painDuringEvacuation: parsed.painDuringEvacuation,
                 hasRedFlag: parsed.hasRedFlags,
                 usedExtraMedication: parsed.usedExtraMedication,

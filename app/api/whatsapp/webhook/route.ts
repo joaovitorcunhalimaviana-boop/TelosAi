@@ -829,6 +829,30 @@ async function processQuestionnaireAnswer(
 
     const mergedData = aiResult.updatedData;
 
+    // PROTEÇÃO: Verificar se additionalSymptoms foi realmente PERGUNTADO na conversa
+    // antes de aceitar o valor (evita que Claude sete null prematuramente)
+    if (mergedData.additionalSymptoms !== undefined) {
+      const allMessages = [...conversationHistory, { role: 'assistant', content: aiResult.aiResponse }];
+      const assistantMessages = allMessages
+        .filter((m: any) => m.role === 'assistant' || m.role === 'system')
+        .map((m: any) => (m.content || '').toLowerCase());
+      const questionWasAsked = assistantMessages.some((msg: string) =>
+        msg.includes('mais alguma coisa') ||
+        msg.includes('algo mais') ||
+        msg.includes('relatar mais') ||
+        msg.includes('alguma queixa') ||
+        msg.includes('algum sintoma') ||
+        msg.includes('mais alguma') ||
+        msg.includes('gostaria de me contar') ||
+        msg.includes('deseja relatar') ||
+        msg.includes('antes de encerrar')
+      );
+      if (!questionWasAsked) {
+        logger.warn('⚠️ Claude setou additionalSymptoms sem perguntar - removendo valor prematuro');
+        delete mergedData.additionalSymptoms;
+      }
+    }
+
     // VALIDAÇÃO SERVER-SIDE: Nunca confiar cegamente no isComplete do Claude
     // Campos que aceitam null como valor válido (ex: "nada mais a relatar" = null)
     const nullableFields = ['additionalSymptoms', 'concerns'];
@@ -851,7 +875,7 @@ async function processQuestionnaireAnswer(
       f => f !== 'localCareAdherence' && f !== 'additionalSymptoms'
     );
 
-    if (!aiResult.isComplete && criticalMissing.length > 0 && otherMissing.length === 0 && conversationLength >= 12) {
+    if (!aiResult.isComplete && criticalMissing.length > 0 && otherMissing.length === 0 && conversationLength >= 6) {
       // Todos os outros campos foram coletados, só faltam os críticos.
       // A IA deveria estar perguntando estes mas não está. Forçar.
       // Prioridade: localCareAdherence primeiro, additionalSymptoms por último
@@ -995,7 +1019,9 @@ async function finalizeQuestionnaireWithAI(
     // ============================================
     // REGISTRAR PRIMEIRA EVACUAÇÃO SE APLICÁVEL
     // ============================================
-    if (extractedData.hadBowelMovementSinceLastContact && !followUp.surgery.hadFirstBowelMovement) {
+    // CORRIGIDO: Aceitar ambos os nomes de campo (PostOpData e QuestionnaireData)
+    const hadBowelMovement = extractedData.hadBowelMovementSinceLastContact ?? (extractedData as any).bowelMovementSinceLastContact;
+    if (hadBowelMovement && !followUp.surgery.hadFirstBowelMovement) {
       const { recordFirstBowelMovement } = await import('@/lib/bowel-movement-tracker');
       await recordFirstBowelMovement(
         followUp.surgeryId,
@@ -1021,13 +1047,14 @@ async function finalizeQuestionnaireWithAI(
     };
 
     // Usar painAtRest como painLevel principal (compatibilidade)
+    // CORRIGIDO: Usar ?? ao invés de || para aceitar valor 0 (sem dor)
     const questionnaireData = {
-      painLevel: extractedData.painAtRest || extractedData.painLevel || (extractedData as any).pain,
-      painAtRest: extractedData.painAtRest || (extractedData as any).pain,
-      painDuringBowelMovement: extractedData.painDuringBowelMovement || (extractedData as any).painDuringBowelMovement,
-      fever: extractedData.hasFever,
+      painLevel: extractedData.painAtRest ?? extractedData.painLevel ?? (extractedData as any).pain,
+      painAtRest: extractedData.painAtRest ?? (extractedData as any).pain,
+      painDuringBowelMovement: extractedData.painDuringBowelMovement ?? (extractedData as any).painDuringBowelMovement,
+      fever: extractedData.hasFever ?? (extractedData as any).fever,
       urinaryRetention: extractedData.canUrinate === false,
-      bowelMovement: extractedData.hadBowelMovementSinceLastContact || extractedData.hadBowelMovement,
+      bowelMovement: extractedData.hadBowelMovementSinceLastContact ?? (extractedData as any).bowelMovementSinceLastContact ?? extractedData.hadBowelMovement,
       bowelMovementTime: extractedData.bowelMovementTime,
       bleeding: typeof extractedData.bleeding === 'string'
         ? bleedingMap[extractedData.bleeding]

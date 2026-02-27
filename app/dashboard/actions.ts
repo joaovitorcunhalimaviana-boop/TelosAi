@@ -702,10 +702,15 @@ export async function getPatientConversationHistory(patientId: string) {
     }
   }
 
-  // 3. Remover duplicatas por conteúdo+role (mensagens podem estar em ambas as fontes)
+  // 3. Remover duplicatas por conteúdo+role+timestamp (preserva mensagens iguais em dias diferentes)
   const seen = new Set<string>();
   const uniqueMessages = allMessages.filter(msg => {
-    const key = `${msg.role}:${msg.content.substring(0, 100)}`;
+    // Usar timestamp (truncado para minuto) + role + conteúdo para deduplicar
+    // Isso preserva mensagens com mesmo texto em dias diferentes (ex: "leve", "não", "2")
+    const timestampKey = msg.timestamp
+      ? new Date(msg.timestamp).toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
+      : '';
+    const key = `${msg.role}:${timestampKey}:${msg.content.substring(0, 100)}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

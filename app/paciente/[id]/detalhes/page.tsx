@@ -84,7 +84,7 @@ export default function PatientDetailsPage() {
 
                             return {
                                 day: `D+${f.dayNumber}`,
-                                repouso: parsed.painAtRest ?? 0,
+                                repouso: parsed.painAtRest,
                                 evacuar: parsed.painDuringEvacuation,
                                 fullData: f
                             };

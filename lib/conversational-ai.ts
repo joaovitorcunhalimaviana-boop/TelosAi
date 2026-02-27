@@ -513,9 +513,22 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
 - Ao finalizar D+14: agradecer pelo feedback (positivo e construtivo), desejar boa recuperação
 
 ⚠️ IMPORTANTE:
-- Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu nesta mensagem.
+- Só incluir em extractedInfo os dados que o paciente EFETIVAMENTE forneceu NESTA MENSAGEM ATUAL.
 - Não invente ou assuma valores. Se paciente não respondeu algo, não incluir no JSON.
-- Use sendImages.painScale: true ANTES de perguntar sobre dor (em repouso ou durante evacuação)`;
+- Use sendImages.painScale: true ANTES de perguntar sobre dor (em repouso ou durante evacuação)
+
+🚨 REGRA CRÍTICA SOBRE DADOS DE DIAS ANTERIORES:
+- O resumo dos dias anteriores (acima) é APENAS para CONTEXTO e EMPATIA.
+- NUNCA copie valores de dor ou outros dados dos dias anteriores para o extractedInfo de HOJE.
+- Se o paciente disse "dor 1" HOJE, registre "pain": 1, mesmo que ontem tenha sido 2.
+- Se o paciente NÃO mencionou dor nesta mensagem, NÃO inclua "pain" no extractedInfo.
+- Cada dia é independente. Não repita valores de D+1, D+2, D+3, etc.
+
+🚨 REGRA SOBRE additionalSymptoms:
+- NUNCA sete "additionalSymptoms" sem PERGUNTAR EXPLICITAMENTE ao paciente.
+- A pergunta deve ser feita de forma clara e acolhedora.
+- Só inclua "additionalSymptoms": null se o paciente RESPONDEU "não", "só isso", "nada mais", etc.
+- Se você NÃO perguntou ainda, NÃO inclua additionalSymptoms no extractedInfo.`;
 
   try {
     console.log('🧠 conductConversation - Starting...');
@@ -615,10 +628,45 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       throw new Error('Failed to parse JSON from AI response');
     }
 
-    // Atualizar dados coletados
+    // Atualizar dados coletados com proteção contra sobrescrita acidental
+    // Se pain ou painDuringBowelMovement JÁ foram coletados em turnos anteriores,
+    // só permitir sobrescrita se o paciente mencionou dor nesta mensagem
+    const extractedInfo = { ...result.extractedInfo };
+
+    const userMsgLower = userMessage.toLowerCase();
+    const mentionedPain = userMsgLower.match(/\b([0-9]|10)\b/) ||
+      userMsgLower.includes('dor') ||
+      userMsgLower.includes('doendo') ||
+      userMsgLower.includes('doer') ||
+      userMsgLower.includes('doi') ||
+      userMsgLower.includes('incômodo') ||
+      userMsgLower.includes('desconforto');
+
+    // Proteger campo 'pain' (dor em repouso) contra sobrescrita
+    if (currentData.pain !== undefined && currentData.pain !== null &&
+        extractedInfo.pain !== undefined && extractedInfo.pain !== currentData.pain) {
+      if (!mentionedPain) {
+        console.log(`⚠️ PROTEÇÃO: Claude tentou sobrescrever pain ${currentData.pain} → ${extractedInfo.pain} sem paciente mencionar dor. Mantendo valor original.`);
+        delete extractedInfo.pain;
+      } else {
+        console.log(`✅ Pain atualizado: ${currentData.pain} → ${extractedInfo.pain} (paciente mencionou dor)`);
+      }
+    }
+
+    // Proteger campo 'painDuringBowelMovement' contra sobrescrita
+    if (currentData.painDuringBowelMovement !== undefined && currentData.painDuringBowelMovement !== null &&
+        extractedInfo.painDuringBowelMovement !== undefined && extractedInfo.painDuringBowelMovement !== currentData.painDuringBowelMovement) {
+      if (!mentionedPain) {
+        console.log(`⚠️ PROTEÇÃO: Claude tentou sobrescrever painDuringBowelMovement ${currentData.painDuringBowelMovement} → ${extractedInfo.painDuringBowelMovement} sem paciente mencionar dor. Mantendo valor original.`);
+        delete extractedInfo.painDuringBowelMovement;
+      } else {
+        console.log(`✅ PainDuringBowelMovement atualizado: ${currentData.painDuringBowelMovement} → ${extractedInfo.painDuringBowelMovement} (paciente mencionou dor)`);
+      }
+    }
+
     const updatedData = {
       ...currentData,
-      ...result.extractedInfo
+      ...extractedInfo
     };
 
     // Validação server-side: não aceitar isComplete se ainda faltam dados obrigatórios
