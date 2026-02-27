@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 // Cliente Anthropic configurado
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+  apiKey: (process.env.ANTHROPIC_API_KEY || '').trim(),
 });
 
 export interface PatientData {

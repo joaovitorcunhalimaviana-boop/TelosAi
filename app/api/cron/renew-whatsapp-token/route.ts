@@ -7,11 +7,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-const CRON_SECRET = process.env.CRON_SECRET!;
-const APP_ID = process.env.WHATSAPP_APP_ID!;
-const APP_SECRET = process.env.WHATSAPP_APP_SECRET!;
-const CURRENT_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN!;
-const DOCTOR_PHONE = process.env.DOCTOR_PHONE_NUMBER!;
+const CRON_SECRET = (process.env.CRON_SECRET || '').trim();
+const APP_ID = (process.env.WHATSAPP_APP_ID || '').trim();
+const APP_SECRET = (process.env.WHATSAPP_APP_SECRET || '').trim();
+const DOCTOR_PHONE = (process.env.DOCTOR_PHONE_NUMBER || '').trim();
+
+/**
+ * Busca o token mais recente do banco de dados, com fallback para env var
+ */
+async function getLatestToken(): Promise<string> {
+  try {
+    const config = await prisma.systemConfig.findUnique({
+      where: { key: 'WHATSAPP_ACCESS_TOKEN' }
+    });
+    if (config?.value) {
+      console.log('📌 Using token from database (most recent)');
+      return config.value.trim();
+    }
+  } catch (e) {
+    console.warn('⚠️ Failed to read token from DB, using env var');
+  }
+  return (process.env.WHATSAPP_ACCESS_TOKEN || '').trim();
+}
 
 /**
  * GET - Trigger Cron Job
@@ -35,13 +52,16 @@ export async function GET(request: NextRequest) {
 
     console.log('🔄 Starting automatic WhatsApp token renewal cron job...');
 
+    // Buscar token mais recente do banco de dados (não do env var!)
+    const currentToken = await getLatestToken();
+
     // Verificar credenciais
-    if (!APP_ID || !APP_SECRET || !CURRENT_TOKEN) {
+    if (!APP_ID || !APP_SECRET || !currentToken) {
       throw new Error('Missing WhatsApp credentials');
     }
 
     // Renovar token
-    const renewalUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${APP_ID}&client_secret=${APP_SECRET}&fb_exchange_token=${CURRENT_TOKEN}`;
+    const renewalUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${APP_ID}&client_secret=${APP_SECRET}&fb_exchange_token=${currentToken}`;
 
     const response = await fetch(renewalUrl, { method: 'GET' });
 
@@ -117,15 +137,15 @@ async function notifyAdminSuccess(newToken: string, expiresInDays: number) {
       `📆 Próxima renovação: ~${expiresInDays - 10} dias\n\n` +
       `🔐 Novo Token (início):\n${newToken.substring(0, 10)}...`;
 
-    // Enviar via WhatsApp usando a própria API
-    const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!;
+    // Usar o token NOVO para enviar a notificação (o antigo pode ter sido invalidado)
+    const PHONE_NUMBER_ID = (process.env.WHATSAPP_PHONE_NUMBER_ID || '').trim();
 
     await fetch(
       `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${CURRENT_TOKEN}`,
+          'Authorization': `Bearer ${newToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -140,7 +160,6 @@ async function notifyAdminSuccess(newToken: string, expiresInDays: number) {
     console.log('✅ Admin notification sent successfully');
   } catch (error) {
     console.error('❌ Error sending admin notification:', error);
-    // Não lançar erro para não quebrar o cron
   }
 }
 
@@ -160,17 +179,18 @@ async function notifyAdminError(error: any) {
       `⚠️ AÇÃO URGENTE NECESSÁRIA:\n` +
       `1. Acesse Meta for Developers\n` +
       `2. Gere um novo token manualmente\n` +
-      `3. Atualize nas variáveis de ambiente\n\n` +
-      `📞 Se precisar de ajuda, entre em contato com o suporte técnico.`;
+      `3. Atualize nas variáveis de ambiente`;
 
-    const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!;
+    // Tentar usar token do banco (pode ainda funcionar mesmo se a renovação falhou)
+    const latestToken = await getLatestToken();
+    const PHONE_NUMBER_ID = (process.env.WHATSAPP_PHONE_NUMBER_ID || '').trim();
 
     await fetch(
       `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${CURRENT_TOKEN}`,
+          'Authorization': `Bearer ${latestToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

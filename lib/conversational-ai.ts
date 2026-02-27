@@ -11,7 +11,7 @@ import { getProtocolsForAI } from './protocols';
 import { toBrasiliaTime, getBrasiliaHour } from './date-utils';
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+  apiKey: (process.env.ANTHROPIC_API_KEY || '').trim(),
 });
 
 export interface ConversationMessage {

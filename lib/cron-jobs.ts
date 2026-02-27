@@ -374,9 +374,22 @@ export async function checkStalledFollowUps() {
  */
 export async function renewWhatsAppToken() {
     try {
-        const APP_ID = process.env.WHATSAPP_APP_ID;
-        const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
-        const CURRENT_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+        const APP_ID = (process.env.WHATSAPP_APP_ID || '').trim();
+        const APP_SECRET = (process.env.WHATSAPP_APP_SECRET || '').trim();
+
+        // Buscar token mais recente do BANCO DE DADOS (não do env var!)
+        let CURRENT_TOKEN = (process.env.WHATSAPP_ACCESS_TOKEN || '').trim();
+        try {
+            const config = await prisma.systemConfig.findUnique({
+                where: { key: 'WHATSAPP_ACCESS_TOKEN' }
+            });
+            if (config?.value) {
+                CURRENT_TOKEN = config.value.trim();
+                logger.info('📌 Token renewal: using token from database');
+            }
+        } catch (e) {
+            logger.warn('⚠️ Token renewal: failed to read from DB, using env var');
+        }
 
         if (!APP_ID || !APP_SECRET || !CURRENT_TOKEN) {
             throw new Error('Missing WhatsApp credentials');
