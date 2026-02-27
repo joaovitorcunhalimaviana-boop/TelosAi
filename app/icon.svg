@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="6" fill="#0B0E14"/>
+  <defs>
+    <radialGradient id="centerGlow" cx="50%" cy="48%" r="40%">
+      <stop offset="0%" stop-color="#14BDAE" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#14BDAE" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="roundedClip">
+      <rect width="32" height="32" rx="6" ry="6"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#roundedClip)">
+    <rect width="32" height="32" fill="#0B0E14"/>
+    <rect width="32" height="32" fill="url(#centerGlow)"/>
+    <rect x="0" y="0" width="32" height="1" fill="#14BDAE" opacity="0.7"/>
+  </g>
   <rect x="0.5" y="0.5" width="31" height="31" rx="5.5" fill="none" stroke="#1E2535" stroke-width="1"/>
-  <text x="16" y="22" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="16" font-weight="bold" font-style="italic" fill="#14BDAE">IA</text>
+  <text x="16" y="22" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="400">
+    <tspan fill="#F0EAD6">V</tspan><tspan fill="#14BDAE" font-style="italic">IA</tspan>
+  </text>
 </svg>

@@ -1,8 +1,8 @@
 // Service Worker for Sistema Pós-Operatório
 // Version 1.0.0
 
-const CACHE_NAME = 'pos-op-v1';
-const RUNTIME_CACHE = 'pos-op-runtime-v1';
+const CACHE_NAME = 'pos-op-v2';
+const RUNTIME_CACHE = 'pos-op-runtime-v2';
 const OFFLINE_QUEUE = 'pos-op-offline-queue-v1';
 
 // Essential pages and assets to cache
@@ -14,6 +14,7 @@ const PRECACHE_URLS = [
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/icons/vigia-logo.svg',
 ];
 
 // Install event - cache essential resources
