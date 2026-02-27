@@ -540,23 +540,40 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.log('🧠 Current data:', JSON.stringify(currentData));
 
     // Construir mensagens para Claude
+    // CRÍTICO: Anthropic API exige alternância estrita user/assistant
+    // Nunca pode ter duas mensagens do mesmo role consecutivas
     const messages: any[] = [];
 
-    // Adicionar histórico
+    // Adicionar histórico COM SANITIZAÇÃO de roles consecutivos
     conversationHistory.forEach(msg => {
-      messages.push({
-        role: msg.role,
-        content: msg.content
-      });
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.role === msg.role) {
+        // Merge com a mensagem anterior do mesmo role (evita erro 400)
+        lastMsg.content = lastMsg.content + '\n\n' + msg.content;
+        console.log(`🧠 MERGED consecutive ${msg.role} messages to avoid API error`);
+      } else {
+        messages.push({
+          role: msg.role,
+          content: msg.content
+        });
+      }
     });
 
     // Adicionar mensagem atual do usuário
-    messages.push({
-      role: 'user',
-      content: userMessage
-    });
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.role === 'user') {
+      // Se a última mensagem já é user, merge (evita user/user)
+      lastMsg.content = lastMsg.content + '\n\n' + userMessage;
+      console.log('🧠 MERGED user message with previous user message');
+    } else {
+      messages.push({
+        role: 'user',
+        content: userMessage
+      });
+    }
 
     console.log('🧠 Messages array length:', messages.length);
+    console.log('🧠 Messages roles:', messages.map((m: any) => m.role).join(', '));
     console.log('🧠 Calling Anthropic API...');
 
     // Chamada à API com retry rápido (máximo 1 retry, timeout 45s)
@@ -711,9 +728,12 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.error('🚨 Error message:', error?.message);
     console.error('🚨 Error status:', error?.status);
     console.error('🚨 Error code:', error?.error?.type || error?.code);
+    console.error('🚨 Error headers:', JSON.stringify(error?.headers));
+    console.error('🚨 Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error || {})));
     console.error('🚨 User message was:', userMessage);
     console.error('🚨 Current data state:', JSON.stringify(currentData));
-    console.error('🚨 Messages array length:', conversationHistory?.length || 0);
+    console.error('🚨 Conversation history length:', conversationHistory?.length || 0);
+    console.error('🚨 Conversation roles:', conversationHistory?.map((m: any) => m.role)?.join(', '));
 
     // REGRA DE OURO: O fallback NUNCA modifica dados (updatedData = currentData)
     // Apenas pede ao paciente para repetir, para que na próxima tentativa a IA funcione

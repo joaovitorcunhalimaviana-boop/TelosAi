@@ -899,7 +899,14 @@ async function processQuestionnaireAnswer(
         if (!alreadyAsked) {
           await new Promise(resolve => setTimeout(resolve, 1000));
           await sendEmpatheticResponse(phone, proactiveQuestion);
-          conversationHistory.push({ role: 'assistant', content: proactiveQuestion });
+          // FIX: Merge com a última mensagem assistant ao invés de criar
+          // duas assistant consecutivas (causa erro 400 na Anthropic API)
+          const lastEntry = conversationHistory[conversationHistory.length - 1];
+          if (lastEntry && lastEntry.role === 'assistant') {
+            lastEntry.content = lastEntry.content + '\n\n' + proactiveQuestion;
+          } else {
+            conversationHistory.push({ role: 'assistant', content: proactiveQuestion });
+          }
           logger.info('🔄 Pergunta PROATIVA forçada para campo crítico:', fieldToForce);
         }
       }
@@ -921,7 +928,14 @@ async function processQuestionnaireAnswer(
       if (forcedQuestion) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Pequena pausa
         await sendEmpatheticResponse(phone, forcedQuestion);
-        conversationHistory.push({ role: 'assistant', content: forcedQuestion });
+        // FIX: Merge com a última mensagem assistant ao invés de criar
+        // duas assistant consecutivas (causa erro 400 na Anthropic API)
+        const lastEntry = conversationHistory[conversationHistory.length - 1];
+        if (lastEntry && lastEntry.role === 'assistant') {
+          lastEntry.content = lastEntry.content + '\n\n' + forcedQuestion;
+        } else {
+          conversationHistory.push({ role: 'assistant', content: forcedQuestion });
+        }
         logger.info('🔄 Pergunta forçada enviada para campo:', fieldToAsk);
       }
     }
