@@ -47,7 +47,7 @@ interface PatientSummary {
 
 interface GraphData {
     day: string;
-    repouso: number;
+    repouso: number | null;
     evacuar: number | null;
     fullData: FollowUp;
 }
