@@ -438,10 +438,51 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
       };
     }
 
-    // Atualizar dados coletados com proteção contra sobrescrita acidental
-    // Se pain ou painDuringBowelMovement JÁ foram coletados em turnos anteriores,
-    // só permitir sobrescrita se o paciente mencionou dor nesta mensagem
-    const extractedInfo = { ...result.extractedInfo };
+    // NORMALIZAÇÃO: A IA às vezes usa nomes de campos diferentes dos esperados.
+    // Mapear variações para os nomes canônicos que getMissingInformation() espera.
+    const rawInfo = result.extractedInfo || {};
+    const extractedInfo: Record<string, any> = {};
+
+    const fieldAliases: Record<string, string> = {
+      // Evacuação
+      bowelMovement: 'bowelMovementSinceLastContact',
+      hadBowelMovement: 'bowelMovementSinceLastContact',
+      evacuated: 'bowelMovementSinceLastContact',
+      hadBowelMovementSinceLastContact: 'bowelMovementSinceLastContact',
+      // Medicações prescritas
+      prescribedMedicationAdherence: 'medications',
+      takingPrescribedMeds: 'medications',
+      takingMedications: 'medications',
+      medicationAdherence: 'medications',
+      // Febre
+      hasFever: 'fever',
+      temperature: 'feverTemperature',
+      // Dor
+      painAtRest: 'pain',
+      painLevel: 'pain',
+      painDuringEvacuation: 'painDuringBowelMovement',
+      painDuringBowel: 'painDuringBowelMovement',
+      // Sangramento
+      bleedingLevel: 'bleeding',
+      // Urina
+      canUrinate: 'urination',
+      urinaryRetention: 'urination', // inverter valor
+      // Medicação extra
+      takingExtraMeds: 'usedExtraMedication',
+      extraMeds: 'usedExtraMedication',
+      extraMedsDetails: 'extraMedicationDetails',
+      // Outros
+      otherSymptoms: 'additionalSymptoms',
+      concerns: 'additionalSymptoms',
+    };
+
+    for (const [key, value] of Object.entries(rawInfo)) {
+      const canonicalKey = fieldAliases[key] || key;
+      // Não sobrescrever se já tem valor canônico definido nesta mesma extração
+      if (extractedInfo[canonicalKey] === undefined) {
+        extractedInfo[canonicalKey] = value;
+      }
+    }
 
     const userMsgLower = userMessage.toLowerCase();
     const mentionedPain = userMsgLower.match(/\b([0-9]|10)\b/) ||
