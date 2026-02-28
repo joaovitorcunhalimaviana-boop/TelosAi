@@ -659,8 +659,17 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     const endIndex = cleanText.lastIndexOf('}');
 
     if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
-      console.error('Invalid AI response structure (brackets mismatch):', cleanText);
-      throw new Error('No JSON found in Claude response');
+      // AI respondeu com texto puro sem JSON — usar texto como resposta diretamente
+      // NÃO fazer throw! Isso causava fallback desnecessário
+      console.warn('⚠️ AI respondeu sem JSON. Usando texto como aiResponse diretamente.');
+      console.warn('⚠️ Texto recebido:', cleanText.substring(0, 300));
+      return {
+        aiResponse: cleanText,
+        updatedData: currentData, // NÃO modifica dados
+        isComplete: false,
+        needsDoctorAlert: false,
+        urgencyLevel: 'low' as const,
+      };
     }
 
     const jsonString = cleanText.substring(startIndex, endIndex + 1);
@@ -669,9 +678,16 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     try {
       result = JSON.parse(jsonString);
     } catch (parseError) {
-      console.error('JSON Parse Error:', parseError);
-      console.error('Failed JSON String:', jsonString);
-      throw new Error('Failed to parse JSON from AI response');
+      // JSON malformado — usar texto original como resposta
+      console.warn('⚠️ JSON parse falhou. Usando texto como aiResponse.');
+      console.warn('⚠️ JSON tentado:', jsonString.substring(0, 300));
+      return {
+        aiResponse: cleanText,
+        updatedData: currentData, // NÃO modifica dados
+        isComplete: false,
+        needsDoctorAlert: false,
+        urgencyLevel: 'low' as const,
+      };
     }
 
     // Atualizar dados coletados com proteção contra sobrescrita acidental

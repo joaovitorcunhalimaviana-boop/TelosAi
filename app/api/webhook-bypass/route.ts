@@ -387,7 +387,11 @@ Por favor, me diga um número de 0 a 10, onde:
 0️⃣ = **Zero dor** (totalmente sem dor)
 🔟 = **Pior dor da vida** (insuportável)`;
 
-      const shouldProcessFirstMessage = !isPositiveResponse;
+      // NUNCA processar a primeira mensagem com IA — sempre deixar o paciente
+      // responder à pergunta da dor antes de chamar processQuestionnaireAnswer.
+      // Antes, `shouldProcessFirstMessage = !isPositiveResponse` causava
+      // uma SEGUNDA saudação (a IA gerava outra mensagem de boas-vindas).
+      const shouldProcessFirstMessage = false;
 
       // PRIMEIRO: Criar FollowUpResponse + atualizar status em transação
       // Isso PRECISA vir ANTES de enviar mensagens para evitar duplicação
