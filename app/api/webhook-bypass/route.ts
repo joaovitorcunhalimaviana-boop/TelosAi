@@ -6,8 +6,6 @@
  *
  * Funcionalidades:
  * - conductConversation (IA conversacional com protocolo médico)
- * - Validação server-side de campos obrigatórios
- * - Forced questions (localCareAdherence, additionalSymptoms)
  * - Saves incrementais (FollowUpResponse atualizada a cada mensagem)
  * - Deduplicação de mensagens (memória + banco)
  * - Rate limiting
@@ -544,42 +542,6 @@ async function sendImageScale(phone: string, scaleType: 'pain_scale') {
 }
 
 // ============================================
-// SERVER-SIDE FORCED QUESTIONS
-// ============================================
-function getServerSideForcedQuestion(fieldName: string): string | null {
-  const questions: Record<string, string> = {
-    localCareAdherence:
-      'Ah, antes de encerrar, preciso te perguntar uma coisa importante: você está seguindo os cuidados locais orientados pelo médico? Como uso de pomadas, banhos de assento, compressas... Está conseguindo fazer direitinho?',
-    additionalSymptoms:
-      'E para finalizar: tem mais alguma coisa que você gostaria de me contar? Qualquer sintoma, dúvida ou preocupação — pode falar livremente! 😊',
-    pain:
-      'Preciso saber: como está sua dor agora, em repouso? Me diz um número de 0 a 10.',
-    bowelMovementSinceLastContact:
-      'Me conta: você evacuou desde a última vez que conversamos?',
-    bleeding:
-      'E sobre sangramento: está tendo algum sangramento? (nenhum, leve, moderado ou intenso)',
-    fever:
-      'Você teve febre?',
-    medications:
-      'Está tomando as medicações conforme o médico prescreveu?',
-    usedExtraMedication:
-      'Além das medicações prescritas, você tomou alguma outra medicação por conta própria?',
-    urination:
-      'Está conseguindo urinar normalmente?',
-    painDuringBowelMovement:
-      'E a dor durante a evacuação, de 0 a 10, quanto foi?',
-    satisfactionRating:
-      'De 0 a 10, qual nota você daria para o acompanhamento que recebeu durante sua recuperação?',
-    wouldRecommend:
-      'Você recomendaria este tipo de acompanhamento pós-operatório para outros pacientes?',
-    improvementSuggestions:
-      'Você tem alguma sugestão de como podemos melhorar o acompanhamento para futuros pacientes?',
-  };
-
-  return questions[fieldName] || null;
-}
-
-// ============================================
 // PROCESS QUESTIONNAIRE ANSWER (with conductConversation)
 // ============================================
 async function processQuestionnaireAnswer(
@@ -623,33 +585,6 @@ async function processQuestionnaireAnswer(
     // 2. Dados já coletados
     const currentData = questionnaireData.extractedData || {};
 
-    // Campos obrigatórios para validação server-side
-    const requiredFields = [
-      'pain',
-      'bowelMovementSinceLastContact',
-      'bleeding',
-      'fever',
-      'medications',
-      'usedExtraMedication',
-      'additionalSymptoms',
-      'localCareAdherence',
-    ];
-
-    const dayNumber = followUp.dayNumber || 1;
-
-    // Campos condicionais por dia
-    if (dayNumber === 1) {
-      requiredFields.push('urination');
-    }
-    if (dayNumber >= 14) {
-      requiredFields.push('satisfactionRating');
-      requiredFields.push('wouldRecommend');
-      requiredFields.push('improvementSuggestions');
-    }
-    if (currentData.bowelMovementSinceLastContact === true) {
-      requiredFields.push('painDuringBowelMovement');
-    }
-
     // 3. Formatar histórico para Claude
     const claudeHistory = conversationHistory.map((msg: any) => ({
       role: msg.role as 'user' | 'assistant',
@@ -685,107 +620,11 @@ async function processQuestionnaireAnswer(
 
     const mergedData = aiResult.updatedData;
 
-    // PROTEÇÃO: Verificar se additionalSymptoms foi realmente PERGUNTADO
-    if (mergedData.additionalSymptoms !== undefined) {
-      const allMessages = [...conversationHistory, { role: 'assistant', content: aiResult.aiResponse }];
-      const assistantMessages = allMessages
-        .filter((m: any) => m.role === 'assistant' || m.role === 'system')
-        .map((m: any) => (m.content || '').toLowerCase());
-      const questionWasAsked = assistantMessages.some((msg: string) =>
-        msg.includes('mais alguma coisa') ||
-        msg.includes('algo mais') ||
-        msg.includes('relatar mais') ||
-        msg.includes('alguma queixa') ||
-        msg.includes('algum sintoma') ||
-        msg.includes('mais alguma') ||
-        msg.includes('gostaria de me contar') ||
-        msg.includes('deseja relatar') ||
-        msg.includes('antes de encerrar')
-      );
-      if (!questionWasAsked) {
-        logger.warn('⚠️ Claude setou additionalSymptoms sem perguntar - removendo valor prematuro');
-        delete mergedData.additionalSymptoms;
-      }
-    }
-
-    // VALIDAÇÃO SERVER-SIDE: Nunca confiar cegamente no isComplete do Claude
-    const nullableFields = ['additionalSymptoms', 'concerns'];
-    const updatedMissingFields = requiredFields.filter(f => {
-      if (nullableFields.includes(f)) {
-        return mergedData[f] === undefined;
-      }
-      return mergedData[f] === undefined || mergedData[f] === null;
-    });
-    const isActuallyComplete = aiResult.isComplete && updatedMissingFields.length === 0;
-
-    // PROACTIVE FORCE: Se conversa longa e faltam apenas campos críticos
-    const conversationLength = conversationHistory.length;
-    const criticalMissing = updatedMissingFields.filter(
-      f => f === 'localCareAdherence' || f === 'additionalSymptoms'
-    );
-    const otherMissing = updatedMissingFields.filter(
-      f => f !== 'localCareAdherence' && f !== 'additionalSymptoms'
-    );
-
-    if (!aiResult.isComplete && criticalMissing.length > 0 && otherMissing.length === 0 && conversationLength >= 6) {
-      const fieldToForce = criticalMissing.includes('localCareAdherence')
-        ? 'localCareAdherence'
-        : 'additionalSymptoms';
-
-      const proactiveQuestion = getServerSideForcedQuestion(fieldToForce);
-      if (proactiveQuestion) {
-        const aiResponseLower = aiResult.aiResponse.toLowerCase();
-        const alreadyAsked =
-          (fieldToForce === 'localCareAdherence' &&
-            (aiResponseLower.includes('cuidados locais') || aiResponseLower.includes('banho de assento') || aiResponseLower.includes('pomada'))) ||
-          (fieldToForce === 'additionalSymptoms' &&
-            (aiResponseLower.includes('mais alguma coisa') || aiResponseLower.includes('algo mais') || aiResponseLower.includes('relatar mais')));
-
-        if (!alreadyAsked) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          await sendEmpatheticResponse(phone, proactiveQuestion);
-          // FIX: Merge com a última mensagem assistant ao invés de criar
-          // duas assistant consecutivas (causa erro 400 na Anthropic API)
-          const lastEntry = conversationHistory[conversationHistory.length - 1];
-          if (lastEntry && lastEntry.role === 'assistant') {
-            lastEntry.content = lastEntry.content + '\n\n' + proactiveQuestion;
-          } else {
-            conversationHistory.push({ role: 'assistant', content: proactiveQuestion });
-          }
-          logger.info('🔄 Pergunta PROATIVA forçada para campo crítico:', fieldToForce);
-        }
-      }
-    }
-
-    // SERVER-SIDE FORCE: Se IA marcou completo mas faltam campos
-    if (aiResult.isComplete && updatedMissingFields.length > 0) {
-      logger.warn('⚠️ Claude marcou isComplete=true mas ainda faltam campos:', updatedMissingFields);
-
-      const fieldToAsk = updatedMissingFields.includes('additionalSymptoms') && updatedMissingFields.length === 1
-        ? 'additionalSymptoms'
-        : updatedMissingFields.find(f => f !== 'additionalSymptoms') || updatedMissingFields[0];
-
-      const forcedQuestion = getServerSideForcedQuestion(fieldToAsk);
-      if (forcedQuestion) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await sendEmpatheticResponse(phone, forcedQuestion);
-        // FIX: Merge com a última mensagem assistant ao invés de criar
-        // duas assistant consecutivas (causa erro 400 na Anthropic API)
-        const lastEntry = conversationHistory[conversationHistory.length - 1];
-        if (lastEntry && lastEntry.role === 'assistant') {
-          lastEntry.content = lastEntry.content + '\n\n' + forcedQuestion;
-        } else {
-          conversationHistory.push({ role: 'assistant', content: forcedQuestion });
-        }
-        logger.info('🔄 Pergunta forçada enviada para campo:', fieldToAsk);
-      }
-    }
-
     const updatedQuestionnaireData = {
       conversation: conversationHistory,
       extractedData: mergedData,
-      completed: isActuallyComplete,
-      conversationPhase: isActuallyComplete ? 'completed' : 'in_progress',
+      completed: aiResult.isComplete,
+      conversationPhase: aiResult.isComplete ? 'completed' : 'in_progress',
     };
 
     // 8. Salvar no banco (incluindo campos dedicados de dor para gráficos)
@@ -826,11 +665,9 @@ async function processQuestionnaireAnswer(
       });
     }
 
-    // 9. Se REALMENTE completou (validado server-side), finalizar
-    if (isActuallyComplete) {
+    // 9. Se completou, finalizar
+    if (aiResult.isComplete) {
       await finalizeQuestionnaireWithAI(followUp, patient, phone, mergedData as any, response?.id || '');
-    } else if (aiResult.isComplete && updatedMissingFields.length > 0) {
-      logger.info('🔄 Forçando continuação: faltam campos', updatedMissingFields);
     }
 
     // 10. Alertar médico se urgência alta
