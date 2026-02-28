@@ -131,13 +131,6 @@ export const QUESTIONNAIRE_QUESTIONS = {
       required: true,
     },
     {
-      id: 'discharge',
-      question: 'Está saindo secreção da ferida?',
-      type: 'select',
-      options: ['none', 'serous', 'purulent', 'abundant'],
-      required: true,
-    },
-    {
       id: 'fever',
       question: 'Você está com febre?',
       type: 'boolean',
@@ -192,13 +185,6 @@ export const QUESTIONNAIRE_QUESTIONS = {
       id: 'painLevel',
       question: 'Numa escala de 0 a 10, qual o nível de dor que você está sentindo?',
       type: 'number',
-      required: true,
-    },
-    {
-      id: 'discharge',
-      question: 'Está saindo secreção da ferida?',
-      type: 'select',
-      options: ['none', 'serous', 'purulent', 'abundant'],
       required: true,
     },
     {

@@ -42,11 +42,6 @@ export interface QuestionnaireData {
   fever?: boolean;
   feverTemperature?: number; // Temperatura em °C
 
-  // Secreção (D3+)
-  discharge?: boolean; // Tem secreção?
-  dischargeType?: 'clear' | 'yellowish' | 'purulent' | 'bloody'; // Tipo de secreção
-  dischargeAmount?: 'minimal' | 'moderate' | 'abundant';
-
   // Medicações / Analgesia
   medications?: boolean; // Está tomando conforme prescrito
   medicationIssues?: string;
@@ -421,27 +416,11 @@ se o médico já orientou diferente.
    ✅ fever (febre) — PERGUNTOU?
    ✅ medications (tomando medicações prescritas) — PERGUNTOU?
    ✅ localCareAdherence (cuidados locais: pomada, banho de assento) — PERGUNTOU?
-   ${daysPostOp >= 3 ? '✅ discharge (secreção na ferida) — PERGUNTOU?' : ''}
    ✅ additionalSymptoms (pergunta final acolhedora: "tem mais alguma coisa que gostaria de me contar?") — PERGUNTOU?
 
    Se QUALQUER item acima não foi coletado, NÃO marque isComplete: true.
 
-   Ordem recomendada: 1)Dor → 2)Medicação extra → 3)Evacuação → 4)Sangramento → 5)Urina(D+1) → 6)Febre → 7)Medicações prescritas → 8)Cuidados locais → 9)Secreção(D+3+) → 10)Sintomas adicionais(ÚLTIMO)
-
-6. SECREÇÃO DE FERIDA (A PARTIR DE D+3):
-   ⚠️ IMPORTANTE: Secreção é COMUM no pós-operatório de feridas!
-
-   SECREÇÃO NORMAL (não preocupa):
-   - Clara, serosa (tipo água)
-   - Serossanguinolenta (rosada, com um pouco de sangue)
-   - Amarelada clara
-   → Orientar: "Isso é normal no processo de cicatrização. Mantenha a higiene local."
-
-   SECREÇÃO ANORMAL (preocupa - alertar médico):
-   - Purulenta (pus: amarelo-esverdeado, espesso, com cheiro forte)
-   - Com odor fétido
-   - Acompanhada de febre ou vermelhidão intensa
-   → Marcar urgency: "high", needsDoctorAlert: true
+   Ordem recomendada: 1)Dor → 2)Medicação extra → 3)Evacuação → 4)Sangramento → 5)Urina(D+1) → 6)Febre → 7)Medicações prescritas → 8)Cuidados locais → 9)Sintomas adicionais(ÚLTIMO)
 
 RESPOND ONLY WITH RAW JSON. DO NOT USE MARKDOWN FORMATTING.
 DO NOT INCLUDE ANY TEXT BEFORE OR AFTER THE JSON.
@@ -881,21 +860,7 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadF
     missing.push('Qual foi a temperatura da febre (em °C)');
   }
 
-  // 7. SECREÇÃO PURULENTA (apenas D+3 ou superior)
-  if (daysPostOp >= 3) {
-    if (data.discharge === undefined) {
-      missing.push('Se tem saída de secreção pela ferida');
-    } else if (data.discharge === true) {
-      if (!data.dischargeType) {
-        missing.push('Aspecto/cor da secreção (clara, amarelada, purulenta, sanguinolenta)');
-      }
-      if (!data.dischargeAmount) {
-        missing.push('Quantidade de secreção (pouca, moderada, muita)');
-      }
-    }
-  }
-
-  // 8. MEDICAÇÕES PRESCRITAS
+  // 7. MEDICAÇÕES PRESCRITAS
   if (data.medications === undefined) {
     missing.push('Se está tomando as medicações conforme prescrito');
   }

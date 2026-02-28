@@ -45,7 +45,6 @@ testCase('Hemorroidectomia - Caso normal (baixo risco)', () => {
     bowelMovement: true,
     bleeding: 'light',
     fever: false,
-    discharge: 'none',
   });
 
   const riskLevel = getRiskLevel(flags);
@@ -134,31 +133,6 @@ testCase('Hemorroidectomia - Ausência de evacuação D+3', () => {
 // TESTES - FÍSTULA
 // ============================================
 
-testCase('Fístula - Secreção purulenta', () => {
-  const flags = detectRedFlags({
-    surgeryType: 'fistula',
-    dayNumber: 5,
-    painLevel: 6,
-    urinaryRetention: false,
-    bowelMovement: true,
-    bleeding: 'none',
-    fever: false,
-    discharge: 'purulent',
-  });
-
-  const riskLevel = getRiskLevel(flags);
-
-  assert(flags.length > 0, 'Deveria detectar red flag');
-  assert(
-    flags.some(f => f.id === 'purulent_discharge'),
-    'Deveria detectar secreção purulenta'
-  );
-  assert(riskLevel === 'high', 'Nível de risco deveria ser high');
-
-  console.log('  Flags:', formatRedFlags(flags));
-  console.log('  Risk:', riskLevel);
-});
-
 testCase('Fístula - Sinais de celulite', () => {
   const flags = detectRedFlags({
     surgeryType: 'fistula',
@@ -168,7 +142,6 @@ testCase('Fístula - Sinais de celulite', () => {
     bowelMovement: true,
     bleeding: 'none',
     fever: false,
-    discharge: 'serous',
     additionalSymptoms: ['Vermelhidão local', 'Inchaço', 'Calor local'],
   });
 
@@ -250,22 +223,17 @@ testCase('Pilonidal - Secreção purulenta + celulite', () => {
     bowelMovement: true,
     bleeding: 'none',
     fever: false,
-    discharge: 'purulent',
     additionalSymptoms: ['Vermelhidão ao redor', 'Inchaço'],
   });
 
   const riskLevel = getRiskLevel(flags);
 
-  assert(flags.length >= 2, 'Deveria detectar múltiplos red flags');
-  assert(
-    flags.some(f => f.id === 'purulent_discharge_pilonidal'),
-    'Deveria detectar secreção purulenta'
-  );
+  assert(flags.length >= 1, 'Deveria detectar red flags');
   assert(
     flags.some(f => f.id === 'cellulitis_signs_pilonidal'),
     'Deveria detectar celulite'
   );
-  assert(riskLevel === 'critical', 'Nível de risco deveria ser critical (2+ high flags)');
+  assert(riskLevel === 'high', 'Nível de risco deveria ser high');
 
   console.log('  Flags:', formatRedFlags(flags));
   console.log('  Risk:', riskLevel);

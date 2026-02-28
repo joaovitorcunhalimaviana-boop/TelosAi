@@ -619,10 +619,6 @@ interface PostOpData {
   takingExtraMeds?: boolean | null; // Precisou tomar algo ALÉM do prescrito?
   extraMedsDetails?: string | null; // Quais medicações extras está tomando
 
-  // SECREÇÃO PURULENTA (apenas D+3 em diante)
-  hasPurulentDischarge?: boolean | null; // Tem saída de secreção purulenta?
-  purulentDischargeDetails?: string | null;
-
   // OUTROS
   otherSymptoms?: string | null;
 
@@ -700,8 +696,6 @@ function getServerSideForcedQuestion(fieldName: string): string | null {
       'Além das medicações prescritas, você tomou alguma outra medicação por conta própria?',
     urination:
       'Está conseguindo urinar normalmente?',
-    discharge:
-      'Você tem saída de secreção (líquido) pela ferida operatória?',
     painDuringBowelMovement:
       'E a dor durante a evacuação, de 0 a 10, quanto foi?',
     satisfactionRating:
@@ -778,11 +772,6 @@ async function processQuestionnaireAnswer(
     // URINA: apenas D+1 (retenção pós-anestesia imediata)
     if (dayNumber === 1) {
       requiredFields.push('urination');
-    }
-
-    // SECREÇÃO: a partir de D+3
-    if (dayNumber >= 3) {
-      requiredFields.push('discharge');
     }
 
     // D+14: Pesquisa de satisfação
@@ -1268,9 +1257,6 @@ async function finalizeQuestionnaireWithAI(
               if (extracted.hasFever) complications.push(`Febre D+${fu.dayNumber}`);
               if (extracted.bleeding === 'severe' || extracted.bleeding === 'moderate') {
                 complications.push(`Sangramento ${extracted.bleeding} D+${fu.dayNumber}`);
-              }
-              if (extracted.hasPurulentDischarge) {
-                complications.push(`Secreção purulenta D+${fu.dayNumber}`);
               }
             }
           }

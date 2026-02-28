@@ -364,10 +364,6 @@ export const postOpDataSchema = z.object({
   // CUIDADOS LOCAIS
   localCareAdherence: z.boolean().optional().nullable(),
 
-  // SECREÇÃO PURULENTA (apenas D+3 em diante)
-  hasPurulentDischarge: z.boolean().optional().nullable(),
-  purulentDischargeDetails: z.string().optional().nullable(),
-
   // OUTROS
   otherSymptoms: z.string().optional().nullable(),
   additionalSymptoms: z.string().nullable().optional(),
@@ -475,13 +471,6 @@ export function validatePostOpDataByDay(
     }
     if (data.npsScore !== null && data.npsScore !== undefined) {
       warnings.push(`NPS coletado em D+${dayNumber}, mas só é esperado em D+14`);
-    }
-  }
-
-  // Secreção purulenta só a partir de D+3
-  if (dayNumber < 3) {
-    if (data.hasPurulentDischarge !== null && data.hasPurulentDischarge !== undefined) {
-      warnings.push(`Secreção purulenta coletada em D+${dayNumber}, mas só é esperada a partir de D+3`);
     }
   }
 

@@ -30,7 +30,6 @@ interface QuestionnaireData {
   usedPrescribedMeds?: boolean
   usedExtraMeds?: boolean
   extraMedsDetails?: string
-  hasPurulentDischarge?: boolean
   // Formato da IA (compatibilidade)
   pain?: number
   painDuringBowel?: number
@@ -44,9 +43,6 @@ interface QuestionnaireData {
   extraMedicationDetails?: string
   localCareAdherence?: boolean
   additionalSymptoms?: string | null
-  discharge?: boolean
-  dischargeType?: string
-  dischargeAmount?: string
   satisfactionRating?: number
   wouldRecommend?: boolean
   positiveFeedback?: string
@@ -345,28 +341,6 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                       </p>
                     )}
                   </div>
-
-                  {/* Secreção */}
-                  {(data.discharge === true || data.hasPurulentDischarge) && (
-                    <div className="rounded-lg p-3 shadow-sm" style={{ backgroundColor: '#161B27', border: '1px solid #1E2535' }}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                        <span className="font-medium">Secreção pela ferida</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {data.dischargeType && (
-                          <Badge variant="outline" className={`${data.dischargeType === 'purulent' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>
-                            {data.dischargeType === 'clear' ? 'Clara' : data.dischargeType === 'yellowish' ? 'Amarelada' : data.dischargeType === 'purulent' ? 'Purulenta' : data.dischargeType === 'bloody' ? 'Sanguinolenta' : data.dischargeType}
-                          </Badge>
-                        )}
-                        {data.dischargeAmount && (
-                          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
-                            {data.dischargeAmount === 'minimal' ? 'Pouca' : data.dischargeAmount === 'moderate' ? 'Moderada' : data.dischargeAmount === 'abundant' ? 'Muita' : data.dischargeAmount}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  )}
 
                   {/* Cuidados Locais */}
                   {data.localCareAdherence !== undefined && (

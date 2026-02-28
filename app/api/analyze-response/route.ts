@@ -82,30 +82,6 @@ export async function POST(request: NextRequest) {
     };
 
     // PASSO 1: Aplicar red flags determinísticos
-    // Mapear discharge: o questionário pode enviar discharge como boolean + dischargeType,
-    // mas o red-flags system espera discharge como 'none' | 'serous' | 'purulent' | 'abundant'
-    let redFlagDischarge: 'none' | 'serous' | 'purulent' | 'abundant' | undefined;
-    if (typeof questionnaireData.discharge === 'boolean') {
-      // Novo formato: discharge (boolean) + dischargeType (string)
-      if (!questionnaireData.discharge) {
-        redFlagDischarge = 'none';
-      } else if (questionnaireData.dischargeType) {
-        // Mapear dischargeType para o formato esperado pelo red-flags
-        const dischargeTypeMap: Record<string, 'serous' | 'purulent' | 'abundant'> = {
-          clear: 'serous',
-          yellowish: 'serous',
-          purulent: 'purulent',
-          bloody: 'abundant',
-        };
-        redFlagDischarge = dischargeTypeMap[questionnaireData.dischargeType] || 'serous';
-      } else {
-        redFlagDischarge = 'serous'; // Tem secreção mas tipo não especificado
-      }
-    } else {
-      // Formato legado: discharge já é string enum
-      redFlagDischarge = questionnaireData.discharge as 'none' | 'serous' | 'purulent' | 'abundant' | undefined;
-    }
-
     const redFlagInput = {
       surgeryType: surgery.type as 'hemorroidectomia' | 'fistula' | 'fissura' | 'pilonidal',
       dayNumber: followUp.dayNumber,
@@ -116,7 +92,6 @@ export async function POST(request: NextRequest) {
       bleeding: questionnaireData.bleeding as 'none' | 'light' | 'moderate' | 'severe' | undefined,
       fever: questionnaireData.fever,
       temperature: questionnaireData.temperature,
-      discharge: redFlagDischarge,
       additionalSymptoms: questionnaireData.additionalSymptoms,
     };
 

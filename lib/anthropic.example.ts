@@ -25,7 +25,6 @@ async function exampleLowRisk() {
     bowelMovement: true,
     bleeding: 'light',
     fever: false,
-    discharge: 'none',
     additionalSymptoms: [],
     concerns: '',
   };
@@ -66,7 +65,6 @@ async function exampleHighRisk() {
     bowelMovement: false,
     bleeding: 'light',
     fever: false,
-    discharge: 'none',
     additionalSymptoms: ['Distensão abdominal'],
     concerns: 'Estou muito preocupada com a retenção urinária',
   };
@@ -110,7 +108,6 @@ async function exampleCritical() {
     bleeding: 'none',
     fever: true,
     temperature: 39.2,
-    discharge: 'purulent',
     additionalSymptoms: ['Vermelhidão local', 'Inchaço', 'Calor local'],
     concerns: 'A região está muito inchada e quente',
   };
@@ -150,7 +147,6 @@ async function exampleAPIRoute() {
       bowelMovement: true,
       bleeding: 'light',
       fever: false,
-      discharge: 'serous',
       additionalSymptoms: [],
       concerns: '',
     },

@@ -13,7 +13,6 @@ export interface RedFlagInput {
   bleeding?: 'none' | 'light' | 'moderate' | 'severe' | null;
   fever?: boolean | null;
   temperature?: number | null;
-  discharge?: 'none' | 'serous' | 'purulent' | 'abundant' | null;
   additionalSymptoms?: string[] | null;
 }
 
@@ -179,16 +178,6 @@ function detectHemorroidectomyRedFlags(input: RedFlagInput): RedFlag[] {
 function detectFistulaRedFlags(input: RedFlagInput): RedFlag[] {
   const flags: RedFlag[] = [];
 
-  // Secreção purulenta abundante
-  if (input.discharge === 'purulent' || input.discharge === 'abundant') {
-    flags.push({
-      id: 'purulent_discharge',
-      severity: 'high',
-      message: 'Secreção purulenta abundante',
-      recommendation: 'Pode indicar infecção. Procure avaliação médica urgente.',
-    });
-  }
-
   // Dor muito intensa (>8/10)
   if (input.painLevel != null && input.painLevel > 8) {
     flags.push({
@@ -260,16 +249,6 @@ function detectFissureRedFlags(input: RedFlagInput): RedFlag[] {
  */
 function detectPilonidalRedFlags(input: RedFlagInput): RedFlag[] {
   const flags: RedFlag[] = [];
-
-  // Secreção purulenta
-  if (input.discharge === 'purulent' || input.discharge === 'abundant') {
-    flags.push({
-      id: 'purulent_discharge_pilonidal',
-      severity: 'high',
-      message: 'Secreção purulenta na ferida',
-      recommendation: 'Pode indicar infecção. Procure avaliação médica.',
-    });
-  }
 
   // Sinais de celulite
   if (input.additionalSymptoms?.some(s =>

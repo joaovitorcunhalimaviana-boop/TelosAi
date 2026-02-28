@@ -24,8 +24,6 @@ export interface QuestionnaireData {
   bleeding?: string | null; // none, light, moderate, severe
   fever?: boolean | null;
   temperature?: number | null;
-  discharge?: boolean | string | null; // boolean (new) or string (legacy: none, serous, purulent, abundant)
-  dischargeType?: string | null; // clear, yellowish, purulent, bloody
   additionalSymptoms?: string[] | null;
   concerns?: string | null;
   usedExtraMedication?: boolean | null;
@@ -244,36 +242,6 @@ function buildQuestionnaireDescription(data: QuestionnaireData): string {
       parts.push('- Febre: SIM');
     } else {
       parts.push('- Febre: NÃO');
-    }
-  }
-
-  // Secreção
-  if (data.discharge != null) {
-    if (typeof data.discharge === 'boolean') {
-      // Novo formato: discharge (boolean) + dischargeType (string)
-      if (data.discharge) {
-        const dischargeTypeTranslation: Record<string, string> = {
-          clear: 'clara',
-          yellowish: 'amarelada',
-          purulent: 'purulenta',
-          bloody: 'sanguinolenta',
-        };
-        const typeLabel = data.dischargeType
-          ? (dischargeTypeTranslation[data.dischargeType] || data.dischargeType)
-          : 'tipo não especificado';
-        parts.push(`- Secreção: SIM (${typeLabel})`);
-      } else {
-        parts.push('- Secreção: NÃO');
-      }
-    } else if (typeof data.discharge === 'string' && data.discharge !== 'none') {
-      // Formato legado: discharge como string enum
-      const dischargeTranslation: Record<string, string> = {
-        none: 'nenhuma',
-        serous: 'serosa (clara)',
-        purulent: 'purulenta',
-        abundant: 'abundante',
-      };
-      parts.push(`- Secreção: ${dischargeTranslation[data.discharge] || data.discharge}`);
     }
   }
 

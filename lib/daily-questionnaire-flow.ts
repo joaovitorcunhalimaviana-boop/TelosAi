@@ -34,7 +34,6 @@ export interface QuestionDefinition {
     | 'bleeding'
     | 'urination'
     | 'fever'
-    | 'discharge'
     | 'medications'
     | 'analgesia'
     | 'general';
@@ -138,24 +137,6 @@ export async function getDailyQuestions(
       `
     }
   ];
-
-  // Adicionar pergunta sobre secreção se D+3 ou posterior
-  if (dayNumber >= 3) {
-    commonQuestions.push({
-      id: 'discharge',
-      category: 'discharge',
-      required: true,
-      text: 'Você tem saída de secreção (líquido) pela ferida operatória?',
-      followUpLogic: `
-        Se SIM:
-          - Qual a cor/aspecto? (clara, amarelada, purulenta/pus, sanguinolenta)
-          - Qual a quantidade? (pouca, moderada, muita)
-
-        ⚠️ Se purulenta (pus) ou quantidade abundante: alerta médico
-      `,
-      contextNote: 'Secreção purulenta a partir de D+3 pode indicar infecção'
-    });
-  }
 
   // Perguntas sobre analgesia (todos os dias)
   const analgesiaQuestions = getAnalgesiaQuestions();

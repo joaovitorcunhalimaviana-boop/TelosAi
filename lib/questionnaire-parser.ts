@@ -19,9 +19,6 @@ export interface ParsedQuestionnaireData {
   extraMedicationDetails: string | null
   localCareAdherence: boolean | null
   additionalSymptoms: string | null
-  discharge: boolean | null
-  dischargeType: string | null
-  dischargeAmount: string | null
   satisfactionRating: number | null
   wouldRecommend: boolean | null
   positiveFeedback: string | null
@@ -146,12 +143,6 @@ export function parseQuestionnaireData(
   // --- Sintomas adicionais ---
   const additionalSymptoms = get(['additionalSymptoms']) ?? null
 
-  // --- Secreção ---
-  const dischargeRaw = get(['discharge', 'hasPurulentDischarge'])
-  const discharge = dischargeRaw !== undefined ? dischargeRaw === true : null
-  const dischargeType = get(['dischargeType']) ?? null
-  const dischargeAmount = get(['dischargeAmount']) ?? null
-
   // --- Satisfação (D+14) ---
   const satisfactionRatingRaw = get(['satisfactionRating'])
   const satisfactionRating = satisfactionRatingRaw !== undefined ? Number(satisfactionRatingRaw) : null
@@ -191,9 +182,6 @@ export function parseQuestionnaireData(
     extraMedicationDetails,
     localCareAdherence,
     additionalSymptoms,
-    discharge,
-    dischargeType,
-    dischargeAmount,
     satisfactionRating: satisfactionRating !== null && !isNaN(satisfactionRating) ? satisfactionRating : null,
     wouldRecommend,
     positiveFeedback,
