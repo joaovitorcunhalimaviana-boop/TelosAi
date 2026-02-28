@@ -735,6 +735,37 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.error('🚨 Conversation history length:', conversationHistory?.length || 0);
     console.error('🚨 Conversation roles:', conversationHistory?.map((m: any) => m.role)?.join(', '));
 
+    // SALVAR ERRO NO BANCO para diagnóstico (não depende de logs da Vercel)
+    try {
+      await prisma.systemConfig.upsert({
+        where: { key: 'LAST_AI_ERROR' },
+        update: { value: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          errorType: error?.constructor?.name,
+          errorMessage: error?.message,
+          errorStatus: error?.status,
+          errorCode: error?.error?.type || error?.code,
+          userMessage: userMessage?.substring(0, 200),
+          historyLength: conversationHistory?.length || 0,
+          roles: conversationHistory?.map((m: any) => m.role),
+          currentDataKeys: Object.keys(currentData || {}),
+        }) },
+        create: { key: 'LAST_AI_ERROR', value: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          errorType: error?.constructor?.name,
+          errorMessage: error?.message,
+          errorStatus: error?.status,
+          errorCode: error?.error?.type || error?.code,
+          userMessage: userMessage?.substring(0, 200),
+          historyLength: conversationHistory?.length || 0,
+          roles: conversationHistory?.map((m: any) => m.role),
+          currentDataKeys: Object.keys(currentData || {}),
+        }) },
+      });
+    } catch (dbErr) {
+      console.error('🚨 Failed to save error to DB:', dbErr);
+    }
+
     // REGRA DE OURO: O fallback NUNCA modifica dados (updatedData = currentData)
     // Apenas pede ao paciente para repetir, para que na próxima tentativa a IA funcione
     return {
