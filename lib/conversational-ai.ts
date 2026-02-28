@@ -202,23 +202,47 @@ export async function conductConversation(
   }
 
   // Obter contexto do questionário diário
-  const { getDailyQuestions } = await import('./daily-questionnaire-flow');
-  const dailyQuestions = await getDailyQuestions(surgery.id, daysPostOp + 1);
+  console.log('🧠 [STEP 1] Loading daily questions...');
+  let dailyQuestions: any;
+  try {
+    const { getDailyQuestions } = await import('./daily-questionnaire-flow');
+    dailyQuestions = await getDailyQuestions(surgery.id, daysPostOp + 1);
+    console.log('🧠 [STEP 1] Daily questions loaded OK');
+  } catch (err: any) {
+    console.error('🧠 [STEP 1] FAILED:', err.message);
+    dailyQuestions = { contextForAI: '' };
+  }
 
   // Definir o que ainda precisa ser coletado
   const hadFirstBowelMovement = surgery.hadFirstBowelMovement || false;
   const missingInfo = getMissingInformation(currentData, daysPostOp, hadFirstBowelMovement);
 
   // Buscar protocolos: primeiro tenta banco de dados, fallback para hardcoded
-  const medicalProtocol = await getProtocolsForAI(
-    patient.userId,       // ID do médico responsável
-    surgery.type,         // Tipo de cirurgia
-    daysPostOp,           // Dia pós-operatório
-    patient.researchId    // ID da pesquisa (opcional - está no Patient)
-  );
+  console.log('🧠 [STEP 2] Loading medical protocols...');
+  let medicalProtocol: string;
+  try {
+    medicalProtocol = await getProtocolsForAI(
+      patient.userId,       // ID do médico responsável
+      surgery.type,         // Tipo de cirurgia
+      daysPostOp,           // Dia pós-operatório
+      patient.researchId    // ID da pesquisa (opcional - está no Patient)
+    );
+    console.log('🧠 [STEP 2] Protocols loaded OK, length:', medicalProtocol.length);
+  } catch (err: any) {
+    console.error('🧠 [STEP 2] FAILED:', err.message);
+    medicalProtocol = 'Protocolo padrão de acompanhamento pós-operatório.';
+  }
 
   // Buscar resumo dos dias anteriores (memória entre dias)
-  const previousDaysSummary = await getPreviousDaysSummary(surgery.id, daysPostOp);
+  console.log('🧠 [STEP 3] Loading previous days summary...');
+  let previousDaysSummary: string;
+  try {
+    previousDaysSummary = await getPreviousDaysSummary(surgery.id, daysPostOp);
+    console.log('🧠 [STEP 3] Summary loaded OK, length:', previousDaysSummary.length);
+  } catch (err: any) {
+    console.error('🧠 [STEP 3] FAILED:', err.message);
+    previousDaysSummary = '';
+  }
 
   // Buscar notas do médico (orientações específicas para este paciente)
   const doctorNotes = (surgery as any).doctorNotes || '';
@@ -533,11 +557,14 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
   try {
     console.log('🧠 conductConversation - Starting...');
     console.log('🧠 User message:', userMessage);
-    console.log('🧠 Patient:', patient.name);
-    console.log('🧠 Surgery:', surgery.type);
+    console.log('🧠 Patient:', patient?.name);
+    console.log('🧠 Surgery type:', surgery?.type);
+    console.log('🧠 Surgery ID:', surgery?.id);
     console.log('🧠 Days post-op:', daysPostOp);
     console.log('🧠 Conversation history length:', conversationHistory.length);
     console.log('🧠 Current data:', JSON.stringify(currentData));
+    console.log('🧠 Patient has userId:', !!patient?.userId);
+    console.log('🧠 Surgery has date:', !!surgery?.date);
 
     // Construir mensagens para Claude
     // CRÍTICO: Anthropic API exige alternância estrita user/assistant
@@ -572,9 +599,11 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
       });
     }
 
-    console.log('🧠 Messages array length:', messages.length);
-    console.log('🧠 Messages roles:', messages.map((m: any) => m.role).join(', '));
-    console.log('🧠 Calling Anthropic API...');
+    console.log('🧠 [STEP 4] Messages array length:', messages.length);
+    console.log('🧠 [STEP 4] Messages roles:', messages.map((m: any) => m.role).join(', '));
+    console.log('🧠 [STEP 4] System prompt length:', systemPrompt.length, 'chars');
+    console.log('🧠 [STEP 4] Total messages content:', messages.reduce((sum: number, m: any) => sum + (m.content?.length || 0), 0), 'chars');
+    console.log('🧠 [STEP 4] Calling Anthropic API...');
 
     // Chamada à API com retry rápido (máximo 1 retry, timeout 45s)
     // Vercel Hobby permite até 60s com maxDuration=60
@@ -735,33 +764,34 @@ PESQUISA DE SATISFAÇÃO (APENAS D+14):
     console.error('🚨 Conversation history length:', conversationHistory?.length || 0);
     console.error('🚨 Conversation roles:', conversationHistory?.map((m: any) => m.role)?.join(', '));
 
-    // SALVAR ERRO NO BANCO para diagnóstico (não depende de logs da Vercel)
+    // SALVAR ERRO COMPLETO NO BANCO para diagnóstico
+    const errorData = {
+      timestamp: new Date().toISOString(),
+      errorType: error?.constructor?.name,
+      errorMessage: error?.message?.substring(0, 500),
+      errorStatus: error?.status,
+      errorCode: error?.error?.type || error?.code,
+      errorStack: error?.stack?.substring(0, 300),
+      fullError: (() => {
+        try { return JSON.stringify(error, Object.getOwnPropertyNames(error || {})).substring(0, 1000); }
+        catch { return 'Could not serialize'; }
+      })(),
+      userMessage: userMessage?.substring(0, 200),
+      historyLength: conversationHistory?.length || 0,
+      roles: conversationHistory?.map((m: any) => m.role),
+      currentDataKeys: Object.keys(currentData || {}),
+      patientName: patient?.name,
+      surgeryType: surgery?.type,
+      daysPostOp,
+    };
+    console.error('🚨 ERROR DATA TO SAVE:', JSON.stringify(errorData));
     try {
       await prisma.systemConfig.upsert({
         where: { key: 'LAST_AI_ERROR' },
-        update: { value: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          errorType: error?.constructor?.name,
-          errorMessage: error?.message,
-          errorStatus: error?.status,
-          errorCode: error?.error?.type || error?.code,
-          userMessage: userMessage?.substring(0, 200),
-          historyLength: conversationHistory?.length || 0,
-          roles: conversationHistory?.map((m: any) => m.role),
-          currentDataKeys: Object.keys(currentData || {}),
-        }) },
-        create: { key: 'LAST_AI_ERROR', value: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          errorType: error?.constructor?.name,
-          errorMessage: error?.message,
-          errorStatus: error?.status,
-          errorCode: error?.error?.type || error?.code,
-          userMessage: userMessage?.substring(0, 200),
-          historyLength: conversationHistory?.length || 0,
-          roles: conversationHistory?.map((m: any) => m.role),
-          currentDataKeys: Object.keys(currentData || {}),
-        }) },
+        update: { value: JSON.stringify(errorData) },
+        create: { key: 'LAST_AI_ERROR', value: JSON.stringify(errorData) },
       });
+      console.error('🚨 Error saved to DB successfully');
     } catch (dbErr) {
       console.error('🚨 Failed to save error to DB:', dbErr);
     }
