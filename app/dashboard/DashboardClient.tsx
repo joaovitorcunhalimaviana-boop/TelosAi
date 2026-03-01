@@ -286,7 +286,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
               <Button
                 size="lg"
                 className="w-full md:w-auto shadow-lg font-semibold transition-transform hover:scale-105 active:scale-95 text-sm md:text-base px-6 md:px-8 h-11 md:h-12"
-                style={{ background: 'linear-gradient(135deg, #0A2647, #144272)', color: '#7A8299' }}
+                style={{ backgroundColor: '#0D7377', color: '#F0EAD6' }}
                 data-tutorial="new-patient-btn"
               >
                 <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
