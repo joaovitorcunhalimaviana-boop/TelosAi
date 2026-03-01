@@ -285,7 +285,8 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
             <Link href="/cadastro" className="w-full md:w-auto">
               <Button
                 size="lg"
-                className="w-full md:w-auto shadow-lg shadow-yellow-500/20 font-semibold transition-transform hover:scale-105 active:scale-95 text-sm md:text-base px-6 md:px-8 h-11 md:h-12 bg-[#D4AF37] hover:bg-[#D4AF37] text-[#0A2647]"
+                className="w-full md:w-auto shadow-lg font-semibold transition-transform hover:scale-105 active:scale-95 text-sm md:text-base px-6 md:px-8 h-11 md:h-12"
+                style={{ backgroundColor: '#F0EAD6', color: '#7A8299' }}
                 data-tutorial="new-patient-btn"
               >
                 <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />

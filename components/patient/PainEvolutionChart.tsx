@@ -192,7 +192,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
         cy={cy}
         r={radius}
         fill={fill}
-        stroke={isRedFlag ? '#DC2626' : dataKey === 'painAtRest' ? '#14BDAE' : '#D4AF37'}
+        stroke={isRedFlag ? '#DC2626' : dataKey === 'painAtRest' ? '#14BDAE' : '#F0EAD6'}
         strokeWidth={isRedFlag ? 3 : 2}
       />
     )
@@ -278,7 +278,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
               variant={showEvacuation ? "default" : "outline"}
               size="sm"
               onClick={() => setShowEvacuation(!showEvacuation)}
-              style={showEvacuation ? { backgroundColor: '#D4AF37' } : {}}
+              style={showEvacuation ? { backgroundColor: '#F0EAD6', color: '#0B0E14' } : {}}
             >
               Evacuação
             </Button>
@@ -385,7 +385,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                   <Line
                     type="monotone"
                     dataKey="painDuringEvacuation"
-                    stroke="#D4AF37"
+                    stroke="#F0EAD6"
                     strokeWidth={3}
                     strokeDasharray="5 5"
                     dot={(props: any) => renderDot({ ...props, dataKey: 'painDuringEvacuation' })}
