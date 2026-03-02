@@ -146,34 +146,33 @@ export function getBowelMovementQuestions(
   contextForAI: string;
 } {
   if (!hadFirstMovement) {
-    // Primeira evacuação ainda não ocorreu
+    // PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA
     return {
       mainQuestion: 'Você evacuou desde a última vez que conversamos?',
       followUpIfYes: [
-        'Que ótimo! Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.'
+        'Quando foi? Hoje ou ontem? E que horas mais ou menos?',
+        'Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.',
       ],
-      followUpIfNo: [
+      followUpIfNo:
         currentDay <= 2
-          ? 'Tudo bem, é normal. Quando foi a última vez que você evacuou?'
+          ? ['Tudo bem, é normal nessa fase.']
           : currentDay === 3
-          ? 'Quando foi a última vez que você evacuou? Você está tomando os laxantes que o médico receitou?'
+          ? ['Está tomando os laxantes que o médico receitou? É importante manter a hidratação.']
           : currentDay === 4
-          ? 'Quando foi a última vez que você evacuou? É importante evacuar logo. Você está com medo da dor ou alguma dificuldade?'
-          : 'Quando foi a última vez que você evacuou? Isso é importante. Vou avisar seu médico.'
-      ],
-      contextForAI: getBowelMovementContextMessage(false, currentDay)
+          ? ['É importante evacuar logo. Está com medo da dor ou alguma dificuldade?']
+          : ['Isso é importante. Vou avisar seu médico.'],
+      contextForAI: getBowelMovementContextMessage(false, currentDay),
     };
   } else {
-    // Já evacuou pela primeira vez, perguntas de rotina
+    // DIÁRIO EVACUATÓRIO (primeira evacuação já registrada)
     return {
-      mainQuestion: 'Você evacuou desde a última vez que conversamos?',
+      mainQuestion: 'Desde a última vez que conversamos, você evacuou?',
       followUpIfYes: [
-        'Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.'
+        'Quantas vezes evacuou desde então?',
+        'Qual foi a dor na última evacuação? De 0 a 10.',
       ],
-      followUpIfNo: [
-        'Quando foi a última evacuação?'
-      ],
-      contextForAI: 'Paciente já teve primeira evacuação. Perguntas de rotina.'
+      followUpIfNo: [],
+      contextForAI: 'Primeira evacuação já registrada. Modo diário: coletar frequência e dor na última evacuação.',
     };
   }
 }

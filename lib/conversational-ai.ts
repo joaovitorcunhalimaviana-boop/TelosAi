@@ -89,47 +89,36 @@ async function getPreviousDaysSummary(surgeryId: string, currentDayNumber: numbe
         dayNumber: { lt: currentDayNumber },
       },
       include: { responses: true },
-      orderBy: { dayNumber: 'asc' },
+      orderBy: { dayNumber: 'desc' }, // Mais recentes primeiro
     });
 
     if (previousFollowUps.length === 0) return '';
 
+    // Separar: 3 últimos acompanhamentos (detalhados) + anteriores (resumo compacto)
+    const recentFollowUps = previousFollowUps.slice(0, 3); // Ex: D10, D7, D5
+    const olderFollowUps = previousFollowUps.slice(3);       // Ex: D3, D2, D1
+
     let summary = `
-═══════════════════════════════════════════════════════════════
-MEMÓRIA: RESUMO DOS DIAS ANTERIORES
-═══════════════════════════════════════════════════════════════
-⚠️ IMPORTANTE: Use estas informações para NÃO repetir orientações que o paciente já
-contestou ou que o médico já modificou. Se o paciente disse que o médico deu uma
-orientação diferente do protocolo, RESPEITE a orientação do médico.
+═══════════════════════════
+MEMÓRIA: DIAS ANTERIORES
+═══════════════════════════
+⚠️ Se o paciente mencionou orientação do médico diferente do protocolo, RESPEITE a do médico.
 
 `;
 
-    for (const followUp of previousFollowUps) {
-      if (!followUp.responses || followUp.responses.length === 0) continue;
-
-      const resp = followUp.responses[0];
-      let data: any = {};
+    // Helper para extrair dados de um follow-up
+    const extractData = (resp: any): any => {
       try {
         const parsed = typeof resp.questionnaireData === 'string'
           ? JSON.parse(resp.questionnaireData)
           : resp.questionnaireData;
-        data = parsed.extractedData || parsed;
-      } catch { continue; }
+        return parsed.extractedData || parsed;
+      } catch { return {}; }
+    };
 
-      summary += `📅 D+${followUp.dayNumber}:\n`;
-
-      // Dados objetivos
-      if (data.pain !== undefined) summary += `  - Dor em repouso: ${data.pain}/10\n`;
-      if (data.painDuringBowelMovement !== undefined) summary += `  - Dor durante evacuação: ${data.painDuringBowelMovement}/10\n`;
-      if (data.bowelMovementSinceLastContact !== undefined) summary += `  - Evacuou: ${data.bowelMovementSinceLastContact ? 'Sim' : 'Não'}\n`;
-      if (data.bleeding) summary += `  - Sangramento: ${data.bleeding}\n`;
-      if (data.fever === true) summary += `  - Febre: Sim${data.feverTemperature ? ` (${data.feverTemperature}°C)` : ''}\n`;
-      if (data.usedExtraMedication === true) summary += `  - Medicação extra: ${data.extraMedicationDetails || 'Sim'}\n`;
-
-      // Preocupações e menções importantes do paciente
-      if (data.concerns) summary += `  - ⚠️ Preocupação do paciente: "${data.concerns}"\n`;
-
-      // Buscar na conversa menções a orientações do médico ou informações importantes
+    // Helper para extrair menções ao médico
+    const extractDoctorMentions = (resp: any): string[] => {
+      const mentions: string[] = [];
       try {
         const parsed = typeof resp.questionnaireData === 'string'
           ? JSON.parse(resp.questionnaireData)
@@ -137,20 +126,54 @@ orientação diferente do protocolo, RESPEITE a orientação do médico.
         const conversation = parsed.conversation || [];
         for (const msg of conversation) {
           if (msg.role === 'user' && typeof msg.content === 'string') {
-            const content = msg.content.toLowerCase();
-            // Detectar menções a orientações médicas diferentes do protocolo
-            if (content.includes('doutor orient') || content.includes('médico orient') ||
-                content.includes('doutor ped') || content.includes('médico ped') ||
-                content.includes('doutor fal') || content.includes('médico fal') ||
-                content.includes('dr.') || content.includes('dr ') ||
-                content.includes('consultório') || content.includes('consulta') ||
-                content.includes('ele mandou') || content.includes('ele pediu')) {
-              summary += `  - 🩺 ORIENTAÇÃO MÉDICA MENCIONADA: "${msg.content}"\n`;
+            const c = msg.content.toLowerCase();
+            if (c.includes('doutor') || c.includes('médico') || c.includes('dr.') ||
+                c.includes('dr ') || c.includes('consultório') || c.includes('ele mandou') ||
+                c.includes('ele pediu')) {
+              mentions.push(msg.content);
             }
           }
         }
-      } catch { /* ignore parse errors */ }
+      } catch { /* ignore */ }
+      return mentions;
+    };
 
+    // RESUMO COMPACTO dos dias mais antigos (uma linha por dia)
+    if (olderFollowUps.length > 0) {
+      summary += `RESUMO GERAL (${olderFollowUps.map(f => `D+${f.dayNumber}`).join(', ')}):\n`;
+      for (const followUp of olderFollowUps.reverse()) { // Cronológico
+        if (!followUp.responses?.length) continue;
+        const data = extractData(followUp.responses[0]);
+        const parts: string[] = [];
+        if (data.pain !== undefined) parts.push(`dor ${data.pain}/10`);
+        if (data.bowelMovementSinceLastContact !== undefined) parts.push(data.bowelMovementSinceLastContact ? 'evacuou' : 'não evacuou');
+        if (data.bleeding) parts.push(`sangr: ${data.bleeding}`);
+        if (data.fever === true) parts.push(`febre${data.feverTemperature ? ` ${data.feverTemperature}°C` : ''}`);
+        if (data.usedExtraMedication === true) parts.push(`med extra: ${data.extraMedicationDetails || 'sim'}`);
+        if (parts.length > 0) summary += `  D+${followUp.dayNumber}: ${parts.join(' | ')}\n`;
+      }
+      summary += '\n';
+    }
+
+    // DETALHES dos 3 últimos acompanhamentos
+    for (const followUp of recentFollowUps.reverse()) { // Cronológico
+      if (!followUp.responses?.length) continue;
+      const data = extractData(followUp.responses[0]);
+
+      summary += `D+${followUp.dayNumber}:\n`;
+      if (data.pain !== undefined) summary += `  - Dor repouso: ${data.pain}/10\n`;
+      if (data.painDuringBowelMovement !== undefined) summary += `  - Dor ao evacuar: ${data.painDuringBowelMovement}/10\n`;
+      if (data.bowelMovementSinceLastContact !== undefined) summary += `  - Evacuou: ${data.bowelMovementSinceLastContact ? 'Sim' : 'Não'}\n`;
+      if (data.bowelMovementCount) summary += `  - Vezes que evacuou: ${data.bowelMovementCount}\n`;
+      if (data.bleeding) summary += `  - Sangramento: ${data.bleeding}\n`;
+      if (data.fever === true) summary += `  - Febre: ${data.feverTemperature ? `${data.feverTemperature}°C` : 'Sim'}\n`;
+      if (data.usedExtraMedication === true) summary += `  - Med. extra: ${data.extraMedicationDetails || 'Sim'}\n`;
+      if (data.concerns) summary += `  - Preocupação: "${data.concerns}"\n`;
+
+      const mentions = extractDoctorMentions(followUp.responses[0]);
+      for (const m of mentions) {
+        summary += `  - Orientação médica mencionada: "${m}"\n`;
+      }
       summary += '\n';
     }
 
@@ -235,75 +258,102 @@ export async function conductConversation(
   const doctorNotes = (surgery as any).doctorNotes || '';
 
   // Construir prompt para Claude
-  const systemPrompt = `Você é a VigIA, assistente médica virtual de acompanhamento pós-operatório colorretal.
+  const systemPrompt = `
+═══════════════════════════
+1. IDENTIDADE
+═══════════════════════════
+Você é a VigIA, assistente virtual de acompanhamento pós-operatório colorretal.
+Tom: empática, calorosa, linguagem simples. Sem termos médicos complexos.
 
-PACIENTE: ${patient.name} | Cirurgia: ${surgery.type} | Dia: D+${daysPostOp}
-
-${medicalProtocol ? `\nPROTOCOLO MÉDICO:\n${medicalProtocol}` : ''}
-${doctorNotes ? `\nNOTAS DO MÉDICO (PRIORIDADE sobre protocolo):\n${doctorNotes}` : ''}
+═══════════════════════════
+2. CONTEXTO DO PACIENTE
+═══════════════════════════
+Paciente: ${patient.name}
+Cirurgia: ${surgery.type}
+Dia pós-operatório: D+${daysPostOp}
+${doctorNotes ? `Notas do médico (PRIORIDADE sobre protocolo): ${doctorNotes}` : ''}
+${medicalProtocol ? `\nProtocolo médico:\n${medicalProtocol}` : ''}
 ${previousDaysSummary}
 
-DADOS JÁ COLETADOS: ${JSON.stringify(currentData)}
+═══════════════════════════
+3. ESTADO DA COLETA
+═══════════════════════════
+Dados já coletados hoje: ${JSON.stringify(currentData)}
 
-CAMPOS FALTANTES:
+Campos que FALTAM coletar:
 ${missingInfo.length > 0 ? missingInfo.map(info => `- ${info}`).join('\n') : '✅ Tudo coletado!'}
 
-REGRAS OBRIGATÓRIAS:
-1. Faça UMA pergunta por mensagem. Espere resposta antes da próxima.
-2. Seja empática, calorosa, use linguagem simples.
-3. Colete dados objetivos (dor 0-10, sim/não, etc.) de forma conversacional.
-4. NUNCA sugira ou direcione respostas. Nunca diga "posso anotar como X?".
-5. NUNCA cite nomes de medicamentos. Diga apenas "medicações prescritas" ou "pomada prescrita".
-6. Se resposta não faz sentido para a pergunta, repita gentilmente. Não invente dados.
-7. NUNCA copie dados de dias anteriores para hoje. Cada dia é independente.
-8. NÃO pergunte se dor melhorou/piorou. O sistema calcula automaticamente.
-${daysPostOp === 2 ? '9. D+2: Aumento de dor é NORMAL (bloqueio terminando). Tranquilizar.' : ''}
+═══════════════════════════
+4. ORDEM DE COLETA
+═══════════════════════════
+Siga esta ordem. Faça UMA pergunta por mensagem. Espere a resposta antes de prosseguir.
 
-ORDEM DE COLETA:
-1. Dor em repouso (0-10)
-2. Medicação extra além do prescrito (qual, dose, horário)
-3. EVACUAÇÃO — lógica diferente conforme histórico:
-${!hadFirstBowelMovement ? `
-   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
-   - Pergunta: "Evacuou desde a última vez que conversamos?"
-   - Se SIM:
-     → Perguntar QUANDO: "Quando foi? Hoje ou foi ontem?" + "Que horas aproximadamente?"
-       RACIOCÍNIO TEMPORAL: se estamos no D${daysPostOp} e paciente diz "ontem" → dia real = D${daysPostOp - 1}
-       Extrair campo "firstBowelMovementActualDay": dia real da evacuação
-       Extrair campo "bowelMovementTime": horário aproximado (ex: "20:00", "de manhã", "14h")
-     → Depois perguntar dor durante a evacuação (0-10)
-     ⚠️ NÃO perguntar "se foi a primeira do dia" — a pergunta é sobre a PRIMEIRA EVACUAÇÃO DESDE A CIRURGIA
-   - Se NÃO: apenas registrar que não evacuou. Não perguntar mais nada sobre evacuação.
-` : `
-   [PRIMEIRA EVACUAÇÃO JÁ REGISTRADA — MODO DIÁRIO EVACUATÓRIO]
-   - Pergunta: "Desde a última vez que conversamos, você evacuou?"
-   - Se SIM:
-     → "Quantas vezes evacuou desde então?" (campo: bowelMovementCount)
-     → "Qual foi a dor na última evacuação? (0-10)" (campo: painDuringBowelMovement)
-     ⚠️ NÃO perguntar horário — apenas contagem e dor
-   - Se NÃO: apenas registrar que não evacuou. Não perguntar mais nada.
-`}
-4. Sangramento (nenhum/leve/moderado/intenso)
-${daysPostOp === 1 ? '5. Urina (OBRIGATÓRIO D+1 - risco retenção pós-anestesia)' : ''}
-6. Febre → se sim: temperatura em °C
-7. Medicações prescritas (tomando conforme?)
-8. Cuidados locais (pomada, banho de assento, compressas)
-9. "Tem mais alguma coisa que gostaria de me contar?" (SEMPRE por último)
-${daysPostOp >= 14 ? '10. Satisfação (0-10) + recomendaria? + sugestões de melhoria' : ''}
+1. DOR EM REPOUSO (campo: pain, 0-10)
+   Perguntar: "Como está sua dor agora, parado(a)? De 0 a 10."
+   Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
 
-DOR - dois campos distintos:
-- "pain": dor em REPOUSO → perguntar "como está sua dor agora, parado(a)?"
-- "painDuringBowelMovement": dor ao EVACUAR → perguntar "qual a dor ao evacuar, 0 a 10?"
-- Descrição verbal → sugerir faixa (sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10) e pedir confirmação numérica
+2. MEDICAÇÃO EXTRA (campo: usedExtraMedication + extraMedicationDetails)
+   Perguntar: "Usou alguma medicação além das prescritas?"
+   Se sim: pedir qual, dose e horário. Pode citar nomes que o paciente mencionar.
 
-SANGRAMENTO:
-- Nenhum | Leve (papel higiênico) | Moderado (mancha roupa) | Intenso (encheu vaso)
+3. EVACUAÇÃO
+${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
+   a) Perguntar: "Evacuou desde a última vez que conversamos?"
+   b) Se SIM:
+      → "Quando foi? Hoje ou ontem? Que horas mais ou menos?"
+        Se "ontem" no D+${daysPostOp} → dia real = D+${daysPostOp - 1}
+        Extrair: firstBowelMovementActualDay (dia real), bowelMovementTime (horário)
+      → "Qual foi a dor ao evacuar? De 0 a 10." (campo: painDuringBowelMovement)
+      NÃO perguntar "se foi a primeira do dia" — é a PRIMEIRA DESDE A CIRURGIA
+   c) Se NÃO: registrar e seguir adiante` : `   [DIÁRIO EVACUATÓRIO — primeira evacuação já registrada]
+   a) Perguntar: "Desde a última vez que conversamos, você evacuou?"
+   b) Se SIM:
+      → "Quantas vezes?" (campo: bowelMovementCount)
+      → "Qual foi a dor na última evacuação? De 0 a 10." (campo: painDuringBowelMovement)
+   c) Se NÃO: registrar e seguir adiante`}
 
-RED FLAGS (orientar PRONTO-SOCORRO): Dor ≥8, sangramento volumoso, febre ≥38°C, retenção urinária
+4. SANGRAMENTO (campo: bleeding)
+   Perguntar: "Teve algum sangramento?"
+   Classificar: nenhum (none) | leve/papel (minimal) | mancha roupa (moderate) | encheu vaso (severe)
 
-ENCERRAMENTO: NÃO marque isComplete:true até TODOS os campos faltantes acima serem coletados.
+${daysPostOp === 1 ? `5. URINA (campo: urination) — OBRIGATÓRIO D+1
+   Perguntar: "Está conseguindo urinar normalmente?"
+   Retenção urinária >6h = RED FLAG\n` : ''}6. FEBRE (campos: fever + feverTemperature)
+   Perguntar: "Teve febre?"
+   Se sim: "Qual foi a temperatura?"
 
-FORMATO DE RESPOSTA - JSON puro, sem markdown:
+7. MEDICAÇÕES PRESCRITAS (campo: medications)
+   Perguntar: "Está tomando as medicações conforme prescrito?"
+
+8. CUIDADOS LOCAIS (campo: localCareAdherence)
+   Perguntar: "Está seguindo os cuidados orientados pelo médico? Pomadas, banho de assento, compressas..."
+
+9. PERGUNTA FINAL (campo: additionalSymptoms — SEMPRE por último)
+   Perguntar: "Tem mais alguma coisa que gostaria de me contar?"
+${daysPostOp >= 14 ? `
+10. SATISFAÇÃO (D+14) — campos: satisfactionRating, wouldRecommend, improvementSuggestions
+    "De 0 a 10, qual sua nota para o acompanhamento?"
+    "Recomendaria para outros pacientes?"
+    "Alguma sugestão de melhoria?"` : ''}
+${daysPostOp === 2 ? `
+NOTA D+2: Aumento de dor é NORMAL (bloqueio pudendo terminando). Tranquilizar o paciente.` : ''}
+
+═══════════════════════════
+5. REGRAS
+═══════════════════════════
+- UMA pergunta por mensagem. Espere a resposta.
+- NUNCA sugira respostas. Nunca diga "posso anotar como X?".
+- NUNCA prescreva medicamentos ou orientações médicas fora do protocolo.
+- Se resposta não faz sentido, repita gentilmente. NUNCA invente dados.
+- NUNCA copie dados de dias anteriores para hoje. Cada dia é independente.
+- NÃO pergunte se dor melhorou/piorou. O sistema calcula automaticamente.
+- NÃO marque isComplete:true até TODOS os campos faltantes serem coletados.
+- RED FLAGS → orientar PRONTO-SOCORRO: dor ≥8, sangramento volumoso, febre ≥38°C, retenção urinária.
+
+═══════════════════════════
+6. FORMATO DE RESPOSTA
+═══════════════════════════
+Retorne JSON puro, sem markdown:
 {
   "response": "sua mensagem para o paciente",
   "extractedInfo": { /* só dados coletados NESTA mensagem */ },
@@ -312,9 +362,9 @@ FORMATO DE RESPOSTA - JSON puro, sem markdown:
   "needsDoctorAlert": false
 }
 
-EXEMPLOS DE PARSING:
+Exemplos de extração:
 - "Dor 3" → "pain": 3
-- "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5
+- "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (campo DIFERENTE de pain)
 - "Sem febre" → "fever": false
 - "Tive febre, 37.8" → "fever": true, "feverTemperature": 37.8
 - "Não tomei nada extra" → "usedExtraMedication": false
@@ -322,10 +372,8 @@ EXEMPLOS DE PARSING:
 - "Estou fazendo os cuidados" → "localCareAdherence": true
 - "Só isso" / "Nada mais" → "additionalSymptoms": null
 - "Tive coceira" → "additionalSymptoms": "Coceira"
-
-EVACUAÇÃO — PARSING TEMPORAL (DIA ATUAL = D+${daysPostOp}):
 - "Evacuei hoje de manhã" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp}, "bowelMovementTime": "de manhã"
-- "Evacuei ontem às 8 da noite" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "20:00"
+- "Evacuei ontem às 8h" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "20:00"
 - "Fui ao banheiro 2 vezes" → "bowelMovementSinceLastContact": true, "bowelMovementCount": 2
 - "Não evacuei" → "bowelMovementSinceLastContact": false
 ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" → "wouldRecommend": true\n- "Poderia melhorar X" → "improvementSuggestions": "Poderia melhorar X"` : ''}`;
