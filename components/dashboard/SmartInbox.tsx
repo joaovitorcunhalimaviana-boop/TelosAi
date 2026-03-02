@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { getTodayTasks, type TodayTask, type TodayTasksResult } from "@/app/dashboard/actions"
+import { getTodayTasks, type TodayTask, type TodayTasksResult, type SilentPatient } from "@/app/dashboard/actions"
+import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,7 +14,8 @@ import {
     RefreshCcw,
     CheckCircle2,
     Loader2,
-    Phone
+    Phone,
+    Send
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -149,7 +151,7 @@ function SectionHeader({ title, count, color }: { title: string; count: number; 
 }
 
 export function SmartInbox() {
-    const [tasks, setTasks] = useState<TodayTasksResult>({ overdue: [], inProgress: [], pendingToday: [] })
+    const [tasks, setTasks] = useState<TodayTasksResult>({ overdue: [], inProgress: [], pendingToday: [], silentPatients: [] })
     const [loading, setLoading] = useState(true)
 
     const fetchTasks = async () => {
@@ -168,7 +170,21 @@ export function SmartInbox() {
         fetchTasks()
     }, [])
 
-    const totalTasks = tasks.overdue.length + tasks.inProgress.length + tasks.pendingToday.length
+    const totalTasks = tasks.overdue.length + tasks.inProgress.length + tasks.pendingToday.length + tasks.silentPatients.length
+
+    const handleResend = async (followUpId: string) => {
+        try {
+            const res = await fetch(`/api/followup/${followUpId}/send`, { method: 'POST' })
+            if (res.ok) {
+                toast.success('Questionário reenviado!')
+                fetchTasks()
+            } else {
+                toast.error('Erro ao reenviar')
+            }
+        } catch {
+            toast.error('Erro ao reenviar')
+        }
+    }
 
     return (
         <Card style={{ backgroundColor: '#161B27', borderColor: '#1E2535' }}>
@@ -227,6 +243,79 @@ export function SmartInbox() {
                         animate="show"
                         className="space-y-1"
                     >
+                        {/* Sem Resposta (Silent Patients) */}
+                        {tasks.silentPatients.length > 0 && (
+                            <>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                    <span className="text-xs md:text-sm font-semibold" style={{ color: '#F0EAD6' }}>
+                                        Sem Resposta
+                                    </span>
+                                    <Badge variant="secondary" className="text-[10px] md:text-xs px-1.5 py-0" style={{ backgroundColor: '#2A3147', color: '#D8DEEB' }}>
+                                        {tasks.silentPatients.length}
+                                    </Badge>
+                                </div>
+                                {tasks.silentPatients.map((sp) => (
+                                    <motion.div key={sp.id} variants={item}>
+                                        <div className="group relative flex gap-3 md:gap-4 p-3 md:p-4 rounded-lg md:rounded-xl glass-card border-none transition-all duration-300 overflow-hidden" style={{ backgroundColor: '#111520' }}>
+                                            {/* Red strip */}
+                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
+
+                                            <Link href={`/paciente/${sp.patientId}/editar`} className="flex gap-3 md:gap-4 flex-1 min-w-0 cursor-pointer">
+                                                <div className="flex-shrink-0">
+                                                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(192, 57, 43, 0.15)', color: '#C0392B' }}>
+                                                        <AlertTriangle className="h-4 w-4 md:h-5 md:w-5" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between items-start gap-2 mb-1">
+                                                        <div className="min-w-0">
+                                                            <h4 className="font-semibold text-xs md:text-sm truncate" style={{ color: '#F0EAD6' }}>
+                                                                {sp.patientName}
+                                                            </h4>
+                                                            <span className="text-[10px] md:text-xs flex items-center gap-1" style={{ color: '#7A8299' }}>
+                                                                <span className="truncate">{sp.surgeryType}</span> &bull; D+{sp.dayNumber}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-1 shrink-0">
+                                                            <span className="inline-flex items-center gap-1 text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 rounded-full" style={{ color: '#C0392B', backgroundColor: 'rgba(192, 57, 43, 0.15)', border: '1px solid rgba(192, 57, 43, 0.3)' }}>
+                                                                <Clock className="h-2.5 w-2.5 md:h-3 md:w-3" />
+                                                                {sp.hoursSinceSent}h sem resposta
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+
+                                            {/* Action buttons */}
+                                            <div className="flex flex-col justify-center gap-1.5 shrink-0">
+                                                <a
+                                                    href={getWhatsAppUrl(sp.patientPhone)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="h-8 w-8 md:h-9 md:w-9 rounded-full flex items-center justify-center transition-colors"
+                                                    style={{ backgroundColor: 'rgba(26, 140, 106, 0.15)', color: '#1A8C6A', border: '1px solid rgba(26, 140, 106, 0.3)' }}
+                                                    title="Abrir WhatsApp"
+                                                >
+                                                    <Phone className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                                                </a>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleResend(sp.followUpId) }}
+                                                    className="h-8 w-8 md:h-9 md:w-9 rounded-full flex items-center justify-center transition-colors"
+                                                    style={{ backgroundColor: 'rgba(13, 115, 119, 0.15)', color: '#14BDAE', border: '1px solid rgba(13, 115, 119, 0.3)' }}
+                                                    title="Reenviar questionário"
+                                                >
+                                                    <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </>
+                        )}
+
                         {/* Overdue Section */}
                         {tasks.overdue.length > 0 && (
                             <>

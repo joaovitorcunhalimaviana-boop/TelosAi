@@ -597,10 +597,23 @@ export interface TodayTask {
   followUpStatus: string // original status from DB (pending, sent, in_progress)
 }
 
+export interface SilentPatient {
+  id: string
+  followUpId: string
+  patientId: string
+  patientName: string
+  patientPhone: string
+  surgeryType: string
+  dayNumber: number
+  sentAt: Date
+  hoursSinceSent: number
+}
+
 export interface TodayTasksResult {
   overdue: TodayTask[]
   inProgress: TodayTask[]
   pendingToday: TodayTask[]
+  silentPatients: SilentPatient[]
 }
 
 /**
@@ -808,8 +821,29 @@ export async function getTodayTasks(): Promise<TodayTasksResult> {
   }
 
   const userId = session.user.id
+  const now = getNowBrasilia()
   const todayStart = startOfDayBrasilia()
   const todayEnd = endOfDayBrasilia()
+
+  // Pacientes silenciosos - enviado há mais de 8 horas sem resposta
+  const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000)
+
+  const silentPatientsRaw = await prisma.followUp.findMany({
+    where: {
+      userId: userId,
+      status: 'sent',
+      sentAt: { lt: eightHoursAgo },
+      responses: { none: {} },
+      surgery: {
+        status: { not: 'completed' }
+      }
+    },
+    include: {
+      patient: { select: { id: true, name: true, phone: true } },
+      surgery: { select: { id: true, type: true, date: true } }
+    },
+    orderBy: { sentAt: 'asc' }
+  })
 
   // Follow-ups pendentes para hoje (agendados para hoje, não respondidos)
   const pendingToday = await prisma.followUp.findMany({
@@ -878,6 +912,17 @@ export async function getTodayTasks(): Promise<TodayTasksResult> {
     overdue: overdue.map(f => mapToTask(f, 'overdue')),
     inProgress: inProgress.map(f => mapToTask(f, 'in_progress')),
     pendingToday: pendingToday.map(f => mapToTask(f, 'pending_today')),
+    silentPatients: silentPatientsRaw.map(f => ({
+      id: f.id,
+      followUpId: f.id,
+      patientId: f.patient.id,
+      patientName: f.patient.name,
+      patientPhone: f.patient.phone,
+      surgeryType: f.surgery.type,
+      dayNumber: f.dayNumber,
+      sentAt: f.sentAt!,
+      hoursSinceSent: Math.floor((now.getTime() - (f.sentAt?.getTime() || now.getTime())) / (1000 * 60 * 60)),
+    })),
   }
 }
 

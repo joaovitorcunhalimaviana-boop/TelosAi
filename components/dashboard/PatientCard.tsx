@@ -6,14 +6,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import {
   AlertCircle,
   Calendar,
   CheckCircle2,
+  ClipboardList,
   FlaskConical,
   TestTube2,
   MessageCircle,
   Phone,
   Trash2,
+  Zap,
+  Send,
+  RefreshCw,
+  FileText,
+  CheckCheck,
 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -88,6 +101,13 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
   const riskLevel = getPatientRiskLevel(patient)
   const isCritical = patient.latestResponse?.riskLevel === 'critical' || patient.latestResponse?.riskLevel === 'high'
 
+  // Quick Actions Modal state
+  const [showActionsModal, setShowActionsModal] = useState(false)
+  const [customMessage, setCustomMessage] = useState("")
+  const [observation, setObservation] = useState("")
+  const [actionLoading, setActionLoading] = useState<'resend' | 'message' | 'observation' | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<'resend' | 'observation' | null>(null)
+
   const handleWhatsAppClick = () => {
     const message = encodeURIComponent(`Olá ${patient.patientName}, aqui é ${userName}. Como está o seu pós-operatório?`)
     window.open(`https://wa.me/55${patient.phone.replace(/\D/g, '')}?text=${message}`, '_blank')
@@ -95,6 +115,51 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
 
   const handlePhoneClick = () => {
     window.open(`tel:${patient.phone.replace(/\D/g, '')}`, '_self')
+  }
+
+  // Quick Actions handlers
+  const handleResendFollowUp = async () => {
+    setActionLoading('resend')
+    setActionSuccess(null)
+    try {
+      const res = await fetch(`/api/surgery/${patient.id}/resend-followup`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao reenviar')
+      setActionSuccess('resend')
+      setTimeout(() => setActionSuccess(null), 3000)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao reenviar questionário')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleSendCustomMessage = () => {
+    if (!customMessage.trim()) return
+    const encoded = encodeURIComponent(customMessage.trim())
+    window.open(`https://wa.me/55${patient.phone.replace(/\D/g, '')}?text=${encoded}`, '_blank')
+    setCustomMessage("")
+  }
+
+  const handleSaveObservation = async () => {
+    if (!observation.trim()) return
+    setActionLoading('observation')
+    setActionSuccess(null)
+    try {
+      const res = await fetch(`/api/surgery/${patient.id}/notes`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doctorNotes: observation }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar')
+      setActionSuccess('observation')
+      setTimeout(() => setActionSuccess(null), 3000)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao salvar observação')
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const handleCompleteSurgery = async () => {
@@ -411,6 +476,19 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                     </Button>
                   )}
                 </div>
+                {(patient.status === 'completed' || patient.daysSinceSurgery >= 14) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2"
+                    style={{ borderColor: '#0D7377', color: '#14BDAE' }}
+                    onClick={() => window.open(`/api/export/discharge-pdf?surgeryId=${patient.id}`, '_blank')}
+                    aria-label={`Gerar relatorio de alta de ${patient.patientName}`}
+                  >
+                    <ClipboardList className="h-4 w-4" aria-hidden="true" />
+                    Relatorio de Alta
+                  </Button>
+                )}
                 {showResearchButton && onAddToResearch && (
                   <Button
                     variant="outline"
@@ -424,6 +502,18 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
                     Adicionar à Pesquisa
                   </Button>
                 )}
+
+                {/* Ações Rápidas */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2 font-semibold"
+                  style={{ borderColor: '#14BDAE', color: '#14BDAE', backgroundColor: 'rgba(20, 189, 174, 0.08)' }}
+                  onClick={() => { setShowActionsModal(true); setActionSuccess(null) }}
+                >
+                  <Zap className="h-4 w-4" />
+                  Ações Rápidas
+                </Button>
 
                 {/* Concluir / Teste / Excluir */}
                 <div className="flex gap-2">
@@ -479,6 +569,156 @@ export function PatientCard({ patient, userName, onAddToResearch, onPatientChang
           </CardContent>
         </Card>
       </ScaleOnHover>
+
+      {/* Quick Actions Modal */}
+      <Dialog open={showActionsModal} onOpenChange={setShowActionsModal}>
+        <DialogContent
+          className="max-w-md"
+          style={{ backgroundColor: '#161B27', border: '1px solid #1E2535', color: '#F0EAD6' }}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg" style={{ color: '#F0EAD6' }}>
+              <Zap className="h-5 w-5" style={{ color: '#14BDAE' }} />
+              Ações Rápidas
+              <span className="text-sm font-normal ml-1" style={{ color: '#7A8299' }}>
+                — {patient.patientName}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-5 pt-2">
+
+            {/* 1. Reenviar questionário */}
+            <div className="rounded-lg p-4 space-y-3" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" style={{ color: '#14BDAE' }} />
+                <span className="font-semibold text-sm" style={{ color: '#D8DEEB' }}>
+                  Reenviar Questionário
+                </span>
+              </div>
+              <p className="text-xs" style={{ color: '#7A8299' }}>
+                Reenvia o questionário de acompanhamento mais recente pendente para o paciente via WhatsApp.
+              </p>
+              <Button
+                size="sm"
+                className="w-full gap-2"
+                style={{
+                  backgroundColor: actionSuccess === 'resend' ? '#1A8C6A' : '#0D7377',
+                  color: '#F0EAD6',
+                  border: 'none',
+                }}
+                onClick={handleResendFollowUp}
+                disabled={actionLoading === 'resend'}
+              >
+                {actionLoading === 'resend' ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : actionSuccess === 'resend' ? (
+                  <>
+                    <CheckCheck className="h-4 w-4" />
+                    Enviado!
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    Reenviar Questionário
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* 2. Mensagem personalizada */}
+            <div className="rounded-lg p-4 space-y-3" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" style={{ color: '#1A8C6A' }} />
+                <span className="font-semibold text-sm" style={{ color: '#D8DEEB' }}>
+                  Mensagem Personalizada
+                </span>
+              </div>
+              <Textarea
+                placeholder={`Olá ${patient.patientName}, tudo bem?`}
+                value={customMessage}
+                onChange={(e) => setCustomMessage(e.target.value)}
+                rows={3}
+                className="resize-none text-sm"
+                style={{
+                  backgroundColor: '#1E2535',
+                  border: '1px solid #2A3147',
+                  color: '#F0EAD6',
+                }}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full gap-2"
+                style={{ borderColor: '#1A8C6A', color: '#1A8C6A' }}
+                onClick={handleSendCustomMessage}
+                disabled={!customMessage.trim()}
+              >
+                <MessageCircle className="h-4 w-4" />
+                Abrir no WhatsApp
+              </Button>
+            </div>
+
+            {/* 3. Adicionar observação */}
+            <div className="rounded-lg p-4 space-y-3" style={{ backgroundColor: '#0B0E14', border: '1px solid #1E2535' }}>
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" style={{ color: '#D4AF37' }} />
+                <span className="font-semibold text-sm" style={{ color: '#D8DEEB' }}>
+                  Adicionar Observação
+                </span>
+              </div>
+              <p className="text-xs" style={{ color: '#7A8299' }}>
+                Salva uma anotação clínica nos registros da cirurgia (visível nos detalhes do paciente).
+              </p>
+              <Textarea
+                placeholder="Ex: Paciente relatou dor leve ao sentar. Orientado sobre banhos de assento..."
+                value={observation}
+                onChange={(e) => setObservation(e.target.value)}
+                rows={3}
+                className="resize-none text-sm"
+                style={{
+                  backgroundColor: '#1E2535',
+                  border: '1px solid #2A3147',
+                  color: '#F0EAD6',
+                }}
+              />
+              <Button
+                size="sm"
+                className="w-full gap-2"
+                style={{
+                  backgroundColor: actionSuccess === 'observation' ? '#1A8C6A' : '#D4AF37',
+                  color: actionSuccess === 'observation' ? '#F0EAD6' : '#0A2647',
+                  border: 'none',
+                  fontWeight: 600,
+                }}
+                onClick={handleSaveObservation}
+                disabled={actionLoading === 'observation' || !observation.trim()}
+              >
+                {actionLoading === 'observation' ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : actionSuccess === 'observation' ? (
+                  <>
+                    <CheckCheck className="h-4 w-4" />
+                    Salvo!
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4" />
+                    Salvar Observação
+                  </>
+                )}
+              </Button>
+            </div>
+
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   )
 }

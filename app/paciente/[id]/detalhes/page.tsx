@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PostOpDayBadge } from "@/components/ui/badge-variants";
-import { ArrowLeft, MessageCircle, History } from "lucide-react";
+import { ArrowLeft, MessageCircle, History, FileText } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { parseQuestionnaireData } from "@/lib/questionnaire-parser";
 
@@ -43,6 +43,10 @@ interface PatientSummary {
     type: string;
     date: Date;
     followUps: FollowUp[];
+    firstBowelMovementDate?: Date | null;
+    firstBowelMovementDay?: number | null;
+    firstBowelMovementTime?: string | null;
+    hadFirstBowelMovement?: boolean;
 }
 
 interface GraphData {
@@ -153,6 +157,23 @@ export default function PatientDetailsPage() {
                     </div>
                 </div>
 
+                {/* Primeira Evacuação */}
+                <div className="flex flex-wrap gap-3 mb-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
+                        style={{
+                            backgroundColor: patientData.hadFirstBowelMovement ? 'rgba(26, 140, 106, 0.15)' : 'rgba(212, 175, 55, 0.15)',
+                            border: `1px solid ${patientData.hadFirstBowelMovement ? '#1A8C6A' : '#D4AF37'}`,
+                            color: patientData.hadFirstBowelMovement ? '#1A8C6A' : '#D4AF37'
+                        }}>
+                        <span>💩</span>
+                        <span className="font-medium">
+                            {patientData.hadFirstBowelMovement
+                                ? `1ª Evacuação: D+${patientData.firstBowelMovementDay}${patientData.firstBowelMovementTime ? ` às ${patientData.firstBowelMovementTime}` : ''}`
+                                : 'Ainda não evacuou'}
+                        </span>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     {/* Coluna Esquerda: Gráfico e Lista de Dias */}
@@ -184,7 +205,7 @@ export default function PatientDetailsPage() {
                                         />
                                         <Legend wrapperStyle={{ color: '#D8DEEB' }} />
                                         <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#14BDAE" strokeWidth={3} dot={{ fill: '#14BDAE', strokeWidth: 2, r: 4 }} connectNulls={false} />
-                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#D4AF37" strokeWidth={3} dot={{ fill: '#D4AF37', strokeWidth: 2, r: 4 }} connectNulls={false} />
+                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#F0EAD6" strokeWidth={3} dot={{ fill: '#F0EAD6', strokeWidth: 2, r: 4 }} connectNulls={false} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </CardContent>
@@ -231,15 +252,27 @@ export default function PatientDetailsPage() {
                                         {showFullHistory ? 'Histórico Completo' : 'Chat com IA'}
                                         {!showFullHistory && selectedFollowUp && <Badge variant="outline" style={{ borderColor: '#1E2535', color: '#D8DEEB' }}>Dia {selectedFollowUp.dayNumber}</Badge>}
                                     </CardTitle>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setShowFullHistory(!showFullHistory)}
-                                        className="text-xs"
-                                        style={{ color: '#14BDAE' }}
-                                    >
-                                        {showFullHistory ? 'Ver por dia' : 'Ver tudo'}
-                                    </Button>
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => window.open(`/api/export/communication-pdf?patientId=${patientData.patient.id}`, '_blank')}
+                                            className="text-xs gap-1"
+                                            style={{ borderColor: '#1E2535', color: '#D8DEEB' }}
+                                        >
+                                            <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                                            Exportar PDF
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setShowFullHistory(!showFullHistory)}
+                                            className="text-xs"
+                                            style={{ color: '#14BDAE' }}
+                                        >
+                                            {showFullHistory ? 'Ver por dia' : 'Ver tudo'}
+                                        </Button>
+                                    </div>
                                 </div>
                                 {showFullHistory && (
                                     <p className="text-xs mt-1" style={{ color: '#7A8299' }}>
