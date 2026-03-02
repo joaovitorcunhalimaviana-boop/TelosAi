@@ -432,16 +432,26 @@ export function FollowUpResponseCard({ response, isLatest = false }: FollowUpRes
                   )}
 
                   {/* Análise da IA */}
-                  {response.aiAnalysis && (
-                    <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #0D7377' }}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium" style={{ color: '#14BDAE' }}>Análise da IA</span>
+                  {response.aiAnalysis && (() => {
+                    let insightText: string | null = null
+                    try {
+                      const parsed = JSON.parse(response.aiAnalysis)
+                      insightText = parsed.reasoning || null
+                    } catch {
+                      insightText = response.aiAnalysis
+                    }
+                    if (!insightText) return null
+                    return (
+                      <div className="rounded-lg p-3" style={{ backgroundColor: '#1E2535', border: '1px solid #0D7377' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium" style={{ color: '#14BDAE' }}>Análise da IA</span>
+                        </div>
+                        <p className="text-sm whitespace-pre-wrap" style={{ color: '#D8DEEB' }}>
+                          {insightText}
+                        </p>
                       </div>
-                      <p className="text-sm whitespace-pre-wrap" style={{ color: '#D8DEEB' }}>
-                        {response.aiAnalysis}
-                      </p>
-                    </div>
-                  )}
+                    )
+                  })()}
                 </div>
               </motion.div>
             )}

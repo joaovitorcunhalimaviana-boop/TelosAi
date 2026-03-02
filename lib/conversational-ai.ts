@@ -26,9 +26,11 @@ export interface QuestionnaireData {
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
-  lastBowelMovement?: string; // Quando foi a última evacuação
+  lastBowelMovement?: string; // Quando foi a última evacuação (se não evacuou)
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
-  bowelMovementTime?: string; // Horário aproximado da primeira evacuação
+  bowelMovementTime?: string; // Horário aproximado da PRIMEIRA evacuação pós-cirurgia (ex: "de manhã", "às 14h")
+  firstBowelMovementActualDay?: number; // Dia real da primeira evacuação (ex: se paciente disse "ontem" no D3 → dia 2)
+  bowelMovementCount?: number; // Quantas vezes evacuou desde o último contato (diário pós-1ª evacuação)
 
   // Sangramento
   bleeding?: 'none' | 'minimal' | 'moderate' | 'severe'; // nenhum, leve (papel), moderado (roupa), intenso (vaso)
@@ -260,7 +262,27 @@ ${daysPostOp === 2 ? '9. D+2: Aumento de dor é NORMAL (bloqueio terminando). Tr
 ORDEM DE COLETA:
 1. Dor em repouso (0-10)
 2. Medicação extra além do prescrito (qual, dose, horário)
-3. Evacuação desde último contato → se sim: dor durante evacuação (0-10)${!hadFirstBowelMovement ? ' + horário aproximado (1ª evacuação)' : ''} → se não: quando foi última
+3. EVACUAÇÃO — lógica diferente conforme histórico:
+${!hadFirstBowelMovement ? `
+   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
+   - Pergunta: "Evacuou desde a última vez que conversamos?"
+   - Se SIM:
+     → Perguntar QUANDO: "Quando foi? Hoje ou foi ontem?" + "Que horas aproximadamente?"
+       RACIOCÍNIO TEMPORAL: se estamos no D${daysPostOp} e paciente diz "ontem" → dia real = D${daysPostOp - 1}
+       Extrair campo "firstBowelMovementActualDay": dia real da evacuação
+       Extrair campo "bowelMovementTime": horário aproximado (ex: "20:00", "de manhã", "14h")
+     → Depois perguntar dor durante a evacuação (0-10)
+     ⚠️ NÃO perguntar "se foi a primeira do dia" — a pergunta é sobre a PRIMEIRA EVACUAÇÃO DESDE A CIRURGIA
+   - Se NÃO: apenas registrar que não evacuou. Não perguntar mais nada sobre evacuação.
+` : `
+   [PRIMEIRA EVACUAÇÃO JÁ REGISTRADA — MODO DIÁRIO EVACUATÓRIO]
+   - Pergunta: "Desde a última vez que conversamos, você evacuou?"
+   - Se SIM:
+     → "Quantas vezes evacuou desde então?" (campo: bowelMovementCount)
+     → "Qual foi a dor na última evacuação? (0-10)" (campo: painDuringBowelMovement)
+     ⚠️ NÃO perguntar horário — apenas contagem e dor
+   - Se NÃO: apenas registrar que não evacuou. Não perguntar mais nada.
+`}
 4. Sangramento (nenhum/leve/moderado/intenso)
 ${daysPostOp === 1 ? '5. Urina (OBRIGATÓRIO D+1 - risco retenção pós-anestesia)' : ''}
 6. Febre → se sim: temperatura em °C
@@ -300,6 +322,12 @@ EXEMPLOS DE PARSING:
 - "Estou fazendo os cuidados" → "localCareAdherence": true
 - "Só isso" / "Nada mais" → "additionalSymptoms": null
 - "Tive coceira" → "additionalSymptoms": "Coceira"
+
+EVACUAÇÃO — PARSING TEMPORAL (DIA ATUAL = D+${daysPostOp}):
+- "Evacuei hoje de manhã" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp}, "bowelMovementTime": "de manhã"
+- "Evacuei ontem às 8 da noite" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "20:00"
+- "Fui ao banheiro 2 vezes" → "bowelMovementSinceLastContact": true, "bowelMovementCount": 2
+- "Não evacuei" → "bowelMovementSinceLastContact": false
 ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" → "wouldRecommend": true\n- "Poderia melhorar X" → "improvementSuggestions": "Poderia melhorar X"` : ''}`;
 
   try {
@@ -636,18 +664,31 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadF
   if (data.bowelMovementSinceLastContact === undefined) {
     missing.push('Se evacuou desde o último contato');
   } else if (data.bowelMovementSinceLastContact === false) {
-    // Se não evacuou, perguntar quando foi a última vez
-    if (!data.lastBowelMovement) {
-      missing.push('Quando foi a última evacuação');
-    }
+    // Não evacuou — não perguntar nada a mais (contexto: paciente simplesmente não evacuou desde o último contato)
+    // Apenas registrar ausência. Não perguntar "quando foi a última" pois é desnecessário para o diário.
   } else if (data.bowelMovementSinceLastContact === true) {
-    // Se evacuou, perguntar a dor durante a evacuação
-    if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
-      missing.push('Dor durante a evacuação (0-10 na escala numérica)');
-    }
-    // Perguntar horário APENAS da PRIMEIRA evacuação pós-cirurgia
-    if (!data.bowelMovementTime && !hadFirstBowelMovement) {
-      missing.push('Horário aproximado da evacuação (ex: "de manhã", "às 14h", "à noite") — é a primeira evacuação pós-cirurgia');
+    // Evacuou!
+    if (!hadFirstBowelMovement) {
+      // ---- PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA ----
+      // Perguntar dor durante evacuação
+      if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
+        missing.push('Dor durante a evacuação (0-10) — primeira evacuação pós-cirurgia');
+      }
+      // Perguntar horário aproximado — para registrar a PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA
+      // A IA deve entender referências como "ontem às 8h" e extrair o dia correto
+      if (!data.bowelMovementTime) {
+        missing.push('Horário aproximado dessa evacuação (ex: "de manhã", "às 14h", "à noite"). IMPORTANTE: perguntar QUANDO ocorreu (ex: hoje, ontem) para registrar o dia correto da primeira evacuação após a cirurgia');
+      }
+    } else {
+      // ---- DIÁRIO EVACUATÓRIO (após 1ª evacuação já registrada) ----
+      // Perguntar quantas vezes evacuou desde o último contato
+      if (data.bowelMovementCount === undefined || data.bowelMovementCount === null) {
+        missing.push('Quantas vezes evacuou desde a última vez que conversamos');
+      }
+      // Perguntar dor na última evacuação
+      if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
+        missing.push('Dor na última evacuação (0-10 na escala numérica)');
+      }
     }
   }
 

@@ -497,9 +497,10 @@ async function saveQuestionnaireResponse(
     !followUp.surgery.hadFirstBowelMovement
   ) {
     const { recordFirstBowelMovement } = await import('./bowel-movement-tracker');
+    const actualBMDay = (answers as any).firstBowelMovementActualDay || followUp.dayNumber;
     await recordFirstBowelMovement(
       followUp.surgeryId,
-      followUp.dayNumber,
+      actualBMDay,
       answers.painDuringBowelMovement || 0,
       new Date(),
       answers.bowelMovementTime || undefined

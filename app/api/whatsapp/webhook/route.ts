@@ -1029,9 +1029,11 @@ async function finalizeQuestionnaireWithAI(
     const hadBowelMovement = extractedData.hadBowelMovementSinceLastContact ?? (extractedData as any).bowelMovementSinceLastContact;
     if (hadBowelMovement && !followUp.surgery.hadFirstBowelMovement) {
       const { recordFirstBowelMovement } = await import('@/lib/bowel-movement-tracker');
+      // Usar o dia real da evacuação (IA extrai "ontem" como dayNumber-1, "hoje" como dayNumber)
+      const actualBMDay = (extractedData as any).firstBowelMovementActualDay || followUp.dayNumber;
       await recordFirstBowelMovement(
         followUp.surgeryId,
-        followUp.dayNumber,
+        actualBMDay,
         extractedData.painDuringBowelMovement || 0,
         new Date(),
         extractedData.bowelMovementTime || undefined

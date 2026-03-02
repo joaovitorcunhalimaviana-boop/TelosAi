@@ -28,8 +28,14 @@ export function AIRecoveryInsights({ surgeryId }: AIRecoveryInsightsProps) {
                     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .find(r => r.aiAnalysis) // Get first one with analysis
 
-                if (latestResponse) {
-                    setAnalysis(latestResponse.aiAnalysis)
+                if (latestResponse?.aiAnalysis) {
+                    try {
+                        const parsed = JSON.parse(latestResponse.aiAnalysis)
+                        setAnalysis(parsed.reasoning || null)
+                    } catch {
+                        // Se não for JSON, exibe como texto
+                        setAnalysis(latestResponse.aiAnalysis)
+                    }
                     setRiskLevel(latestResponse.riskLevel)
                 }
             } catch (error) {
