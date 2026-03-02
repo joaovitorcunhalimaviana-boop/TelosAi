@@ -79,14 +79,20 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // 2. Resetar todos os follow-ups para pending
+    // 2. Resetar todos os follow-ups: status, datas e scheduledDate recalculado
     for (const followUp of surgery.followUps) {
+      // Recalcular scheduledDate com base na nova data da cirurgia
+      const newScheduledDate = new Date(yesterday);
+      newScheduledDate.setDate(newScheduledDate.getDate() + followUp.dayNumber);
+      newScheduledDate.setHours(10, 0, 0, 0); // 10h horário local
+
       await prisma.followUp.update({
         where: { id: followUp.id },
         data: {
           status: 'pending',
           sentAt: null,
-          respondedAt: null
+          respondedAt: null,
+          scheduledDate: newScheduledDate,
         }
       });
 
