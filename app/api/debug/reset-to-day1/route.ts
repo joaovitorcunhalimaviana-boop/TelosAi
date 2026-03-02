@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
           surgeries: {
             where: { status: { in: ['active', 'completed'] } },
             include: { followUps: true },
-            orderBy: { surgeryDate: 'desc' },
+            orderBy: { createdAt: 'desc' },
             take: 1
           }
         }
