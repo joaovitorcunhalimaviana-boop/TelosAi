@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     await prisma.surgery.update({
       where: { id: surgery.id },
       data: {
-        surgeryDate: yesterday,
+        date: yesterday,
         // Limpar dados de evacuação para testar do zero
         hadFirstBowelMovement: false,
         firstBowelMovementDate: null,
