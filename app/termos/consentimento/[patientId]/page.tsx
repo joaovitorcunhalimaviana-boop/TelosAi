@@ -49,6 +49,10 @@ export default async function ConsentTermPage({ params, searchParams }: PageProp
     researchTitle = research?.title
   }
 
+  // Pega o tipo de cirurgia mais recente
+  const latestSurgery = patient.surgeries?.[0]
+  const surgeryType = latestSurgery?.type || undefined
+
   const termData = {
     patientName: patient.name,
     patientCpf: patient.cpf || "Não informado",
@@ -58,6 +62,7 @@ export default async function ConsentTermPage({ params, searchParams }: PageProp
     date: new Date().toLocaleDateString("pt-BR"),
     isResearch: !!searchParams.research,
     researchTitle,
+    surgeryType,
   }
 
   return <ConsentTermViewer data={termData} patientId={params.patientId} />
