@@ -1,14 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { getTiposList } from '@/lib/termo-templates';
 
 export default function TermosPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [pacienteNome, setPacienteNome] = useState('');
   const termos = getTiposList();
-  const router = useRouter();
+
+  // Protege a página - redireciona se não autenticado
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#14BDAE' }}></div>
+      </div>
+    );
+  }
 
   const categorizados = termos.reduce((acc, termo) => {
     if (!acc[termo.categoria]) {

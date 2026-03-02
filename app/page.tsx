@@ -741,8 +741,8 @@ export default function Home() {
                 &copy; 2025 VigIA - Dr. João Vitor Viana. Todos os direitos reservados.
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
-                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Termos de Uso</Link>
-                <Link href="/termos" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Política de Privacidade</Link>
+                <Link href="/terms-of-service" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Termos de Uso</Link>
+                <Link href="/privacidade" className="transition-colors hover:text-[#F0EAD6]" style={{ color: '#7A8299' }}>Política de Privacidade</Link>
               </div>
             </div>
           </div>

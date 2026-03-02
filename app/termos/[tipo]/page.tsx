@@ -2,13 +2,23 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { termoTemplates, TermoData } from '@/lib/termo-templates';
 
 function TermoPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const tipo = params.tipo as string;
+
+  // Protege a página - redireciona se não autenticado
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
 
   const [data, setData] = useState<TermoData>({
     pacienteNome: searchParams.get('nome') || '',
@@ -28,6 +38,14 @@ function TermoPage() {
       }, 500);
     }
   }, [searchParams]);
+
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0B0E14' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: '#14BDAE' }}></div>
+      </div>
+    );
+  }
 
   const termo = termoTemplates[tipo as keyof typeof termoTemplates];
 
