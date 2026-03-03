@@ -64,12 +64,14 @@ const getCachedDashboardStatsInternal = unstable_cache(
     const todayEnd = endOfDayBrasilia()
 
     // SECURITY: All queries filter by userId to ensure doctor only sees their own patients
-    // Total de pacientes (ativos + concluídos, exclui excluídos pois cascade delete remove do banco)
-    const totalPatients = await prisma.surgery.count({
+    // Total de pacientes únicos (ativos + concluídos) — conta pacientes, não cirurgias
+    const totalPatients = await prisma.patient.count({
       where: {
-        status: { in: ["active", "completed"] },
-        patient: {
-          userId: userId,
+        userId: userId,
+        surgeries: {
+          some: {
+            status: { in: ["active", "completed"] },
+          },
         },
       },
     })
