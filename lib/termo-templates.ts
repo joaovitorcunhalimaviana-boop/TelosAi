@@ -573,6 +573,35 @@ export const termoTemplates = {
         <strong>Importante:</strong> Este é um documento legal que estabelece os termos do serviço de acompanhamento pós-operatório. Guarde uma cópia para referência futura. Em caso de dúvidas, entre em contato através do e-mail vigia.app.br@gmail.com
       </p>
     `
+  },
+  condensado: {
+    titulo: "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO",
+    subtitulo: "Termo Unificado — Cirurgia, Acompanhamento e Pesquisa",
+    conteudo: (data: TermoData) => `
+      <p>Eu, <strong>${data.pacienteNome}</strong>${data.pacienteCPF ? `, CPF ${data.pacienteCPF}` : ''}, declaro que fui devidamente informado(a) pelo meu médico sobre os itens abaixo e forneço meu consentimento:</p>
+
+      <h3>1. Procedimento Cirúrgico</h3>
+      <p>Fui informado(a) sobre o procedimento cirúrgico proposto, incluindo: indicações, técnicas disponíveis, riscos, complicações possíveis e alternativas de tratamento. Compreendo que complicações podem ocorrer mesmo com técnica adequada e que resultados absolutos não podem ser garantidos. Autorizo o médico e sua equipe a realizarem o procedimento e quaisquer medidas adicionais necessárias durante o ato operatório.</p>
+
+      <h3>2. Acompanhamento Pós-Operatório via WhatsApp</h3>
+      <p>Autorizo o envio de questionários automáticos via WhatsApp nos dias seguintes à cirurgia (D+1 a D+14), para monitoramento da minha recuperação. As respostas serão analisadas por inteligência artificial para detecção precoce de complicações, com alertas automáticos ao médico quando necessário.</p>
+      <p><strong>Este acompanhamento NÃO substitui consultas presenciais ou atendimento de urgência.</strong> Em caso de sintomas graves, devo procurar atendimento médico imediatamente.</p>
+
+      <h3>3. Uso de Dados e Pesquisa Científica</h3>
+      <p>Autorizo a coleta e uso dos meus dados de saúde (respostas aos questionários, evolução clínica, níveis de dor) para:</p>
+      <ul>
+        <li>Meu próprio acompanhamento médico;</li>
+        <li>Melhoria dos algoritmos de inteligência artificial da plataforma;</li>
+        <li>Pesquisa científica e publicações, sempre de forma <strong>anonimizada</strong> (sem qualquer identificação pessoal).</li>
+      </ul>
+      <p>Meus dados são armazenados com criptografia e acesso restrito ao médico responsável. Posso solicitar acesso, correção ou exclusão dos meus dados a qualquer momento.</p>
+
+      <h3>4. Voluntariedade</h3>
+      <p>Minha participação é <strong>voluntária</strong>. Posso revogar este consentimento a qualquer momento, sem prejuízo ao meu atendimento médico. Em caso de revogação, o acompanhamento via WhatsApp será interrompido e meu tratamento continuará normalmente.</p>
+
+      <h3>Declaração</h3>
+      <p>Declaro que li, compreendi e concordo com todos os termos acima. Tive oportunidade de fazer perguntas e todas foram esclarecidas. Recebi uma cópia deste documento.</p>
+    `
   }
 };
 
@@ -600,6 +629,12 @@ export const getTiposList = () => [
     nome: 'Doença Pilonidal',
     descricao: 'Cirurgia de Cisto Pilonidal',
     categoria: 'Cirúrgico'
+  },
+  {
+    id: 'condensado',
+    nome: 'Termo Unificado (Condensado)',
+    descricao: 'Cirurgia + WhatsApp + Pesquisa — tudo em 1 página',
+    categoria: 'Consentimento'
   },
   {
     id: 'lgpd',
