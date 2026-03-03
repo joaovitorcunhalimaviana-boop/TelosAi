@@ -89,6 +89,18 @@ export function DashboardHeader() {
             </Link>
           )}
 
+          {(isMedico || isAdmin) && (
+            <Link
+              href="/termos"
+              className="text-sm font-medium transition-colors"
+              style={{ color: pathname === '/termos' || pathname.startsWith('/termos/') ? '#14BDAE' : '#7A8299', fontWeight: pathname === '/termos' || pathname.startsWith('/termos/') ? 700 : 500 }}
+              onMouseEnter={(e) => { if (pathname !== '/termos') e.currentTarget.style.color = '#F0EAD6' }}
+              onMouseLeave={(e) => { if (pathname !== '/termos') e.currentTarget.style.color = '#7A8299' }}
+            >
+              Termos
+            </Link>
+          )}
+
           {isMedico && (
             <Link
               href="/dashboard/billing"
