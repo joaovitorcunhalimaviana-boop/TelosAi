@@ -349,6 +349,8 @@ NOTA D+2: Aumento de dor é NORMAL (bloqueio pudendo terminando). Tranquilizar o
 - NÃO pergunte se dor melhorou/piorou. O sistema calcula automaticamente.
 - NÃO marque isComplete:true até TODOS os campos faltantes serem coletados.
 - RED FLAGS → orientar PRONTO-SOCORRO: dor ≥8, sangramento volumoso, febre ≥38°C, retenção urinária.
+- PROGRESSO: Se a dor de hoje for menor que a do dia anterior (veja MEMÓRIA), faça um breve comentário positivo ("Que bom que a dor diminuiu!"). Não exagere — uma frase curta basta.
+- MARCO — PRIMEIRA EVACUAÇÃO: Se o paciente relatar a primeira evacuação pós-cirurgia, celebre brevemente ("Ótima notícia! Esse é um marco importante da recuperação.") antes de continuar com as perguntas.
 
 ═══════════════════════════
 6. FORMATO DE RESPOSTA
@@ -808,13 +810,69 @@ export async function getInitialGreeting(
   // Nome do médico: parâmetro > patient.doctorName (webhook) > patient.user (Prisma) > fallback
   const nomeMedico = doctorName || patient.doctorName || patient.user?.nomeCompleto || 'seu médico';
 
-  const introMessage = '';
+  // Buscar progresso do dia anterior para personalizar a saudação
+  let progressMessage = '';
+  if (dayNumber > 1) {
+    try {
+      const lastFollowUp = await prisma.followUp.findFirst({
+        where: {
+          surgeryId: surgery.id,
+          status: 'responded',
+          dayNumber: { lt: dayNumber },
+        },
+        include: { responses: true },
+        orderBy: { dayNumber: 'desc' },
+      });
+
+      if (lastFollowUp?.responses?.length) {
+        const resp = lastFollowUp.responses[0];
+        let data: any = {};
+        try {
+          const parsed = typeof resp.questionnaireData === 'string'
+            ? JSON.parse(resp.questionnaireData)
+            : resp.questionnaireData;
+          data = parsed.extractedData || parsed;
+        } catch { /* ignore */ }
+
+        const parts: string[] = [];
+
+        // Celebrar primeira evacuação
+        if (surgery.hadFirstBowelMovement && lastFollowUp.dayNumber === dayNumber - 1) {
+          // Verificar se a primeira evacuação foi registrada no dia anterior
+          if (data.bowelMovementSinceLastContact === true && !data.bowelMovementCount) {
+            parts.push('🎉 Parabéns pela primeira evacuação — isso é um marco importante na recuperação!');
+          }
+        }
+
+        // Mostrar tendência de dor
+        if (data.pain !== undefined) {
+          const painYesterday = data.pain;
+          if (painYesterday <= 3) {
+            parts.push(`Sua dor no D+${lastFollowUp.dayNumber} estava em ${painYesterday}/10 — ótimo!`);
+          } else if (painYesterday <= 6) {
+            parts.push(`Sua dor no D+${lastFollowUp.dayNumber} estava em ${painYesterday}/10.`);
+          } else {
+            parts.push(`Sua dor no D+${lastFollowUp.dayNumber} estava em ${painYesterday}/10. Vamos acompanhar de perto hoje.`);
+          }
+        }
+
+        // Celebrar D+14 (último dia)
+        if (dayNumber >= 14) {
+          parts.push('Hoje é seu último dia de acompanhamento! 🎉');
+        }
+
+        if (parts.length > 0) {
+          progressMessage = '\n' + parts.join('\n') + '\n';
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching progress for greeting:', error);
+    }
+  }
 
   // Enviar imagem da escala de dor ANTES da saudação
   const { sendImage } = await import('./whatsapp');
   try {
-    // URL pública da imagem da escala de dor
-    // Nota: O arquivo escala-dor.png deve estar em public/
     const imageUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://proactive-rejoicing-production.up.railway.app'}/escala-dor.png`;
 
     await sendImage(
@@ -826,18 +884,25 @@ export async function getInitialGreeting(
     console.log('✅ Pain scale image sent before initial greeting');
   } catch (error) {
     console.error('❌ Error sending pain scale image:', error);
-    // Continuar mesmo se falhar o envio da imagem
   }
 
-  return `${greeting}, ${firstName}! 👋
+  // D+1: apresentação completa
+  if (dayNumber === 1) {
+    return `${greeting}, ${firstName}! 👋
 
 Aqui é a VigIA, assistente virtual de acompanhamento pós-operatório do(a) ${nomeMedico}.
 
 ⚠️ *Importante:* Sou uma assistente virtual — não sou médica e não prescrevo medicamentos. Meu papel é coletar informações sobre como você está e repassar tudo certinho para o(a) ${nomeMedico}. 😊
 
-${introMessage}
-
 Vou te fazer algumas perguntas. Pode responder livremente!`;
+  }
+
+  // D+2 em diante: saudação mais curta + progresso
+  return `${greeting}, ${firstName}! 👋
+
+Aqui é a VigIA — D+${dayNumber} do seu pós-operatório.${progressMessage}
+
+Vamos ao acompanhamento de hoje?`;
 }
 
 /**
