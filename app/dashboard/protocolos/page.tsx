@@ -259,7 +259,7 @@ export default function ProtocolsPage() {
           <Button
             variant="ghost"
             onClick={() => router.push('/dashboard')}
-            className="mb-4 hover:bg-[#1E2535] -ml-2"
+            className="mb-4 hover:bg-[#1E2535] hover:text-[#14BDAE] -ml-2"
             style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

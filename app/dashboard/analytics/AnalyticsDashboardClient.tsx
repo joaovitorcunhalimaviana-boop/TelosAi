@@ -118,7 +118,7 @@ export function AnalyticsDashboardClient({ userName }: AnalyticsDashboardClientP
           </div>
           <div className="flex gap-3">
             <Link href="/dashboard">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="hover:bg-[#1E2535] hover:text-[#14BDAE] hover:border-[#14BDAE]">
                 Voltar ao Dashboard
               </Button>
             </Link>

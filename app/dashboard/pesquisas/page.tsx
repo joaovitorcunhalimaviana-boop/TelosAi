@@ -255,7 +255,7 @@ export default function PesquisasPage() {
           <Button
             variant="ghost"
             onClick={() => router.push('/dashboard')}
-            className="mb-4 -ml-2"
+            className="mb-4 -ml-2 hover:bg-[#1E2535] hover:text-[#14BDAE]"
             style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

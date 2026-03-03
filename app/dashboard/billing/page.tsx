@@ -40,7 +40,7 @@ export default async function BillingPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm" className="-ml-3 hover:bg-[#1E2535]" style={{ color: '#7A8299' }}>
+                <Button variant="ghost" size="sm" className="-ml-3 hover:bg-[#1E2535] hover:text-[#14BDAE]" style={{ color: '#7A8299' }}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Voltar ao Dashboard
                 </Button>

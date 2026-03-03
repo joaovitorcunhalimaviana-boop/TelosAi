@@ -159,8 +159,8 @@ export default function TemplatesPage() {
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}
-            className="mb-4 hover:bg-[#1E2535]"
-            style={{ color: '#D8DEEB' }}
+            className="mb-4 hover:bg-[#1E2535] hover:text-[#14BDAE]"
+            style={{ color: '#7A8299' }}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar ao Dashboard
