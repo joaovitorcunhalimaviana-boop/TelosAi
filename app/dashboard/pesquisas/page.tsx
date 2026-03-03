@@ -248,36 +248,41 @@ export default function PesquisasPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-8" style={{ backgroundColor: '#0B0E14' }}>
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/dashboard')}
-            className="mb-4 -ml-2 hover:bg-[#1E2535] hover:text-[#14BDAE]"
-            style={{ color: '#7A8299' }}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar ao Dashboard
-          </Button>
-
+    <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
+      {/* Header - padrão igual à página de Termos */}
+      <div className="backdrop-blur-sm shadow-sm sticky top-0 z-10" style={{ backgroundColor: '#111520', borderBottom: '1px solid #1C2233' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ backgroundColor: '#0D7377' }}>
-                <FlaskConical className="w-8 h-8" style={{ color: '#F0EAD6' }} />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #14BDAE, #0FA89B)' }}>
+                <FlaskConical className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold" style={{ color: '#F0EAD6' }}>
+                <h1 className="text-2xl font-bold" style={{ color: '#D8DEEB' }}>
                   Minhas Pesquisas
                 </h1>
-                <p className="mt-2 text-lg" style={{ color: '#7A8299' }}>
+                <p className="text-sm" style={{ color: '#7A8299' }}>
                   Gerencie seus estudos clínicos e monitore o progresso dos pacientes.
                 </p>
               </div>
             </div>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
+              style={{ color: '#D8DEEB', backgroundColor: '#161B27', border: '2px solid #14BDAE' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14BDAE'; e.currentTarget.style.color = '#0B0E14'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#161B27'; e.currentTarget.style.color = '#D8DEEB'; }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Voltar ao Dashboard
+            </button>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         {/* Card informativo - Igual a Protocolos */}
         <Card className="mt-8 border-2 shadow-sm" style={{ backgroundColor: '#161B27', borderColor: '#C9A84C' }}>

@@ -216,30 +216,50 @@ export function DadosAgregadosClient({ userName }: DadosAgregadosClientProps) {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0B0E14' }}>
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <div>
-            <h1 className="text-4xl font-bold mb-2" style={{ color: "#F0EAD6" }}>
-              Dados Agregados
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Dados para publicação científica - {userName}
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/dashboard">
-              <Button variant="outline" size="lg" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Dashboard
-              </Button>
-            </Link>
-            <Button size="lg" className="gap-2" onClick={exportCSV}>
-              <Download className="h-5 w-5" />
-              Exportar CSV
-            </Button>
+      {/* Header - padrão igual à página de Termos */}
+      <div className="backdrop-blur-sm shadow-sm sticky top-0 z-10" style={{ backgroundColor: '#111520', borderBottom: '1px solid #1C2233' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #14BDAE, #0FA89B)' }}>
+                <BarChart3 className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold" style={{ color: '#D8DEEB' }}>
+                  Dados Agregados
+                </h1>
+                <p className="text-sm" style={{ color: '#7A8299' }}>
+                  Dados para publicação científica — {userName}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={exportCSV}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
+                style={{ color: '#0B0E14', backgroundColor: '#14BDAE' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0FA89B'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#14BDAE'; }}
+              >
+                <Download className="w-4 h-4" />
+                Exportar CSV
+              </button>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm"
+                style={{ color: '#D8DEEB', backgroundColor: '#161B27', border: '2px solid #14BDAE' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14BDAE'; e.currentTarget.style.color = '#0B0E14'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#161B27'; e.currentTarget.style.color = '#D8DEEB'; }}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar ao Dashboard
+              </Link>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Filter */}
         <Card className="mb-6 border-2" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
