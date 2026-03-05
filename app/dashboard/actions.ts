@@ -304,13 +304,8 @@ const getCachedDashboardPatientsInternal = unstable_cache(
         }
       }
 
-      // Determinar o dia do follow-up e histórico de dor
-      let followUpDay = "D+0"
-      if (latestFollowUp) {
-        followUpDay = `D+${latestFollowUp.dayNumber}`
-      } else if (daysSinceSurgery > 0) {
-        followUpDay = `D+${daysSinceSurgery}`
-      }
+      // Determinar o dia pós-operatório baseado na data da cirurgia (não no dayNumber do follow-up)
+      const followUpDay = daysSinceSurgery > 0 ? `D+${daysSinceSurgery}` : "D+0"
 
       // Extract pain history for sparkline using centralized parser
       const painHistory = surgery.followUps

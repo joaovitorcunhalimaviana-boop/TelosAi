@@ -1060,17 +1060,15 @@ async function findPendingFollowUp(patientId: string): Promise<any | null> {
   const yesterdayStart = new Date(todayStart);
   yesterdayStart.setDate(yesterdayStart.getDate() - 1);
 
+  // Se um follow-up já foi enviado (sent/in_progress), ele DEVE ser encontrado
+  // independente da scheduledDate — já foi entregue ao paciente via WhatsApp
   const activeFollowUp = await prisma.followUp.findFirst({
     where: {
       patientId,
       status: { in: ['sent', 'in_progress'] },
-      scheduledDate: {
-        gte: yesterdayStart,
-        lte: todayEnd,
-      },
     },
     include: { surgery: true },
-    orderBy: { scheduledDate: 'desc' },
+    orderBy: { sentAt: 'desc' },
   });
 
   if (activeFollowUp) {

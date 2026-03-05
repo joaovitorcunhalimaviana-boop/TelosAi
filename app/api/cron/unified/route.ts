@@ -192,6 +192,7 @@ async function taskSendReminders(type: 'first' | 'second') {
   const unansweredFollowUps = await prisma.followUp.findMany({
     where: {
       status: { in: ['sent', 'in_progress'] },
+      respondedAt: null,  // NUNCA enviar lembrete para quem já respondeu
       OR: [
         { sentAt: { gte: todayStart, lt: todayEnd } },
         { scheduledDate: { gte: todayStart, lt: todayEnd } },
