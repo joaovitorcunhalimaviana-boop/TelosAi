@@ -94,45 +94,13 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST - Receive Incoming Messages
- * Meta envia eventos de mensagens via POST
+ * POST - DESATIVADO
+ * Este webhook foi substituído pelo /api/webhook-bypass (URL ativa no Meta WhatsApp).
+ * Retorna 200 sem processar para evitar processamento duplicado e retries do Meta.
  */
-export async function POST(request: NextRequest) {
-  try {
-    // Rate limiting using in-memory fallback
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded' },
-        { status: 429 }
-      );
-    }
-
-    const body = await request.json();
-
-    logger.debug('Webhook received', JSON.stringify(body, null, 2));
-
-    // Validar estrutura do webhook
-    if (!body.object || body.object !== 'whatsapp_business_account') {
-      logger.debug('Not a WhatsApp webhook');
-      return NextResponse.json({ status: 'ok' }, { status: 200 });
-    }
-
-    // Processar cada entrada
-    for (const entry of body.entry || []) {
-      for (const change of entry.changes || []) {
-        if (change.field === 'messages') {
-          await processMessages(change.value);
-        }
-      }
-    }
-
-    return NextResponse.json({ status: 'ok' }, { status: 200 });
-  } catch (error) {
-    logger.error('Error processing webhook:', error);
-    // Retornar 200 mesmo com erro para evitar retry infinito do Meta
-    return NextResponse.json({ status: 'error', error: String(error) }, { status: 200 });
-  }
+export async function POST() {
+  logger.warn('⚠️ Webhook original /api/whatsapp/webhook chamado — ignorando (usar /api/webhook-bypass)');
+  return NextResponse.json({ status: 'disabled', message: 'Use /api/webhook-bypass' }, { status: 200 });
 }
 
 // Simple in-memory deduplication for the same serverless instance

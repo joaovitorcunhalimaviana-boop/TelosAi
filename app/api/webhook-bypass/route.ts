@@ -39,6 +39,12 @@ import { startOfDayBrasilia, endOfDayBrasilia } from '@/lib/date-utils';
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || 'meu-token-super-secreto-2024';
 
 // ============================================
+// LOCK POR PACIENTE (previne processamento concorrente)
+// Protege contra retries do WhatsApp e race conditions
+// ============================================
+const patientProcessingLocks = new Map<string, boolean>();
+
+// ============================================
 // IN-MEMORY RATE LIMITER
 // ============================================
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -550,6 +556,13 @@ async function processQuestionnaireAnswer(
   phone: string,
   message: string
 ) {
+  // LOCK POR PACIENTE: Impedir processamento concorrente (protege contra retries do WhatsApp)
+  if (patientProcessingLocks.get(phone)) {
+    logger.warn(`⚠️ LOCK: Processamento concorrente bloqueado para ${phone}. Mensagem ignorada (provável retry do WhatsApp).`);
+    return;
+  }
+  patientProcessingLocks.set(phone, true);
+
   try {
     logger.debug('🔄 Processando resposta com IA Claude...', {
       patientId: patient.id,
@@ -690,6 +703,9 @@ async function processQuestionnaireAnswer(
         logger.error('❌ ERRO FATAL: Impossível enviar qualquer mensagem para', phone);
       }
     }
+  } finally {
+    // SEMPRE liberar o lock do paciente ao finalizar
+    patientProcessingLocks.delete(phone);
   }
 }
 
