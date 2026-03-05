@@ -33,6 +33,14 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [age, setAge] = useState<number | null>(null)
 
+  // Data de hoje no fuso de Brasília (evita bug de timezone UTC à noite)
+  const brazilToday = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date())
+
   // Estado para os campos do formulário
   const [formData, setFormData] = useState<SimplifiedPatientFormData>({
     name: "",
@@ -40,7 +48,7 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
     phone: "",
     email: "",
     surgeryType: "", // Campo de texto livre
-    surgeryDate: new Date().toISOString().split("T")[0],
+    surgeryDate: brazilToday,
     notes: "",
     hospital: "Clínica",
   })
@@ -219,8 +227,8 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
         </div>
       </div>
 
-      <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 mt-6 mb-6">
-        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+      <div className="p-4 rounded-lg border mt-6 mb-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
+        <h3 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: '#F0EAD6' }}>
           <span className="text-lg">🏥</span> Dados da Cirurgia
         </h3>
 
@@ -281,7 +289,7 @@ export function CadastroPacienteSimplificado({ onSubmit }: CadastroPacienteSimpl
               type="date"
               value={formData.surgeryDate}
               onChange={handleSurgeryDateChange}
-              max={new Date().toISOString().split("T")[0]}
+              max={brazilToday}
               className="h-12 text-base"
               aria-invalid={!!errors.surgeryDate}
             />

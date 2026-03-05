@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orientações Pós-Operatórias — Hemorroidectomia</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      background: #fff;
+      padding: 0;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 40px 40px;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #0a2647 0%, #0d4a7a 100%);
+      color: white;
+      padding: 24px 40px 20px;
+      margin: -30px -40px 28px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: 17pt;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+    .header .subtitle {
+      font-size: 10pt;
+      opacity: 0.85;
+    }
+    .header .doctor-info {
+      text-align: right;
+      font-size: 10pt;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    .header .doctor-info strong {
+      font-size: 11pt;
+      display: block;
+    }
+
+    /* ALERT BOX */
+    .alert {
+      background: #fff8e1;
+      border-left: 4px solid #f59e0b;
+      border-radius: 4px;
+      padding: 10px 14px;
+      margin-bottom: 22px;
+      font-size: 10pt;
+      color: #6b4c00;
+    }
+    .alert strong { color: #92400e; }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      background: #0a2647;
+      color: white;
+      padding: 6px 12px;
+      font-size: 10.5pt;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .icon { font-size: 13pt; }
+
+    .content { padding: 0 4px; }
+
+    ul { padding-left: 18px; }
+    ul li { margin-bottom: 4px; line-height: 1.55; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      border: 1px solid #dde3ec;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .card-title {
+      background: #1a4a7a;
+      color: white;
+      padding: 5px 12px;
+      font-size: 9.5pt;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .card-body {
+      padding: 10px 12px;
+      font-size: 10pt;
+      line-height: 1.55;
+    }
+    .card-body ul { padding-left: 16px; }
+    .card-body li { margin-bottom: 3px; }
+
+    /* TIMELINE */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .timeline-item {
+      border: 1px solid #dde3ec;
+      border-radius: 6px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .timeline-item .day {
+      background: #0d7377;
+      color: white;
+      padding: 4px 8px;
+      font-weight: 700;
+      font-size: 9.5pt;
+    }
+    .timeline-item .desc {
+      padding: 7px 8px;
+      font-size: 9pt;
+      line-height: 1.45;
+      color: #333;
+    }
+
+    /* ALARM TABLE */
+    .alarm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10pt;
+    }
+    .alarm-table th {
+      background: #0a2647;
+      color: white;
+      padding: 7px 10px;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+    .alarm-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e8edf4;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .alarm-table tr:nth-child(even) td { background: #f5f8fc; }
+    .alarm-table .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag-urgent { background: #fee2e2; color: #991b1b; }
+    .tag-warning { background: #fef3c7; color: #92400e; }
+    .tag-monitor { background: #dbeafe; color: #1e40af; }
+    .tag-normal { background: #d1fae5; color: #065f46; }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid #dde3ec;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 9pt;
+      color: #6b7280;
+    }
+    .signature-line {
+      text-align: center;
+    }
+    .signature-line .line {
+      width: 200px;
+      border-bottom: 1px solid #1a1a1a;
+      margin: 0 auto 5px;
+      height: 30px;
+    }
+    .signature-line p { font-size: 9.5pt; color: #1a1a1a; }
+    .signature-line small { color: #6b7280; }
+
+    /* PRINT */
+    @media print {
+      body { padding: 0; }
+      .page { padding: 20px 30px 30px; }
+      .header { margin: -20px -30px 24px; }
+      .no-print { display: none; }
+      @page { margin: 10mm; size: A4; }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+
+    /* PRINT BUTTON */
+    .print-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0d7377;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 13pt;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(13,115,119,0.4);
+      z-index: 100;
+    }
+    .print-btn:hover { background: #0a5c60; }
+
+    .highlight { color: #0a2647; font-weight: 700; }
+    .green { color: #065f46; }
+    .red { color: #991b1b; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Salvar PDF</button>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>Orientações Pós-Operatórias</h1>
+        <div class="subtitle">Hemorroidectomia</div>
+      </div>
+      <div class="doctor-info">
+        <strong>Dr. João Vítor da Cunha Lima Viana</strong>
+        Cirurgião Colorretal<br/>
+        CRM 12831
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTA MEDICAMENTOS -->
+  <div class="alert">
+    <strong>⚠️ Medicamentos:</strong> Tome <em>todos</em> os remédios conforme a receita médica, nos horários marcados.
+    Não espere a dor aparecer — tome de forma regular nas primeiras horas. Aplique a <strong>pomada manipulada</strong>
+    na região da ferida a cada <strong>8 horas por 15 dias</strong>.
+  </div>
+
+  <!-- HIGIENE + COMPRESSAS LADO A LADO -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🚿 Higiene Local</div>
+      <div class="card-body">
+        <ul>
+          <li><span class="red">Proibido papel higiênico por 4 semanas</span></li>
+          <li>Higienize com água corrente após cada evacuação</li>
+          <li>Pode usar sabonete líquido neutro ou de glicerina</li>
+          <li>Secar com toques suaves (toalha macia ou gaze)</li>
+          <li>Usar gaze ou absorvente na região — trocar quando úmido</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">❄️ Compressas de Gelo</div>
+      <div class="card-body">
+        <p style="margin-bottom:7px;"><strong>D0 a D2:</strong> <span class="highlight">5× ao dia, 10 minutos cada</span></p>
+        <ul>
+          <li>Gelo em saco plástico <strong>sempre com pano entre o gelo e a pele</strong></li>
+          <li>Reduz inchaço, hematoma e dor</li>
+        </ul>
+        <p style="margin: 10px 0 7px;"><strong>A partir de D3:</strong> <span class="highlight">conforme a necessidade</span> (3 a 5× ao dia)</p>
+        <ul>
+          <li>Utilize sempre que sentir desconforto ou inchaço</li>
+          <li>Não há obrigatoriedade de horário fixo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRONOGRAMA -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📅</span> Cronograma de Cuidados</div>
+    <div class="content">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="day">D0 — D2 (hoje até 2º dia)</div>
+          <div class="desc">Compressa de gelo 5×/dia · Medicação regular · Não usar papel higiênico</div>
+        </div>
+        <div class="timeline-item">
+          <div class="day">D3 em diante</div>
+          <div class="desc">Compressa de gelo <strong>conforme necessidade</strong> · Continuar pomada 8/8h</div>
+        </div>
+        <div class="timeline-item">
+          <div class="day">D7</div>
+          <div class="desc">Pode suspender anti-inflamatório · Aumentar atividades gradualmente · Agendar retorno</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALIMENTAÇÃO + ATIVIDADE -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">🥗 Alimentação e Hidratação</div>
+      <div class="card-body">
+        <p style="margin-bottom:6px;"><strong>Beber:</strong> entre 2 e 3 litros de água/dia</p>
+        <p style="margin-bottom:4px;"><span class="green">✔ Comer:</span></p>
+        <ul>
+          <li>Frutas com casca, verduras, legumes</li>
+          <li>Mamão, ameixa, laranja com bagaço</li>
+          <li>Cereais integrais</li>
+        </ul>
+        <p style="margin: 8px 0 4px;"><span class="red">✘ Evitar por 30 dias:</span></p>
+        <ul>
+          <li>Banana prata, goiaba, maçã sem casca</li>
+          <li>Pimenta, condimentos fortes</li>
+          <li>Café em excesso, álcool</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚶 Atividade Física e Repouso</div>
+      <div class="card-body">
+        <p style="margin-bottom:6px;"><strong>1ª semana:</strong> repouso relativo, pequenas caminhadas em casa</p>
+        <p style="margin-bottom:4px;"><span class="red">Evitar por 30 dias:</span></p>
+        <ul>
+          <li>Exercícios de impacto e musculação</li>
+          <li>Carregar peso acima de 5 kg</li>
+          <li><strong>Almofada tipo boia/anel</strong> — contraindicada</li>
+        </ul>
+        <p style="margin-top:8px;"><strong>Dirigir:</strong> somente sem analgésicos fortes e sem dor limitante</p>
+        <p><strong>Vida sexual:</strong> evitar por 7 dias</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- O QUE É NORMAL -->
+  <div class="section">
+    <div class="section-title"><span class="icon">✅</span> O Que É Normal Após a Cirurgia</div>
+    <div class="content">
+      <ul style="columns: 2; column-gap: 24px;">
+        <li>Secreção clara, rosada ou amarelada (até 3 semanas)</li>
+        <li>Pequenas manchas de sangue na gaze ou roupa íntima</li>
+        <li>Dor ao evacuar nas primeiras semanas</li>
+        <li>Inchaços de pele ao redor da cicatriz (plicomas)</li>
+        <li>Plicomas <strong>não são hemorroidas voltando</strong></li>
+        <li>Cicatrização completa leva <strong>40 a 60 dias</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SINAIS DE ALARME -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🚨</span> Sinais de Alarme — Quando Buscar Atendimento</div>
+    <div class="content">
+      <table class="alarm-table">
+        <thead>
+          <tr>
+            <th style="width:38%">Sinal / Sintoma</th>
+            <th style="width:20%">Urgência</th>
+            <th>Conduta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sangramento abundante, em jato ou com coágulos grandes</td>
+            <td><span class="tag tag-urgent">🚨 Urgente</span></td>
+            <td><strong>Pronto-socorro imediatamente</strong></td>
+          </tr>
+          <tr>
+            <td>Incapacidade de urinar por mais de 8–12h</td>
+            <td><span class="tag tag-urgent">🚨 Urgente</span></td>
+            <td><strong>Pronto-socorro imediatamente</strong></td>
+          </tr>
+          <tr>
+            <td>Febre acima de 38°C</td>
+            <td><span class="tag tag-warning">⚠️ Alerta</span></td>
+            <td>Contato com o médico/clínica no mesmo dia</td>
+          </tr>
+          <tr>
+            <td>Secreção amarelo-esverdeada com odor forte</td>
+            <td><span class="tag tag-warning">⚠️ Alerta</span></td>
+            <td>Contato com o médico/clínica no mesmo dia</td>
+          </tr>
+          <tr>
+            <td>Dor piorando progressivamente após o 10º dia</td>
+            <td><span class="tag tag-warning">⚠️ Alerta</span></td>
+            <td>Contato com o médico/clínica no mesmo dia</td>
+          </tr>
+          <tr>
+            <td>Dor intensa (≥ 8/10) que não melhora com os remédios</td>
+            <td><span class="tag tag-monitor">🔵 Atenção</span></td>
+            <td>Entrar em contato com o cirurgião</td>
+          </tr>
+          <tr>
+            <td>Pequeno sangramento, dor moderada, plicomas, secreção clara</td>
+            <td><span class="tag tag-normal">✓ Normal</span></td>
+            <td>Manter orientações — sem necessidade de contato urgente</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <p>Gerado em: <strong id="data-geracao"></strong></p>
+      <p style="margin-top:4px;">Em caso de dúvidas não urgentes, entre em contato com a clínica em horário comercial.</p>
+    </div>
+    <div class="signature-line">
+      <div class="line"></div>
+      <p>Dr. João Vítor da Cunha Lima Viana</p>
+      <small>Cirurgião Colorretal · CRM 12831</small>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.getElementById('data-geracao').textContent =
+    new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+</script>
+
+</body>
+</html>
