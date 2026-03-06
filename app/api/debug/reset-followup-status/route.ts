@@ -68,7 +68,9 @@ export async function GET(request: NextRequest) {
       data: {
         status: newStatus,
         sentAt: newStatus === 'pending' ? null : followUp.sentAt,
-        respondedAt: newStatus === 'pending' ? null : followUp.respondedAt
+        respondedAt: newStatus === 'pending' ? null
+          : newStatus === 'responded' ? (followUp.respondedAt || new Date())
+          : followUp.respondedAt
       }
     });
 
