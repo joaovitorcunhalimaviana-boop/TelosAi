@@ -215,6 +215,10 @@ async function taskSendReminders(type: 'first' | 'second') {
 
   results.partialResponse.found = partialConversations.length;
 
+  // Import dinâmico para logar lembretes no histórico de conversa
+  const { getOrCreateConversation, recordSystemMessage } = await import('@/lib/conversation-manager');
+  const reminderLabel = type === 'first' ? '14h' : '18h';
+
   // Enviar lembretes para não respondidos (usando template aprovado)
   for (const followUp of unansweredFollowUps) {
     try {
@@ -232,6 +236,15 @@ async function taskSendReminders(type: 'first' | 'second') {
         }
       ], 'pt_BR');
       results.noResponse.sent++;
+
+      // LOG: registrar lembrete no histórico para visibilidade no "Ver Detalhes"
+      try {
+        const conv = await getOrCreateConversation(followUp.patient.phone, followUp.patientId);
+        await recordSystemMessage(conv.id,
+          `[LEMBRETE ${reminderLabel}] Template de acompanhamento reenviado ao paciente`
+        );
+      } catch { /* log nunca deve bloquear o envio */ }
+
       await sleep(300);
     } catch (error: any) {
       results.noResponse.errors.push(`${followUp.patient.name}: ${error?.message}`);
@@ -254,6 +267,14 @@ async function taskSendReminders(type: 'first' | 'second') {
         }
       ], 'pt_BR');
       results.partialResponse.sent++;
+
+      // LOG: registrar lembrete no histórico para visibilidade no "Ver Detalhes"
+      try {
+        await recordSystemMessage(conv.id,
+          `[LEMBRETE ${reminderLabel}] Template de acompanhamento reenviado (conversa parcial)`
+        );
+      } catch { /* log nunca deve bloquear o envio */ }
+
       await sleep(300);
     } catch (error: any) {
       results.partialResponse.errors.push(`${conv.patient?.name}: ${error?.message}`);
