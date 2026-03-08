@@ -100,7 +100,7 @@ async function getCollectiveIntelligenceStats() {
   const complicationRate = totalWithData > 0 ? (totalWithComplications / totalWithData) * 100 : 0
 
   // CURVA DE DOR COMPLETA - Todos os dias de follow-up
-  const followUpDays = [1, 2, 3, 5, 7, 10, 14]
+  const followUpDays = [1, 2, 3, 4, 5, 6, 7, 10, 14]
   const painCurve = []
 
   for (const day of followUpDays) {

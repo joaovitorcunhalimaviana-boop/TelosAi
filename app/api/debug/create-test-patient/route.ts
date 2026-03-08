@@ -65,7 +65,7 @@ export async function POST() {
     });
 
     // Criar follow-ups
-    const followUpDays = [1, 2, 3, 5, 7, 10, 14];
+    const followUpDays = [1, 2, 3, 4, 5, 6, 7, 10, 14];
     const followUps = [];
 
     for (const day of followUpDays) {

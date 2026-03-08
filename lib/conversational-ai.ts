@@ -288,29 +288,44 @@ ${missingInfo.length > 0 ? missingInfo.map(info => `- ${info}`).join('\n') : '�
 ═══════════════════════════
 ⛔ REGRA CRÍTICA: Faça APENAS UMA pergunta por mensagem. Após cada pergunta, PARE e espere a resposta do paciente. NUNCA pule para a próxima pergunta sem ter recebido a resposta. Se o paciente responder sobre mais de um tema, extraia os dados, mas faça APENAS UMA nova pergunta.
 
-1. DOR EM REPOUSO (campo: pain, 0-10)
-   Perguntar: "Como está sua dor agora, parado(a)? De 0 a 10."
-   Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
-
-2. MEDICAÇÃO EXTRA (campo: usedExtraMedication + extraMedicationDetails)
-   Perguntar: "Usou alguma medicação além das prescritas?"
-   Se sim: pedir qual, dose e horário. Pode citar nomes que o paciente mencionar.
-
-3. EVACUAÇÃO
+1. EVACUAÇÃO (PERGUNTAR PRIMEIRO!)
 ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
    a) Perguntar: "Evacuou desde a última vez que conversamos?"
    b) Se SIM:
       → "Quando foi? Hoje ou ontem? Que horas mais ou menos?"
         Se "ontem" no D+${daysPostOp} → dia real = D+${daysPostOp - 1}
         Extrair: firstBowelMovementActualDay (dia real), bowelMovementTime (horário)
-      → "Qual foi a dor ao evacuar? De 0 a 10." (campo: painDuringBowelMovement)
+      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
+      → "Qual foi a dor DURANTE a evacuação? De 0 a 10." (campo: painDuringBowelMovement)
+      Se houve mais de uma evacuação (ex: ontem à noite e hoje de manhã), coletar dor de cada uma.
+      Extrair evacuationDetails: [{ actualDay: número, time: "horário", pain: número }]
       NÃO perguntar "se foi a primeira do dia" — é a PRIMEIRA DESDE A CIRURGIA
-   c) Se NÃO: registrar e seguir adiante` : `   [DIÁRIO EVACUATÓRIO — primeira evacuação já registrada]
+   c) Se NÃO: registrar e seguir para DOR EM REPOUSO` : (daysPostOp <= 7 ? `   [DIÁRIO EVACUATÓRIO D1-D7 — COLETA DETALHADA]
    a) Perguntar: "Desde a última vez que conversamos, você evacuou?"
    b) Se SIM:
-      → "Quantas vezes?" (campo: bowelMovementCount)
+      → "Quantas vezes? Quando foram? Hoje, ontem?" (campo: bowelMovementCount)
+      → Para CADA evacuação: perguntar a dor durante (0-10)
+        Extrair evacuationDetails: [{ actualDay: número, time: "horário", pain: número }]
+        Exemplo: "ontem à noite dor 6, hoje de manhã dor 4" →
+          evacuationDetails: [{ actualDay: ${daysPostOp - 1}, time: "à noite", pain: 6 }, { actualDay: ${daysPostOp}, time: "de manhã", pain: 4 }]
+      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
+   c) Se NÃO: registrar e seguir para DOR EM REPOUSO` : `   [DIÁRIO EVACUATÓRIO D10+ — COLETA RESUMIDA]
+   a) Perguntar: "Desde a última vez que conversamos, você evacuou?"
+   b) Se SIM:
+      → "Quando foi a ÚLTIMA evacuação?" (campo: bowelMovementTime)
       → "Qual foi a dor na última evacuação? De 0 a 10." (campo: painDuringBowelMovement)
-   c) Se NÃO: registrar e seguir adiante`}
+      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
+   c) Se NÃO: registrar e seguir para DOR EM REPOUSO`)}
+
+2. DOR EM REPOUSO (campo: pain, 0-10)
+   ⚠️ SÓ PERGUNTAR SE O PACIENTE NÃO EVACUOU!
+   Se evacuou: a "dor antes de evacuar" coletada no passo 1 JÁ É a dor em repouso (campo pain). NÃO perguntar novamente.
+   Se NÃO evacuou: "Como está sua dor agora, parado(a)? De 0 a 10."
+   Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
+
+3. MEDICAÇÃO EXTRA (campo: usedExtraMedication + extraMedicationDetails)
+   Perguntar: "Usou alguma medicação além das prescritas?"
+   Se sim: pedir qual, dose e horário. Pode citar nomes que o paciente mencionar.
 
 4. SANGRAMENTO (campo: bleeding)
    Perguntar: "Teve algum sangramento?"
@@ -318,20 +333,17 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
 
 ${daysPostOp === 1 ? `5. URINA (campo: urination) — OBRIGATÓRIO D+1
    Perguntar: "Está conseguindo urinar normalmente?"
-   Retenção urinária >6h = RED FLAG\n` : ''}6. FEBRE (campos: fever + feverTemperature)
-   Perguntar: "Teve febre?"
-   Se sim: "Qual foi a temperatura?"
-
-7. MEDICAÇÕES PRESCRITAS (campo: medications)
+   Retenção urinária >6h = RED FLAG\n` : ''}6. MEDICAÇÕES PRESCRITAS (campo: medications)
    Perguntar: "Está tomando as medicações conforme prescrito?"
 
-8. CUIDADOS LOCAIS (campo: localCareAdherence)
+7. CUIDADOS LOCAIS (campo: localCareAdherence)
    Perguntar: "Está seguindo os cuidados orientados pelo médico? Pomadas, compressas geladas..."
 
-9. PERGUNTA FINAL (campo: additionalSymptoms — SEMPRE por último)
-   Perguntar: "Tem mais alguma coisa que gostaria de me contar?"
+8. PERGUNTA FINAL (campo: additionalSymptoms — SEMPRE por último)
+   Perguntar: "Tem mais alguma coisa que gostaria de me contar? Qualquer sintoma, febre, dúvida..."
+   (Captura febre e outros sintomas espontaneamente)
 ${daysPostOp >= 14 ? `
-10. SATISFAÇÃO (D+14) — campos: satisfactionRating, wouldRecommend, improvementSuggestions
+9. SATISFAÇÃO (D+14) — campos: satisfactionRating, wouldRecommend, improvementSuggestions
     "De 0 a 10, qual sua nota para o acompanhamento?"
     "Recomendaria para outros pacientes?"
     "Alguma sugestão de melhoria?"` : ''}
@@ -370,19 +382,22 @@ Retorne JSON puro, sem markdown:
 }
 
 Exemplos de extração:
-- "Dor 3" → "pain": 3
+- "Dor 3" → "pain": 3 (dor em repouso / dor antes de evacuar)
+- "Antes de evacuar a dor era 3" → "pain": 3 (dor antes de evacuar = repouso)
 - "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (campo DIFERENTE de pain)
-- "Sem febre" → "fever": false
-- "Tive febre, 37.8" → "fever": true, "feverTemperature": 37.8
 - "Não tomei nada extra" → "usedExtraMedication": false
 - "Tomei Tramadol" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol"
 - "Estou fazendo os cuidados" → "localCareAdherence": true
 - "Só isso" / "Nada mais" → "additionalSymptoms": null
 - "Tive coceira" → "additionalSymptoms": "Coceira"
+- "Tive febre, 37.8" → "fever": true, "feverTemperature": 37.8 (se paciente mencionar espontaneamente)
 - "Evacuei hoje de manhã" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp}, "bowelMovementTime": "de manhã"
-- "Evacuei ontem às 8h" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "20:00"
+- "Evacuei ontem às 8h" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "às 8h"
 - "Fui ao banheiro 2 vezes" → "bowelMovementSinceLastContact": true, "bowelMovementCount": 2
 - "Não evacuei" → "bowelMovementSinceLastContact": false
+- "Evacuei ontem à noite (dor 6) e hoje de manhã (dor 4)" →
+    "bowelMovementSinceLastContact": true, "bowelMovementCount": 2,
+    "evacuationDetails": [{ "actualDay": ${daysPostOp - 1}, "time": "à noite", "pain": 6 }, { "actualDay": ${daysPostOp}, "time": "de manhã", "pain": 4 }]
 ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" → "wouldRecommend": true\n- "Poderia melhorar X" → "improvementSuggestions": "Poderia melhorar X"` : ''}`;
 
   try {
@@ -543,6 +558,7 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
       // Dor
       painAtRest: 'pain',
       painLevel: 'pain',
+      painBeforeEvacuation: 'pain', // dor antes de evacuar = dor em repouso
       painDuringEvacuation: 'painDuringBowelMovement',
       painDuringBowel: 'painDuringBowelMovement',
       // Sangramento
@@ -702,81 +718,76 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
 function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadFirstBowelMovement: boolean = false): string[] {
   const missing: string[] = [];
 
-  // 1. DOR (sempre obrigatório)
-  if (data.pain === undefined || data.pain === null) {
-    missing.push('🚨 Nível de dor ATUAL (0-10 na escala numérica)');
-  }
-
-  // 2. MEDICAÇÃO EXTRA (OBRIGATÓRIO TODOS OS DIAS - PERGUNTAR CEDO!)
-  // Movido para cima para garantir que seja perguntado
-  if (data.usedExtraMedication === undefined) {
-    missing.push('🚨 MEDICAÇÃO EXTRA: Usou Tramadol, Codeína, Tylex, ou outro analgésico além dos prescritos?');
-  } else if (data.usedExtraMedication === true && !data.extraMedicationDetails) {
-    missing.push('🚨 Qual medicação extra usou, dose e horário');
-  }
-
-  // 3. EVACUAÇÃO
+  // 1. EVACUAÇÃO (PERGUNTAR PRIMEIRO!)
   if (data.bowelMovementSinceLastContact === undefined) {
-    missing.push('Se evacuou desde o último contato');
-  } else if (data.bowelMovementSinceLastContact === false) {
-    // Não evacuou — não perguntar nada a mais (contexto: paciente simplesmente não evacuou desde o último contato)
-    // Apenas registrar ausência. Não perguntar "quando foi a última" pois é desnecessário para o diário.
+    missing.push('🚨 Se evacuou desde o último contato (PERGUNTAR PRIMEIRO!)');
   } else if (data.bowelMovementSinceLastContact === true) {
     // Evacuou!
     if (!hadFirstBowelMovement) {
       // ---- PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA ----
-      // Perguntar dor durante evacuação
-      if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
-        missing.push('Dor durante a evacuação (0-10) — primeira evacuação pós-cirurgia');
-      }
-      // Perguntar horário aproximado — para registrar a PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA
-      // A IA deve entender referências como "ontem às 8h" e extrair o dia correto
       if (!data.bowelMovementTime) {
-        missing.push('Horário aproximado dessa evacuação (ex: "de manhã", "às 14h", "à noite"). IMPORTANTE: perguntar QUANDO ocorreu (ex: hoje, ontem) para registrar o dia correto da primeira evacuação após a cirurgia');
+        missing.push('Quando evacuou (hoje ou ontem? que horas?) — PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA');
+      }
+      if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
+        missing.push('Dor DURANTE a evacuação (0-10)');
+      }
+    } else if (daysPostOp <= 7) {
+      // ---- DIÁRIO EVACUATÓRIO D1-D7: COLETA DETALHADA ----
+      if (data.bowelMovementCount === undefined || data.bowelMovementCount === null) {
+        missing.push('Quantas vezes evacuou e quando (hoje, ontem)');
+      }
+      // Para D1-D7, preferir evacuationDetails mas aceitar painDuringBowelMovement
+      if ((data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) &&
+          !(data as any).evacuationDetails) {
+        missing.push('Dor durante cada evacuação (0-10)');
       }
     } else {
-      // ---- DIÁRIO EVACUATÓRIO (após 1ª evacuação já registrada) ----
-      // Perguntar quantas vezes evacuou desde o último contato
-      if (data.bowelMovementCount === undefined || data.bowelMovementCount === null) {
-        missing.push('Quantas vezes evacuou desde a última vez que conversamos');
-      }
-      // Perguntar dor na última evacuação
+      // ---- DIÁRIO EVACUATÓRIO D10+: COLETA RESUMIDA ----
       if (data.painDuringBowelMovement === undefined || data.painDuringBowelMovement === null) {
-        missing.push('Dor na última evacuação (0-10 na escala numérica)');
+        missing.push('Dor na última evacuação (0-10)');
       }
+    }
+    // Dor antes de evacuar = repouso (campo pain)
+    if (data.pain === undefined || data.pain === null) {
+      missing.push('Dor ANTES de evacuar (0-10) — este valor representa o repouso');
+    }
+  } else {
+    // Não evacuou — perguntar dor em repouso normalmente
+    if (data.pain === undefined || data.pain === null) {
+      missing.push('🚨 Nível de dor ATUAL em repouso (0-10)');
     }
   }
 
-  // 4. SANGRAMENTO
+  // 2. MEDICAÇÃO EXTRA
+  if (data.usedExtraMedication === undefined) {
+    missing.push('MEDICAÇÃO EXTRA: Usou Tramadol, Codeína, Tylex, ou outro analgésico além dos prescritos?');
+  } else if (data.usedExtraMedication === true && !data.extraMedicationDetails) {
+    missing.push('Qual medicação extra usou, dose e horário');
+  }
+
+  // 3. SANGRAMENTO
   if (!data.bleeding) {
     missing.push('Informações sobre sangramento (nenhum, leve, moderado, intenso)');
   }
 
-  // 5. URINA (apenas D+1 - retenção pós-anestesia imediata)
+  // 4. URINA (apenas D+1 - retenção pós-anestesia imediata)
   if (daysPostOp === 1) {
     if (data.urination === undefined) {
       missing.push('Se está conseguindo urinar normalmente');
     }
   }
 
-  // 6. FEBRE
-  if (data.fever === undefined) {
-    missing.push('Se teve febre');
-  } else if (data.fever === true && !data.feverTemperature) {
-    missing.push('Qual foi a temperatura da febre (em °C)');
-  }
-
-  // 7. MEDICAÇÕES PRESCRITAS
+  // 5. MEDICAÇÕES PRESCRITAS
   if (data.medications === undefined) {
     missing.push('Se está tomando as medicações conforme prescrito');
   }
 
-  // 9. ADERÊNCIA A CUIDADOS LOCAIS (todos os dias)
+  // 6. ADERÊNCIA A CUIDADOS LOCAIS (todos os dias)
   if (data.localCareAdherence === undefined) {
     missing.push('Se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas)');
   }
 
-  // 11. PESQUISA DE SATISFAÇÃO (apenas D+14)
+  // 7. PESQUISA DE SATISFAÇÃO (apenas D+14)
   if (daysPostOp >= 14) {
     if (data.satisfactionRating === undefined || data.satisfactionRating === null) {
       missing.push('Nota de satisfação com o acompanhamento (0-10)');
@@ -789,9 +800,9 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadF
     }
   }
 
-  // 10. SINTOMAS ADICIONAIS (todos os dias - pergunta final)
+  // 8. SINTOMAS ADICIONAIS (todos os dias - pergunta final, captura febre espontaneamente)
   if (data.additionalSymptoms === undefined) {
-    missing.push('Deseja relatar mais alguma coisa ao médico');
+    missing.push('Deseja relatar mais alguma coisa ao médico (captura febre, dúvidas, etc.)');
   }
 
   return missing;

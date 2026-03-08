@@ -4,10 +4,18 @@
  * em uma interface padronizada.
  */
 
+export interface EvacuationDetail {
+  actualDay: number
+  time?: string
+  pain: number
+}
+
 export interface ParsedQuestionnaireData {
   painAtRest: number | null
   painDuringEvacuation: number | null
   didEvacuate: boolean
+  evacuationActualDay: number | null
+  evacuationDetails: EvacuationDetail[] | null
   bleeding: string | null
   fever: boolean
   temperature: number | null
@@ -95,6 +103,20 @@ export function parseQuestionnaireData(
     'bowelMovement',
   ]) === true
 
+  // --- Dia real da evacuação (para plotar no dia correto) ---
+  const rawEvacDay = get(['firstBowelMovementActualDay', 'evacuationActualDay', 'bowelMovementActualDay'])
+  const evacuationActualDay = rawEvacDay !== undefined ? Number(rawEvacDay) : null
+
+  // --- Detalhes de múltiplas evacuações ---
+  let evacuationDetails: EvacuationDetail[] | null = null
+  const rawEvacDetails = get(['evacuationDetails'])
+  if (Array.isArray(rawEvacDetails) && rawEvacDetails.length > 0) {
+    evacuationDetails = rawEvacDetails
+      .filter((d: any) => d && typeof d.actualDay === 'number' && typeof d.pain === 'number')
+      .map((d: any) => ({ actualDay: d.actualDay, time: d.time, pain: d.pain }))
+    if (evacuationDetails.length === 0) evacuationDetails = null
+  }
+
   // --- Dor durante evacuação ---
   let painDuringEvacuation: number | null = null
   if (didEvacuate) {
@@ -108,6 +130,12 @@ export function parseQuestionnaireData(
     painDuringEvacuation = rawEvacPain !== undefined
       ? Number(rawEvacPain)
       : (dbResponse?.painDuringBowel ?? null)
+
+    // Se não há evacuationDetails mas há painDuringEvacuation e evacuationActualDay,
+    // construir evacuationDetails a partir dos dados legados
+    if (!evacuationDetails && painDuringEvacuation !== null && evacuationActualDay !== null) {
+      evacuationDetails = [{ actualDay: evacuationActualDay, pain: painDuringEvacuation }]
+    }
   }
 
   // --- Sangramento ---
@@ -171,6 +199,8 @@ export function parseQuestionnaireData(
     painAtRest: painAtRest !== null && !isNaN(painAtRest as number) ? painAtRest : null,
     painDuringEvacuation: painDuringEvacuation !== null && !isNaN(painDuringEvacuation as number) ? painDuringEvacuation : null,
     didEvacuate,
+    evacuationActualDay,
+    evacuationDetails,
     bleeding,
     fever,
     temperature,

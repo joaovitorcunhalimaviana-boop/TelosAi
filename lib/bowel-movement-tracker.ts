@@ -151,7 +151,8 @@ export function getBowelMovementQuestions(
       mainQuestion: 'Você evacuou desde a última vez que conversamos?',
       followUpIfYes: [
         'Quando foi? Hoje ou ontem? E que horas mais ou menos?',
-        'Qual foi a dor durante a evacuação? Me diz um número de 0 a 10.',
+        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
+        'Qual foi a dor DURANTE a evacuação? De 0 a 10.',
       ],
       followUpIfNo:
         currentDay <= 2
@@ -163,16 +164,29 @@ export function getBowelMovementQuestions(
           : ['Isso é importante. Vou avisar seu médico.'],
       contextForAI: getBowelMovementContextMessage(false, currentDay),
     };
-  } else {
-    // DIÁRIO EVACUATÓRIO (primeira evacuação já registrada)
+  } else if (currentDay <= 7) {
+    // DIÁRIO EVACUATÓRIO D1-D7 — COLETA DETALHADA (todas as evacuações)
     return {
       mainQuestion: 'Desde a última vez que conversamos, você evacuou?',
       followUpIfYes: [
-        'Quantas vezes evacuou desde então?',
-        'Qual foi a dor na última evacuação? De 0 a 10.',
+        'Quantas vezes evacuou? Quando foram? (hoje, ontem)',
+        'Qual foi a dor durante cada evacuação? De 0 a 10.',
+        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
       ],
       followUpIfNo: [],
-      contextForAI: 'Primeira evacuação já registrada. Modo diário: coletar frequência e dor na última evacuação.',
+      contextForAI: 'Primeira evacuação já registrada. D1-D7: coletar TODAS as evacuações com dia, horário e dor de cada uma. Extrair evacuationDetails como array.',
+    };
+  } else {
+    // DIÁRIO EVACUATÓRIO D10+ — COLETA RESUMIDA (só última evacuação)
+    return {
+      mainQuestion: 'Desde a última vez que conversamos, você evacuou?',
+      followUpIfYes: [
+        'Quando foi a última evacuação?',
+        'Qual foi a dor na última evacuação? De 0 a 10.',
+        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
+      ],
+      followUpIfNo: [],
+      contextForAI: 'Primeira evacuação já registrada. D10+: coletar apenas a ÚLTIMA evacuação e sua dor.',
     };
   }
 }

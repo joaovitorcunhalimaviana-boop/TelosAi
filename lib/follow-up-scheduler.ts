@@ -7,7 +7,7 @@
 import { prisma } from '@/lib/prisma';
 import { toBrasiliaTime, fromBrasiliaTime, BRASILIA_TZ } from '@/lib/date-utils';
 
-const FOLLOW_UP_DAYS = [1, 2, 3, 5, 7, 10, 14];
+const FOLLOW_UP_DAYS = [1, 2, 3, 4, 5, 6, 7, 10, 14];
 const SEND_HOUR = 10; // 10:00 BRT (horário de Brasília)
 
 interface CreateFollowUpScheduleParams {

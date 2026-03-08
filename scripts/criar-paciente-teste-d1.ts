@@ -53,7 +53,7 @@ async function main() {
   console.log('✅ Cirurgia criada para ontem')
 
   // 3. Criar follow-ups (D+1, D+2, D+3, D+5, D+7, D+10, D+14)
-  const followUpDays = [1, 2, 3, 5, 7, 10, 14]
+  const followUpDays = [1, 2, 3, 4, 5, 6, 7, 10, 14]
 
   for (const dayNumber of followUpDays) {
     const scheduledDate = new Date(surgeryDate)

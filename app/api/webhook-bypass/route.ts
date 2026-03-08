@@ -507,6 +507,12 @@ const MEDICAL_IMAGES = {
 // ============================================
 // PostOpData Interface
 // ============================================
+interface EvacuationDetailData {
+  actualDay: number;
+  time?: string;
+  pain: number;
+}
+
 interface PostOpData {
   painAtRest?: number | null;
   painDuringBowelMovement?: number | null;
@@ -532,6 +538,7 @@ interface PostOpData {
   dietDetails?: string | null;
   canUrinate?: boolean | null;
   urinationDetails?: string | null;
+  evacuationDetails?: EvacuationDetailData[] | null;
 }
 
 // ============================================
@@ -735,6 +742,31 @@ async function finalizeQuestionnaireWithAI(
         extractedData.bowelMovementTime || undefined
       );
       logger.debug('✅ Primeira evacuação registrada!');
+    }
+
+    // Processar evacuationDetails: atualizar painDuringBowel nas FollowUpResponses dos dias anteriores
+    const evacDetails = (extractedData as any).evacuationDetails as EvacuationDetailData[] | undefined;
+    if (Array.isArray(evacDetails) && evacDetails.length > 0) {
+      for (const evac of evacDetails) {
+        if (evac.actualDay !== followUp.dayNumber && evac.actualDay > 0) {
+          // Encontrar o follow-up do dia real da evacuação e atualizar painDuringBowel
+          try {
+            const targetFollowUp = await prisma.followUp.findFirst({
+              where: { surgeryId: followUp.surgeryId, dayNumber: evac.actualDay },
+              include: { responses: { orderBy: { createdAt: 'desc' }, take: 1 } },
+            });
+            if (targetFollowUp && targetFollowUp.responses.length > 0) {
+              await prisma.followUpResponse.update({
+                where: { id: targetFollowUp.responses[0].id },
+                data: { painDuringBowel: evac.pain },
+              });
+              logger.debug(`✅ painDuringBowel ${evac.pain} registrado no D+${evac.actualDay}`);
+            }
+          } catch (err) {
+            logger.warn(`⚠️ Não foi possível atualizar painDuringBowel no D+${evac.actualDay}:`, err);
+          }
+        }
+      }
     }
 
     // Converter PostOpData para QuestionnaireData

@@ -62,7 +62,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
         const painDataMap = new Map<number, PainData>()
 
         // Dias padrão de follow-up
-        const followUpDays = [1, 2, 3, 5, 7, 10, 14]
+        const followUpDays = [1, 2, 3, 4, 5, 6, 7, 10, 14]
         followUpDays.forEach(day => {
           painDataMap.set(day, {
             day,
@@ -75,6 +75,17 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             extraMedicationDetails: null,
           })
         })
+
+        // Helper para garantir que um dia existe no mapa
+        const ensureDay = (d: number) => {
+          if (!painDataMap.has(d)) {
+            painDataMap.set(d, {
+              day: d, label: `D+${d}`, date: '',
+              painAtRest: null, painDuringEvacuation: null,
+              hasRedFlag: false, usedExtraMedication: false, extraMedicationDetails: null,
+            })
+          }
+        }
 
         // Processar followUps usando parser centralizado
         const followUps = result.data.followUps || []
@@ -90,20 +101,28 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             })
 
             const day = f.dayNumber
+            ensureDay(day)
 
-            if (followUpDays.includes(day) || painDataMap.has(day)) {
-              // Manter null quando não há dado (não converter para 0)
-              // 0 é um valor válido (sem dor), null = dado não coletado
-              painDataMap.set(day, {
-                day,
-                label: `D+${day}`,
-                date: resp.createdAt ? new Date(resp.createdAt).toLocaleDateString('pt-BR') : '',
-                painAtRest: parsed.painAtRest,
-                painDuringEvacuation: parsed.painDuringEvacuation,
-                hasRedFlag: parsed.hasRedFlags,
-                usedExtraMedication: parsed.usedExtraMedication,
-                extraMedicationDetails: parsed.extraMedicationDetails,
-              })
+            // Dor em repouso sempre no dia do follow-up
+            const dayEntry = painDataMap.get(day)!
+            dayEntry.painAtRest = parsed.painAtRest
+            dayEntry.date = resp.createdAt ? new Date(resp.createdAt).toLocaleDateString('pt-BR') : ''
+            dayEntry.hasRedFlag = parsed.hasRedFlags
+            dayEntry.usedExtraMedication = parsed.usedExtraMedication
+            dayEntry.extraMedicationDetails = parsed.extraMedicationDetails
+
+            // Dor durante evacuação: plotar no dia REAL da evacuação
+            if (parsed.evacuationDetails && parsed.evacuationDetails.length > 0) {
+              // Múltiplas evacuações: cada uma no seu dia real
+              for (const evac of parsed.evacuationDetails) {
+                ensureDay(evac.actualDay)
+                painDataMap.get(evac.actualDay)!.painDuringEvacuation = evac.pain
+              }
+            } else if (parsed.painDuringEvacuation !== null) {
+              // Fallback: dados legados sem evacuationDetails
+              const evacDay = parsed.evacuationActualDay ?? day
+              ensureDay(evacDay)
+              painDataMap.get(evacDay)!.painDuringEvacuation = parsed.painDuringEvacuation
             }
           })
 

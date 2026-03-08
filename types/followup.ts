@@ -218,7 +218,7 @@ export const FOLLOW_UP_STATUS_LABELS: Record<FollowUpStatus, string> = {
 // DIAS DE FOLLOW-UP
 // ============================================
 
-export const FOLLOW_UP_DAYS = [1, 2, 3, 5, 7, 10, 14] as const;
+export const FOLLOW_UP_DAYS = [1, 2, 3, 4, 5, 6, 7, 10, 14] as const;
 export type FollowUpDay = typeof FOLLOW_UP_DAYS[number];
 
 // ============================================

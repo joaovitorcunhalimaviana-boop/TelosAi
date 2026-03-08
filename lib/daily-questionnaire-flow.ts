@@ -54,47 +54,46 @@ export async function getDailyQuestions(
   const bowelStatus = await checkBowelMovementStatus(surgeryId, dayNumber);
   const painHistory = await getPainHistory(surgeryId);
 
+  // Perguntas sobre evacuação (PRIMEIRO! variam se já evacuou ou não)
+  const bowelQuestions = getBowelMovementQuestions(
+    bowelStatus.hadFirstMovement,
+    dayNumber
+  );
+
   // Perguntas base (presentes em todos os dias)
   const baseQuestions: QuestionDefinition[] = [
+    // 1. EVACUAÇÃO (perguntar primeiro!)
+    {
+      id: 'bowel_movement',
+      category: 'bowel_movement',
+      required: true,
+      text: bowelQuestions.mainQuestion,
+      followUpLogic: `
+        Se SIM:
+          ${bowelQuestions.followUpIfYes.join('\n          ')}
+        Se NÃO:
+          ${bowelQuestions.followUpIfNo.join('\n          ')}
+      `,
+      contextNote: bowelQuestions.contextForAI
+    },
+    // 2. DOR EM REPOUSO (condicional: se evacuou, perguntar "dor antes de evacuar")
     {
       id: 'pain_at_rest',
       category: 'pain',
       required: true,
       text: 'Como está sua dor AGORA, em repouso? Me diz um número de 0 a 10.',
       contextNote:
-        'SEMPRE enviar imagem da escala visual analógica ANTES desta pergunta. NUNCA aceitar respostas vagas.'
+        'SEMPRE enviar imagem da escala visual analógica ANTES desta pergunta. NUNCA aceitar respostas vagas. Se o paciente JÁ informou "dor antes de evacuar" na seção de evacuação, NÃO perguntar novamente — esse valor JÁ É a dor em repouso.'
+    },
+    // 3. MEDICAÇÃO EXTRA
+    {
+      id: 'used_extra_medication',
+      category: 'medications',
+      required: true,
+      text: 'Além das medicações prescritas pelo médico, você tomou alguma outra medicação por conta própria? (Tramadol, Codeína, laxante, etc.)',
+      followUpLogic: `Se sim: perguntar qual medicação, dose e horário`
     }
   ];
-
-  // Pergunta sobre medicação extra (após dor, antes de evacuação)
-  baseQuestions.push({
-    id: 'used_extra_medication',
-    category: 'medications',
-    required: true,
-    text: 'Além das medicações prescritas pelo médico, você tomou alguma outra medicação por conta própria? (Tramadol, Codeína, laxante, etc.)',
-    followUpLogic: `Se sim: perguntar qual medicação, dose e horário`
-  });
-
-  // Perguntas sobre evacuação (variam se já evacuou ou não)
-  const bowelQuestions = getBowelMovementQuestions(
-    bowelStatus.hadFirstMovement,
-    dayNumber
-  );
-
-  // Adicionar pergunta sobre evacuação
-  baseQuestions.push({
-    id: 'bowel_movement',
-    category: 'bowel_movement',
-    required: true,
-    text: bowelQuestions.mainQuestion,
-    followUpLogic: `
-      Se SIM:
-        ${bowelQuestions.followUpIfYes.join('\n        ')}
-      Se NÃO:
-        ${bowelQuestions.followUpIfNo.join('\n        ')}
-    `,
-    contextNote: bowelQuestions.contextForAI
-  });
 
   // Perguntas específicas por dia
   const daySpecificQuestions = getDaySpecificQuestions(dayNumber, bowelStatus, painHistory.length > 0);
@@ -126,16 +125,7 @@ export async function getDailyQuestions(
         ⚠️ Se retenção urinária: orientar procurar pronto-socorro
       `
     },
-    {
-      id: 'fever',
-      category: 'fever',
-      required: true,
-      text: 'Você teve febre?',
-      followUpLogic: `
-        Se SIM: perguntar qual foi a temperatura em °C
-        ⚠️ Se ≥38°C: alerta médico
-      `
-    }
+    // Febre removida: capturada espontaneamente na pergunta final ("Tem mais alguma coisa?")
   ];
 
   // Perguntas sobre analgesia (todos os dias)
@@ -178,8 +168,8 @@ export async function getDailyQuestions(
       id: 'additional_symptoms',
       category: 'general',
       required: true,
-      text: 'Deseja relatar mais alguma coisa? Pode ser qualquer sintoma, dúvida ou preocupação.',
-      followUpLogic: `Se sim: registrar o que o paciente relatar. Se não: registrar null.`
+      text: 'Deseja relatar mais alguma coisa? Pode ser qualquer sintoma, febre, dúvida ou preocupação.',
+      followUpLogic: `Se sim: registrar o que o paciente relatar (incluindo febre, se mencionada). Se não: registrar null.`
     }
   ];
 

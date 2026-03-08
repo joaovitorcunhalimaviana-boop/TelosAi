@@ -27,7 +27,7 @@ describe('follow-up-scheduler', () => {
 
   describe('createFollowUpSchedule', () => {
     it('should create follow-ups at correct BRT time (10:00)', async () => {
-      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 9 });
 
       const surgeryDate = new Date('2025-01-15T14:00:00Z'); // UTC
       const params = {
@@ -54,7 +54,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should respect protocol days (D+1, D+2, D+3, D+5, D+7, D+10, D+14)', async () => {
-      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 9 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
@@ -70,8 +70,8 @@ describe('follow-up-scheduler', () => {
       const followUpsData = callArgs.data;
 
       // Verificar dias corretos
-      const expectedDays = [1, 2, 3, 5, 7, 10, 14];
-      expect(followUpsData.length).toBe(7);
+      const expectedDays = [1, 2, 3, 4, 5, 6, 7, 10, 14];
+      expect(followUpsData.length).toBe(9);
 
       followUpsData.forEach((followUp: any, index: number) => {
         expect(followUp.dayNumber).toBe(expectedDays[index]);
@@ -79,7 +79,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should avoid weekends (Saturday and Sunday)', async () => {
-      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 9 });
 
       // Cirurgia numa sexta-feira
       const surgeryDate = new Date('2025-01-17T10:00:00-03:00'); // Sexta
@@ -112,7 +112,7 @@ describe('follow-up-scheduler', () => {
     });
 
     it('should handle surgeries without protocol', async () => {
-      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 9 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
@@ -125,12 +125,12 @@ describe('follow-up-scheduler', () => {
       const result = await createFollowUpSchedule(params);
 
       expect(result.success).toBe(true);
-      expect(result.count).toBe(7);
-      expect(result.followUpDays).toEqual([1, 2, 3, 5, 7, 10, 14]);
+      expect(result.count).toBe(9);
+      expect(result.followUpDays).toEqual([1, 2, 3, 4, 5, 6, 7, 10, 14]);
     });
 
     it('should calculate scheduledDate correctly', async () => {
-      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 7 });
+      (mockPrisma.followUp.createMany as jest.Mock).mockResolvedValue({ count: 9 });
 
       const surgeryDate = new Date('2025-01-15T10:00:00-03:00');
       const params = {
