@@ -182,6 +182,114 @@ export async function GET(request: NextRequest) {
 
     y += 10
 
+    // ========== DIARIO DE EVACUACOES ==========
+    if (y > pageHeight - 60) { doc.addPage(); y = margin }
+
+    doc.setTextColor(10, 38, 71)
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("Diario de Evacuacoes", margin, y)
+    y += 8
+
+    // Coletar todas as evacuações de todos os follow-ups
+    interface EvacRow {
+      actualDay: number
+      time: string
+      pain: number
+      reportedInDay: number
+    }
+    const evacRows: EvacRow[] = []
+
+    for (const fu of respondedFollowUps) {
+      const resp = fu.responses[0]
+      const parsed = parseQuestionnaireData(resp.questionnaireData, {
+        painAtRest: resp.painAtRest,
+        painDuringBowel: resp.painDuringBowel,
+      })
+
+      if (parsed.evacuationDetails && parsed.evacuationDetails.length > 0) {
+        for (const evac of parsed.evacuationDetails) {
+          // Evitar duplicatas exatas (mesmo dia + dor + hora já adicionados)
+          const isDuplicate = evacRows.some(
+            r => r.actualDay === evac.actualDay && r.pain === evac.pain && r.time === (evac.time ?? "-")
+          )
+          if (!isDuplicate) {
+            evacRows.push({
+              actualDay: evac.actualDay,
+              time: evac.time ?? "-",
+              pain: evac.pain,
+              reportedInDay: fu.dayNumber,
+            })
+          }
+        }
+      } else if (parsed.painDuringEvacuation !== null) {
+        // Fallback: dado legado sem evacuationDetails
+        const evacDay = parsed.evacuationActualDay ?? fu.dayNumber
+        const isDuplicate = evacRows.some(
+          r => r.actualDay === evacDay && r.pain === parsed.painDuringEvacuation && r.time === "-"
+        )
+        if (!isDuplicate) {
+          evacRows.push({
+            actualDay: evacDay,
+            time: "-",
+            pain: parsed.painDuringEvacuation,
+            reportedInDay: fu.dayNumber,
+          })
+        }
+      }
+    }
+
+    // Ordenar por dia real e depois por hora
+    evacRows.sort((a, b) => a.actualDay - b.actualDay || a.time.localeCompare(b.time))
+
+    if (evacRows.length > 0) {
+      const evacTableData = evacRows.map(row => {
+        const painLabel = row.pain <= 3 ? `${row.pain}/10 (Leve)` : row.pain <= 6 ? `${row.pain}/10 (Moderada)` : `${row.pain}/10 (Intensa)`
+        const reportedLabel = row.reportedInDay === row.actualDay ? "-" : `D+${row.reportedInDay}`
+        return [`D+${row.actualDay}`, row.time, painLabel, reportedLabel]
+      })
+
+      autoTable(doc, {
+        head: [["Dia Real", "Horario", "Dor (EVA)", "Reportado em"]],
+        body: evacTableData,
+        startY: y,
+        margin: { left: margin, right: margin },
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: {
+          fillColor: [20, 189, 174],
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+        },
+        alternateRowStyles: { fillColor: [240, 250, 249] },
+        didParseCell: (data: any) => {
+          if (data.section === "body" && data.column.index === 2) {
+            const raw = data.cell.raw as string
+            if (raw.includes("Intensa")) {
+              data.cell.styles.textColor = [192, 57, 43]
+              data.cell.styles.fontStyle = "bold"
+            } else if (raw.includes("Moderada")) {
+              data.cell.styles.textColor = [211, 167, 21]
+              data.cell.styles.fontStyle = "bold"
+            } else {
+              data.cell.styles.textColor = [39, 174, 96]
+              data.cell.styles.fontStyle = "bold"
+            }
+          }
+        },
+        foot: [[
+          { content: `Total de evacuacoes registradas: ${evacRows.length}`, colSpan: 4, styles: { fontStyle: "bold", textColor: [10, 38, 71], fontSize: 9 } }
+        ]],
+        footStyles: { fillColor: [230, 248, 246] },
+      })
+      y = (doc as any).lastAutoTable.finalY + 12
+    } else {
+      doc.setFontSize(11)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(100, 100, 100)
+      doc.text("Nenhuma evacuacao registrada.", margin, y)
+      y += 10
+    }
+
     // ========== COMPLICATIONS / RED FLAGS ==========
     if (y > pageHeight - 60) { doc.addPage(); y = margin }
 
@@ -344,6 +452,108 @@ export async function GET(request: NextRequest) {
     doc.text(`Taxa de resposta: ${responseRate}%`, margin + 5, y + 30)
 
     y += 52
+
+    // ========== SATISFACAO DO PACIENTE ==========
+    // Buscar do último follow-up respondido que contenha dados de satisfação
+    let satisfactionRating: number | null = null
+    let wouldRecommend: boolean | null = null
+    let positiveFeedback: string | null = null
+    let improvementSuggestions: string | null = null
+    let satisfactionDay: number | null = null
+
+    // Percorre do último para o primeiro buscando dados de satisfação
+    for (let i = respondedFollowUps.length - 1; i >= 0; i--) {
+      const fu = respondedFollowUps[i]
+      const resp = fu.responses[0]
+      const parsed = parseQuestionnaireData(resp.questionnaireData, {
+        painAtRest: resp.painAtRest,
+        painDuringBowel: resp.painDuringBowel,
+      })
+      if (parsed.satisfactionRating !== null || parsed.wouldRecommend !== null || parsed.positiveFeedback) {
+        satisfactionRating = parsed.satisfactionRating
+        wouldRecommend = parsed.wouldRecommend
+        positiveFeedback = parsed.positiveFeedback
+        improvementSuggestions = parsed.improvementSuggestions
+        satisfactionDay = fu.dayNumber
+        break
+      }
+    }
+
+    if (y > pageHeight - 70) { doc.addPage(); y = margin }
+
+    doc.setTextColor(10, 38, 71)
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("Satisfacao do Paciente", margin, y)
+    y += 8
+
+    if (satisfactionRating !== null || wouldRecommend !== null) {
+      // Caixa de satisfação
+      const boxHeight = 8 + (satisfactionRating !== null ? 10 : 0) + (wouldRecommend !== null ? 10 : 0)
+        + (positiveFeedback ? 14 : 0) + (improvementSuggestions ? 14 : 0)
+
+      doc.setFillColor(245, 245, 250)
+      doc.roundedRect(margin, y - 2, pageWidth - 2 * margin, boxHeight + 4, 3, 3, "F")
+      doc.setFontSize(11)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(0, 0, 0)
+
+      let iy = y + 6
+
+      if (satisfactionDay !== null) {
+        doc.setFont("helvetica", "bold")
+        doc.setFontSize(9)
+        doc.setTextColor(100, 100, 100)
+        doc.text(`Coletado em D+${satisfactionDay}`, margin + 5, iy - 2)
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(11)
+        doc.setTextColor(0, 0, 0)
+      }
+
+      if (satisfactionRating !== null) {
+        // Estrelas representadas por texto
+        const stars = "★".repeat(Math.round(satisfactionRating)) + "☆".repeat(5 - Math.round(satisfactionRating))
+        doc.text(`Nota de satisfacao: ${satisfactionRating}/5  ${stars}`, margin + 5, iy)
+        iy += 10
+      }
+
+      if (wouldRecommend !== null) {
+        const recText = wouldRecommend ? "Sim, recomendaria este procedimento" : "Nao recomendaria este procedimento"
+        const recColor: [number, number, number] = wouldRecommend ? [39, 174, 96] : [192, 57, 43]
+        doc.setTextColor(...recColor)
+        doc.setFont("helvetica", "bold")
+        doc.text(`Recomendaria: ${recText}`, margin + 5, iy)
+        doc.setTextColor(0, 0, 0)
+        doc.setFont("helvetica", "normal")
+        iy += 10
+      }
+
+      if (positiveFeedback) {
+        doc.setFontSize(10)
+        doc.setTextColor(60, 60, 60)
+        const feedbackLines = doc.splitTextToSize(`Pontos positivos: ${positiveFeedback}`, pageWidth - 2 * margin - 10)
+        doc.text(feedbackLines, margin + 5, iy)
+        iy += feedbackLines.length * 5 + 2
+      }
+
+      if (improvementSuggestions) {
+        doc.setFontSize(10)
+        doc.setTextColor(60, 60, 60)
+        const suggLines = doc.splitTextToSize(`Sugestoes de melhoria: ${improvementSuggestions}`, pageWidth - 2 * margin - 10)
+        doc.text(suggLines, margin + 5, iy)
+        iy += suggLines.length * 5 + 2
+      }
+
+      y = iy + 14
+    } else {
+      doc.setFontSize(11)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(100, 100, 100)
+      doc.text("Nenhuma avaliacao de satisfacao registrada.", margin, y)
+      y += 10
+    }
+
+    y += 6
 
     // ========== SIGNATURE LINE ==========
     if (y > pageHeight - 50) { doc.addPage(); y = margin }
