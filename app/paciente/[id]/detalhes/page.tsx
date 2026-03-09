@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PostOpDayBadge } from "@/components/ui/badge-variants";
 import { ArrowLeft, MessageCircle, History, FileText } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { parseQuestionnaireData } from "@/lib/questionnaire-parser";
+import { PainEvolutionChart } from "@/components/patient/PainEvolutionChart";
 
 // Interfaces para tipagem
 interface ConversationMessage {
@@ -49,19 +48,12 @@ interface PatientSummary {
     hadFirstBowelMovement?: boolean;
 }
 
-interface GraphData {
-    day: string;
-    repouso: number | null;
-    evacuar: number | null;
-    fullData: FollowUp;
-}
 
 export default function PatientDetailsPage() {
     const params = useParams();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [patientData, setPatientData] = useState<PatientSummary | null>(null);
-    const [graphData, setGraphData] = useState<GraphData[]>([]);
     const [selectedFollowUp, setSelectedFollowUp] = useState<FollowUp | null>(null);
     const [fullConversation, setFullConversation] = useState<ConversationMessage[]>([]);
     const [showFullHistory, setShowFullHistory] = useState(true); // Por padrão mostra histórico completo
@@ -75,25 +67,6 @@ export default function PatientDetailsPage() {
                     // Casting seguro pois sabemos a estrutura do retorno
                     const typedData = data as unknown as PatientSummary;
                     setPatientData(typedData);
-
-                    // Processar dados para o gráfico usando parser centralizado
-                    const chartData = typedData.followUps
-                        .filter((f) => f.responses.length > 0)
-                        .map((f) => {
-                            const resp = f.responses[0];
-                            const parsed = parseQuestionnaireData(resp.questionnaireData, {
-                                painAtRest: resp.painAtRest,
-                                painDuringBowel: resp.painDuringBowel,
-                            });
-
-                            return {
-                                day: `D+${f.dayNumber}`,
-                                repouso: parsed.painAtRest,
-                                evacuar: parsed.painDuringEvacuation,
-                                fullData: f
-                            };
-                        });
-                    setGraphData(chartData);
 
                     // Selecionar o último follow-up por padrão
                     if (typedData.followUps.length > 0) {
@@ -179,37 +152,8 @@ export default function PatientDetailsPage() {
                     {/* Coluna Esquerda: Gráfico e Lista de Dias */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* Gráfico de Evolução */}
-                        <Card style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
-                            <CardHeader>
-                                <CardTitle style={{ color: '#F0EAD6' }}>
-                                    Evolução da Dor
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="h-[250px] md:h-[300px] pt-4">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={graphData}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1E2535" />
-                                        <XAxis dataKey="day" tick={{ fill: '#7A8299', fontSize: 12 }} />
-                                        <YAxis domain={[0, 10]} tick={{ fill: '#7A8299', fontSize: 12 }} />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: 'rgba(22,27,39,0.95)',
-                                                borderRadius: '12px',
-                                                border: '1px solid #1E2535',
-                                                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                                                color: '#D8DEEB'
-                                            }}
-                                            labelStyle={{ color: '#F0EAD6' }}
-                                            itemStyle={{ color: '#D8DEEB' }}
-                                        />
-                                        <Legend wrapperStyle={{ color: '#D8DEEB' }} />
-                                        <Line type="monotone" dataKey="repouso" name="Dor em Repouso" stroke="#14BDAE" strokeWidth={3} dot={{ fill: '#14BDAE', strokeWidth: 2, r: 4 }} connectNulls={false} />
-                                        <Line type="monotone" dataKey="evacuar" name="Dor ao Evacuar" stroke="#F0EAD6" strokeWidth={3} dot={{ fill: '#F0EAD6', strokeWidth: 2, r: 4 }} connectNulls={false} />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </CardContent>
-                        </Card>
+                        {/* Gráfico de Evolução da Dor */}
+                        <PainEvolutionChart patientId={patientData.patientId || patientData.patient.id} />
 
                         {/* Lista de Follow-ups */}
                         <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
