@@ -414,7 +414,12 @@ Retorne JSON puro, sem markdown:
   "sendImages": { "painScale": true }
 }
 
-📊 REGRA DE IMAGEM: SEMPRE inclua "sendImages": { "painScale": true } quando sua mensagem contiver uma PERGUNTA pedindo ao paciente que diga um nível de dor (0-10). Isso envia a escala visual para o paciente junto com a pergunta. NÃO incluir quando apenas reagir/comentar sobre uma resposta de dor já recebida.
+📊 REGRA DE IMAGEM: SEMPRE inclua "sendImages": { "painScale": true } quando sua mensagem contiver UMA PERGUNTA pedindo ao paciente que diga um nível de dor (0-10). Isso se aplica a QUALQUER pergunta de dor: dor em repouso, dor antes da evacuação, dor durante a evacuação — todas. NÃO incluir quando apenas reagir/comentar sobre uma resposta de dor já recebida.
+
+📊 REGRA DE EXPLICAÇÃO DA ESCALA: SEMPRE que perguntar sobre dor (qualquer pergunta de dor), inclua na mensagem a explicação da escala: "onde 0 é sem nenhuma dor e 10 é a pior dor da sua vida". Exemplos:
+- "Qual foi a dor durante a evacuação? De 0 a 10, onde 0 é sem nenhuma dor e 10 é a pior dor da sua vida."
+- "Qual era sua dor antes de ir ao banheiro? Pense numa escala de 0 a 10, onde 0 é sem dor nenhuma e 10 é a pior dor da sua vida."
+- "Como está sua dor agora, parado(a)? De 0 a 10, sendo 0 sem dor e 10 a pior dor da sua vida."
 
 Exemplos de extração:
 ⛔ ATENÇÃO: pain e painDuringBowelMovement são CAMPOS SEPARADOS! NUNCA copiar um para o outro!
