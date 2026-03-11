@@ -712,15 +712,22 @@ export async function getPatientConversationHistory(patientId: string) {
     }
   }
 
-  // 3. Remover duplicatas por conteúdo+role+timestamp (preserva mensagens iguais em dias diferentes)
+  // 3. Remover duplicatas com lógica mais precisa
+  // CORREÇÃO: Mensagens curtas ("sim", "não", "2") com mesmo timestamp eram removidas incorretamente.
+  // Agora usa timestamp com SEGUNDOS + content completo para reduzir falsos positivos.
+  // Mensagens sem timestamp usam um índice sequencial para nunca serem deduplicadas entre si.
+  let noTimestampIndex = 0;
   const seen = new Set<string>();
   const uniqueMessages = allMessages.filter(msg => {
-    // Usar timestamp (truncado para minuto) + role + conteúdo para deduplicar
-    // Isso preserva mensagens com mesmo texto em dias diferentes (ex: "leve", "não", "2")
-    const timestampKey = msg.timestamp
-      ? new Date(msg.timestamp).toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
-      : '';
-    const key = `${msg.role}:${timestampKey}:${msg.content.substring(0, 100)}`;
+    let timestampKey: string;
+    if (msg.timestamp) {
+      // Usar timestamp com precisão de segundo (não minuto) para evitar falsa dedup
+      timestampKey = new Date(msg.timestamp).toISOString().substring(0, 19); // YYYY-MM-DDTHH:MM:SS
+    } else {
+      // Mensagens sem timestamp: cada uma recebe um índice único para nunca serem deduplicadas entre si
+      timestampKey = `noTS-${noTimestampIndex++}`;
+    }
+    const key = `${msg.role}:${timestampKey}:${msg.content}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

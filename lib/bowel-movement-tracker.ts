@@ -150,9 +150,9 @@ export function getBowelMovementQuestions(
     return {
       mainQuestion: 'Você evacuou desde a última vez que conversamos?',
       followUpIfYes: [
-        'Quando foi? Hoje ou ontem? E que horas mais ou menos?',
-        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
+        'Quando foi? Hoje ou ontem? Aproximadamente que horas?',
         'Qual foi a dor DURANTE a evacuação? De 0 a 10.',
+        'Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?" Se evacuou só ONTEM: "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?" ⛔ NÃO copiar dor da evacuação para cá — são campos diferentes!',
       ],
       followUpIfNo:
         currentDay <= 2
@@ -169,9 +169,9 @@ export function getBowelMovementQuestions(
     return {
       mainQuestion: 'Desde a última vez que conversamos, você evacuou?',
       followUpIfYes: [
-        'Quantas vezes evacuou? Quando foram? (hoje, ontem)',
+        'Quantas vezes evacuou? Quando foram? (hoje, ontem) Aproximadamente que horas cada uma?',
         'Qual foi a dor durante cada evacuação? De 0 a 10.',
-        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
+        'Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?" Se evacuou só ONTEM: "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?" ⛔ NÃO copiar dor da evacuação para cá — são campos diferentes!',
       ],
       followUpIfNo: [],
       contextForAI: 'Primeira evacuação já registrada. D1-D7: coletar TODAS as evacuações com dia, horário e dor de cada uma. Extrair evacuationDetails como array.',
@@ -181,9 +181,9 @@ export function getBowelMovementQuestions(
     return {
       mainQuestion: 'Desde a última vez que conversamos, você evacuou?',
       followUpIfYes: [
-        'Quando foi a última evacuação?',
+        'Quando foi a última evacuação? Que dia e aproximadamente que horas?',
         'Qual foi a dor na última evacuação? De 0 a 10.',
-        'Qual era sua dor ANTES de evacuar? De 0 a 10.',
+        'Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?" Se evacuou só em dias anteriores: "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?" ⛔ NÃO copiar dor da evacuação para cá — são campos diferentes!',
       ],
       followUpIfNo: [],
       contextForAI: 'Primeira evacuação já registrada. D10+: coletar apenas a ÚLTIMA evacuação e sua dor.',

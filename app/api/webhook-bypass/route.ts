@@ -632,10 +632,11 @@ async function processQuestionnaireAnswer(
     // 6. Enviar resposta da IA
     await sendEmpatheticResponse(phone, aiResult.aiResponse);
 
-    // 7. Atualizar histórico e dados
+    // 7. Atualizar histórico e dados (COM timestamps para dedup correto no histórico)
+    const nowTs = new Date().toISOString();
     conversationHistory.push(
-      { role: 'user', content: message },
-      { role: 'assistant', content: aiResult.aiResponse }
+      { role: 'user' as const, content: message, timestamp: nowTs } as any,
+      { role: 'assistant' as const, content: aiResult.aiResponse, timestamp: new Date(Date.now() + 1000).toISOString() } as any
     );
 
     const mergedData = aiResult.updatedData;

@@ -211,10 +211,11 @@ function getDaySpecificQuestions(
     id: 'local_care_adherence',
     category: 'general',
     required: true,
-    text: 'Está seguindo os cuidados locais orientados pelo médico? (como uso de pomadas, banhos de assento, compressas)',
+    text: 'Está seguindo os cuidados locais? (pomadas, compressas, banho de assento — os que o médico orientou)',
     followUpLogic: `
       Se NÃO: investigar motivo e reforçar importância
-      Consultar o PROTOCOLO MÉDICO para saber quais cuidados específicos orientar
+      Consultar o PROTOCOLO MÉDICO para saber quais cuidados específicos o médico prescreveu
+      Citar APENAS os cuidados que estão no protocolo
     `
   });
 
@@ -437,8 +438,8 @@ LEMBRAR: SEMPRE perguntar "evacuou desde a última vez que conversamos?"
 CUIDADOS LOCAIS
 ═══════════════════════════════════════════════════════════════
 
-Perguntar se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas).
-Consultar o PROTOCOLO MÉDICO OFICIAL para saber quais cuidados específicos o médico prescreveu.
+Perguntar se está seguindo os cuidados locais orientados pelo médico (pomadas, compressas, banho de assento — os que o médico orientou).
+Consultar o PROTOCOLO MÉDICO para saber quais cuidados específicos foram prescritos. Citar APENAS os que estão no protocolo.
 `;
 
   // Contexto sobre dor (se houver histórico)

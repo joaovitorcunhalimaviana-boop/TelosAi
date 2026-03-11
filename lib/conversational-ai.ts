@@ -292,34 +292,56 @@ ${missingInfo.length > 0 ? missingInfo.map(info => `- ${info}`).join('\n') : '�
 ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
    a) Perguntar: "Evacuou desde a última vez que conversamos?"
    b) Se SIM:
-      → "Quando foi? Hoje ou ontem? Que horas mais ou menos?"
+      → "Quando foi? Hoje ou ontem? Aproximadamente que horas?"
+        ⚠️ SEMPRE APERTAR O HORÁRIO: Se paciente responder algo vago como "de manhã", "à tarde", "à noite", "depois do almoço", "cedo", "de madrugada" — isso NÃO é suficiente. INSISTIR: "Mais ou menos que horas? Por exemplo, 7h, 8h, 9h...?"
+        Só aceitar como resposta final: um horário aproximado (ex: "umas 8h", "por volta das 21h", "entre 6 e 7h")
         Se "ontem" no D+${daysPostOp} → dia real = D+${daysPostOp - 1}
         Extrair: firstBowelMovementActualDay (dia real), bowelMovementTime (horário)
-      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
       → "Qual foi a dor DURANTE a evacuação? De 0 a 10." (campo: painDuringBowelMovement)
-      Se houve mais de uma evacuação (ex: ontem à noite e hoje de manhã), coletar dor de cada uma.
+      Se houve mais de uma evacuação (ex: ontem à noite e hoje de manhã), coletar o HORÁRIO APROXIMADO e a DOR de CADA UMA separadamente. NÃO pular nenhuma.
+      ⚠️ REGRA: Perguntar o horário de TODAS as evacuações, uma por uma. Se o paciente disse "evacuei ontem e hoje", perguntar o horário de ONTEM e o horário de HOJE. Não aceitar apenas uma.
       Extrair evacuationDetails: [{ actualDay: número, time: "horário", pain: número }]
+      → DOR EM REPOUSO (campo: pain) — ⛔ É UM CAMPO DIFERENTE de painDuringBowelMovement!
+        Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?"
+        Se evacuou só ONTEM (não hoje): "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?"
+        ⚠️ A dor em repouso é SEMPRE referente a HOJE. NÃO copiar o valor da dor durante evacuação para cá.
       NÃO perguntar "se foi a primeira do dia" — é a PRIMEIRA DESDE A CIRURGIA
    c) Se NÃO: registrar e seguir para DOR EM REPOUSO` : (daysPostOp <= 7 ? `   [DIÁRIO EVACUATÓRIO D1-D7 — COLETA DETALHADA]
    a) Perguntar: "Desde a última vez que conversamos, você evacuou?"
    b) Se SIM:
-      → "Quantas vezes? Quando foram? Hoje, ontem?" (campo: bowelMovementCount)
+      → "Quantas vezes? Quando foram? Hoje, ontem? Aproximadamente que horas cada uma?"
+        ⚠️ SEMPRE APERTAR O HORÁRIO DE CADA EVACUAÇÃO: Se paciente responder algo vago como "de manhã", "à tarde", "à noite", "depois do almoço" — isso NÃO é suficiente. INSISTIR: "Mais ou menos que horas? Por exemplo, 7h, 8h, 9h...?"
+        Perguntar o horário de TODAS as evacuações reportadas, não apenas de uma.
+        (campo: bowelMovementCount)
       → Para CADA evacuação: perguntar a dor durante (0-10)
         Extrair evacuationDetails: [{ actualDay: número, time: "horário", pain: número }]
         Exemplo: "ontem à noite dor 6, hoje de manhã dor 4" →
           evacuationDetails: [{ actualDay: ${daysPostOp - 1}, time: "à noite", pain: 6 }, { actualDay: ${daysPostOp}, time: "de manhã", pain: 4 }]
-      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
+      → DOR EM REPOUSO (campo: pain) — ⛔ É UM CAMPO DIFERENTE de painDuringBowelMovement!
+        Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?"
+        Se evacuou só ONTEM (não hoje): "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?"
+        ⚠️ A dor em repouso é SEMPRE referente a HOJE. NÃO copiar o valor da dor durante evacuação para cá.
    c) Se NÃO: registrar e seguir para DOR EM REPOUSO` : `   [DIÁRIO EVACUATÓRIO D10+ — COLETA RESUMIDA]
    a) Perguntar: "Desde a última vez que conversamos, você evacuou?"
    b) Se SIM:
-      → "Quando foi a ÚLTIMA evacuação?" (campo: bowelMovementTime)
+      → "Quando foi a ÚLTIMA evacuação? Que dia e aproximadamente que horas?" (campo: bowelMovementTime)
+        ⚠️ SEMPRE APERTAR O HORÁRIO: Se paciente responder algo vago como "de manhã", "à tarde", "à noite" — isso NÃO é suficiente. INSISTIR: "Mais ou menos que horas? Por exemplo, 7h, 8h, 9h...?"
       → "Qual foi a dor na última evacuação? De 0 a 10." (campo: painDuringBowelMovement)
-      → "Qual era sua dor ANTES de evacuar? De 0 a 10." (campo: pain — este É o repouso)
+      → DOR EM REPOUSO (campo: pain) — ⛔ É UM CAMPO DIFERENTE de painDuringBowelMovement!
+        Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?"
+        Se evacuou só em dias anteriores (não hoje): "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?"
+        ⚠️ A dor em repouso é SEMPRE referente a HOJE. NÃO copiar o valor da dor durante evacuação para cá.
    c) Se NÃO: registrar e seguir para DOR EM REPOUSO`)}
 
 2. DOR EM REPOUSO (campo: pain, 0-10)
-   ⚠️ SÓ PERGUNTAR SE O PACIENTE NÃO EVACUOU!
-   Se evacuou: a "dor antes de evacuar" coletada no passo 1 JÁ É a dor em repouso (campo pain). NÃO perguntar novamente.
+   ⛔ REGRA CRÍTICA: Dor em repouso e dor durante a evacuação são DOIS CAMPOS DIFERENTES.
+   - painDuringBowelMovement = dor NO MOMENTO de evacuar (ex: "doeu 6 quando evacuei")
+   - pain = dor PARADO, SEM estar evacuando (ex: "agora estou com dor 3")
+   ⚠️ Se o paciente deu dor 6 durante a evacuação, NÃO copiar o 6 para dor em repouso. São dados separados!
+
+   ⚠️ SÓ PERGUNTAR SEPARADAMENTE SE O PACIENTE NÃO EVACUOU!
+   Se evacuou HOJE: a "dor antes da evacuação de hoje" do passo 1 JÁ É a dor em repouso. NÃO perguntar novamente.
+   Se evacuou só ONTEM (não hoje): a "dor agora em repouso" do passo 1 JÁ É a dor em repouso. NÃO perguntar novamente.
    Se NÃO evacuou: "Como está sua dor agora, parado(a)? De 0 a 10."
    Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
 
@@ -337,7 +359,8 @@ ${daysPostOp === 1 ? `5. URINA (campo: urination) — OBRIGATÓRIO D+1
    Perguntar: "Está tomando as medicações conforme prescrito?"
 
 7. CUIDADOS LOCAIS (campo: localCareAdherence)
-   Perguntar: "Está seguindo os cuidados orientados pelo médico? Pomadas, compressas geladas..."
+   Perguntar: "Está seguindo os cuidados locais? Tipo pomadas, compressas, banho de assento — apenas os que o médico te orientou a fazer."
+   ⚠️ Consultar o PROTOCOLO MÉDICO (seção 2) para saber quais cuidados específicos o médico prescreveu. Se o paciente perguntar sobre um cuidado que NÃO está no protocolo, não orientar — dizer que vai verificar com o médico.
 
 8. PERGUNTA FINAL (campo: additionalSymptoms — SEMPRE por último)
    Perguntar: "Tem mais alguma coisa que gostaria de me contar? Qualquer sintoma, febre, dúvida..."
@@ -378,13 +401,20 @@ Retorne JSON puro, sem markdown:
   "extractedInfo": { /* só dados coletados NESTA mensagem */ },
   "isComplete": false,
   "urgency": "low",
-  "needsDoctorAlert": false
+  "needsDoctorAlert": false,
+  "sendImages": { "painScale": true }
 }
 
+📊 REGRA DE IMAGEM: SEMPRE inclua "sendImages": { "painScale": true } quando sua mensagem contiver uma PERGUNTA pedindo ao paciente que diga um nível de dor (0-10). Isso envia a escala visual para o paciente junto com a pergunta. NÃO incluir quando apenas reagir/comentar sobre uma resposta de dor já recebida.
+
 Exemplos de extração:
-- "Dor 3" → "pain": 3 (dor em repouso / dor antes de evacuar)
-- "Antes de evacuar a dor era 3" → "pain": 3 (dor antes de evacuar = repouso)
-- "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (campo DIFERENTE de pain)
+⛔ ATENÇÃO: pain e painDuringBowelMovement são CAMPOS SEPARADOS! NUNCA copiar um para o outro!
+- "Antes de evacuar a dor era 3" → "pain": 3 (dor em repouso = ANTES de evacuar)
+- "Parado a dor tá 3" → "pain": 3 (dor em repouso)
+- "Minha dor agora tá 3" → "pain": 3 (dor atual em repouso)
+- "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (⚠️ NÃO é pain! É campo DIFERENTE!)
+- "Na hora de evacuar foi 6" → "painDuringBowelMovement": 6 (⚠️ NÃO colocar 6 no campo pain!)
+- Se paciente diz "dor 6 ao evacuar" e depois "antes de ir ao banheiro era 2" → painDuringBowelMovement: 6, pain: 2
 - "Não tomei nada extra" → "usedExtraMedication": false
 - "Tomei Tramadol" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol"
 - "Estou fazendo os cuidados" → "localCareAdherence": true
@@ -630,8 +660,8 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
         // Substituir a despedida da IA por uma pergunta amigável sobre o que falta
         // Usar perguntas prontas para campos comuns, caso contrário usar a descrição técnica
         const friendlyQuestions: Record<string, string> = {
-          'Se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas)':
-            'Ah, antes de encerrar, preciso te perguntar uma coisa importante: você está seguindo os cuidados locais orientados pelo médico? Como uso de pomadas, banhos de assento, compressas... Está conseguindo fazer direitinho?',
+          'Se está seguindo os cuidados locais orientados pelo médico (pomadas, compressas, banho de assento — os que o médico orientou)':
+            'Ah, antes de encerrar: você está conseguindo seguir os cuidados locais? Tipo pomadas, compressas, banho de assento — apenas os que o médico te orientou a fazer?',
           'Deseja relatar mais alguma coisa ao médico':
             'E para finalizar: tem mais alguma coisa que você gostaria de me contar? Qualquer sintoma, dúvida ou preocupação — pode falar livremente! 😊',
         };
@@ -747,9 +777,9 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadF
         missing.push('Dor na última evacuação (0-10)');
       }
     }
-    // Dor antes de evacuar = repouso (campo pain)
+    // Dor em repouso: se evacuou hoje = "antes da evacuação de hoje", se só ontem = "dor agora"
     if (data.pain === undefined || data.pain === null) {
-      missing.push('Dor ANTES de evacuar (0-10) — este valor representa o repouso');
+      missing.push('🚨 Dor antes da evacuação de hoje ou dor atual em repouso (0-10)');
     }
   } else {
     // Não evacuou — perguntar dor em repouso normalmente
@@ -784,7 +814,7 @@ function getMissingInformation(data: QuestionnaireData, daysPostOp: number, hadF
 
   // 6. ADERÊNCIA A CUIDADOS LOCAIS (todos os dias)
   if (data.localCareAdherence === undefined) {
-    missing.push('Se está seguindo os cuidados locais orientados pelo médico (pomadas, banhos de assento, compressas)');
+    missing.push('Se está seguindo os cuidados locais orientados pelo médico (pomadas, compressas, banho de assento — os que o médico orientou)');
   }
 
   // 7. PESQUISA DE SATISFAÇÃO (apenas D+14)

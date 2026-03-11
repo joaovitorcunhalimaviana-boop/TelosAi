@@ -23,11 +23,12 @@ interface Medication {
 }
 
 export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesSectionProps) {
-  const [medications, setMedications] = useState<Medication[]>(
-    patient?.currentMedications || [
-      { id: crypto.randomUUID(), name: '', dose: '', frequency: '', route: '' }
-    ]
-  );
+  const [medications, setMedications] = useState<Medication[]>(() => {
+    try {
+      const parsed = JSON.parse(patient?.surgery?.currentMedications || '[]');
+      return parsed.length > 0 ? parsed : [{ id: crypto.randomUUID(), name: '', dose: '', frequency: '', route: '' }];
+    } catch { return [{ id: crypto.randomUUID(), name: '', dose: '', frequency: '', route: '' }]; }
+  });
 
   // Check completion - no required fields, always complete
   useEffect(() => {
@@ -36,7 +37,11 @@ export function MedicacoesSection({ patient, onUpdate, onComplete }: MedicacoesS
 
   // Update parent
   useEffect(() => {
-    onUpdate({ currentMedications: medications.filter(m => m.name.trim() !== '') });
+    onUpdate({
+      surgery: {
+        currentMedications: JSON.stringify(medications.filter(m => m.name.trim() !== '')),
+      }
+    });
   }, [medications, onUpdate]);
 
   const handleMedicationChange = (id: string, field: keyof Medication, value: string) => {

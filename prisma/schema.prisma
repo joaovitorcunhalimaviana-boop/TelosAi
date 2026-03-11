@@ -212,6 +212,9 @@ model Surgery {
   firstBowelMovementTime String?
   hadFirstBowelMovement  Boolean             @default(false)
   doctorNotes            String?
+  asa                    String?
+  currentMedications     String?
+  comorbidityData        String?
   anesthesia             Anesthesia?
   consentTerms           ConsentTerm[]
   followUps              FollowUp[]

@@ -32,17 +32,19 @@ interface SystemicMedication {
 }
 
 export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoSectionProps) {
-  const [ointments, setOintments] = useState<Ointment[]>(
-    patient?.prescription?.ointments || [
-      { id: crypto.randomUUID(), name: '', frequency: '', duration: '' }
-    ]
-  );
+  const [ointments, setOintments] = useState<Ointment[]>(() => {
+    try {
+      const parsed = JSON.parse(patient?.postOp?.ointments || '[]');
+      return parsed.length > 0 ? parsed : [{ id: crypto.randomUUID(), name: '', frequency: '', duration: '' }];
+    } catch { return [{ id: crypto.randomUUID(), name: '', frequency: '', duration: '' }]; }
+  });
 
-  const [systemicMeds, setSystemicMeds] = useState<SystemicMedication[]>(
-    patient?.prescription?.systemicMeds || [
-      { id: crypto.randomUUID(), name: '', dose: '', route: '', frequency: '', duration: '', category: '' }
-    ]
-  );
+  const [systemicMeds, setSystemicMeds] = useState<SystemicMedication[]>(() => {
+    try {
+      const parsed = JSON.parse(patient?.postOp?.medications || '[]');
+      return parsed.length > 0 ? parsed : [{ id: crypto.randomUUID(), name: '', dose: '', route: '', frequency: '', duration: '', category: '' }];
+    } catch { return [{ id: crypto.randomUUID(), name: '', dose: '', route: '', frequency: '', duration: '', category: '' }]; }
+  });
 
   // Check completion - no required fields, always complete
   useEffect(() => {
@@ -52,9 +54,9 @@ export function PrescricaoSection({ patient, onUpdate, onComplete }: PrescricaoS
   // Update parent
   useEffect(() => {
     onUpdate({
-      prescription: {
-        ointments: ointments.filter(o => o.name.trim() !== ''),
-        systemicMeds: systemicMeds.filter(m => m.name.trim() !== '')
+      postOp: {
+        ointments: JSON.stringify(ointments.filter(o => o.name.trim() !== '')),
+        medications: JSON.stringify(systemicMeds.filter(m => m.name.trim() !== '')),
       }
     });
   }, [ointments, systemicMeds, onUpdate]);

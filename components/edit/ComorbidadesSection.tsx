@@ -62,17 +62,35 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
     { name: 'Coagulopatia', category: 'outras', checked: false, details: '' },
   ]);
 
-  const [severity, setSeverity] = useState(patient?.comorbidadesSeverity || 'leve');
-  const [otherComorbidities, setOtherComorbidities] = useState(patient?.otherComorbidities || '');
+  const [asa, setAsa] = useState(patient?.asa || '');
+  const [otherComorbidities, setOtherComorbidities] = useState('');
 
-  // Load patient data
+  // Load patient data from surgery.comorbidityData (JSON)
   useEffect(() => {
-    if (patient?.comorbidades) {
-      const updatedComorbidades = comorbidades.map(c => {
-        const found = patient.comorbidades.find((pc: any) => pc.name === c.name);
-        return found ? { ...c, checked: found.checked, details: found.details } : c;
-      });
-      setComorbidades(updatedComorbidades);
+    try {
+      const saved = JSON.parse(patient?.surgery?.comorbidityData || '{}');
+      if (saved.comorbidades && Array.isArray(saved.comorbidades)) {
+        const updatedComorbidades = comorbidades.map(c => {
+          const found = saved.comorbidades.find((pc: any) => pc.name === c.name);
+          return found ? { ...c, checked: found.checked || true, details: found.details || '' } : c;
+        });
+        setComorbidades(updatedComorbidades);
+      }
+      if (saved.otherComorbidities) {
+        setOtherComorbidities(saved.otherComorbidities);
+      }
+    } catch {
+      // Fallback: try legacy format
+      if (patient?.comorbidades) {
+        const updatedComorbidades = comorbidades.map(c => {
+          const found = patient.comorbidades.find((pc: any) => pc.name === c.name);
+          return found ? { ...c, checked: found.checked, details: found.details } : c;
+        });
+        setComorbidades(updatedComorbidades);
+      }
+      if (patient?.otherComorbidities) {
+        setOtherComorbidities(patient.otherComorbidities);
+      }
     }
   }, []);
 
@@ -84,11 +102,15 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
   // Update parent
   useEffect(() => {
     onUpdate({
-      comorbidades: comorbidades.filter(c => c.checked),
-      comorbidadesSeverity: severity,
-      otherComorbidities
+      asa,
+      surgery: {
+        comorbidityData: JSON.stringify({
+          comorbidades: comorbidades.filter(c => c.checked),
+          otherComorbidities,
+        }),
+      }
     });
-  }, [comorbidades, severity, otherComorbidities, onUpdate]);
+  }, [comorbidades, asa, otherComorbidities, onUpdate]);
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
     const updated = [...comorbidades];
@@ -124,19 +146,22 @@ export function ComorbidadesSection({ patient, onUpdate, onComplete }: Comorbida
     <Card className="p-6" style={{ backgroundColor: '#111520', borderColor: '#1E2535' }}>
       <h2 className="text-2xl font-semibold mb-6" style={{ color: '#F0EAD6' }}>Comorbidades</h2>
 
-      {/* Severity Selection */}
+      {/* ASA Classification */}
       <div className="mb-6">
-        <Label htmlFor="severity" className="text-sm font-medium" style={{ color: '#7A8299' }}>
-          Gravidade Geral das Comorbidades
+        <Label htmlFor="asa" className="text-sm font-medium" style={{ color: '#7A8299' }}>
+          Classificação ASA
         </Label>
-        <Select value={severity} onValueChange={setSeverity}>
-          <SelectTrigger className="mt-1 w-full md:w-64" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
-            <SelectValue placeholder="Selecione a gravidade" />
+        <Select value={asa} onValueChange={setAsa}>
+          <SelectTrigger className="mt-1 w-full md:w-80" style={{ backgroundColor: '#161B27', color: '#D8DEEB', borderColor: '#1E2535' }}>
+            <SelectValue placeholder="Selecione a classificação ASA" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="leve">Leve</SelectItem>
-            <SelectItem value="moderada">Moderada</SelectItem>
-            <SelectItem value="grave">Grave</SelectItem>
+            <SelectItem value="ASA I">ASA I — Paciente saudável, sem doenças sistêmicas</SelectItem>
+            <SelectItem value="ASA II">ASA II — Doença sistêmica leve (ex: HAS controlada, DM compensada)</SelectItem>
+            <SelectItem value="ASA III">ASA III — Doença sistêmica grave (ex: DM descompensada, DPOC)</SelectItem>
+            <SelectItem value="ASA IV">ASA IV — Doença sistêmica grave com risco de vida constante</SelectItem>
+            <SelectItem value="ASA V">ASA V — Paciente moribundo, não se espera sobrevivência sem cirurgia</SelectItem>
+            <SelectItem value="ASA VI">ASA VI — Morte cerebral (doação de órgãos)</SelectItem>
           </SelectContent>
         </Select>
       </div>

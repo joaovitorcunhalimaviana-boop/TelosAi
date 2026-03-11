@@ -461,8 +461,8 @@ Por favor, me diga um número de 0 a 10, onde:
               userId: patient.userId,
               questionnaireData: JSON.stringify({
                 conversation: [
-                  { role: 'user', content: text },
-                  { role: 'assistant', content: initialMessage }
+                  { role: 'user', content: text, timestamp: new Date().toISOString() },
+                  { role: 'assistant', content: initialMessage, timestamp: new Date().toISOString() }
                 ],
                 extractedData: {},
                 completed: false,
@@ -723,14 +723,19 @@ async function processQuestionnaireAnswer(
     const currentData = questionnaireData.extractedData || {};
 
     // Campos obrigatórios para validação server-side (base)
+    // CORREÇÃO: 'fever' REMOVIDO da lista obrigatória.
+    // Motivo: A febre é capturada ESPONTANEAMENTE via additionalSymptoms
+    // ("Tem mais alguma coisa? Qualquer sintoma, febre, dúvida...").
+    // Se o paciente não menciona febre, significa que NÃO TEM febre.
+    // Manter 'fever' aqui fazia o questionário NUNCA finalizar porque
+    // o Claude nunca pergunta febre diretamente.
     const requiredFields = [
       'pain',               // Dor em repouso (SEMPRE obrigatório)
       'bowelMovementSinceLastContact',
       'bleeding',
-      'fever',
       'medications',
       'usedExtraMedication',
-      'additionalSymptoms', // NOVO: Todos os dias (pergunta final)
+      'additionalSymptoms', // Todos os dias (pergunta final — captura febre espontaneamente)
       'localCareAdherence',
     ];
 
@@ -781,13 +786,58 @@ async function processQuestionnaireAnswer(
     // 6. Enviar resposta da IA
     await sendEmpatheticResponse(phone, aiResult.aiResponse);
 
-    // 7. Atualizar histórico e dados
+    // 7. Atualizar histórico e dados (COM timestamps para dedup correto no histórico completo)
+    const nowTs = new Date().toISOString();
     conversationHistory.push(
-      { role: 'user', content: message },
-      { role: 'assistant', content: aiResult.aiResponse }
+      { role: 'user' as const, content: message, timestamp: nowTs } as any,
+      { role: 'assistant' as const, content: aiResult.aiResponse, timestamp: new Date(Date.now() + 1000).toISOString() } as any
     );
 
     const mergedData = aiResult.updatedData;
+
+    // DERIVAÇÃO + RETROATIVIDADE: Para D1-D7 com evacuationDetails[], distribuir dor
+    // ao dia correto. Ex: paciente no D5 diz "ontem (D4) doeu 5, hoje (D5) doeu 6"
+    // → D4 recebe painDuringBowel=5, D5 recebe painDuringBowel=6.
+    if ((mergedData as any).evacuationDetails) {
+      const details = (mergedData as any).evacuationDetails as Array<{ actualDay?: number; time?: string; pain?: number }>;
+      if (Array.isArray(details) && details.length > 0) {
+        // 1. Derivar painDuringBowelMovement para o DIA ATUAL (para salvar no response de hoje)
+        const todayEvac = details.find(d => d.actualDay === dayNumber);
+        const recentEvac = details[details.length - 1];
+        const todayTarget = todayEvac || recentEvac;
+        if (todayTarget?.pain !== undefined && todayTarget.pain !== null && !mergedData.painDuringBowelMovement) {
+          (mergedData as any).painDuringBowelMovement = todayTarget.pain;
+          logger.info(`✅ painDuringBowelMovement derivado de evacuationDetails: ${todayTarget.pain} (D+${dayNumber})`);
+        }
+
+        // 2. RETROATIVIDADE: Para evacuações de DIAS ANTERIORES, atualizar o follow-up daquele dia
+        const previousDayEvacs = details.filter(d => d.actualDay !== undefined && d.actualDay !== dayNumber && d.pain !== undefined);
+        for (const evac of previousDayEvacs) {
+          try {
+            const prevFollowUp = await prisma.followUp.findFirst({
+              where: { surgeryId: followUp.surgeryId, dayNumber: evac.actualDay! },
+              include: { responses: { orderBy: { createdAt: 'desc' }, take: 1 } },
+            });
+            if (prevFollowUp && prevFollowUp.responses.length > 0) {
+              const prevResp = prevFollowUp.responses[0];
+              // Atualizar painDuringBowel do dia anterior (sobrescreve se ainda era null,
+              // ou atualiza se o paciente estava reportando retroativamente)
+              if (prevResp.painDuringBowel === null || prevResp.painDuringBowel === undefined) {
+                await prisma.followUpResponse.update({
+                  where: { id: prevResp.id },
+                  data: { painDuringBowel: evac.pain! },
+                });
+                logger.info(`✅ Retroactive: D+${evac.actualDay} painDuringBowel atualizado para ${evac.pain}`);
+              }
+            } else {
+              logger.info(`ℹ️ D+${evac.actualDay} não tem follow-up/response — dor ${evac.pain} registrada em evacuationDetails do D+${dayNumber}`);
+            }
+          } catch (err) {
+            logger.error(`❌ Erro ao atualizar retroativamente D+${evac.actualDay}:`, err);
+          }
+        }
+      }
+    }
 
     // PROTEÇÃO: Verificar se additionalSymptoms foi realmente PERGUNTADO na conversa
     // antes de aceitar o valor (evita que Claude sete null prematuramente)

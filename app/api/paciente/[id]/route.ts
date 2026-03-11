@@ -27,6 +27,9 @@ const updatePatientSchema = z.object({
   email: z.string().email().optional().nullable(),
   isTest: z.boolean().optional(),
 
+  // ASA classification (top-level, saved on Surgery)
+  asa: z.string().optional().nullable(),
+
   // Surgery data
   surgery: z
     .object({
@@ -37,6 +40,8 @@ const updatePatientSchema = z.object({
       durationMinutes: z.number().int().optional().nullable(),
       status: z.string().optional(),
       doctorNotes: z.string().optional().nullable(),
+      currentMedications: z.string().optional().nullable(),
+      comorbidityData: z.string().optional().nullable(),
     })
     .optional(),
 
@@ -363,19 +368,25 @@ export async function PATCH(
       let surgeryId = existingPatient.surgeries[0]?.id;
 
       // Update or create surgery
-      if (validatedData.surgery) {
+      if (validatedData.surgery || validatedData.asa !== undefined) {
         const surgeryData: any = {};
-        if (validatedData.surgery.type) surgeryData.type = validatedData.surgery.type;
-        if (validatedData.surgery.date)
+        if (validatedData.surgery?.type) surgeryData.type = validatedData.surgery.type;
+        if (validatedData.surgery?.date)
           surgeryData.date = fromBrasiliaTime(new Date(validatedData.surgery.date));
-        if (validatedData.surgery.hospital !== undefined)
+        if (validatedData.surgery?.hospital !== undefined)
           surgeryData.hospital = validatedData.surgery.hospital;
-        if (validatedData.surgery.durationMinutes !== undefined)
+        if (validatedData.surgery?.durationMinutes !== undefined)
           surgeryData.durationMinutes = validatedData.surgery.durationMinutes;
-        if (validatedData.surgery.status)
+        if (validatedData.surgery?.status)
           surgeryData.status = validatedData.surgery.status;
-        if (validatedData.surgery.doctorNotes !== undefined)
+        if (validatedData.surgery?.doctorNotes !== undefined)
           surgeryData.doctorNotes = validatedData.surgery.doctorNotes;
+        if (validatedData.surgery?.currentMedications !== undefined)
+          surgeryData.currentMedications = validatedData.surgery.currentMedications;
+        if (validatedData.surgery?.comorbidityData !== undefined)
+          surgeryData.comorbidityData = validatedData.surgery.comorbidityData;
+        if (validatedData.asa !== undefined)
+          surgeryData.asa = validatedData.asa;
 
         if (surgeryId) {
           // Update existing surgery
@@ -389,8 +400,9 @@ export async function PATCH(
             data: {
               ...surgeryData,
               patientId: id,
-              type: validatedData.surgery.type || 'hemorroidectomia',
-              date: validatedData.surgery.date
+              userId: existingPatient.userId,
+              type: validatedData.surgery?.type || 'hemorroidectomia',
+              date: validatedData.surgery?.date
                 ? fromBrasiliaTime(new Date(validatedData.surgery.date))
                 : fromBrasiliaTime(new Date()),
             },

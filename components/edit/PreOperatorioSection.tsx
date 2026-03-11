@@ -14,19 +14,19 @@ interface PreOperatorioSectionProps {
 }
 
 export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOperatorioSectionProps) {
-  // Botox fields
-  const [botoxUsed, setBotoxUsed] = useState(patient?.preOperative?.botox?.used || false);
-  const [botoxDate, setBotoxDate] = useState(patient?.preOperative?.botox?.date || '');
-  const [botoxDose, setBotoxDose] = useState(patient?.preOperative?.botox?.dose || '');
-  const [botoxLocation, setBotoxLocation] = useState(patient?.preOperative?.botox?.location || '');
-  const [botoxObservations, setBotoxObservations] = useState(patient?.preOperative?.botox?.observations || '');
+  // Botox fields — read from flat DB fields (preOp.botoxUsed, etc.)
+  const [botoxUsed, setBotoxUsed] = useState(patient?.preOp?.botoxUsed || false);
+  const [botoxDate, setBotoxDate] = useState(patient?.preOp?.botoxDate || '');
+  const [botoxDose, setBotoxDose] = useState(patient?.preOp?.botoxDoseUnits || '');
+  const [botoxLocation, setBotoxLocation] = useState(patient?.preOp?.botoxLocation || '');
+  const [botoxObservations, setBotoxObservations] = useState(patient?.preOp?.botoxObservations || '');
 
   // Intestinal prep fields
-  const [intestinalPrepUsed, setIntestinalPrepUsed] = useState(patient?.preOperative?.intestinalPrep?.used || false);
-  const [intestinalPrepType, setIntestinalPrepType] = useState(patient?.preOperative?.intestinalPrep?.type || '');
+  const [intestinalPrepUsed, setIntestinalPrepUsed] = useState(patient?.preOp?.intestinalPrep || false);
+  const [intestinalPrepType, setIntestinalPrepType] = useState(patient?.preOp?.intestinalPrepType || '');
 
   // Other preparations
-  const [otherPreparations, setOtherPreparations] = useState(patient?.preOperative?.otherPreparations || '');
+  const [otherPreparations, setOtherPreparations] = useState(patient?.preOp?.otherPreparations || '');
 
   // Check completion - no required fields, always complete
   useEffect(() => {
@@ -36,19 +36,15 @@ export function PreOperatorioSection({ patient, onUpdate, onComplete }: PreOpera
   // Update parent
   useEffect(() => {
     onUpdate({
-      preOperative: {
-        botox: {
-          used: botoxUsed,
-          date: botoxDate,
-          dose: botoxDose,
-          location: botoxLocation,
-          observations: botoxObservations
-        },
-        intestinalPrep: {
-          used: intestinalPrepUsed,
-          type: intestinalPrepType
-        },
-        otherPreparations
+      preOp: {
+        botoxUsed,
+        botoxDate: botoxDate || null,
+        botoxDoseUnits: botoxDose ? parseInt(String(botoxDose)) : null,
+        botoxLocation: botoxLocation || null,
+        botoxObservations: botoxObservations || null,
+        intestinalPrep: intestinalPrepUsed,
+        intestinalPrepType: intestinalPrepType || null,
+        otherPreparations: otherPreparations || null,
       }
     });
   }, [botoxUsed, botoxDate, botoxDose, botoxLocation, botoxObservations, intestinalPrepUsed, intestinalPrepType, otherPreparations, onUpdate]);

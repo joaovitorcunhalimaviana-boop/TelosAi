@@ -24,8 +24,8 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
     sex: patient?.sex || '',
     phone: patient?.phone || '',
     email: patient?.email || '',
-    hospital: patient?.hospital || '',
-    surgeryDuration: patient?.surgeryDuration || '',
+    hospital: patient?.surgery?.hospital || '',
+    surgeryDuration: patient?.surgery?.durationMinutes || '',
     isTest: patient?.isTest || false
   });
 
@@ -73,7 +73,14 @@ export function DadosBasicosSection({ patient, onUpdate, onComplete, isResearchP
 
   // Update parent on any change
   useEffect(() => {
-    onUpdateRef.current(formData);
+    const { hospital, surgeryDuration, ...patientFields } = formData;
+    onUpdateRef.current({
+      ...patientFields,
+      surgery: {
+        hospital: hospital || null,
+        durationMinutes: surgeryDuration ? parseInt(String(surgeryDuration)) : null,
+      }
+    });
   }, [formData]);
 
   const handleChange = (field: string, value: string) => {

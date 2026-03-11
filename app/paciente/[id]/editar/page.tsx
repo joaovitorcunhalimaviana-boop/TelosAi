@@ -19,7 +19,6 @@ import { SurgeryRiskDisplay, SurgeryRiskNotAvailable } from "@/components/ml/sur
 import { DadosBasicosSection } from "@/components/edit/DadosBasicosSection"
 import { ComorbidadesSection } from "@/components/edit/ComorbidadesSection"
 import { MedicacoesSection } from "@/components/edit/MedicacoesSection"
-import { DetalhesCirurgicosSection } from "@/components/edit/DetalhesCirurgicosSection"
 import { PreOperatorioSection } from "@/components/edit/PreOperatorioSection"
 import { AnestesiaSection } from "@/components/edit/AnestesiaSection"
 import { PrescricaoSection } from "@/components/edit/PrescricaoSection"
@@ -99,6 +98,13 @@ export default function EditPatientPage() {
       // Transform surgeries array to surgery object (take the latest one)
       if (patientData.surgeries && Array.isArray(patientData.surgeries) && patientData.surgeries.length > 0) {
         patientData.surgery = patientData.surgeries[0] || {};
+        // Map related data so components can read them directly from patient.*
+        const s = patientData.surgeries[0] || {}
+        patientData.anesthesia = s.anesthesia || {}
+        patientData.details = s.details || {}
+        patientData.preOp = s.preOp || {}
+        patientData.postOp = s.postOp || {}
+        patientData.asa = s.asa || ''
       }
 
       // If surgery is still undefined or null, set default
@@ -159,7 +165,23 @@ export default function EditPatientPage() {
   const handleSectionUpdate = useCallback((updates: any) => {
     setPatient(prev => {
       if (!prev) return null;
-      return { ...prev, ...updates };
+      const merged: any = { ...prev };
+      for (const key of Object.keys(updates)) {
+        if (
+          updates[key] !== null &&
+          typeof updates[key] === 'object' &&
+          !Array.isArray(updates[key]) &&
+          merged[key] !== null &&
+          typeof merged[key] === 'object' &&
+          !Array.isArray(merged[key])
+        ) {
+          // Deep merge para objetos (surgery, anesthesia, details, preOp, postOp)
+          merged[key] = { ...merged[key], ...updates[key] };
+        } else {
+          merged[key] = updates[key];
+        }
+      }
+      return merged;
     });
   }, [])
 
@@ -184,11 +206,16 @@ export default function EditPatientPage() {
     if (!patient) return
 
     try {
-      await fetch(`/api/paciente/${params.id}`, {
+      const response = await fetch(`/api/paciente/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patient)
       })
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        console.error("Auto-save failed HTTP:", err)
+        return
+      }
       setLastSaved(new Date())
     } catch (error) {
       console.error("Auto-save failed:", error)
@@ -199,11 +226,16 @@ export default function EditPatientPage() {
     setSaving(true)
     try {
       if (!patient) return;
-      await fetch(`/api/paciente/${params.id}`, {
+      const response = await fetch(`/api/paciente/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patient)
       })
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err?.error || `Erro HTTP ${response.status}`)
+      }
 
       toast({
         title: "Dados salvos com sucesso",
@@ -214,7 +246,7 @@ export default function EditPatientPage() {
     } catch (error) {
       toast({
         title: "Erro ao salvar",
-        description: "Não foi possível salvar os dados",
+        description: error instanceof Error ? error.message : "Não foi possível salvar os dados",
         variant: "destructive"
       })
     } finally {
@@ -256,7 +288,6 @@ export default function EditPatientPage() {
     { id: "basicos", label: "Dados Básicos", component: DadosBasicosSection },
     { id: "comorbidades", label: "Comorbidades", component: ComorbidadesSection },
     { id: "medicacoes", label: "Medicações", component: MedicacoesSection },
-    { id: "detalhes", label: "Detalhes Cirúrgicos", component: DetalhesCirurgicosSection },
     { id: "preop", label: "Pré-Operatório", component: PreOperatorioSection },
     { id: "anestesia", label: "Anestesia", component: AnestesiaSection },
     { id: "prescricao", label: "Prescrição Pós-Op", component: PrescricaoSection },

@@ -19,16 +19,20 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
   const [anesthesiaType, setAnesthesiaType] = useState(patient?.anesthesia?.type || '');
   const [anesthesiologist, setAnesthesiologist] = useState(patient?.anesthesia?.anesthesiologist || '');
 
-  // Pudendal Block fields
-  const [pudendalUsed, setPudendalUsed] = useState(patient?.anesthesia?.pudendalBlock?.used || false);
-  const [pudendalTechnique, setPudendalTechnique] = useState(patient?.anesthesia?.pudendalBlock?.technique || '');
-  const [pudendalAccess, setPudendalAccess] = useState(patient?.anesthesia?.pudendalBlock?.access || '');
-  const [pudendalAnesthetic, setPudendalAnesthetic] = useState(patient?.anesthesia?.pudendalBlock?.anesthetic || '');
-  const [pudendalConcentration, setPudendalConcentration] = useState(patient?.anesthesia?.pudendalBlock?.concentration || '');
-  const [pudendalVolume, setPudendalVolume] = useState(patient?.anesthesia?.pudendalBlock?.volume || '');
-  const [pudendalLaterality, setPudendalLaterality] = useState(patient?.anesthesia?.pudendalBlock?.laterality || '');
-  const [pudendalAdjuvants, setPudendalAdjuvants] = useState<string[]>(patient?.anesthesia?.pudendalBlock?.adjuvants || []);
-  const [pudendalDetails, setPudendalDetails] = useState(patient?.anesthesia?.pudendalBlock?.details || '');
+  // Pudendal Block fields — read from flat DB fields (prefix pudendo)
+  const [pudendalUsed, setPudendalUsed] = useState(patient?.anesthesia?.pudendoBlock || false);
+  const [pudendalTechnique, setPudendalTechnique] = useState(patient?.anesthesia?.pudendoTechnique || '');
+  const [pudendalAccess, setPudendalAccess] = useState(patient?.anesthesia?.pudendoAccess || '');
+  const [pudendalAnesthetic, setPudendalAnesthetic] = useState(patient?.anesthesia?.pudendoAnesthetic || '');
+  const [pudendalConcentration, setPudendalConcentration] = useState(patient?.anesthesia?.pudendoConcentration || '');
+  const [pudendalVolume, setPudendalVolume] = useState(patient?.anesthesia?.pudendoVolumeML || '');
+  const [pudendalLaterality, setPudendalLaterality] = useState(patient?.anesthesia?.pudendoLaterality || '');
+  const [pudendalAdjuvants, setPudendalAdjuvants] = useState<string[]>(
+    patient?.anesthesia?.pudendoAdjuvants
+      ? patient.anesthesia.pudendoAdjuvants.split(',').filter(Boolean)
+      : []
+  );
+  const [pudendalDetails, setPudendalDetails] = useState(patient?.anesthesia?.pudendoDetails || '');
 
   // General observations
   const [generalObservations, setGeneralObservations] = useState(patient?.anesthesia?.observations || '');
@@ -39,24 +43,22 @@ export function AnestesiaSection({ patient, onUpdate, onComplete }: AnestesiaSec
     onComplete(isComplete);
   }, [anesthesiaType, onComplete]);
 
-  // Update parent
+  // Update parent — emit flat fields matching the API schema (prefix pudendo)
   useEffect(() => {
     onUpdate({
       anesthesia: {
         type: anesthesiaType,
         anesthesiologist,
-        pudendalBlock: {
-          used: pudendalUsed,
-          technique: pudendalTechnique,
-          access: pudendalAccess,
-          anesthetic: pudendalAnesthetic,
-          concentration: pudendalConcentration,
-          volume: pudendalVolume,
-          laterality: pudendalLaterality,
-          adjuvants: pudendalAdjuvants,
-          details: pudendalDetails
-        },
-        observations: generalObservations
+        observations: generalObservations,
+        pudendoBlock: pudendalUsed,
+        pudendoTechnique: pudendalTechnique || null,
+        pudendoAccess: pudendalAccess || null,
+        pudendoAnesthetic: pudendalAnesthetic || null,
+        pudendoConcentration: pudendalConcentration || null,
+        pudendoVolumeML: pudendalVolume ? parseFloat(String(pudendalVolume)) : null,
+        pudendoLaterality: pudendalLaterality || null,
+        pudendoAdjuvants: pudendalAdjuvants.length > 0 ? pudendalAdjuvants.join(',') : null,
+        pudendoDetails: pudendalDetails || null,
       }
     });
   }, [anesthesiaType, anesthesiologist, pudendalUsed, pudendalTechnique, pudendalAccess, pudendalAnesthetic, pudendalConcentration, pudendalVolume, pudendalLaterality, pudendalAdjuvants, pudendalDetails, generalObservations, onUpdate]);
