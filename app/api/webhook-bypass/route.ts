@@ -379,22 +379,23 @@ async function processTextMessage(message: any) {
       const firstName = patient.name.split(' ')[0];
       const hadFirstBowelMovement = pendingFollowUp.surgery.hadFirstBowelMovement || false;
 
+      // Pergunta inicial: evacuação SEMPRE primeiro.
+      // Se D+1 (primeira vez), "Desde a cirurgia, você evacuou?"
+      // Nos demais dias, "Desde a última vez que conversamos, você evacuou?"
+      const bowelQuestion = daysPostOp === 1
+        ? `Desde a cirurgia, você evacuou?`
+        : `Desde a última vez que conversamos, você evacuou?`;
+
       const initialMessage = `Olá ${firstName}! 👋
 
 Aqui é a *VigIA*, assistente virtual de acompanhamento pós-operatório.
 
 Vamos atualizar como você está hoje, no seu *${daysPostOp}º dia* pós-cirurgia.
 
-Para começar: *quanto está doendo agora, quando você está parado(a)?*
-
-Por favor, me diga um número de 0 a 10, onde:
-0️⃣ = **Zero dor** (totalmente sem dor)
-🔟 = **Pior dor da vida** (insuportável)`;
+Para começar: *${bowelQuestion}*`;
 
       // NUNCA processar a primeira mensagem com IA — sempre deixar o paciente
-      // responder à pergunta da dor antes de chamar processQuestionnaireAnswer.
-      // Antes, `shouldProcessFirstMessage = !isPositiveResponse` causava
-      // uma SEGUNDA saudação (a IA gerava outra mensagem de boas-vindas).
+      // responder à pergunta de evacuação antes de chamar processQuestionnaireAnswer.
       const shouldProcessFirstMessage = false;
 
       // PRIMEIRO: Criar FollowUpResponse + atualizar status em transação
@@ -423,7 +424,7 @@ Por favor, me diga um número de 0 a 10, onde:
                 ],
                 extractedData: {},
                 completed: false,
-                conversationPhase: 'collecting_pain_at_rest',
+                conversationPhase: 'collecting_bowel_movement',
                 hadFirstBowelMovement: hadFirstBowelMovement
               }),
               riskLevel: 'low',
@@ -447,9 +448,7 @@ Por favor, me diga um número de 0 a 10, onde:
       // SÓ AGORA envia o greeting (após transaction confirmar que somos a primeira instância)
       await sendEmpatheticResponse(phone, initialMessage);
 
-      // Enviar escala de dor
-      await new Promise(resolve => setTimeout(resolve, 500));
-      await sendImageScale(phone, 'pain_scale');
+      // NÃO enviar escala de dor ainda — ela será enviada pela IA quando chegar a hora de perguntar a dor
 
       invalidateDashboardStats();
 

@@ -290,7 +290,7 @@ ${missingInfo.length > 0 ? missingInfo.map(info => `- ${info}`).join('\n') : '�
 
 1. EVACUAÇÃO (PERGUNTAR PRIMEIRO!)
 ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO REGISTRADA]
-   a) Perguntar: "Evacuou desde a última vez que conversamos?"
+   a) Perguntar: ${daysPostOp === 1 ? `"Desde a cirurgia, você evacuou?"` : `"Evacuou desde a última vez que conversamos?"`}
    b) Se SIM:
       → "Quando foi? Hoje ou ontem? Aproximadamente que horas?"
         ⚠️ SEMPRE APERTAR O HORÁRIO: Se paciente responder algo vago como "de manhã", "à tarde", "à noite", "depois do almoço", "cedo", "de madrugada" — isso NÃO é suficiente. INSISTIR: "Mais ou menos que horas? Por exemplo, 7h, 8h, 9h...?"
@@ -336,12 +336,21 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
 2. DOR EM REPOUSO (campo: pain, 0-10)
    ⛔ REGRA CRÍTICA: Dor em repouso e dor durante a evacuação são DOIS CAMPOS DIFERENTES.
    - painDuringBowelMovement = dor NO MOMENTO de evacuar (ex: "doeu 6 quando evacuei")
-   - pain = dor PARADO, SEM estar evacuando (ex: "agora estou com dor 3")
+   - pain = dor BASAL em repouso, SEM estar evacuando (ex: "antes de ir ao banheiro estava com 3", "agora estou com dor 3")
    ⚠️ Se o paciente deu dor 6 durante a evacuação, NÃO copiar o 6 para dor em repouso. São dados separados!
 
-   ⚠️ SÓ PERGUNTAR SEPARADAMENTE SE O PACIENTE NÃO EVACUOU!
-   Se evacuou HOJE: a "dor antes da evacuação de hoje" do passo 1 JÁ É a dor em repouso. NÃO perguntar novamente.
-   Se evacuou só ONTEM (não hoje): a "dor agora em repouso" do passo 1 JÁ É a dor em repouso. NÃO perguntar novamente.
+   LÓGICA CLÍNICA — POR QUÊ A ORDEM IMPORTA:
+   A evacuação pode influenciar a dor nas horas seguintes. Por isso:
+   - Se evacuou HOJE (ex: às 8h, e agora são 10h): a dor atual pode estar elevada pela evacuação recente.
+     → Perguntar "Qual era sua dor ANTES de ir ao banheiro?" (retroativo — dor basal sem influência da evacuação)
+   - Se evacuou só ONTEM ou antes (não hoje): a dor atual não foi influenciada pela evacuação.
+     → Perguntar "Qual é sua dor AGORA, parado(a)?"
+   - Se NÃO evacuou: mesma lógica — sem influência de evacuação recente.
+     → Perguntar "Qual é sua dor AGORA, parado(a)?"
+
+   ⚠️ SÓ PERGUNTAR SEPARADAMENTE SE O PASSO 1 NÃO JÁ COLETOU A DOR EM REPOUSO!
+   Se evacuou HOJE: a "dor antes da evacuação de hoje" do passo 1 JÁ É o campo pain. NÃO perguntar novamente.
+   Se evacuou só ONTEM (não hoje): a "dor agora em repouso" do passo 1 JÁ É o campo pain. NÃO perguntar novamente.
    Se NÃO evacuou: "Como está sua dor agora, parado(a)? De 0 a 10."
    Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
 
