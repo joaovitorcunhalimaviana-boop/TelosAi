@@ -289,20 +289,41 @@ ${previousDaysSummary}
 ═══════════════════════════
 2b. REGRA GLOBAL DE HORÁRIOS
 ═══════════════════════════
-⛔ NUNCA usar termos vagos como "mais tarde", "de manhã", "à tarde", "à noite", "agora", "depois" como valor de horário.
+⛔ NUNCA usar termos vagos como "mais tarde", "de manhã", "à tarde", "à noite", "cedo", "depois" como valor de horário.
 O campo time em evacuationDetails e restingPainHistory DEVE ser SEMPRE no formato HH:MM (ex: "07:30", "14:00", "21:45").
 
-COMO CONVERTER:
-- Paciente diz "agora" → usar o horário atual: ${currentTimeStr}
-- Paciente diz "7 da noite" / "7 horas da noite" → "19:00"
-- Paciente diz "4 da tarde" / "às 4" (contexto tarde) → "16:00"
-- Paciente diz "9 da manhã" / "9h" → "09:00"
-- Paciente diz "de manhã" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 7h, 8h, 9h...?"
-- Paciente diz "à tarde" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 14h, 15h, 16h...?"
-- Paciente diz "à noite" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 19h, 20h, 21h...?"
-- Paciente diz "de madrugada" (sem precisar) → INSISTIR por horas
-- Só aceitar como horário final: um valor HH:MM concreto (ex: "08:00", "13:30")
-- Se o paciente deu uma aproximação razoável (ex: "umas 8h") → usar "08:00"
+PRINCÍPIO FUNDAMENTAL:
+Só registrar o horário quando o paciente fornecer um NÚMERO de hora — explicitamente ou por conversão direta.
+Quando não há número, PERGUNTAR. Nunca assumir.
+
+✅ PODE CONVERTER diretamente (paciente forneceu o número da hora):
+- "7 da noite" / "sete da noite" / "7 horas da noite" → "19:00"  (tem o número 7)
+- "4 da tarde" / "4 horas da tarde" → "16:00"  (tem o número 4)
+- "9 da manhã" / "9h" / "às 9" → "09:00"  (tem o número 9)
+- "meia-noite" → "00:00"
+- "meio-dia" → "12:00"
+- "umas 8 da noite" / "por volta das 8 da noite" → "20:00"  (tem o número 8)
+- "agora" → usar o horário atual exato: ${currentTimeStr}  (horário Brasília desta mensagem)
+
+⛔ DEVE PERGUNTAR (paciente usou período do dia SEM número):
+- "de manhã" → Pergunta: "Mais ou menos que horas? Por exemplo, 7h, 8h, 9h...?"
+- "à tarde" → Pergunta: "Mais ou menos que horas? Por exemplo, 14h, 15h, 16h...?"
+- "à noite" → Pergunta: "Mais ou menos que horas? Por exemplo, 19h, 20h, 21h...?"
+- "de madrugada" → Pergunta: "Mais ou menos que horas?"
+- "ontem à noite" → Pergunta: "Que horas mais ou menos foi isso ontem?"
+- "hoje de manhã" → Pergunta: "Que horas mais ou menos foi hoje de manhã?"
+- "depois do almoço" → Pergunta: "Mais ou menos que horas foi isso?"
+Só registrar o horário DEPOIS que o paciente responder com um número.
+
+EXEMPLO CORRETO:
+  Paciente: "evacuei ontem à noite e hoje de manhã"
+  IA pergunta: "Que horas foi ontem? E hoje, mais ou menos que horas?"
+  Paciente: "ontem umas 8 da noite, hoje às 7h"
+  IA registra: time "20:00" (ontem) e time "07:00" (hoje)
+
+EXEMPLO ERRADO (PROIBIDO):
+  Paciente: "evacuei ontem à noite"
+  IA registra: time "21:00"  ← ⛔ PROIBIDO! "à noite" não tem número, não pode assumir nada.
 
 Esta regra se aplica a TODOS os campos com horário: bowelMovementTime, evacuationDetails[].time, restingPainHistory[].time.
 
