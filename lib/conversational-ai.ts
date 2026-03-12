@@ -21,7 +21,7 @@ export interface ConversationMessage {
 }
 
 export interface RestingPainEntry {
-  time: string;  // Horário aproximado (ex: "10h30", "após almoço")
+  time: string;  // Horário em HH:MM (ex: "10:30", "20:00") — NUNCA termos vagos
   pain: number;  // Nível de dor 0-10
 }
 
@@ -34,7 +34,7 @@ export interface QuestionnaireData {
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
   lastBowelMovement?: string; // Quando foi a última evacuação (se não evacuou)
   painDuringBowelMovement?: number; // Dor durante evacuação (0-10)
-  bowelMovementTime?: string; // Horário aproximado da PRIMEIRA evacuação pós-cirurgia (ex: "de manhã", "às 14h")
+  bowelMovementTime?: string; // Horário da PRIMEIRA evacuação pós-cirurgia em HH:MM (ex: "08:00", "14:00")
   firstBowelMovementActualDay?: number; // Dia real da primeira evacuação (ex: se paciente disse "ontem" no D3 → dia 2)
   bowelMovementCount?: number; // Quantas vezes evacuou desde o último contato (diário pós-1ª evacuação)
 
@@ -263,6 +263,10 @@ export async function conductConversation(
   // Buscar notas do médico (orientações específicas para este paciente)
   const doctorNotes = (surgery as any).doctorNotes || '';
 
+  // Horário atual de Brasília — passado para a IA saber o "agora"
+  const nowBrasilia = toBrasiliaTime(new Date());
+  const currentTimeStr = `${String(nowBrasilia.getHours()).padStart(2, '0')}:${String(nowBrasilia.getMinutes()).padStart(2, '0')}`;
+
   // Construir prompt para Claude
   const systemPrompt = `
 ═══════════════════════════
@@ -277,9 +281,30 @@ Tom: empática, calorosa, linguagem simples. Sem termos médicos complexos.
 Paciente: ${patient.name}
 Cirurgia: ${surgery.type}
 Dia pós-operatório: D+${daysPostOp}
+⏰ Horário atual (Brasília): ${currentTimeStr}
 ${doctorNotes ? `Notas do médico (PRIORIDADE sobre protocolo): ${doctorNotes}` : ''}
 ${medicalProtocol ? `\nProtocolo médico:\n${medicalProtocol}` : ''}
 ${previousDaysSummary}
+
+═══════════════════════════
+2b. REGRA GLOBAL DE HORÁRIOS
+═══════════════════════════
+⛔ NUNCA usar termos vagos como "mais tarde", "de manhã", "à tarde", "à noite", "agora", "depois" como valor de horário.
+O campo time em evacuationDetails e restingPainHistory DEVE ser SEMPRE no formato HH:MM (ex: "07:30", "14:00", "21:45").
+
+COMO CONVERTER:
+- Paciente diz "agora" → usar o horário atual: ${currentTimeStr}
+- Paciente diz "7 da noite" / "7 horas da noite" → "19:00"
+- Paciente diz "4 da tarde" / "às 4" (contexto tarde) → "16:00"
+- Paciente diz "9 da manhã" / "9h" → "09:00"
+- Paciente diz "de manhã" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 7h, 8h, 9h...?"
+- Paciente diz "à tarde" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 14h, 15h, 16h...?"
+- Paciente diz "à noite" (sem precisar) → INSISTIR: "Mais ou menos que horas? Ex: 19h, 20h, 21h...?"
+- Paciente diz "de madrugada" (sem precisar) → INSISTIR por horas
+- Só aceitar como horário final: um valor HH:MM concreto (ex: "08:00", "13:30")
+- Se o paciente deu uma aproximação razoável (ex: "umas 8h") → usar "08:00"
+
+Esta regra se aplica a TODOS os campos com horário: bowelMovementTime, evacuationDetails[].time, restingPainHistory[].time.
 
 ═══════════════════════════
 3. ESTADO DA COLETA
@@ -321,8 +346,9 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
         (campo: bowelMovementCount)
       → Para CADA evacuação: perguntar a dor durante (0-10)
         Extrair evacuationDetails: [{ actualDay: número, time: "horário", pain: número }]
-        Exemplo: "ontem à noite dor 6, hoje de manhã dor 4" →
-          evacuationDetails: [{ actualDay: ${daysPostOp - 1}, time: "à noite", pain: 6 }, { actualDay: ${daysPostOp}, time: "de manhã", pain: 4 }]
+        Exemplo: "ontem às 21h dor 6, hoje às 8h dor 4" →
+          evacuationDetails: [{ actualDay: ${daysPostOp - 1}, time: "21:00", pain: 6 }, { actualDay: ${daysPostOp}, time: "08:00", pain: 4 }]
+        ⚠️ Lembrar: campos time em evacuationDetails DEVEM ser HH:MM. Se paciente disse "de manhã" ou "à noite", INSISTIR no horário (ver seção 2b).
       → DOR EM REPOUSO (campo: pain) — ⛔ É UM CAMPO DIFERENTE de painDuringBowelMovement!
         Se evacuou HOJE: "E ANTES de ir ao banheiro, como estava sua dor? Parado(a), sem evacuar, de 0 a 10?"
         Se evacuou só ONTEM (não hoje): "E agora, como está sua dor? Parado(a), em repouso, de 0 a 10?"
@@ -362,8 +388,11 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
 
    ⛔ CAMPO pain É IMUTÁVEL APÓS PRIMEIRA COLETA:
    Uma vez que pain foi registrado, NÃO sobrescrever nunca. É a leitura basal do dia.
-   Se o paciente ESPONTANEAMENTE mencionar que a dor mudou mais tarde na conversa (ex: "a dor aumentou", "agora tá pior"), registrar como nova entrada em restingPainHistory com horário aproximado.
-   Exemplo: pain=6 (coletado às 10h), paciente diz "agora tá com 7" → restingPainHistory: [{time: "mais tarde", pain: 7}]
+   Se o paciente ESPONTANEAMENTE mencionar que a dor mudou em outro momento do dia (ex: "a dor aumentou", "agora tá pior", "à noite piorou"), registrar como nova entrada em restingPainHistory.
+   ⚠️ O campo time de restingPainHistory DEVE ser HH:MM (ver seção 2b).
+   - Se paciente diz "agora tá com 7" → usar o horário atual (${currentTimeStr}): restingPainHistory: [{time: "${currentTimeStr}", pain: 7}]
+   - Se paciente diz "à noite foi pior, umas 20h, dor 8" → restingPainHistory: [{time: "20:00", pain: 8}]
+   - Se horário for vago ("mais tarde", "de noite"), NÃO registrar ainda — perguntar "Mais ou menos que horas foi isso?"
    NÃO perguntar proativamente se a dor mudou — só registrar se o paciente mencionar espontaneamente.
 
 3. MEDICAÇÃO EXTRA (campo: usedExtraMedication + extraMedicationDetails)
@@ -441,22 +470,24 @@ Exemplos de extração:
 - "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (⚠️ NÃO é pain! É campo DIFERENTE!)
 - "Na hora de evacuar foi 6" → "painDuringBowelMovement": 6 (⚠️ NÃO colocar 6 no campo pain!)
 - Se paciente diz "dor 6 ao evacuar" e depois "antes de ir ao banheiro era 2" → painDuringBowelMovement: 6, pain: 2
-- Pain já coletado (ex: pain=6) e paciente diz espontaneamente "a dor piorou, tá 8 agora" → NÃO alterar pain=6, adicionar: "restingPainHistory": [{"time": "mais tarde", "pain": 8}]
-- Pain já coletado e paciente diz "melhorou, agora tá 4" → NÃO alterar pain, adicionar: "restingPainHistory": [{"time": "mais tarde", "pain": 4}]
-- ⚠️ NUNCA sobrescrever pain após coletado. NUNCA perguntar proativamente se a dor mudou.
+- Pain já coletado (ex: pain=6) e paciente diz espontaneamente "a dor piorou, tá 8 agora" → NÃO alterar pain=6, perguntar "Mais ou menos que horas foi isso?", então adicionar: "restingPainHistory": [{"time": "${currentTimeStr}", "pain": 8}]
+- Pain já coletado e paciente diz "melhorou, agora tá 4" (contexto: horário atual ${currentTimeStr}) → "restingPainHistory": [{"time": "${currentTimeStr}", "pain": 4}]
+- Pain já coletado e paciente diz "à noite foi 8" → NÃO registrar ainda. Perguntar: "Mais ou menos que horas foi isso?" → ao confirmar "umas 20h" → "restingPainHistory": [{"time": "20:00", "pain": 8}]
+- ⚠️ NUNCA sobrescrever pain após coletado. NUNCA perguntar proativamente se a dor mudou. NUNCA usar "mais tarde" ou termos vagos como time.
 - "Não tomei nada extra" → "usedExtraMedication": false
 - "Tomei Tramadol" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol"
 - "Estou fazendo os cuidados" → "localCareAdherence": true
 - "Só isso" / "Nada mais" → "additionalSymptoms": null
 - "Tive coceira" → "additionalSymptoms": "Coceira"
 - "Tive febre, 37.8" → "fever": true, "feverTemperature": 37.8 (se paciente mencionar espontaneamente)
-- "Evacuei hoje de manhã" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp}, "bowelMovementTime": "de manhã"
-- "Evacuei ontem às 8h" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "às 8h"
+- "Evacuei hoje de manhã" → NÃO registrar bowelMovementTime ainda. INSISTIR: "Mais ou menos que horas? Ex: 7h, 8h...?" → ao confirmar "umas 8h" → "bowelMovementTime": "08:00"
+- "Evacuei ontem às 8h" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp - 1}, "bowelMovementTime": "08:00"
+- "Evacuei hoje às 9 da manhã" → "bowelMovementSinceLastContact": true, "firstBowelMovementActualDay": ${daysPostOp}, "bowelMovementTime": "09:00"
 - "Fui ao banheiro 2 vezes" → "bowelMovementSinceLastContact": true, "bowelMovementCount": 2
 - "Não evacuei" → "bowelMovementSinceLastContact": false
-- "Evacuei ontem à noite (dor 6) e hoje de manhã (dor 4)" →
+- "Evacuei ontem às 21h (dor 6) e hoje às 8h (dor 4)" →
     "bowelMovementSinceLastContact": true, "bowelMovementCount": 2,
-    "evacuationDetails": [{ "actualDay": ${daysPostOp - 1}, "time": "à noite", "pain": 6 }, { "actualDay": ${daysPostOp}, "time": "de manhã", "pain": 4 }]
+    "evacuationDetails": [{ "actualDay": ${daysPostOp - 1}, "time": "21:00", "pain": 6 }, { "actualDay": ${daysPostOp}, "time": "08:00", "pain": 4 }]
 ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" → "wouldRecommend": true\n- "Poderia melhorar X" → "improvementSuggestions": "Poderia melhorar X"` : ''}`;
 
   try {
@@ -663,7 +694,7 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
         if (!alreadyRecorded) {
           extractedInfo.restingPainHistory = [
             ...existingHistory,
-            { time: 'mais tarde', pain: newPainValue }
+            { time: currentTimeStr, pain: newPainValue }
           ];
           console.log(`📈 restingPainHistory: adicionado pain=${newPainValue} (original mantido: ${currentData.pain})`);
         }
