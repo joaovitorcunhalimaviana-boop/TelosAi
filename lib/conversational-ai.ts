@@ -28,6 +28,7 @@ export interface RestingPainEntry {
 export interface QuestionnaireData {
   // Dor
   pain?: number; // 0-10 — PRIMEIRA leitura do dia (imutável após coletada)
+  painTime?: string; // Horário HH:MM da primeira leitura basal (ex: "10:01")
   restingPainHistory?: RestingPainEntry[]; // Leituras espontâneas adicionais durante o dia
 
   // Evacuação
@@ -407,6 +408,9 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
    Se NÃO evacuou: "Como está sua dor agora, parado(a)? De 0 a 10."
    Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
 
+   ⏰ REGISTRAR painTime: Sempre que coletar o campo pain pela primeira vez, registrar também o campo painTime com o horário atual: "${currentTimeStr}"
+   Exemplo: paciente responde "6" para a dor em repouso → "pain": 6, "painTime": "${currentTimeStr}"
+
    ⛔ CAMPO pain É IMUTÁVEL APÓS PRIMEIRA COLETA:
    Uma vez que pain foi registrado, NÃO sobrescrever nunca. É a leitura basal do dia.
    Se o paciente ESPONTANEAMENTE mencionar que a dor mudou em outro momento do dia (ex: "a dor aumentou", "agora tá pior", "à noite piorou"), registrar como nova entrada em restingPainHistory.
@@ -491,6 +495,7 @@ Exemplos de extração:
 - "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (⚠️ NÃO é pain! É campo DIFERENTE!)
 - "Na hora de evacuar foi 6" → "painDuringBowelMovement": 6 (⚠️ NÃO colocar 6 no campo pain!)
 - Se paciente diz "dor 6 ao evacuar" e depois "antes de ir ao banheiro era 2" → painDuringBowelMovement: 6, pain: 2
+- Paciente responde "6" para dor em repouso (horário atual ${currentTimeStr}) → "pain": 6, "painTime": "${currentTimeStr}"
 - Pain já coletado (ex: pain=6) e paciente diz espontaneamente "a dor piorou, tá 8 agora" → NÃO alterar pain=6, perguntar "Mais ou menos que horas foi isso?", então adicionar: "restingPainHistory": [{"time": "${currentTimeStr}", "pain": 8}]
 - Pain já coletado e paciente diz "melhorou, agora tá 4" (contexto: horário atual ${currentTimeStr}) → "restingPainHistory": [{"time": "${currentTimeStr}", "pain": 4}]
 - Pain já coletado e paciente diz "à noite foi 8" → NÃO registrar ainda. Perguntar: "Mais ou menos que horas foi isso?" → ao confirmar "umas 20h" → "restingPainHistory": [{"time": "20:00", "pain": 8}]

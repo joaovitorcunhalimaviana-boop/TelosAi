@@ -17,6 +17,7 @@ export interface RestingPainEntry {
 
 export interface ParsedQuestionnaireData {
   painAtRest: number | null
+  painTime: string | null  // Horário HH:MM da primeira leitura basal (ex: "10:01")
   restingPainHistory: RestingPainEntry[] | null  // Leituras espontâneas adicionais de dor em repouso
   painDuringEvacuation: number | null
   didEvacuate: boolean
@@ -100,6 +101,9 @@ export function parseQuestionnaireData(
   const painAtRest = rawPainAtRest !== undefined
     ? Number(rawPainAtRest)
     : (dbResponse?.painAtRest ?? null)
+
+  // --- Horário da dor em repouso basal ---
+  const painTime = (get(['painTime']) as string | undefined) ?? null
 
   // --- Evacuação ---
   const didEvacuate = get([
@@ -213,6 +217,7 @@ export function parseQuestionnaireData(
 
   return {
     painAtRest: painAtRest !== null && !isNaN(painAtRest as number) ? painAtRest : null,
+    painTime,
     restingPainHistory,
     painDuringEvacuation: painDuringEvacuation !== null && !isNaN(painDuringEvacuation as number) ? painDuringEvacuation : null,
     didEvacuate,
