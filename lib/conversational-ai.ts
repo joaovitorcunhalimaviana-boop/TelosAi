@@ -20,9 +20,15 @@ export interface ConversationMessage {
   timestamp: string;
 }
 
+export interface RestingPainEntry {
+  time: string;  // Horário aproximado (ex: "10h30", "após almoço")
+  pain: number;  // Nível de dor 0-10
+}
+
 export interface QuestionnaireData {
   // Dor
-  pain?: number; // 0-10 na escala numérica
+  pain?: number; // 0-10 — PRIMEIRA leitura do dia (imutável após coletada)
+  restingPainHistory?: RestingPainEntry[]; // Leituras espontâneas adicionais durante o dia
 
   // Evacuação
   bowelMovementSinceLastContact?: boolean; // Evacuou desde último contato?
@@ -354,6 +360,12 @@ ${!hadFirstBowelMovement ? `   [PRIMEIRA EVACUAÇÃO PÓS-CIRURGIA AINDA NÃO RE
    Se NÃO evacuou: "Como está sua dor agora, parado(a)? De 0 a 10."
    Se resposta verbal: sem dor=0, leve=1-3, média=4-6, forte=7-8, insuportável=9-10
 
+   ⛔ CAMPO pain É IMUTÁVEL APÓS PRIMEIRA COLETA:
+   Uma vez que pain foi registrado, NÃO sobrescrever nunca. É a leitura basal do dia.
+   Se o paciente ESPONTANEAMENTE mencionar que a dor mudou mais tarde na conversa (ex: "a dor aumentou", "agora tá pior"), registrar como nova entrada em restingPainHistory com horário aproximado.
+   Exemplo: pain=6 (coletado às 10h), paciente diz "agora tá com 7" → restingPainHistory: [{time: "mais tarde", pain: 7}]
+   NÃO perguntar proativamente se a dor mudou — só registrar se o paciente mencionar espontaneamente.
+
 3. MEDICAÇÃO EXTRA (campo: usedExtraMedication + extraMedicationDetails)
    Perguntar: "Usou alguma medicação além das prescritas?"
    Se sim: pedir qual, dose e horário. Pode citar nomes que o paciente mencionar.
@@ -429,6 +441,9 @@ Exemplos de extração:
 - "Doeu 5 ao evacuar" → "painDuringBowelMovement": 5 (⚠️ NÃO é pain! É campo DIFERENTE!)
 - "Na hora de evacuar foi 6" → "painDuringBowelMovement": 6 (⚠️ NÃO colocar 6 no campo pain!)
 - Se paciente diz "dor 6 ao evacuar" e depois "antes de ir ao banheiro era 2" → painDuringBowelMovement: 6, pain: 2
+- Pain já coletado (ex: pain=6) e paciente diz espontaneamente "a dor piorou, tá 8 agora" → NÃO alterar pain=6, adicionar: "restingPainHistory": [{"time": "mais tarde", "pain": 8}]
+- Pain já coletado e paciente diz "melhorou, agora tá 4" → NÃO alterar pain, adicionar: "restingPainHistory": [{"time": "mais tarde", "pain": 4}]
+- ⚠️ NUNCA sobrescrever pain após coletado. NUNCA perguntar proativamente se a dor mudou.
 - "Não tomei nada extra" → "usedExtraMedication": false
 - "Tomei Tramadol" → "usedExtraMedication": true, "extraMedicationDetails": "Tramadol"
 - "Estou fazendo os cuidados" → "localCareAdherence": true
@@ -636,15 +651,27 @@ ${daysPostOp >= 14 ? `- "Nota 9" → "satisfactionRating": 9\n- "Recomendo sim" 
       userMsgLower.includes('incômodo') ||
       userMsgLower.includes('desconforto');
 
-    // Proteger campo 'pain' (dor em repouso) contra sobrescrita
+    // Proteger campo 'pain' (dor em repouso) — IMUTÁVEL após primeira coleta.
+    // Se o paciente mencionar mudança espontânea, adicionar ao restingPainHistory.
     if (currentData.pain !== undefined && currentData.pain !== null &&
         extractedInfo.pain !== undefined && extractedInfo.pain !== currentData.pain) {
-      if (!mentionedPain) {
-        console.log(`⚠️ PROTEÇÃO: Claude tentou sobrescrever pain ${currentData.pain} → ${extractedInfo.pain} sem paciente mencionar dor. Mantendo valor original.`);
-        delete extractedInfo.pain;
+      if (mentionedPain) {
+        // Paciente relatou mudança espontânea — preservar pain original e adicionar ao histórico
+        const newPainValue = extractedInfo.pain as number;
+        const existingHistory: RestingPainEntry[] = currentData.restingPainHistory || [];
+        const alreadyRecorded = existingHistory.some(e => e.pain === newPainValue);
+        if (!alreadyRecorded) {
+          extractedInfo.restingPainHistory = [
+            ...existingHistory,
+            { time: 'mais tarde', pain: newPainValue }
+          ];
+          console.log(`📈 restingPainHistory: adicionado pain=${newPainValue} (original mantido: ${currentData.pain})`);
+        }
       } else {
-        console.log(`✅ Pain atualizado: ${currentData.pain} → ${extractedInfo.pain} (paciente mencionou dor)`);
+        console.log(`⚠️ PROTEÇÃO: Claude tentou sobrescrever pain ${currentData.pain} → ${extractedInfo.pain} sem paciente mencionar dor. Descartando.`);
       }
+      // Em AMBOS os casos: não sobrescrever pain original
+      delete extractedInfo.pain;
     }
 
     // Proteger campo 'painDuringBowelMovement' contra sobrescrita

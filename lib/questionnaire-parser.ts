@@ -10,8 +10,14 @@ export interface EvacuationDetail {
   pain: number
 }
 
+export interface RestingPainEntry {
+  time?: string  // Horário aproximado (ex: "10h30", "após almoço", "mais tarde")
+  pain: number   // Nível de dor 0-10
+}
+
 export interface ParsedQuestionnaireData {
   painAtRest: number | null
+  restingPainHistory: RestingPainEntry[] | null  // Leituras espontâneas adicionais de dor em repouso
   painDuringEvacuation: number | null
   didEvacuate: boolean
   evacuationActualDay: number | null
@@ -117,6 +123,16 @@ export function parseQuestionnaireData(
     if (evacuationDetails.length === 0) evacuationDetails = null
   }
 
+  // --- Histórico de dor em repouso (leituras espontâneas adicionais) ---
+  let restingPainHistory: RestingPainEntry[] | null = null
+  const rawRestingPainHistory = get(['restingPainHistory'])
+  if (Array.isArray(rawRestingPainHistory) && rawRestingPainHistory.length > 0) {
+    const parsed = rawRestingPainHistory
+      .filter((d: any) => d && typeof d.pain === 'number')
+      .map((d: any) => ({ time: d.time as string | undefined, pain: d.pain as number }))
+    if (parsed.length > 0) restingPainHistory = parsed
+  }
+
   // --- Dor durante evacuação ---
   let painDuringEvacuation: number | null = null
   if (didEvacuate) {
@@ -197,6 +213,7 @@ export function parseQuestionnaireData(
 
   return {
     painAtRest: painAtRest !== null && !isNaN(painAtRest as number) ? painAtRest : null,
+    restingPainHistory,
     painDuringEvacuation: painDuringEvacuation !== null && !isNaN(painDuringEvacuation as number) ? painDuringEvacuation : null,
     didEvacuate,
     evacuationActualDay,

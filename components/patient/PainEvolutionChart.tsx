@@ -34,6 +34,13 @@ interface EvacuationPoint {
   source: string // follow-up de onde veio o relato (ex: "D+3")
 }
 
+interface RestingPainPoint {
+  day: number
+  dayLabel: string
+  pain: number
+  time?: string // Horário da leitura espontânea (ex: "mais tarde", "20h00")
+}
+
 interface PainData {
   day: number
   label: string
@@ -41,6 +48,7 @@ interface PainData {
   painAtRest: number | null
   painDuringEvacuation: number | null // representativo para a linha de tendência
   evacuations: EvacuationPoint[]      // todas as evacuações individuais deste dia
+  restingPainHistory: RestingPainPoint[] // leituras espontâneas adicionais de dor em repouso
   hasRedFlag: boolean
   usedExtraMedication: boolean
   extraMedicationDetails: string | null
@@ -88,6 +96,19 @@ function CustomPainTooltip({ active, payload, label }: any) {
         </p>
       )}
 
+      {item.restingPainHistory && item.restingPainHistory.length > 0 && (
+        <div style={{ marginTop: 6 }}>
+          <p style={{ fontSize: 12, color: '#14BDAE', fontWeight: 600, marginBottom: 3 }}>
+            Dor em repouso (atualizações):
+          </p>
+          {item.restingPainHistory.map((entry, i) => (
+            <p key={i} style={{ fontSize: 12, marginLeft: 8, marginBottom: 1, color: '#e5e5e5' }}>
+              {entry.time ? `${entry.time} → ` : '• '}dor {entry.pain}/10
+            </p>
+          ))}
+        </div>
+      )}
+
       {item.evacuations && item.evacuations.length > 0 && (
         <div style={{ marginTop: 6 }}>
           <p style={{ fontSize: 12, color: '#F0EAD6', fontWeight: 600, marginBottom: 3 }}>
@@ -117,9 +138,11 @@ function CustomPainTooltip({ active, payload, label }: any) {
 export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionChartProps) {
   const [data, setData] = useState<PainData[]>([])
   const [scatterData, setScatterData] = useState<EvacuationPoint[]>([])
+  const [restingPainScatterData, setRestingPainScatterData] = useState<RestingPainPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showEvacuation, setShowEvacuation] = useState(true)
+  const [showRestingPainHistory, setShowRestingPainHistory] = useState(true)
 
   const fetchPainData = async () => {
     try {
@@ -135,6 +158,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
       if (result.success && result.data) {
         const painDataMap = new Map<number, PainData>()
         const allEvacuations: EvacuationPoint[] = []
+        const allRestingPainHistory: RestingPainPoint[] = []
 
         // Dias padrão de follow-up
         const followUpDays = [1, 2, 3, 4, 5, 6, 7, 10, 14]
@@ -146,6 +170,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             painAtRest: null,
             painDuringEvacuation: null,
             evacuations: [],
+            restingPainHistory: [],
             hasRedFlag: false,
             usedExtraMedication: false,
             extraMedicationDetails: null,
@@ -159,6 +184,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
               day: d, label: `D+${d}`, date: '',
               painAtRest: null, painDuringEvacuation: null,
               evacuations: [],
+              restingPainHistory: [],
               hasRedFlag: false, usedExtraMedication: false, extraMedicationDetails: null,
             })
           }
@@ -187,6 +213,20 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             dayEntry.hasRedFlag = parsed.hasRedFlags
             dayEntry.usedExtraMedication = parsed.usedExtraMedication
             dayEntry.extraMedicationDetails = parsed.extraMedicationDetails
+
+            // Histórico de dor em repouso (leituras espontâneas adicionais durante a conversa)
+            if (parsed.restingPainHistory && parsed.restingPainHistory.length > 0) {
+              for (const entry of parsed.restingPainHistory) {
+                const point: RestingPainPoint = {
+                  day,
+                  dayLabel: `D+${day}`,
+                  pain: entry.pain,
+                  time: entry.time,
+                }
+                allRestingPainHistory.push(point)
+                dayEntry.restingPainHistory.push(point)
+              }
+            }
 
             // Dor durante evacuação: coletar TODAS as evacuações individuais
             if (parsed.evacuationDetails && parsed.evacuationDetails.length > 0) {
@@ -232,6 +272,7 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
         const sortedData = Array.from(painDataMap.values()).sort((a, b) => a.day - b.day)
         setData(sortedData)
         setScatterData(allEvacuations)
+        setRestingPainScatterData(allRestingPainHistory)
       } else {
         throw new Error(result.error?.message || 'Erro desconhecido')
       }
@@ -361,6 +402,51 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
     )
   }
 
+  // Dot customizado para Scatter de dor em repouso — leituras espontâneas adicionais
+  const renderRestingPainHistoryDot = (props: any) => {
+    const { cx, cy, payload } = props
+    if (cx === undefined || cy === undefined || !payload) return <g />
+
+    const pain = payload.pain as number
+    const time = payload.time as string | undefined
+    const fill = getPainColor(pain)
+
+    return (
+      <g key={`rph-${cx}-${cy}-${payload.time || ''}`}>
+        {/* Anel externo teal para distinguir de evacuação */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={7}
+          fill="none"
+          stroke="#14BDAE"
+          strokeWidth={1.5}
+          strokeDasharray="3 2"
+        />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={4}
+          fill={fill}
+          stroke="#14BDAE"
+          strokeWidth={1.5}
+        />
+        {time && (
+          <text
+            x={cx}
+            y={cy - 12}
+            textAnchor="middle"
+            fontSize={9}
+            fill="#14BDAE"
+            fontFamily="Inter, sans-serif"
+          >
+            {time}
+          </text>
+        )}
+      </g>
+    )
+  }
+
   if (loading) {
     return (
       <Card>
@@ -448,6 +534,18 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
             >
               Evacuação
             </Button>
+
+            {/* Toggle dor repouso extra */}
+            {restingPainScatterData.length > 0 && (
+              <Button
+                variant={showRestingPainHistory ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowRestingPainHistory(!showRestingPainHistory)}
+                style={showRestingPainHistory ? { backgroundColor: '#14BDAE', color: '#0B0E14' } : {}}
+              >
+                Dor extra
+              </Button>
+            )}
           </div>
         </div>
 
@@ -472,6 +570,19 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
           <div className="flex items-center gap-1.5 text-xs">
             <div className="w-3 h-3 rounded-full border-2 border-purple-500 bg-purple-100 flex items-center justify-center text-[6px] leading-none">💊</div>
             <span>Usou medicação extra (Tramadol, Codeína, etc.)</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <circle cx="7" cy="7" r="6" fill="none" stroke="#14BDAE" strokeWidth="1.5" strokeDasharray="3 2" />
+              <circle cx="7" cy="7" r="3" fill="#F59E0B" stroke="#14BDAE" strokeWidth="1.5" />
+            </svg>
+            <span>Dor repouso (atualização espontânea)</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <circle cx="7" cy="7" r="5" fill="#F59E0B" stroke="#F0EAD6" strokeWidth="2" />
+            </svg>
+            <span>Dor durante evacuação</span>
           </div>
         </div>
       </CardHeader>
@@ -518,9 +629,10 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                   verticalAlign="bottom"
                   wrapperStyle={{ color: '#D8DEEB' }}
                   formatter={(value: string) => {
-                    if (value === 'painAtRest') return 'Dor em repouso'
+                    if (value === 'painAtRest') return 'Dor em repouso (basal)'
                     if (value === 'painDuringEvacuation') return 'Dor evacuação (tendência)'
-                    if (value === 'pain') return 'Evacuações individuais'
+                    if (value === 'evacPain') return 'Evacuações individuais'
+                    if (value === 'restingPain') return 'Dor repouso (atualização)'
                     return value
                   }}
                 />
@@ -549,11 +661,21 @@ export function PainEvolutionChart({ patientId, baselinePain }: PainEvolutionCha
                       dataKey="pain"
                       data={scatterData}
                       fill="#F0EAD6"
-                      name="pain"
+                      name="evacPain"
                       shape={renderEvacScatterDot}
                       legendType="diamond"
                     />
                   </>
+                )}
+                {showRestingPainHistory && restingPainScatterData.length > 0 && (
+                  <Scatter
+                    dataKey="pain"
+                    data={restingPainScatterData}
+                    fill="#14BDAE"
+                    name="restingPain"
+                    shape={renderRestingPainHistoryDot}
+                    legendType="circle"
+                  />
                 )}
               </ComposedChart>
             </ResponsiveContainer>
